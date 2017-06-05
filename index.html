@@ -254,6 +254,445 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【算法】归并排序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【算法】归并排序/" itemprop="url">【算法】归并排序</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:13:28+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><p>归并排序的概念</p>
+<blockquote>
+<p> 归并排序是建立在归并操作上的一种有效的排序算法。该算法是采用分治法（Divide and Conquer）的一个非常典型的应用，归并排序将两个已排序的表合并成一个表。</p>
+</blockquote>
+<p>归并排序基本原理</p>
+<blockquote>
+<p>通过对若干个有序结点序列的归并来实现排序。<br>所谓归并是指将若干个已排好序的部分合并成一个有序的部分。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>【优点】 任意长度为N的数组排序所需时间与NlogN成正比<br>【缺点】它所需额外空间与N成正比</strong></p>
+</blockquote>
+<p><a href="http://www.cnblogs.com/jingmoxukong/p/4308823.html" target="_blank" rel="external">归并排序</a></p>
+<p>Java实现</p>
+<p>归并排序思路<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void mergeSort(int[] data) &#123;  </div><div class="line">        sort(data, 0, data.length - 1);  </div><div class="line">&#125;  </div><div class="line">public static void sort(int[] data, int left, int right) &#123;  </div><div class="line">        if (left &gt;= right)  </div><div class="line">            return;  </div><div class="line">        // 找出中间索引  </div><div class="line">        int center = (left + right) / 2;  </div><div class="line">        // 对左边数组进行递归  </div><div class="line">        sort(data, left, center);  </div><div class="line">        // 对右边数组进行递归  </div><div class="line">        sort(data, center + 1, right);  </div><div class="line">        // 合并结果</div><div class="line">        merge(data, left, center, right);  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>归并排序具体实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">public static void merge(int[] data, int left, int center, int right) &#123;  </div><div class="line">        //复制数组</div><div class="line">        int[] tmpArr = new int[data.length];  </div><div class="line">        //找出右边第一个元素的索引（中间位置）</div><div class="line">        int mid = center + 1;  </div><div class="line">        //新数组开始索引</div><div class="line">        int tempIndex = left;  </div><div class="line">        //存放之前的索引</div><div class="line">        int tmp = left;  </div><div class="line">        //可考虑用for和if-else结构优化算法</div><div class="line">        while (left &lt;= center &amp;&amp; mid &lt;= right) &#123;  </div><div class="line">            if (data[left] &lt;= data[mid]) &#123;  //左边排序</div><div class="line">                tmpArr[tempIndex++] = data[left++];  </div><div class="line">            &#125; else &#123;  //右边数组</div><div class="line">                tmpArr[tempIndex++] = data[mid++];  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        while (mid &lt;= right) &#123;  //右边排序</div><div class="line">            tmpArr[tempIndex++] = data[mid++];  </div><div class="line">        &#125;  </div><div class="line">        while (left &lt;= center) &#123;   //左边排序</div><div class="line">            tmpArr[tempIndex++] = data[left++];  </div><div class="line">        &#125;  </div><div class="line">        //归并完成</div><div class="line">        while (tmp &lt;= right) &#123;  </div><div class="line">            data[tmp] = tmpArr[tmp++];  </div><div class="line">        &#125;  </div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【算法】简单排序算法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【算法】简单排序算法/" itemprop="url">【算法】简单排序算法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:12:44+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="简单排序算法"><a href="#简单排序算法" class="headerlink" title="简单排序算法"></a>简单排序算法</h2><p><a href="http://www.cnblogs.com/luchen927/archive/2012/02/27/2367108.html" target="_blank" rel="external">选择排序</a></p>
+<p><a href="http://www.cnblogs.com/0201zcr/p/4764427.html" target="_blank" rel="external">插入排序/希尔排序/二分排序插入</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">*  插入排序</div><div class="line">*/</div><div class="line">public static void insertSort(int [] numbers)&#123;</div><div class="line">		 int size = numbers.length;</div><div class="line">	     int target = 0 ;</div><div class="line">	     int j =  0;</div><div class="line">	    </div><div class="line">	     for(int i = 0 ; i &lt; size ; i++)&#123;</div><div class="line">	        target = numbers[i];  //目标元素</div><div class="line">            //目标元素比前一个元素小，则向后移一位</div><div class="line">	        for(j = i ; j &gt; 0 &amp;&amp; target &lt; numbers[j-1] ; j --)&#123;</div><div class="line">	       		 numbers[j] = numbers[j-1];</div><div class="line">	        &#125;</div><div class="line">	        numbers[j] = target;</div><div class="line">	     &#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> *  希尔排序（插入排序升级）：根据需求，如果你想要结果从大到小排列，它会首先  *   将数组进行分组，然后将较大值移到前面，较小值</div><div class="line"> * 移到后面，最后将整个数组进行插入排序，这样比起一开始就用插入排序减少了数据交换和移动的次数，可以说希尔排序是加强</div><div class="line"> * 版的插入排序</div><div class="line"> * 拿数组5, 2, 8, 9, 1, 3，4来说，数组长度为7，当increment为3时，数组分为两个序列</div><div class="line"> * 5，2，8和9，1，3，4，第一次排序，9和5比较，1和2比较，3和8比较，4和比其下标值小increment的数组值相比较</div><div class="line"> * 此例子是按照从大到小排列，所以大的会排在前面，第一次排序后数组为9, 2, 8, 5, 1, 3，4</div><div class="line"> * 第一次后increment的值变为3/2=1,此时对数组进行插入排序，</div><div class="line"> *实现数组从大到小排</div><div class="line">*/</div><div class="line">public static void shellSort(int [] numbers)&#123;</div><div class="line">	    int temp = 0;</div><div class="line">		int j = 0;</div><div class="line">		//每次将步长缩短为原来的一半</div><div class="line">	    for (int increment = numbers.length; increment &gt; 0; increment /= 2) &#123;</div><div class="line">	    	//拆分成序列后，将每个序列进行插入排序</div><div class="line">            // 第一个比较的数 i：数组位置（i = increment(随着循环+1)）</div><div class="line">            for (int i = increment; i &lt; numbers.length; i++) </div><div class="line">	        &#123;</div><div class="line">	            temp = numbers[i];</div><div class="line">                //第二个比较的数 j：数组位置（以第一个数为基准位置: i-increment）</div><div class="line">	            for (j = i; j &gt;= increment; j -= increment)&#123;</div><div class="line">		            if(temp &lt; numbers[j - increment])&#123;   </div><div class="line">		                numbers[j] = numbers[j - increment];</div><div class="line">		            &#125;</div><div class="line">	            else&#123;</div><div class="line">	                break;</div><div class="line">	            &#125;</div><div class="line">	        &#125; </div><div class="line">	        numbers[j] = temp;</div><div class="line">	        &#125;</div><div class="line">		&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【算法】快速排序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【算法】快速排序/" itemprop="url">【算法】快速排序</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:12:19+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><p><a href="http://bubkoo.com/2014/01/12/sort-algorithm/quick-sort/" target="_blank" rel="external">快速排序图解</a></p>
+<p><a href="http://blog.csdn.net/morewindows/article/details/6684558" target="_blank" rel="external">快速排序实现</a></p>
+<blockquote>
+<p>快速排序应用广泛的原因主要分为二点：①原地排序（需要很小的辅助栈）②长度为N的数组所需时间与NlgN成正比</p>
+</blockquote>
+<p>快速排序采用<strong>分治法</strong>（将一个数组分成两个子数组，独立的排序）。</p>
+<p>快速排序和归并排序互补</p>
+<p><em>切分（partition）的位置</em>取决于数组的内容</p>
+<p>切分过程，数组需要满足3个条件</p>
+<pre><code>1. 对于某个partIndex, arr[partIndex]已经排定
+2.arr[left] 到 arr[partIndex-1] 的值不大于arr[partIndex]
+3.arr[partIndex+1] 到 arr[right] 的值不小于arr[partIndex]
+</code></pre><p>切分注意：</p>
+<pre><code>1. 原地切分（不采用辅助数组，原因复制数组增加开销）
+2. 预防越界（切分元素有可能为最大值/最小值）
+3. 保持随机性（随机选择切分元素）
+4. 终止循环（需要考虑元素与切分元素相同的情况）
+5. 终止递归
+</code></pre><p>算法实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">   public static void quickSort(int [] arr)&#123;</div><div class="line">	quickSort(arr,0,arr.length-1);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void quickSort(int [] arr,int left,int right)&#123;</div><div class="line">	if(left &gt;= right) return;</div><div class="line">	int pivotIndex = partition(arr,left,right); //基准点</div><div class="line">	quickSort(arr,left,pivotIndex-1);//切分点之前的数组排序</div><div class="line">	quickSort(arr,pivotIndex+1,right); //切分点之后的数组排序</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static int partition(int arr[], int left, int right) &#123;</div><div class="line">	int i = left, j = right;  </div><div class="line">    int pivot = arr[left]; //元素的第一个值就是所找的基准点</div><div class="line">    while (i &lt; j)  </div><div class="line">    &#123;  </div><div class="line">        // 从右向左找小于pivot的数来填arr[i]  </div><div class="line">        while(i &lt; j &amp;&amp; arr[j] &gt;= pivot)   </div><div class="line">            j--;    </div><div class="line">        if(i &lt; j)   </div><div class="line">        &#123;  </div><div class="line">            arr[i] = arr[j]; //将arr[j]填到arr[i]中，arr[j]就形成了一个新的坑  </div><div class="line">            i++;  </div><div class="line">        &#125;  </div><div class="line">        // 从左向右找大于或等于x的数来填arr[j]  </div><div class="line">        while(i &lt; j &amp;&amp; arr[i] &lt; pivot)  </div><div class="line">            i++;    </div><div class="line">        if(i &lt; j)   </div><div class="line">        &#123;  </div><div class="line">            arr[j] = arr[i]; //将arr[i]填到arr[j]中，arr[i]就形成了一个新的坑  </div><div class="line">            j--;  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">    //退出时，i等于j。将pivot填到这个坑中。  </div><div class="line">    arr[i] = pivot;   </div><div class="line">    return i; </div><div class="line">   &#125;</div><div class="line"></div><div class="line">public static void main(String[] args) &#123;</div><div class="line">       int [] arr = &#123;8,1,2,5,4,7,6&#125;;</div><div class="line">       quickSort(arr);</div><div class="line">       for (int i = 0; i &lt; arr.length; i++) &#123;</div><div class="line">           System.out.print(arr[i] + &quot; &quot;);</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《-亿级流量网站架构核心技术》学习笔记-（十）-——-队列/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2086,467 +2525,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/" itemprop="url">【设计模式】行为型模式——命令模式（Command Pattern）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:37:15+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><blockquote>
-<p><strong>将一个请求封装为一个对象，从而让我们可用不同的请求对客户进行参数化；对请求排队或者记录请求日志，以及支持可撤销的操作。命令模式是一种对象行为型模式，其别名为动作(Action)模式或事务(Transaction)模式。</strong></p>
-</blockquote>
-<p> <strong>命令模式可以将请求发送者和接收者完全解耦，发送者与接收者之间没有直接引用关系，发送请求的对象只需要知道如何发送请求，而不必知道如何完成请求。</strong></p>
-<h2 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h2><p>(1) 降低系统的耦合度。由于请求者与接收者之间不存在直接引用，因此请求者与接收者之间实现完全解耦，相同的请求者可以对应不同的接收者，同样，相同的接收者也可以供不同的请求者使用，两者之间具有良好的独立性。<br>       (2) 新的命令可以很容易地加入到系统中。由于增加新的具体命令类不会影响到其他类，因此增加新的具体命令类很容易，无须修改原有系统源代码，甚至客户类代码，满足“开闭原则”的要求。<br>       (3) 可以比较容易地设计一个命令队列或宏命令（组合命令）。<br>       (4) 为请求的撤销(Undo)和恢复(Redo)操作提供了一种设计和实现方案。</p>
-<h2 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h2><p> <strong>使用命令模式可能会导致某些系统有过多的具体命令类。</strong>因为针对每一个对请求接收者的调用操作都需要设计一个具体命令类，因此在某些系统中可能需要提供大量的具体命令类，这将影响命令模式的使用。</p>
-<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p> (1) 系统需要将请求调用者和请求接收者解耦，使得调用者和接收者不直接交互。请求调用者无须知道接收者的存在，也无须知道接收者是谁，接收者也无须关心何时被调用。<br>       (2) 系统需要在不同的时间指定请求、将请求排队和执行请求。一个命令对象和请求的初始调用者可以有不同的生命期，换言之，最初的请求发出者可能已经不在了，而命令对象本身仍然是活动的，可以通过该命令对象去调用请求接收者，而无须关心请求调用者的存在性，可以通过请求日志文件等机制来具体实现。<br>       (3) 系统需要支持命令的撤销(Undo)操作和恢复(Redo)操作。<br>       (4) 系统需要将一组操作组合在一起形成宏命令。</p>
-<h2 id="模式应用"><a href="#模式应用" class="headerlink" title="模式应用"></a>模式应用</h2><blockquote>
-<p><strong>Hystrix</strong></p>
-</blockquote>
-<h2 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h2><p><img src="http://img.blog.csdn.net/20170418143436113?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<blockquote>
-<p><strong>命令模式的本质是对请求进行封装，一个请求对应于一个命令，将发出命令的责任和执行命令的责任分割开。</strong>每一个命令都是一个操作：请求的一方发出请求要求执行一个操作；接收的一方收到请求，并执行相应的操作。命令模式允许请求的一方和接收的一方独立开来，使得请求的一方不必知道接收请求的一方的接口，更不必知道请求如何被接收、操作是否被执行、何时被执行，以及是怎么被执行的。<br>       <strong>命令模式的关键在于引入了抽象命令类，请求发送者针对抽象命令类编程，只有实现了抽象命令类的具体命令才与请求接收者相关联。</strong></p>
-</blockquote>
-<h2 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">abstract class Command &#123;  </div><div class="line">    public abstract void execute();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Invoker &#123;  </div><div class="line">    private Command command;  </div><div class="line">      </div><div class="line">    //构造注入  </div><div class="line">    public Invoker(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //设值注入  </div><div class="line">    public void setCommand(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //业务方法，用于调用命令类的execute()方法  </div><div class="line">    public void call() &#123;  </div><div class="line">        command.execute();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">class ConcreteCommand extends Command &#123;  </div><div class="line">    private Receiver receiver; //维持一个对请求接收者对象的引用  </div><div class="line">  </div><div class="line">    public void execute() &#123;  </div><div class="line">        receiver.action(); //调用请求接收者的业务处理方法action()  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class Receiver &#123;  </div><div class="line">    public void action() &#123;  </div><div class="line">        //具体操作  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>每一个具体命令类对应一个请求的处理者（接收者），通过向请求发送者注入不同的具体命令对象可以使得相同的发送者对应不同的接收者，从而实现“将一个请求封装为一个对象，用不同的请求对客户进行参数化”</strong></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为性模式——模板方法模式-Template-Method-Pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】行为性模式——模板方法模式-Template-Method-Pattern/" itemprop="url">【设计模式】行为性模式——模板方法模式(Template Method Pattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:36:35+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><blockquote>
-<p><strong>定义一个操作中算法的框架，而将一些步骤延迟到子类中。模板方法模式使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤</strong></p>
-</blockquote>
-<p><strong>模板方法模式是一种基于继承的代码复用技术，它是一种类行为型模式。</strong></p>
-<h2 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h2><p>  (1) 在父类中形式化地定义一个算法，而由它的子类来实现细节的处理，在子类实现详细的处理算法时并不会改变算法中步骤的执行次序。<br>       (2) 模板方法模式是一种代码复用技术，它在类库设计中尤为重要，它提取了类库中的公共行为，将公共行为放在父类中，而通过其子类来实现不同的行为，它鼓励我们恰当使用继承来实现代码复用。<br>       (3) 可实现一种反向控制结构，通过子类覆盖父类的钩子方法来决定某一特定步骤是否需要执行。<br>       (4) 在模板方法模式中可以通过子类来覆盖父类的基本方法，不同的子类可以提供基本方法的不同实现，更换和增加新的子类很方便，符合单一职责原则和开闭原则。</p>
-<h2 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h2><p>   需要为每一个基本方法的不同实现提供一个子类，如果父类中可变的基本方法太多，将会导致类的个数增加，系统更加庞大，设计也更加抽象，此时，可结合桥接模式来进行设计。</p>
-<h2 id="模式适用场景"><a href="#模式适用场景" class="headerlink" title="模式适用场景"></a>模式适用场景</h2><p> (1) 对一些复杂的算法进行分割，将其算法中固定不变的部分设计为模板方法和父类具体方法，而一些可以改变的细节由其子类来实现。即：一次性实现一个算法的不变部分，并将可变的行为留给子类来实现。<br>(2) 各子类中公共的行为应被提取出来并集中到一个公共父类中以避免代码重复。<br>(3) 需要通过子类来决定父类算法中某个步骤是否执行，实现子类对父类的反向控制。</p>
-<h2 id="模式实际应用"><a href="#模式实际应用" class="headerlink" title="模式实际应用"></a>模式实际应用</h2><blockquote>
-<p>线程AQS类</p>
-</blockquote>
-<hr>
-<h2 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h2><p><img src="http://img.blog.csdn.net/20170418114145140?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<hr>
-<h2 id="模式实现"><a href="#模式实现" class="headerlink" title="模式实现"></a>模式实现</h2><blockquote>
-<p> 一个模板方法是定义在抽象类中的、把基本操作方法组合在一起形成一个总算法或一个总行为的方法。这个模板方法定义在抽象类中，并由子类不加以修改地完全继承下来。模板方法是一个具体方法，它给出了一个顶层逻辑框架，而逻辑的组成步骤在抽象类中可以是具体方法，也可以是抽象方法。由于模板方法是具体方法，因此模板方法模式中的抽象层只能是抽象类，而不是接口。</p>
-</blockquote>
-<hr>
-<h2 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">abstract class AbstractClass   </div><div class="line">&#123;  </div><div class="line">	//模板方法  </div><div class="line">	public void TemplateMethod()   </div><div class="line">	&#123;  </div><div class="line">	        PrimitiveOperation1();  </div><div class="line">	        PrimitiveOperation2();  </div><div class="line">	        PrimitiveOperation3();  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">	//基本方法—具体方法  </div><div class="line">	public void PrimitiveOperation1()   </div><div class="line">	&#123;  </div><div class="line">	    //实现代码  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">	//基本方法—抽象方法  </div><div class="line">    public abstract void PrimitiveOperation2();      </div><div class="line">  </div><div class="line">	//基本方法—钩子方法  </div><div class="line">	public virtual void PrimitiveOperation3()&#123;  &#125;</div><div class="line">  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">class ConcreteClass : AbstractClass   </div><div class="line">&#123;  </div><div class="line">	public override void PrimitiveOperation2()   </div><div class="line">	&#123;  </div><div class="line">	    //实现代码  </div><div class="line">	&#125;  </div><div class="line">	  </div><div class="line">	public override void PrimitiveOperation3()   </div><div class="line">	&#123;  </div><div class="line">	    //实现代码  </div><div class="line">	&#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p><strong>在模板方法模式中，由于面向对象的多态性，子类对象在运行时将覆盖父类对象，子类中定义的方法也将覆盖父类中定义的方法，因此程序在运行时，具体子类的基本方法将覆盖父类中定义的基本方法，子类的钩子方法也将覆盖父类的钩子方法，从而可以通过在子类中实现的钩子方法对父类方法的执行进行约束，实现子类对父类行为的反向控制。</strong></p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】Lambda表达式实现工厂模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】Lambda表达式实现工厂模式/" itemprop="url">【设计模式】Lambda表达式实现工厂模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:35:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="简单原始例子"><a href="#简单原始例子" class="headerlink" title="简单原始例子"></a>简单原始例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public interface Shape &#123;</div><div class="line">	void draw();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public class Rectangle implements Shape &#123;</div><div class="line">	@Override</div><div class="line">	public void draw() &#123;</div><div class="line">		System.out.println(&quot;Inside Rectangle::draw() method.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">public class Circle implements Shape &#123;</div><div class="line">	@Override</div><div class="line">	public void draw() &#123;</div><div class="line">		System.out.println(&quot;Inside Circle::draw() method.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ShapeFactory &#123;</div><div class="line">	//use getShape method to get object of type shape</div><div class="line">	public Shape getShape(String shapeType)&#123;</div><div class="line">		if(shapeType == null)&#123;</div><div class="line">		return null;</div><div class="line">		&#125;</div><div class="line">		if(shapeType.equalsIgnoreCase(&quot;CIRCLE&quot;))&#123;</div><div class="line">		return new Circle();</div><div class="line">		&#125; else if(shapeType.equalsIgnoreCase(&quot;RECTANGLE&quot;))&#123;</div><div class="line">		return new Rectangle();</div><div class="line">		&#125;</div><div class="line">		return null;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="使用Lambada实现工厂模式"><a href="#使用Lambada实现工厂模式" class="headerlink" title="使用Lambada实现工厂模式"></a>使用Lambada实现工厂模式</h3><p><strong>Lambda表达式允许我们定义一个匿名方法，并允许我们以函数式接口的方式使用它</strong></p>
-<p>方法引用和lambda表达式拥有相同的特性（例如，它们都需要一个目标类型，并需要被转化为函数式接口的实例），不过我们并不需要为方法引用提供方法体，我们可以直接通过方法名称引用已有方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Supplier&lt;Shape&gt; circleSupplier = Circle::new;</div><div class="line">Circle circle = circleSupplier.get();</div></pre></td></tr></table></figure>
-<hr>
-<p>根据构造方法引用的原理，我们可以重写之前的代码，定义一个Map来保存shape name 和它对应的构造方法引用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">final static Map&lt;String, Supplier&lt;Shape&gt;&gt; map = new HashMap&lt;&gt;();</div><div class="line">static &#123;</div><div class="line">	map.put(&quot;CIRCLE&quot;, Circle::new);</div><div class="line">	map.put(&quot;RECTANGLE&quot;, Rectangle::new);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="使用这个map来实例化不同的shapes"><a href="#使用这个map来实例化不同的shapes" class="headerlink" title="使用这个map来实例化不同的shapes"></a>使用这个map来实例化不同的shapes</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ShapeFactory &#123;</div><div class="line">final static Map&lt;String, Supplier&lt;Shape&gt;&gt; map = new HashMap&lt;&gt;();</div><div class="line">	static &#123;</div><div class="line">		map.put(&quot;CIRCLE&quot;, Circle::new);</div><div class="line">		map.put(&quot;RECTANGLE&quot;, Rectangle::new);</div><div class="line">	&#125;</div><div class="line">	public Shape getShape(String shapeType)&#123;</div><div class="line">		Supplier&lt;Shape&gt; shape = map.get(shapeType.toUpperCase());</div><div class="line">		if(shape != null) &#123;</div><div class="line">			return shape.get();</div><div class="line">		&#125;</div><div class="line">		throw new IllegalArgumentException(&quot;No such shape &quot; + shapeType.toUpperCase());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<p>使用lambada表达式实现的工厂方法来创建shape对象</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">	Supplier&lt;ShapeFactory&gt; shapeFactory = ShapeFactory::new;</div><div class="line">	//call draw method of circle</div><div class="line">	shapeFactory.get().getShape(&quot;circle&quot;).draw();</div><div class="line">	//call draw method of Rectangle</div><div class="line">	shapeFactory.get().getShape(&quot;rectangle&quot;).draw();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这里的 Shape::new可以被看作为lambda表达式的简写形式。尽管方法引用不一定会把语法变的更紧凑，但它拥有更明确的语义——如果我们想要调用的方法拥有一个名字，我们就可以通过它的名字直接调用它。</p>
-<p>如果 Shape 构造函数需要多个参数，那么你就需要重新实现自己的Supplier</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">() -&gt; new Circe(args)</div></pre></td></tr></table></figure>
-<p><a href="https://blog.maxleap.cn/archives/1300" target="_blank" rel="external">原文转载</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2596,7 +2574,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">93</span>
+                <span class="site-state-item-count">96</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2607,7 +2585,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-count">33</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2618,7 +2596,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">78</span>
+                <span class="site-state-item-count">81</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
