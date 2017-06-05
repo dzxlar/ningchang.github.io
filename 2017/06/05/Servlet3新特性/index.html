@@ -1,0 +1,734 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Servlet3," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Servlet3新增功能 异步处理支持 新增的注解支持 可插性支持  注解Filter12345678910111213141516@WebFilter(filterName = &amp;quot;myFilter&amp;quot;, urlPatterns=&amp;quot;/*&amp;quot;,        dispatcherTypes = &amp;#123;DispatcherType.REQUEST, Dispa">
+<meta name="keywords" content="Servlet3">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Servlet3】新特性">
+<meta property="og:url" content="http://yoursite.com/2017/06/05/Servlet3新特性/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="Servlet3新增功能 异步处理支持 新增的注解支持 可插性支持  注解Filter12345678910111213141516@WebFilter(filterName = &amp;quot;myFilter&amp;quot;, urlPatterns=&amp;quot;/*&amp;quot;,        dispatcherTypes = &amp;#123;DispatcherType.REQUEST, Dispa">
+<meta property="og:updated_time" content="2017-06-05T02:27:39.961Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【Servlet3】新特性">
+<meta name="twitter:description" content="Servlet3新增功能 异步处理支持 新增的注解支持 可插性支持  注解Filter12345678910111213141516@WebFilter(filterName = &amp;quot;myFilter&amp;quot;, urlPatterns=&amp;quot;/*&amp;quot;,        dispatcherTypes = &amp;#123;DispatcherType.REQUEST, Dispa">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/05/Servlet3新特性/"/>
+
+
+
+
+
+  <title>【Servlet3】新特性 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Servlet3新特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【Servlet3】新特性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:26:32+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Servlet/" itemprop="url" rel="index">
+                    <span itemprop="name">Servlet</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Servlet3新增功能"><a href="#Servlet3新增功能" class="headerlink" title="Servlet3新增功能"></a>Servlet3新增功能</h2><ul>
+<li>异步处理支持</li>
+<li>新增的注解支持</li>
+<li>可插性支持</li>
+</ul>
+<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><h3 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">@WebFilter(filterName = &quot;myFilter&quot;, urlPatterns=&quot;/*&quot;,</div><div class="line">        dispatcherTypes = &#123;DispatcherType.REQUEST, DispatcherType.FORWARD&#125;)</div><div class="line">public class MyFilter implements Filter &#123;</div><div class="line">    @Override</div><div class="line">    public void init(final FilterConfig filterConfig) throws ServletException &#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException &#123;</div><div class="line">        chain.doFilter(request, response);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void destroy() &#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Listener"><a href="#Listener" class="headerlink" title="Listener"></a>Listener</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@WebListener</div><div class="line">public class MyServletContextListener implements ServletContextListener &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void contextInitialized(final ServletContextEvent ctx) &#123;</div><div class="line">        System.out.println(&quot;init servlet context&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void contextDestroyed(final ServletContextEvent ctx) &#123;</div><div class="line">        System.out.println(&quot;destroy servlet container&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@WebServlet(name = &quot;myServlet&quot;,</div><div class="line">		    urlPatterns = &#123;&quot;/servlet1&quot;, &quot;/servlet1/*&quot;&#125;, </div><div class="line">		    loadOnStartup = 1,</div><div class="line">	        initParams = &#123;</div><div class="line">                @WebInitParam(name = &quot;msg&quot;, value=&quot;test&quot;)</div><div class="line">	        &#125;)</div><div class="line">public class MyServlet extends HttpServlet &#123;</div><div class="line">    private String msg;</div><div class="line"></div><div class="line">    public MyServlet() &#123;</div><div class="line">        System.out.println(&quot;load on startup&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void init() throws ServletException &#123;</div><div class="line">        super.init();</div><div class="line">        msg = this.getInitParameter(&quot;msg&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException &#123;</div><div class="line">        System.out.println(msg);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@ComponentScan(</div><div class="line">        value = &#123;&quot;com.test.**.service&quot;, &quot;com.test.**.dao&quot;&#125;,</div><div class="line">        excludeFilters = &#123;</div><div class="line">                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)</div><div class="line">        &#125;)</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableWebMvc</div><div class="line">@ComponentScan(</div><div class="line">        value = &quot;com.test.**.web.controller&quot;,</div><div class="line">        includeFilters = &#123;</div><div class="line">                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)</div><div class="line">        &#125;)</div><div class="line">public class SpringMvcConfiguration &#123;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public ViewResolver createInternalResourceViewResolver() &#123;</div><div class="line">        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();</div><div class="line">        viewResolver.setViewClass(JstlView.class);</div><div class="line">        viewResolver.setContentType(&quot;text/html&quot;);</div><div class="line">        viewResolver.setPrefix(&quot;/WEB-INF/jsp/&quot;);</div><div class="line">        viewResolver.setSuffix(&quot;.jsp&quot;);</div><div class="line"></div><div class="line">        return viewResolver;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public DefaultServletHttpRequestHandler createDefaultServletHttpRequestHandler() &#123;</div><div class="line">        return new DefaultServletHttpRequestHandler();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="web-xml-代码配置"><a href="#web-xml-代码配置" class="headerlink" title="web.xml 代码配置"></a>web.xml 代码配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">public class NoXmlWebAppInitializer implements WebApplicationInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void onStartup(final ServletContext sc) throws ServletException &#123;</div><div class="line"></div><div class="line">        //1、根上下文</div><div class="line">        AnnotationConfigWebApplicationContext  rootContext = new AnnotationConfigWebApplicationContext();</div><div class="line">        rootContext.register(RootConfiguration.class);</div><div class="line">        sc.addListener(new ContextLoaderListener(rootContext));</div><div class="line"></div><div class="line">        //2、springmvc上下文</div><div class="line">        AnnotationConfigWebApplicationContext springMvcContext = new AnnotationConfigWebApplicationContext();</div><div class="line">        springMvcContext.register(SpringMvcConfiguration.class);</div><div class="line"></div><div class="line">        //3、DispatcherServlet</div><div class="line">        DispatcherServlet dispatcherServlet = new DispatcherServlet(springMvcContext);</div><div class="line"></div><div class="line">        ServletRegistration.Dynamic dynamic = sc.addServlet(&quot;dispatcherServlet&quot;, dispatcherServlet);</div><div class="line">        dynamic.setLoadOnStartup(1);</div><div class="line">        dynamic.addMapping(&quot;/&quot;);</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="异步处理"><a href="#异步处理" class="headerlink" title="异步处理"></a>异步处理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">@WebServlet(name = &quot;asyncServlet&quot;, urlPatterns = &quot;/async&quot;, asyncSupported = true)</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">private final ExecutorService executorService = Executors.newScheduledThreadPool(2);</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException &#123;</div><div class="line">        resp.setHeader(&quot;Connection&quot;, &quot;Keep-Alive&quot;);</div><div class="line">        resp.setContentType(&quot;text/html;charset=utf-8&quot;);</div><div class="line"></div><div class="line">        PrintWriter out = resp.getWriter();</div><div class="line">        out.write(&quot;hello async&quot;);</div><div class="line">        out.write(&quot;&lt;br/&gt;&quot;);</div><div class="line">        out.flush();</div><div class="line">        //1、开启异步</div><div class="line">        final AsyncContext asyncContext = req.startAsync();</div><div class="line">        //2、设置超时时间，如果不设置如jetty是30000L</div><div class="line">        asyncContext.setTimeout(10L * 1000); //设置为0表示永不超时</div><div class="line"></div><div class="line">        //把任务提交给自己的任务队列</div><div class="line">        executorService.submit(new Runnable() &#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line">                try &#123;</div><div class="line">                    Thread.sleep(3L * 1000);</div><div class="line">                    PrintWriter out = asyncContext.getResponse().getWriter();</div><div class="line">                    out.write(&quot;over&quot;);</div><div class="line">                    asyncContext.complete();</div><div class="line">                &#125; catch (Exception e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line"></div><div class="line">        //4、当前线程可立即返回</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h2 id="interceptor"><a href="#interceptor" class="headerlink" title="interceptor"></a>interceptor</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">public class MyCallableInterceptor extends CallableProcessingInterceptorAdapter &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void beforeConcurrentHandling(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        System.out.println(&quot;=====在startAsyc开启异步 和 提交异步任务到Executor 之前执行&quot;);</div><div class="line">        //此时可以保存一些数据到异步上下文，如spring security的SecurityContextHolder或Shiro的SecurityUtils(Subject)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void preProcess(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        //此时可以把在beforeConcurrentHandling保存的那些数据绑定到这个线程上（将在一个新线程执行）</div><div class="line">        System.out.println(&quot;在Callable.call运行之前执行&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void postProcess(final NativeWebRequest request, final Callable&lt;T&gt; task, final Object concurrentResult) throws Exception &#123;</div><div class="line">        System.out.println(&quot;在Callable.call运行之后执行&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; Object handleTimeout(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        //超时时调用，返回值将是超时后的结果</div><div class="line">        System.out.println(&quot;异步任务超时了&quot;);</div><div class="line">        return &quot;error&quot;;//返回出错时的结果，将替换掉正常时的结果</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void afterCompletion(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        //异步任务正常结束时调用</div><div class="line">        System.out.println(&quot;异步任务完成了&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">@Controller</div><div class="line">public class MyCallableController &#123;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/myCallable1&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    public Callable&lt;String&gt; callable1() &#123;</div><div class="line">        return new Callable&lt;String&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public String call() throws Exception &#123;</div><div class="line">                System.out.println(&quot;====执行Callable call&quot;);</div><div class="line">                return &quot;success&quot;;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">    @RequestMapping(&quot;/myCallable2&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    public Callable&lt;String&gt; callable2() &#123;</div><div class="line">        return new Callable&lt;String&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public String call() throws Exception &#123;</div><div class="line">                Thread.sleep(31L * 1000);</div><div class="line">                System.out.println(&quot;====执行Callable call&quot;);</div><div class="line">                return &quot;success&quot;;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * spring实现方式：</div><div class="line"> *   1、把任务提交给Executor 异步执行；</div><div class="line"> *   2、执行完成后RequestMappingHandlerAdapter使用内部的  ServletInvocableHandlerMethod包装返回值，即按照非异步方式再执行</div><div class="line"> */</div><div class="line">@Controller</div><div class="line">public class CallableController &#123;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/callable1&quot;)</div><div class="line">    public Callable&lt;String&gt; callable1(final Model model) &#123;</div><div class="line">        return new Callable&lt;String&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public String call() throws Exception &#123;</div><div class="line">                Thread.sleep(2L * 1000); //暂停两秒</div><div class="line">                String viewName = &quot;msg&quot;;</div><div class="line">                model.addAttribute(&quot;msg&quot;, &quot;hello callable&quot;);</div><div class="line">                return viewName; //然后返回到指定视图页面</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/callable2&quot;)</div><div class="line">    public Callable&lt;ModelAndView&gt; callable2() &#123;</div><div class="line">        return new Callable&lt;ModelAndView&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public ModelAndView call() throws Exception &#123;</div><div class="line">                Thread.sleep(2L * 1000); //暂停两秒</div><div class="line">                ModelAndView mv = new ModelAndView(&quot;msg&quot;);</div><div class="line">                mv.addObject(&quot;msg&quot;, &quot;hello callable&quot;);</div><div class="line">                return mv;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/callable3&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    public Callable&lt;Object&gt; callable3() &#123;</div><div class="line">        return new Callable&lt;Object&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public Object call() throws Exception &#123;</div><div class="line">                Thread.sleep(2L * 1000); //暂停两秒</div><div class="line">                return new User(1, &quot;zhang&quot;);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://jinnianshilongnian.iteye.com/blog/1912455" target="_blank" rel="external">参考博客</a><br><a href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet30/" target="_blank" rel="external">Servlet3新特性详解</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Servlet3/" rel="tag"># Servlet3</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/05/Python学习笔记（二）——-正则表达式/" rel="next" title="Python学习笔记（二）—— 正则表达式">
+                <i class="fa fa-chevron-left"></i> Python学习笔记（二）—— 正则表达式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/05/深入理解JVM学习笔记（一）-——-JVM数据区域/" rel="prev" title="深入理解JVM学习笔记（一） —— JVM数据区域">
+                深入理解JVM学习笔记（一） —— JVM数据区域 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">63</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Servlet3新增功能"><span class="nav-number">1.</span> <span class="nav-text">Servlet3新增功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注解"><span class="nav-number">2.</span> <span class="nav-text">注解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Filter"><span class="nav-number">2.1.</span> <span class="nav-text">Filter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Listener"><span class="nav-number">2.2.</span> <span class="nav-text">Listener</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Servlet"><span class="nav-number">2.3.</span> <span class="nav-text">Servlet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC"><span class="nav-number">2.4.</span> <span class="nav-text">SpringMVC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web-xml-代码配置"><span class="nav-number">2.5.</span> <span class="nav-text">web.xml 代码配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步处理"><span class="nav-number">2.6.</span> <span class="nav-text">异步处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#interceptor"><span class="nav-number">3.</span> <span class="nav-text">interceptor</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

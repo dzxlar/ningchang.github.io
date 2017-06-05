@@ -1,0 +1,767 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="synchronized," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="synchronized12345678910111213public class ThreadA extends Thread&amp;#123;	private Count count;		public ThreadA(Count count)&amp;#123;		this.count = count;	&amp;#125;		@Override	public void run() &amp;#123;		count.ad">
+<meta name="keywords" content="synchronized">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程笔记——synchronized">
+<meta property="og:url" content="http://yoursite.com/2017/06/05/线程笔记——synchronized/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="synchronized12345678910111213public class ThreadA extends Thread&amp;#123;	private Count count;		public ThreadA(Count count)&amp;#123;		this.count = count;	&amp;#125;		@Override	public void run() &amp;#123;		count.ad">
+<meta property="og:image" content="http://wiki.jikexueyuan.com/project/java-concurrency/images/synchronous.jpg">
+<meta property="og:image" content="http://img.blog.csdn.net/20170327101917021?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-06-05T03:18:25.992Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线程笔记——synchronized">
+<meta name="twitter:description" content="synchronized12345678910111213public class ThreadA extends Thread&amp;#123;	private Count count;		public ThreadA(Count count)&amp;#123;		this.count = count;	&amp;#125;		@Override	public void run() &amp;#123;		count.ad">
+<meta name="twitter:image" content="http://wiki.jikexueyuan.com/project/java-concurrency/images/synchronous.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/05/线程笔记——synchronized/"/>
+
+
+
+
+
+  <title>线程笔记——synchronized | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——synchronized/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">线程笔记——synchronized</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:17:35+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class ThreadA extends Thread&#123;</div><div class="line"></div><div class="line">	private Count count;</div><div class="line">	</div><div class="line">	public ThreadA(Count count)&#123;</div><div class="line">		this.count = count;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		count.add();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">public class Count &#123;</div><div class="line"></div><div class="line">	private int num = 0;</div><div class="line">	/**</div><div class="line">	 * synchronized</div><div class="line">	 * </div><div class="line">	 */</div><div class="line">	public void add()&#123;</div><div class="line">		synchronized(this)&#123;</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(51);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			num += 1; </div><div class="line">			System.out.println(&quot;[&quot;+Thread.currentThread().getName()+&quot;]&quot; + &quot;:&quot; + num);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	public int getNum() &#123;</div><div class="line">		return num;</div><div class="line">	&#125;</div><div class="line">	public void setNum(int num) &#123;</div><div class="line">		this.num = num;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		Count count = new Count();</div><div class="line">		for (int i = 0; i &lt; 5; i++) &#123;</div><div class="line">			ThreadA t = new ThreadA(count);</div><div class="line">			t.start();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1010);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;5个线程最后的值&quot;+count.getNum());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[Thread-0]:1</div><div class="line">[Thread-1]:2</div><div class="line">[Thread-2]:3</div><div class="line">[Thread-4]:4</div><div class="line">[Thread-3]:5</div><div class="line">5个线程最后的值5</div></pre></td></tr></table></figure>
+<h3 id="如果不加synchronized关键字，数据会错误"><a href="#如果不加synchronized关键字，数据会错误" class="headerlink" title="如果不加synchronized关键字，数据会错误"></a>如果不加synchronized关键字，数据会错误</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[Thread-0]:1</div><div class="line">[Thread-1]:2</div><div class="line">[Thread-2]:3</div><div class="line">[Thread-4]:4</div><div class="line">[Thread-3]:5</div><div class="line">5个线程最后的值3</div></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>保证同一时刻最多只有一个线程执行该段代码</strong><br>可修饰于方法和代码块</p>
+</blockquote>
+<p>修饰在方法上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">synchronized methodName()&#123;...&#125;</div></pre></td></tr></table></figure>
+<p>修饰在代码块上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">methodName()&#123;</div><div class="line">	synchronized(Object)&#123;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="synchronized隐式锁特性"><a href="#synchronized隐式锁特性" class="headerlink" title="synchronized隐式锁特性"></a>synchronized隐式锁特性</h3><p>① Object可以是参数本身、指定对象、this<br>② 不推荐使用this和方法参数，而是指定一个小的对象（隐式锁/同步锁/互斥锁）<br>③ 虽然修饰的地方不尽相同，最终都是锁在一个对象上面<br>④ 默认修饰对象本身，等同synchronized(this)<br>⑤ <strong>之所以叫隐式锁是因为指定一个Object对象作为锁，和它持有相同对象锁的地方将产生互斥性，而不是只有当前代码块或者方法体。另一个相对显示锁不需要加锁或者解锁操作</strong></p>
+<p>隐式锁规则</p>
+<p>① 当两个并发线程访问同一个对象中的synchronized同步代码块时，一个时间内只有一个线程可以执行，另一个线程必须等待当前线程执行完这个代码块才能继续执行<br>②当一个线程访问一个对象中的synchronized同步代码块时，另外一个线程仍然可以访问该对象的非同步代码块<br>③ 以上规则对其他对象锁同样适用</p>
+<p>为了适应高并发以及快速响应的要求，性能以及执行效率从低到高排序</p>
+<blockquote>
+<p>方法体 &lt; 方法块 （synchronized(this)）<br>原因：方法体在方法外面排队加锁，进入方法体，分配资源还需要一定的时间</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>private byte[] lock = new byte[1];</strong><br>synchronized(this) &lt; <strong>synchronized(lock)</strong><br>原因：锁的对象不一样，锁是对象，加锁和解锁都需要释放锁对象，对象越小越好（所以造一个1字节的对象最好）</p>
+</blockquote>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
+<ol>
+<li>如果同一个方法内同时有两个或更多线程，则每个线程有自己的局部变量拷贝。</li>
+<li>类的每个实例都有自己的对象级别锁。当一个线程访问实例对象中的 synchronized 同步代码块或同步方法时，该线程便获取了该实例的对象级别锁，其他线程这时如果要访问 synchronized 同步代码块或同步方法，便需要阻塞等待，直到前面的线程从同步代码块或方法中退出，释放掉了该对象级别锁</li>
+<li>访问同一个类的不同实例对象中的同步代码块，不存在阻塞等待获取对象锁的问题，因为它们获取的是各自实例的对象级别锁，相互之间没有影响</li>
+<li>当一个线程访问一个对象中的synchronized同步代码块时，另外一个线程仍然可以访问该对象的非同步代码块</li>
+<li>类级别锁被特定类的所有示例共享，它用于控制对 static 成员变量以及 static 方法的并发访问。具体用法与对象级别锁相似</li>
+<li><strong>互斥是实现同步的一种手段，临界区、互斥量和信号量都是主要的互斥实现方式。synchronized 关键字经过编译后，会在同步块的前后分别形成 monitorenter 和 monitorexit 这两个字节码指令。根据虚拟机规范的要求，在执行 monitorenter 指令时，首先要尝试获取对象的锁，如果获得了锁，把锁的计数器加 1，相应地，在执行 monitorexit 指令时会将锁计数器减 1，当计数器为 0 时，锁便被释放了。由于 synchronized 同步块对同一个线程是可重入的，因此一个线程可以多次获得同一个对象的互斥锁，同样，要释放相应次数的该互斥锁，才能最终释放掉该锁</strong></li>
+<li>使用 synchronized（obj）同步语句块，可以获取指定对象上的对象级别锁。obj 为对象的引用，如果获取了 obj 对象上的对象级别锁，在并发访问 obj 对象时时，便会在其 synchronized 代码处阻塞等待，直到获取到该 obj对象的对象级别锁。当 obj 为 this 时，便是获取当前对象的对象级别锁</li>
+</ol>
+</blockquote>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="synchronized-的另个一重要作用：内存可见性"><a href="#synchronized-的另个一重要作用：内存可见性" class="headerlink" title="synchronized 的另个一重要作用：内存可见性"></a>synchronized 的另个一重要作用：内存可见性</h3><blockquote>
+<p>加锁（synchronized 同步）的功能不仅仅局限于互斥行为，同时还存在另外一个重要的方面：内存可见性。<strong>我们不仅希望防止某个线程正在使用对象状态而另一个线程在同时修改该状态，而且还希望确保当一个线程修改了对象状态后，其他线程能够看到该变化</strong>。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>内置锁可以用于确保某个线程以一种可预测的方式来查看另一个线程的执行结果</strong>。为了确保所有的线程都能看到共享变量的最新值，可以在所有执行读操作或写操作的线程上加上同一把锁</p>
+</blockquote>
+<p><img src="http://wiki.jikexueyuan.com/project/java-concurrency/images/synchronous.jpg" alt="这里写图片描述"></p>
+<p>当线程 A 执行某个同步代码块时，线程 B 随后进入由同一个锁保护的同步代码块，这种情况下可以保证，当锁被释放前，A 看到的所有变量值（锁释放前，A 看到的变量包括 y 和 x）在 B 获得同一个锁后同样可以由 B 看到。换句话说，当线程 B 执行由锁保护的同步代码块时，可以看到线程 A 之前在同一个锁保护的同步代码块中的所有操作结果。如果在线程 A unlock M 之后，线程 B 才进入 lock M，那么线程 B 都可以看到线程 A unlock M 之前的操作，可以得到 i=1，j=1。如果在线程 B unlock M 之后，线程 A 才进入 lock M，那么线程 B 就不一定能看到线程 A 中的操作，因此 j 的值就不一定是 1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public class  SynchronizedInteger  </div><div class="line">&#123;  </div><div class="line">    private int value;  </div><div class="line"></div><div class="line">    public synchronized int get()&#123;  </div><div class="line">        return value;  </div><div class="line">    &#125;  </div><div class="line">    public synchronized void set(int value)&#123;  </div><div class="line">        this.value = value;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>对 set 和 get 方法进行了同步，加上了同一把对象锁，这样 get 方法可以看到 set 方法中 value 值的变化，从而每次通过 get 方法取得的 value 的值都是最新的 value 值</strong></p>
+<h3 id="Conllection线程安全的API"><a href="#Conllection线程安全的API" class="headerlink" title="Conllection线程安全的API"></a>Conllection线程安全的API</h3><blockquote>
+<p><strong>集合本质上是非多线程安全的，当多个线程与集合交互时，为了使它多线程安全，必须采取额外的措施</strong></p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20170327101917021?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>注意：在 Java 语言中，大部分的线程安全类都是相对线程安全的，它能保证对这个对象单独的操作时线程安全的，我们在调用的时候不需要额外的保障措施，<strong>但是对于一些特定的连续调用</strong>，就可能需要在调用端使用额外的同步手段来保证调用的正确性。例如 Vector、HashTable、Collections的synchronizedXxxx()方法包装的集合等</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">//为了安全起见，仅使用同步列表的一个引用，这样可以确保控制了所有访问  </div><div class="line">        //集合必须同步化，这里是一个List  </div><div class="line">		List&lt;String&gt; nameList = Collections.synchronizedList(new ArrayList&lt;String&gt;());</div><div class="line"></div><div class="line">        //nameList中的add方法是同步方法，会获取nameList实例的对象锁  </div><div class="line">        nameList.add(&quot;zhangsan&quot;);  </div><div class="line">        nameList.add(&quot;lisi&quot;);  </div><div class="line">        nameList.add(&quot;wanger&quot;);  </div><div class="line">        nameList.add(&quot;hanfei&quot;);  </div><div class="line"></div><div class="line">        //获取nameList实例的对象锁，  </div><div class="line">        //迭代时，阻塞其他线程调用add或remove等方法修改元素  </div><div class="line">        synchronized ( nameList ) &#123;  </div><div class="line">            Iterator&lt;String&gt; iter = nameList.iterator();  </div><div class="line">            while ( iter.hasNext() ) &#123;  </div><div class="line">                String s = (String) iter.next();  </div><div class="line">                System.out.println(&quot;found string: &quot; + s + &quot;, length=&quot; + s.length());  </div><div class="line">            &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://wiki.jikexueyuan.com/project/java-concurrency/synchronized.html" target="_blank" rel="external">多线程文档参考</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/synchronized/" rel="tag"># synchronized</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/05/线程笔记——Thread常用方法/" rel="next" title="线程笔记——Thread常用方法">
+                <i class="fa fa-chevron-left"></i> 线程笔记——Thread常用方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/05/线程笔记——显式锁Lock和ReentrantLock/" rel="prev" title="线程笔记——显式锁Lock和ReentrantLock">
+                线程笔记——显式锁Lock和ReentrantLock <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">63</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized"><span class="nav-number">1.</span> <span class="nav-text">synchronized</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行"><span class="nav-number">2.</span> <span class="nav-text">运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#console"><span class="nav-number">3.</span> <span class="nav-text">console</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如果不加synchronized关键字，数据会错误"><span class="nav-number">4.</span> <span class="nav-text">如果不加synchronized关键字，数据会错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized隐式锁特性"><span class="nav-number">5.</span> <span class="nav-text">synchronized隐式锁特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展"><span class="nav-number"></span> <span class="nav-text">扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized-的另个一重要作用：内存可见性"><span class="nav-number">1.</span> <span class="nav-text">synchronized 的另个一重要作用：内存可见性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Conllection线程安全的API"><span class="nav-number">2.</span> <span class="nav-text">Conllection线程安全的API</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

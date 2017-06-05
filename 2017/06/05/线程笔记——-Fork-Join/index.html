@@ -1,0 +1,747 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="任务框架,Fork,Join," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="JDK7的Fork/Join思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度目的：并行执行任务的框架 Future任务机制和FutureTaskFuture就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果1.判断任务是否完成2.是否中断任务3.能够获取任务执行结果FutureTask是Future的实现类FutureTask实现Runn">
+<meta name="keywords" content="任务框架,Fork,Join">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程笔记—— Fork&#x2F;Join">
+<meta property="og:url" content="http://yoursite.com/2017/06/05/线程笔记——-Fork-Join/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="JDK7的Fork/Join思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度目的：并行执行任务的框架 Future任务机制和FutureTaskFuture就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果1.判断任务是否完成2.是否中断任务3.能够获取任务执行结果FutureTask是Future的实现类FutureTask实现Runn">
+<meta property="og:updated_time" content="2017-06-05T03:24:40.295Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线程笔记—— Fork&#x2F;Join">
+<meta name="twitter:description" content="JDK7的Fork/Join思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度目的：并行执行任务的框架 Future任务机制和FutureTaskFuture就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果1.判断任务是否完成2.是否中断任务3.能够获取任务执行结果FutureTask是Future的实现类FutureTask实现Runn">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/05/线程笔记——-Fork-Join/"/>
+
+
+
+
+
+  <title>线程笔记—— Fork/Join | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-Fork-Join/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">线程笔记—— Fork/Join</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:00+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="JDK7的Fork-Join"><a href="#JDK7的Fork-Join" class="headerlink" title="JDK7的Fork/Join"></a>JDK7的Fork/Join</h3><p>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
+<h3 id="Future任务机制和FutureTask"><a href="#Future任务机制和FutureTask" class="headerlink" title="Future任务机制和FutureTask"></a>Future任务机制和FutureTask</h3><p>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
+<h3 id="Future相关"><a href="#Future相关" class="headerlink" title="Future相关"></a>Future相关</h3><p>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
+<h3 id="Future原理"><a href="#Future原理" class="headerlink" title="Future原理"></a>Future原理</h3><p>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
+<h3 id="计算最大并发量"><a href="#计算最大并发量" class="headerlink" title="计算最大并发量"></a>计算最大并发量</h3><p>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
+<h3 id="Fork-Join优缺点"><a href="#Fork-Join优缺点" class="headerlink" title="Fork/Join优缺点"></a>Fork/Join优缺点</h3><ul>
+<li>优点 <ol>
+<li>充分实现并发程序任务拆分</li>
+<li>简化编程</li>
+<li>着重划分任务和组合中间结果</li>
+</ol>
+</li>
+<li>缺点 <ol>
+<li>拆分对象不宜过多，容易造成内存溢出</li>
+</ol>
+</li>
+</ul>
+<h3 id="Fork-Join应用场景"><a href="#Fork-Join应用场景" class="headerlink" title="Fork/Join应用场景"></a>Fork/Join应用场景</h3><blockquote>
+<p><strong>树形数据结构处理和遍历</strong></p>
+</blockquote>
+<h3 id="api"><a href="#api" class="headerlink" title="api"></a>api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">fork() //异步执行任务</div><div class="line">join() //计算完成后返回结果</div><div class="line">RecursiveTask //用于无返回结果的任务</div><div class="line">RecursiveAction //用于有返回结果的任务</div><div class="line">ForkJoinPool //实现Executor接口</div><div class="line">//三个调度子方法</div><div class="line">execute() //异步执行</div><div class="line">invoke() //等待完成，返回结果</div><div class="line">submit() //异步执行execute任务，并立即返回Future对象</div></pre></td></tr></table></figure>
+<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class FutureTaskDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		</div><div class="line">		SonTask sonTask = new SonTask(&quot;线程2&quot;);</div><div class="line">		FutureTask&lt;String&gt; task1 = new FutureTask&lt;&gt;(sonTask);</div><div class="line">		new Thread(task1).start();</div><div class="line">		System.out.println(task1.get()); //获取结果</div><div class="line">		</div><div class="line">		FutureTask&lt;Integer&gt; task2 = new FutureTask&lt;Integer&gt;(new MySun(),2);</div><div class="line">		new Thread(task2).start();</div><div class="line">		System.out.println(&quot;result_&quot;+task2.get());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class SonTask implements Callable&lt;String&gt; &#123;</div><div class="line"></div><div class="line">	private String name = &quot;&quot;;</div><div class="line">	</div><div class="line">	SonTask(String name) &#123;</div><div class="line">		this.name = name;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public String call() throws Exception &#123;</div><div class="line">		Thread.sleep(1000L);</div><div class="line">		System.out.println(name + &quot;计算完成&quot;);</div><div class="line">		return &quot;result_1&quot;;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class MySun implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(500L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;线程2处理完成&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">result_1</div><div class="line">result_2</div></pre></td></tr></table></figure>
+<h3 id="Fork-Join"><a href="#Fork-Join" class="headerlink" title="Fork/Join"></a>Fork/Join</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class CountTask extends RecursiveTask&lt;Integer&gt;&#123;</div><div class="line"></div><div class="line">	private static final long serialVersionUID = 2148758397044775857L;</div><div class="line"></div><div class="line">	private static int splitSize = 2; </div><div class="line">	private int start , end; </div><div class="line">	</div><div class="line">	</div><div class="line">	public CountTask(int start, int end) &#123;</div><div class="line">		this.start = start;</div><div class="line">		this.end = end;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected Integer compute() &#123;</div><div class="line">		int sum = 0;</div><div class="line">		//如果任务不需要拆分就开始计算</div><div class="line">		boolean isSplit =  (end - start) &lt;= splitSize;</div><div class="line">		if(isSplit)&#123;</div><div class="line">			for (int i = start; i &lt;= end; i++) &#123;</div><div class="line">				sum += i;</div><div class="line">			&#125;</div><div class="line">		&#125;else&#123; //拆分成2个子任务</div><div class="line">			int middle = (start + end) / 2;</div><div class="line">			CountTask oneTask = new CountTask(start, middle);</div><div class="line">			CountTask twoTask = new CountTask(middle+1, end);</div><div class="line">			oneTask.fork();//开始执行</div><div class="line">			twoTask.fork();</div><div class="line">			</div><div class="line">			//获得第一个子任务结果</div><div class="line">			int oneResult = oneTask.join();</div><div class="line">			int twoResult = twoTask.join();</div><div class="line">			</div><div class="line">			sum = oneResult + twoResult;</div><div class="line">		&#125;</div><div class="line">		return sum;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public class FockJoinDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		ForkJoinPool pool = new ForkJoinPool();</div><div class="line">		CountTask count1 = new CountTask(1, 5);</div><div class="line">		</div><div class="line">		Future&lt;Integer&gt; res1 = pool.submit(count1);</div><div class="line">		System.out.println(&quot;1-5结果: &quot;+res1.get());</div><div class="line">		</div><div class="line">		CountTask count2 = new CountTask(1, 100);</div><div class="line">		Future&lt;Integer&gt; res2 = pool.submit(count2);</div><div class="line">		System.out.println(&quot;1-100结果：&quot;+res2.get());</div><div class="line">		</div><div class="line">		System.out.println(&quot;=============Fock/Join监控===============&quot;);</div><div class="line">		</div><div class="line">		System.out.println(pool.getActiveThreadCount());</div><div class="line">		System.out.println(pool.getQueuedTaskCount());</div><div class="line">		System.out.println(pool.getQueuedSubmissionCount());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">1-5结果: 15</div><div class="line">1-100结果：5050</div><div class="line">=============Fock/Join监控===============</div><div class="line">1</div><div class="line">0</div><div class="line">0</div></pre></td></tr></table></figure>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp11137.html" target="_blank" rel="external">IBM_Fork/Join分析</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/任务框架/" rel="tag"># 任务框架</a>
+          
+            <a href="/tags/Fork/" rel="tag"># Fork</a>
+          
+            <a href="/tags/Join/" rel="tag"># Join</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/05/线程笔记——-线程池/" rel="next" title="线程笔记—— 线程池">
+                <i class="fa fa-chevron-left"></i> 线程笔记—— 线程池
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/05/线程笔记——可重入内置锁/" rel="prev" title="线程笔记——可重入内置锁">
+                线程笔记——可重入内置锁 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">63</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#JDK7的Fork-Join"><span class="nav-number">1.</span> <span class="nav-text">JDK7的Fork/Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Future任务机制和FutureTask"><span class="nav-number">2.</span> <span class="nav-text">Future任务机制和FutureTask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Future相关"><span class="nav-number">3.</span> <span class="nav-text">Future相关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Future原理"><span class="nav-number">4.</span> <span class="nav-text">Future原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算最大并发量"><span class="nav-number">5.</span> <span class="nav-text">计算最大并发量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fork-Join优缺点"><span class="nav-number">6.</span> <span class="nav-text">Fork/Join优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fork-Join应用场景"><span class="nav-number">7.</span> <span class="nav-text">Fork/Join应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#api"><span class="nav-number">8.</span> <span class="nav-text">api</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FutureTask"><span class="nav-number">9.</span> <span class="nav-text">FutureTask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#console"><span class="nav-number">10.</span> <span class="nav-text">console</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fork-Join"><span class="nav-number">11.</span> <span class="nav-text">Fork/Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行"><span class="nav-number">12.</span> <span class="nav-text">运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#console-1"><span class="nav-number">13.</span> <span class="nav-text">console</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

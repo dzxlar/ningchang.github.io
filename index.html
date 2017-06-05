@@ -254,7 +254,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/SpringSecurity学习笔记（一）/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/链表结构小记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -273,7 +273,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/05/SpringSecurity学习笔记（一）/" itemprop="url">SpringSecurity学习笔记（一）—— Java配置</a></h1>
+                <a class="post-title-link" href="/2017/06/05/链表结构小记/" itemprop="url">链表结构小记</a></h1>
         
 
         <div class="post-meta">
@@ -285,7 +285,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T09:58:59+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:48:15+08:00">
                 2017-06-05
               </time>
             
@@ -308,8 +308,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/权限安全/" itemprop="url" rel="index">
-                    <span itemprop="name">权限安全</span>
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
                   </a>
                 </span>
 
@@ -344,79 +344,44 @@
       
         
           
-            <h2 id="SpringSecurity学习笔记（一）——-Java配置"><a href="#SpringSecurity学习笔记（一）——-Java配置" class="headerlink" title="SpringSecurity学习笔记（一）—— Java配置"></a>SpringSecurity学习笔记（一）—— Java配置</h2><h3 id="目录概要"><a href="#目录概要" class="headerlink" title="目录概要"></a>目录概要</h3><ul>
-<li>验证应用程序每一个URL</li>
-<li>生成登录表单对象</li>
-<li>通过用户/密码进行表单验证</li>
-<li>用户注销</li>
-<li>阻止CSRF攻击</li>
-<li>设置安全请求头</li>
-<li>集成servletAPI</li>
-</ul>
-<h3 id="Web安全"><a href="#Web安全" class="headerlink" title="Web安全"></a>Web安全</h3><blockquote>
-<p>创建Security过滤器(通过springSecurityFilterChain负责所有安全过滤请求)</p>
+            <h2 id="链表的概念"><a href="#链表的概念" class="headerlink" title="链表的概念"></a>链表的概念</h2><blockquote>
+<p>链表是一种递归的数据结构，它或者为空（null），或者是指向一个结点（node）的引用，该节点还有一个元素和一个指向另一条链表的引用。   </p>
 </blockquote>
-<p>基本例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@EnableWebSecurity</div><div class="line">public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected UserDetailsService userDetailsService() &#123;</div><div class="line">		InMemoryUserDetailsManager inMemoryManager = new InMemoryUserDetailsManager();</div><div class="line">		inMemoryManager.createUser(User.withUsername(&quot;admin&quot;).password(&quot;123456&quot;).roles(&quot;SuperAdmin&quot;).build());</div><div class="line">		return inMemoryManager;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">	protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">		http.authorizeRequests()</div><div class="line">            //确保任何请求应用程序需要经过身份验证的用户</div><div class="line">		    .anyRequest().authenticated() </div><div class="line">		        .and()</div><div class="line">            //允许用户进行身份验证和基于表单的登录</div><div class="line">	        .formLogin()</div><div class="line">	        	.and()</div><div class="line">            //允许用户通过HTTP基本认证验证</div><div class="line">	        .httpBasic();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<hr>
-<p><strong>AbstractSecurityWebApplicationInitializer确保springSecurityFilterChain得到注册</strong> </p>
-<h3 id="Http安全和表单登录"><a href="#Http安全和表单登录" class="headerlink" title="Http安全和表单登录"></a>Http安全和表单登录</h3><hr>
-<p>java配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">   @Override</div><div class="line">protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">	http.authorizeRequests()</div><div class="line">           //确保任何请求应用程序需要经过身份验证的用户</div><div class="line">	    .anyRequest().authenticated() </div><div class="line">	        .and()</div><div class="line">           //允许用户进行身份验证和基于表单的登录</div><div class="line">        .formLogin()</div><div class="line">        	.and()</div><div class="line">           //允许用户通过HTTP基本认证验证</div><div class="line">        .httpBasic();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<hr>
-<p>xml配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> &lt;http&gt;</div><div class="line">&lt;intercept-url pattern=&quot;/**&quot; access=&quot;authenticated&quot;/&gt;</div><div class="line">&lt;form-login /&gt;</div><div class="line">&lt;http-basic /&gt;</div><div class="line">&lt;/http&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="认证请求"><a href="#认证请求" class="headerlink" title="认证请求"></a>认证请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">.authorizeRequests()</div><div class="line">     .antMatchers(&quot;/admin&quot;,&quot;/system&quot;,&quot;/resource&quot;).permitAll()</div><div class="line">     .antMatchers(&quot;/product&quot;).hasRole(&quot;admin&quot;)</div><div class="line">     .antMatchers(&quot;/dba&quot;).access(&quot;hasRole(&apos;admin&apos;) and hasRole(&apos;dba&apos;)&quot;)</div><div class="line">     .anyRequest().authenticated()</div></pre></td></tr></table></figure>
-<h3 id="注销"><a href="#注销" class="headerlink" title="注销"></a>注销</h3><ul>
-<li>清除http session</li>
-<li>清除rememberme状态</li>
-<li>清除上下文SecurityContextHolder</li>
-<li><p>重定向/login?logout</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">.logout()</div><div class="line">          //如果开启CSRF，请求必须为POST</div><div class="line">       .logoutUrl(&quot;/logout&quot;)</div><div class="line">          //注销成功后，跳转页面</div><div class="line">       .logoutSuccessUrl(&quot;/index&quot;)</div><div class="line">          //清除无效session</div><div class="line">       .invalidateHttpSession(true)</div><div class="line">          //自定义LogoutSuccessHandler.class。如果该类生效。忽略logoutSuccessUrl</div><div class="line"> .logoutSuccessHandler(logoutSuccessHandler)</div><div class="line">          //添加LogoutHandler</div><div class="line">          .addLogoutHandler(logoutHandler)                                         </div><div class="line">          //删除cookie			   </div><div class="line">          .deleteCookies(cookieNamesToClear)</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<hr>
-<h4 id="LogoutSuccessHandler-的实现类"><a href="#LogoutSuccessHandler-的实现类" class="headerlink" title="LogoutSuccessHandler 的实现类"></a>LogoutSuccessHandler 的实现类</h4><blockquote>
-<p>注销成功后发生的操作</p>
+<p>  在Java中LinkedList就是一个典型的(单向)链表结构（它的一个实例域保存了指向链表中第一个结点的引用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">  </div><div class="line">class LinkedList&lt;Item&gt;&#123;</div><div class="line"></div><div class="line">     private Node first; //当前节点</div><div class="line"></div><div class="line">     private class  Node&#123;</div><div class="line"></div><div class="line">           Item data; </div><div class="line"></div><div class="line">           Node next; //下一节点</div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">             · · · · · ·</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="单向链表"><a href="#单向链表" class="headerlink" title="单向链表"></a>单向链表</h2><blockquote>
+<p>node包含指向后一个节点的引用</p>
 </blockquote>
-<ul>
-<li>SimpleUrlLogoutSuccessHandler</li>
-<li>HttpStatusReturningLogoutSuccessHandler</li>
-</ul>
-<h4 id="LogoutHandler-的实现类"><a href="#LogoutHandler-的实现类" class="headerlink" title="LogoutHandler 的实现类"></a>LogoutHandler 的实现类</h4><blockquote>
-<p>处理必要的清理。例如cookie等</p>
+<h2 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h2><blockquote>
+<p>每个node不仅包含指向下后一个结点的引用，还包含着指向前一个结点的引用。</p>
 </blockquote>
-<ul>
-<li>PersistentTokenBasedRememberMeServices</li>
-<li>TokenBasedRememberMeServices</li>
-<li>CookieClearingLogoutHandler</li>
-<li>CsrfLogoutHandler</li>
-<li>SecurityContextLogoutHandler</li>
-</ul>
-<h4 id="更多关于注销的文档"><a href="#更多关于注销的文档" class="headerlink" title="更多关于注销的文档"></a>更多关于注销的文档</h4><p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#nsa-logout" target="_blank" rel="external">&lt; logout &gt;</a></p>
-<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#remember-me-impls" target="_blank" rel="external">Remember-Me</a></p>
-<p>通过钩子方法实现自动登录。RememberMeServices接口方法类似如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">autoLogin(req,res)</div><div class="line">loginSuccess(req,res)</div><div class="line">loginFail(req,res)</div></pre></td></tr></table></figure></p>
-<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#servletapi-logout" target="_blank" rel="external">HttpServletRequest.logout()</a></p>
+<h4 id="链表的优点"><a href="#链表的优点" class="headerlink" title="链表的优点"></a>链表的优点</h4><ol>
+<li>链表支持<strong><em>插入和删除</em></strong>这两种操作，并且删除/插入链表头部/尾部结点的时间复杂度通常都是常数级别 [  O(1)  ]</li>
+<li>可以动态改变大小。</li>
+</ol>
+<h4 id="链表的缺点"><a href="#链表的缺点" class="headerlink" title="链表的缺点"></a>链表的缺点</h4><ol>
+<li>不支持高效的random access（随机访问）。</li>
+</ol>
 <blockquote>
-<p>用于记录当前用户。HttpServletRequest.logout()被调用,需要编写一个响应。</p>
+<p>由于其链式存储的特性，链表不具备良好的空间局部性，也就是说，链表是一种缓存不友好的数据结构。</p>
 </blockquote>
-<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#ns-logout" target="_blank" rel="external">认证提供者</a></p>
-<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#test-logout" target="_blank" rel="external">Test Logout</a></p>
-<pre><code>mvc
-.perform(logout())
-</code></pre><p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#cas-singlelogout" target="_blank" rel="external">CAS单点注销</a></p>
-<h3 id="高级认证"><a href="#高级认证" class="headerlink" title="高级认证"></a>高级认证</h3><h4 id="In-Memory"><a href="#In-Memory" class="headerlink" title="In-Memory"></a>In-Memory</h4>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@Bean</div><div class="line">   public UserDetailsService userDetailsService() throws Exception &#123;</div><div class="line">  InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();</div><div class="line">  manager.createUser(User.withUsername(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).build());</div><div class="line">  manager.createUser(User.withUsername(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;,&quot;ADMIN&quot;).build());</div><div class="line">  return manager;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<h4 id="JDBC"><a href="#JDBC" class="headerlink" title="JDBC"></a>JDBC</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">   @Autowired</div><div class="line">private DataSource dataSource;</div><div class="line"></div><div class="line">@Autowired</div><div class="line">public void configureGlobal(AuthenticationManagerBuilder 	auth) throws Exception &#123;</div><div class="line"> auth</div><div class="line">	.jdbcAuthentication()</div><div class="line">		.dataSource(dataSource)</div><div class="line">		.withDefaultSchema()</div><div class="line">		.withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).and()</div><div class="line">		.withUser(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;, &quot;ADMIN&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="自定义授权认证"><a href="#自定义授权认证" class="headerlink" title="自定义授权认证"></a>自定义授权认证</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">   @Bean</div><div class="line">   public SpringAuthenticationProvider springAuthenticationProvider() &#123;</div><div class="line">	 return new SpringAuthenticationProvider();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="自定义身份认证"><a href="#自定义身份认证" class="headerlink" title="自定义身份认证"></a>自定义身份认证</h4><pre><code>@Bean
-public SpringDataUserDetailsService springDataUserDetailsService() {
-  return new SpringDataUserDetailsService();
-}
-</code></pre><h4 id="自定义密码加密"><a href="#自定义密码加密" class="headerlink" title="自定义密码加密"></a>自定义密码加密</h4>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"> @Bean</div><div class="line"> public BCryptPasswordEncoder passwordEncoder() &#123;</div><div class="line">return new BCryptPasswordEncoder();</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<h3 id="多个HttpSecurity"><a href="#多个HttpSecurity" class="headerlink" title="多个HttpSecurity"></a>多个HttpSecurity</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">   @EnableWebSecurity</div><div class="line">   public class MultiHttpSecurityConfig &#123;</div><div class="line">@Bean</div><div class="line">public UserDetailsService userDetailsService() throws Exception &#123;</div><div class="line">	InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();</div><div class="line">	manager.createUser(User.withUsername(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).build());</div><div class="line">	manager.createUser(User.withUsername(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;,&quot;ADMIN&quot;).build());</div><div class="line">	return manager;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Configuration</div><div class="line">@Order(1)                                                       1</div><div class="line">public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter &#123;</div><div class="line">	protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">		http</div><div class="line">			.antMatcher(&quot;/api/**&quot;)                               </div><div class="line">			.authorizeRequests()</div><div class="line">				.anyRequest().hasRole(&quot;ADMIN&quot;)</div><div class="line">				.and()</div><div class="line">			.httpBasic();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Configuration                                                   </div><div class="line">public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">		http</div><div class="line">			.authorizeRequests()</div><div class="line">				.anyRequest().authenticated()</div><div class="line">				.and()</div><div class="line">			.formLogin();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<h3 id="方法安全"><a href="#方法安全" class="headerlink" title="方法安全"></a>方法安全</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@EnableGlobalMethodSecurity(securedEnabled = true)</div><div class="line">public class MethodSecurityConfig &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public interface BankService &#123;</div><div class="line"></div><div class="line"> @Secured(&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;)</div><div class="line"> public Account readAccount(Long id);</div><div class="line"></div><div class="line"> @Secured(&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;)</div><div class="line"> public Account[] findAccounts();</div><div class="line"></div><div class="line"> @Secured(&quot;ROLE_TELLER&quot;)</div><div class="line"> public Account post(Account account, double amount);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="后置处理"><a href="#后置处理" class="headerlink" title="后置处理"></a>后置处理</h3>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">.withObjectPostProcessor(new ObjectPostProcessor&lt;FilterSecurityInterceptor&gt;() &#123;</div><div class="line">	public &lt;O extends FilterSecurityInterceptor&gt; O postProcess(</div><div class="line">			O fsi) &#123;</div><div class="line">		fsi.setPublishAuthorizationSuccess(true);</div><div class="line">		return fsi;</div><div class="line">	&#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
-<h3 id="自定义DSLs"><a href="#自定义DSLs" class="headerlink" title="自定义DSLs"></a>自定义DSLs</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">   public class MyCustomDsl extends AbstractHttpConfigurer&lt;CorsConfigurerMyCustomDsl, HttpSecurity&gt; &#123;</div><div class="line">private boolean flag;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void init(H http) throws Exception &#123;</div><div class="line">	// any method that adds another configurer</div><div class="line">	// must be done in the init method</div><div class="line">	http.csrf().disable();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void configure(H http) throws Exception &#123;</div><div class="line">	ApplicationContext context = http.getSharedObject(ApplicationContext.class);</div><div class="line"></div><div class="line">	// here we lookup from the ApplicationContext. You can also just create a new instance.</div><div class="line">	MyFilter myFilter = context.getBean(MyFilter.class);</div><div class="line">	myFilter.setFlag(flag);</div><div class="line">	http.addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public MyCustomDsl flag(boolean value) &#123;</div><div class="line">	this.flag = value;</div><div class="line">	return this;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static MyCustomDsl customDsl() &#123;</div><div class="line">	return new MyCustomDsl();</div><div class="line">&#125;		</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p>META-INF/spring.factories.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer = sample.MyCustomDsl</div></pre></td></tr></table></figure></p>
+<h2 id="链表的实现"><a href="#链表的实现" class="headerlink" title="链表的实现"></a>链表的实现</h2><h4 id="单向链表-1"><a href="#单向链表-1" class="headerlink" title="单向链表"></a>单向链表</h4><p><strong>插入节点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public void insert(Item item) &#123;</div><div class="line"></div><div class="line">    Node oldFirst = first; </div><div class="line"></div><div class="line">    first = new Node(); </div><div class="line"></div><div class="line">    first.item = item; </div><div class="line"></div><div class="line">    first.next = oldFirst; </div><div class="line"></div><div class="line">    itemCount++; </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>删除节点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public Item delete() &#123;</div><div class="line"></div><div class="line">    if (first != null) &#123;</div><div class="line"></div><div class="line">        Item item = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        return item;</div><div class="line"></div><div class="line">    &#125; else &#123;</div><div class="line"></div><div class="line">        throw new NullPointerException(&quot;There&apos;s no Node in the linked list.&quot;);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="双向链表-1"><a href="#双向链表-1" class="headerlink" title="双向链表"></a>双向链表</h2><p>双向链表相比与单链表的优势在于它同时<strong><em>支持高效的正向及反向遍历</em></strong>，<strong><em>并且可以方便的在链表尾部删除结点</em></strong></p>
+<p>Java实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div></pre></td><td class="code"><pre><div class="line">public class DoubleLinkedList&lt;Item&gt; &#123;</div><div class="line"></div><div class="line">    private Node first; </div><div class="line"></div><div class="line">    private Node last;</div><div class="line"></div><div class="line">    private int itemCount;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    private class Node &#123;</div><div class="line"></div><div class="line">        Node prev; </div><div class="line"></div><div class="line">        Node next; </div><div class="line"></div><div class="line">        Item item;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    public void addFirst(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldFirst = first;</div><div class="line"></div><div class="line">        first = new Node();</div><div class="line"></div><div class="line">        first.item = item;</div><div class="line"></div><div class="line">        first.next = oldFirst;</div><div class="line"></div><div class="line">        if (oldFirst != null) &#123;</div><div class="line"></div><div class="line">            oldFirst.prev = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            last = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addLast(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldLast = last;</div><div class="line"></div><div class="line">        last = new Node();</div><div class="line"></div><div class="line">        last.item = item;</div><div class="line"></div><div class="line">        last.prev = oldLast;</div><div class="line"></div><div class="line">        if (oldLast != null) &#123;</div><div class="line"></div><div class="line">            oldLast.next = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            first = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delFirst() &#123;</div><div class="line"></div><div class="line">        if (first == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        if (first != null) &#123;</div><div class="line"></div><div class="line">            first.prev = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            last = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delLast() &#123;</div><div class="line"></div><div class="line">        if (last == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = last.item;</div><div class="line"></div><div class="line">        last = last.prev;</div><div class="line"></div><div class="line">        if (last != null) &#123;</div><div class="line"></div><div class="line">            last.next = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            first = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addBefore(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        //从头开始遍历寻找目标节点</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            //继续向后寻找目标节点</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //现在target为指向目标结点的引用</div><div class="line"></div><div class="line">        if (target.prev == null) &#123;</div><div class="line"></div><div class="line">            //此时相当于在表头插入结点</div><div class="line"></div><div class="line">            addFirst(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldPrev = target.prev;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.prev = newNode;</div><div class="line"></div><div class="line">            newNode.next = target;</div><div class="line"></div><div class="line">            newNode.prev = oldPrev;</div><div class="line"></div><div class="line">            oldPrev.next = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addAfter(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target.next == null) &#123;</div><div class="line"></div><div class="line">            addLast(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldNext = target.next;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.next = newNode;</div><div class="line"></div><div class="line">            newNode.prev = target;</div><div class="line"></div><div class="line">            newNode.next= oldNext;</div><div class="line"></div><div class="line">            oldNext.prev = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注：实现链表使用的是pointer wrapper方式，这种方式的特点是prev/next指针包含在结点中，而数据由结点中的另一个指针（即item）所引用。采取这种方式，在获取结点数据时，我们需要进行double-dereferencing，而且这种方式实现的链表不是一种[局部化结构]，这意味着我们<strong>拿到链表的一个结点数据后，无法直接进行insert/delete操作</strong>。</p>
+<h4 id="常见面试题"><a href="#常见面试题" class="headerlink" title="常见面试题"></a>常见面试题</h4><ol>
+<li>输入一个链表，输出该链表中倒数第k个结点。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public class Solution &#123;</div><div class="line"></div><div class="line">    public ListNode FindKthToTail(ListNode head,int k) &#123;</div><div class="line"></div><div class="line">        //先求得链表的尺寸，赋值给size</div><div class="line"></div><div class="line">        int size = 0;</div><div class="line"></div><div class="line">        ListNode current = head;</div><div class="line"></div><div class="line">        while (current != null) &#123;</div><div class="line"></div><div class="line">            size++;</div><div class="line"></div><div class="line">            current = current.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //获取next实例域size-k次，即可得到倒数第k个结点（从1开始计数）</div><div class="line"></div><div class="line">        for (int i = 0; i &lt; size - k; i++) &#123;</div><div class="line"></div><div class="line">            head = head.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return head;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>2.反转链表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public ListNode ReverseList(ListNode head) &#123;</div><div class="line"></div><div class="line">    if (head == null) &#123;</div><div class="line"></div><div class="line">        return null;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ListNode current = head;</div><div class="line"></div><div class="line">    //原head的next node为null</div><div class="line"></div><div class="line">    ListNode prevNode = null;</div><div class="line"></div><div class="line">    ListNode newHead = null;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    while (current != null) &#123;</div><div class="line"></div><div class="line">        ListNode nextNode = current.next;</div><div class="line"></div><div class="line">        current.next = prevNode;</div><div class="line"></div><div class="line">        if (nextNode == null) &#123;</div><div class="line"></div><div class="line">            newHead = current;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        prevNode = current;</div><div class="line"></div><div class="line">        current = nextNode;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return newHead;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://blog.csdn.net/qq_20597479/article/details/59492181" target="_blank" rel="external">LinkedList源码解析</a></p>
+<p>以上转载</p>
+<p><a href="http://www.cnblogs.com/absfree/p/5463372.html" target="_blank" rel="external">http://www.cnblogs.com/absfree/p/5463372.html</a></p>
 
           
         
@@ -460,7 +425,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/SpringSecurity学习笔记/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java链表——LinkedList解析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -479,7 +444,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/05/SpringSecurity学习笔记/" itemprop="url">Untitled</a></h1>
+                <a class="post-title-link" href="/2017/06/05/Java链表——LinkedList解析/" itemprop="url">Java链表——LinkedList解析</a></h1>
         
 
         <div class="post-meta">
@@ -491,7 +456,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T09:55:13+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:47:34+08:00">
                 2017-06-05
               </time>
             
@@ -502,6 +467,28 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -528,7 +515,15 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
       
         
           
-            
+            <p><strong>LinkedList类结构</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">LinkedList&lt;E&gt;</div><div class="line">    extends AbstractSequentialList&lt;E&gt;</div><div class="line">    implements List&lt;E&gt;, Deque&lt;E&gt;, Cloneable, java.io.Serializable</div></pre></td></tr></table></figure>
+<p><strong>Node结构</strong><br><strong>双向链表结构（指向前一结点和后一节点的引用）</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Node&lt;E&gt; &#123;</div><div class="line">        E item; </div><div class="line">        Node&lt;E&gt; next; </div><div class="line">        Node&lt;E&gt; prev; </div><div class="line"></div><div class="line">        Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) &#123;</div><div class="line">            this.item = element;</div><div class="line">            this.next = next;</div><div class="line">            this.prev = prev;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>声明变量</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * Pointer to first node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (first.prev == null &amp;&amp; first.item != null)</div><div class="line">    */</div><div class="line">transient Node&lt;E&gt; first;</div><div class="line"></div><div class="line">/**</div><div class="line">    * Pointer to last node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (last.next == null &amp;&amp; last.item != null)</div><div class="line">    */</div><div class="line">   transient Node&lt;E&gt; last;</div></pre></td></tr></table></figure></p>
+<p><strong>链表添加首位</strong><br><em>推导–&gt;（链表添加末尾）</em><br><em>同理。可得到添加addBefore()上一元素，根据条件不同</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**private void addLast(E e)&#123;*/</div><div class="line">private void andFirst(E e) &#123;</div><div class="line">        /**final Node&lt;E&gt; l = last;*/</div><div class="line">        final Node&lt;E&gt; f = first; </div><div class="line">        //assert：last.next == null &amp;&amp; first.item != null;</div><div class="line">        /**final Node&lt;E&gt; newNode = new Node&lt;&gt;(l,e,null);*/</div><div class="line">        //assert：first.prev == null &amp;&amp; first.item != null</div><div class="line">        //init newNode</div><div class="line">        final Node&lt;E&gt; newNode = new Node&lt;&gt;(null, e, f);</div><div class="line">        /**last = newNode*/</div><div class="line">        first = newNode; </div><div class="line">        //如果首位结点为空，则直接添加。否则添加到结点元素的上一结点</div><div class="line">        /** if(l == null) first = newNode else l.next = newNode */</div><div class="line">        if (f == null) </div><div class="line">            last = newNode;</div><div class="line">        else</div><div class="line">            f.prev = newNode;</div><div class="line">        size++; // init size=0</div><div class="line">        modCount++;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>添加上一元素</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private void addBefore(E e,Node&lt;E&gt; target)&#123;</div><div class="line">//assert: node.next = target &amp;&amp; node.prev = target.prev != null</div><div class="line">	Node&lt;E&gt; newNode = (target.prev,e,target);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>删除首元素,并且返回</strong><br><em>推导–&gt;删除末尾元素，并且返回下一个元素</em><br><em>如果需要删除任意一个未知结点Node X,需要判断两种极端情况（最末或者最前，然后往后（往前）推，当前位置清空回收</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">//private E removeLast(Node&lt;E&gt; f)&#123;</div><div class="line">private E removeFirst(Node&lt;E&gt; f) &#123;</div><div class="line">        //assert f == first &amp;&amp; f != null;</div><div class="line">        final E element = f.item; //得到该元素</div><div class="line">        //final Node&lt;E&gt; prev = f.prev;</div><div class="line">        final Node&lt;E&gt; next = f.next; //得到它下一个引用</div><div class="line">        f.item = null; //清空</div><div class="line">        //f.prev = null;</div><div class="line">        f.next = null; // 回收内存（GC）</div><div class="line">        //last = prev;</div><div class="line">        first = next; //将下一个Node移到首位</div><div class="line">        //if(prev == null) first= null; else prev.next = null</div><div class="line">        //如果为空，则代表List只有一个元素，回收</div><div class="line">        //否则，移除该元素</div><div class="line">        if (next == null) </div><div class="line">            last = null;</div><div class="line">        else</div><div class="line">            next.prev = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">E remove(Node&lt;E&gt; x) &#123;</div><div class="line">        // assert x != null;</div><div class="line">        final E element = x.item;</div><div class="line">        final Node&lt;E&gt; next = x.next;</div><div class="line">        final Node&lt;E&gt; prev = x.prev;</div><div class="line">		</div><div class="line">        if (prev == null) &#123;</div><div class="line">            first = next;</div><div class="line">        &#125; else &#123; //填充在后一元素的位置</div><div class="line">            prev.next = next;</div><div class="line">            x.prev = null; //之前的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (next == null) &#123; </div><div class="line">            last = prev;</div><div class="line">        &#125; else &#123; //填充在前一元素的位置</div><div class="line">            next.prev = prev;</div><div class="line">            x.next = null; //之后的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        x.item = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
           
         
       
@@ -571,7 +566,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/02/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（二）——-GC策略-内存申请、对象衰老/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -590,7 +585,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/02/hello-world/" itemprop="url">Hello World</a></h1>
+                <a class="post-title-link" href="/2017/06/05/jvm调优笔记（二）——-GC策略-内存申请、对象衰老/" itemprop="url">jvm调优笔记（二）—— GC策略&内存申请、对象衰老</a></h1>
         
 
         <div class="post-meta">
@@ -602,8 +597,8 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-02T14:35:26+08:00">
-                2017-06-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:47:05+08:00">
+                2017-06-05
               </time>
             
 
@@ -612,6 +607,28 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jvm调优/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm调优</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -639,16 +656,1186 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
       
         
           
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+            <p>JVM里的GC(Garbage Collection)的算法有很多种，如标记清除收集器，压缩收集器，分代收集器等等,详见HotSpot VM GC 的种类</p>
+<p>堆内存GC<br>       JVM(采用<strong>分代回收</strong>的策略)，<strong>用较高的频率对年轻的对象(young generation)进行YGC，而对老对象(tenured generation)较少(tenured generation 满了后才进行)进行Full GC</strong>。这样就不需要每次GC都将内存中所有对象都检查一遍。</p>
+<p>非堆内存不GC</p>
+<p>GC不会在主程序运行期对PermGen Space进行清理，所以如果你的应用中有很多CLASS(特别是动态生成类，当然permgen space存放的内容不仅限于类)的话,就很可能出现PermGen Space错误。</p>
+<p>内存申请、对象衰老过程</p>
+<p>一、内存申请过程</p>
+<p>JVM会试图为相关Java对象在Eden中<strong>初始化一块内存区域</strong>；</p>
+<p>判断Eden空间（足够时），内存申请结束。否则到下一步；</p>
+<p>JVM试图<strong>释放在Eden中所有不活跃的对象</strong>（minor collection），释放后若Eden空间仍然不足以放入新对象，则<strong>试图将部分Eden中活跃对象放入Survivor区</strong>；</p>
+<p>Survivor区被用来<strong>作为Eden及old的中间交换区域</strong>，当OLD区空间足够时，Survivor区的对象会被移到Old区，否则会被保留在Survivor区；</p>
+<p>当old区空间不够时，JVM会在old区进行major collection；</p>
+<p>完全垃圾收集后，<strong>若Survivor及old区仍然无法存放从Eden复制过来的部分对象，导致JVM无法在Eden区为新对象创建内存区域，则出现”Out of memory错误</strong>“；</p>
+<p>二、对象衰老过程</p>
+<p>新创建的对象的内存都分配自eden。Minor collection的过程就是将eden和在用survivor space中的活对象copy到空闲survivor space中。对象在young generation里经历了一定次数(可以通过参数配置)的minor collection后，就会被移到old generation中，称为tenuring。</p>
+<p>转载</p>
+<p><a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html" target="_blank" rel="external">http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html</a></p>
 
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（一）——-基础概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/jvm调优笔记（一）——-基础概念/" itemprop="url">jvm调优笔记（一）—— 基础概念</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:46:17+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jvm调优/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm调优</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存</p>
+<blockquote>
+<p>Java 虚拟机具有一个堆，<strong>堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。</strong>”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)</p>
+</blockquote>
+<p>方法栈&amp;本地方法栈:</p>
+<pre><code>&gt;线程创建时产生,方法执行时生成栈帧
+</code></pre><p>方法区</p>
+<pre><code>&gt;存储类的元数据信息 常量等
+</code></pre><p>堆</p>
+<blockquote>
+<p>java代码中所有的new操作</p>
+</blockquote>
+<pre><code>native Memory(C heap)
+Direct Bytebuffer JNI Compile GC;
+</code></pre><p>堆内存分配</p>
+<p><strong>JVM初始分配的内存由-Xms指定</strong>，默认是物理内存的1/64；<strong>JVM最大分配的内存由-Xmx指定</strong>，默认是物理内存的1/4。<strong><em>默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制</em></strong>。因此服务器一般设置-Xms、-Xmx相等以避免在每次GC 后调整堆的大小。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。</p>
+<p>  非堆内存分配<br>      JVM使用<strong>-XX:PermSize</strong>设置非堆内存初始值，默认是物理内存的1/64；由 <strong>-XX:MaxPermSize</strong>设置最大非堆内存的大小，默认是物理内存的1/4。</p>
+<p>JVM内存限制(最大值)</p>
+<blockquote>
+<p>JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处理器虽然 可控内存空间有4GB,但是具体的操作系统会给一个限制，这个限制一般是2GB-3GB（一般来说Windows系统下为1.5G-2G，Linux系统 下为2G-3G），而64bit以上的处理器就不会有限制了。</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java序列化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java序列化/" itemprop="url">Java序列化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:51+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>什么是序列化</p>
+<blockquote>
+<p>序列化 (Serialization)是指将对象的状态信息转换为可以存储或传输的形式的过程。</p>
+</blockquote>
+<p>在序列化期间，<strong>对象将其当前状态写入到临时或持久性存储区。以后，可以通过从存储区中读取或反序列化对象的状态，重新创建该对象</strong>。</p>
+<p>简而言之</p>
+<p>序列化<br><strong>将数据结构或对象转换成二进制串的过程</strong></p>
+<p>反序列化<br><strong>将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程</strong></p>
+<p>具体例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public static void main(String args[]) throws Exception &#123;</div><div class="line"></div><div class="line">    String obj = “hello world!”;</div><div class="line"></div><div class="line">    // 将序列化对象写入文件object.txt中</div><div class="line"></div><div class="line">    FileOutputStream fos = new FileOutputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectOutputStream os = new ObjectOutputStream(fos);</div><div class="line"></div><div class="line">    os.writeObject(obj);</div><div class="line"></div><div class="line">    os.close();</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // 从文件object.txt中读取数据</div><div class="line">    FileInputStream fis = new FileInputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectInputStream ois = new ObjectInputStream(fis);</div><div class="line"></div><div class="line">    // 通过反序列化恢复对象obj</div><div class="line"></div><div class="line">    String obj2 = (String)ois.readObject();</div><div class="line"></div><div class="line">    ois.close();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>反序列化漏洞原理</p>
+<blockquote>
+<p>反序列化漏洞的本质就是反序列化机制打破了数据和对象的边界，导致攻击者注入的恶意序列化数据在反序列化过程中被还原成对象，控制了对象就可能在目标系统上面执行攻击代码。Java序列化应用于RMI JMX JMS 技术中。</p>
+</blockquote>
+<p>以上转载</p>
+<p><a href="http://techshow.ctrip.com/archives/1414.html" target="_blank" rel="external">http://techshow.ctrip.com/archives/1414.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java反射/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java反射/" itemprop="url">Java反射</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:12+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Java反射机制作用</p>
+<p>1.<strong>编译期(Compile Time)之外的运行期(Runtime)</strong>检查类，接口，变量以及方法的信息。<br>2.运行期实例化对象，调用方法，通过调用 get/set 方法获取变量的值。（常用）</p>
+<p>Java6的反射机制例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//得到MyObject所有方法</div><div class="line">   Method[] methods = MyObject.class.getMethods();</div><div class="line"></div><div class="line">       for(Method method : methods)&#123;    </div><div class="line"></div><div class="line">           System.out.println(&quot;method = &quot; + method.getName()); </div><div class="line"></div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<p>Java反射可以获取类的如下内容</p>
+<p>①   编译期获得对象（已知类名）：MyObject.class //获取MyObject对象</p>
+<p>运行期获得对象(编译期未知类名，运行期获得类名字符串)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Class.forName(&quot;packageName.className&quot;);</div></pre></td></tr></table></figure>
+<p>②   cls.getName()  返回类的全限定类名（包含包名）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cls.getSimpleName()  //仅返回类的名称（不包含包名）</div></pre></td></tr></table></figure></p>
+<p>③   cls.getModifiers()    获得修饰符（public…)</p>
+<p>④   cls.getPackage()  获取包名</p>
+<p>⑤   cls.getSuperclass()  获取父类</p>
+<p>⑥   cls.getInterfaces()  获取实现接口集合</p>
+<p>⑦   cls.getConstructors()   获取所有构造方法</p>
+<p>⑧   cls.getMethods()  获取一个类的所有方法</p>
+<p>⑨   cls.getFields()  获取一个类的所有成员变量</p>
+<p>⑩   cls..getAnnotations()  获取一个类的所有注解</p>
+<p>Java构造器</p>
+<p>①Constructor constructor =  cls.getConstructor(new Class[]{String.class}); //获取指定构造器</p>
+<p>②<strong>Class[] constructor.getParameterTypes()</strong>  //获取指定构造方法的方法参数</p>
+<p>③ 利用 Constructor 对象实例化一个类</p>
+<pre><code>constructor.newInstance()方法的方法参数是一个可变参数列表，但是当你调用构造方法的时候你必须提供精确的参数，即形参与实参必须一一对应。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Constructor constructor </div><div class="line">=MyObject.class.getConstructor(String.class);</div><div class="line"></div><div class="line">MyObject myObject = (MyObject) </div><div class="line">constructor.newInstance(&quot;args1&quot;);</div></pre></td></tr></table></figure>
+<p>Java变量</p>
+<p>① Field[]  cls.getFields();    //获取所有成员变量</p>
+<p>② Field cls.getField(“someField”)  //获取指定成员变量</p>
+<p>③ field.getName() //得到变量名称</p>
+<p>④ field.getType() //获取变量类型</p>
+<p>⑤ Class  aClass = MyObject.class</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Field field = aClass.getField(&quot;someField&quot;);</div><div class="line"></div><div class="line">MyObject objectInstance = new MyObject();</div><div class="line"></div><div class="line">Object value = field.get(objectInstance);</div><div class="line"></div><div class="line">field.set(objetInstance, value);</div></pre></td></tr></table></figure>
+<p>传入 Field.get()/Field.set()方法的参数 objetInstance 应该是拥有指定变量的类的实例。在上述的例子中传入的参数是 MyObjec t类的实例，是因为 someField 是 MyObject 类的实例。 如果变量是静态变量的话(public static)那么在调用 Field.get()/Field.set()方法的时候传入 null 做为参数而不用传递拥有该变量的类的实例。</p>
+<p>Java方法</p>
+<p>①  cls.getMethods(); //获取所有方法集合</p>
+<p>②  cls.getMethod(“doFunction”, new Class[]{String.class}); //获取制定方法，并且参数是String类型，若没有参数设置为null</p>
+<p>③ Class[] method.getParameterTypes();  //获取指定方法的参数</p>
+<p>④ Class method.getReturnType();  //获取指定方法的返回类型</p>
+<p>⑤ 通过Method调用方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//获取一个方法名为doSomesthing，参数类型为String的方法</div><div class="line"></div><div class="line"> Method method = MyObject.class.getMethod(&quot;doSomething&quot;, String.class);</div><div class="line"></div><div class="line"> Object returnValue = method.invoke(null, &quot;parameter-value1&quot;);</div></pre></td></tr></table></figure>
+<p>Java访问器</p>
+<p>Getter</p>
+<p>  Getter 方法的名字以 get 开头，没有方法参数，返回一个值。</p>
+<p>Setter<br>    Setter 方法的名字以 set 开头，有一个方法参数。</p>
+<pre><code>setters 方法有可能会有返回值也有可能没有，一些 Setter 方法返回 void，一些用来设置值，有一些对象的 setter 方法在方法链中被调用（译者注：这类的 setter 方法必须要有返回值），因此你不应该妄自假设 setter 方法的返回值，一切应该视情况而定。
+</code></pre><p>//判断getter/setter方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public static boolean isGetter(Method method)</div><div class="line"></div><div class="line">&#123; </div><div class="line"></div><div class="line">     if(!method.getName().startsWith(&quot;get&quot;))  return false; </div><div class="line"></div><div class="line">     if(method.getParameterTypes().length != 0)   return false; </div><div class="line"></div><div class="line">     if(void.class.equals(method.getReturnType()) return false;  </div><div class="line"></div><div class="line">    return true;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">public static boolean isSetter(Method method)</div><div class="line"></div><div class="line">&#123;  </div><div class="line"></div><div class="line">        if(!method.getName().startsWith(&quot;set&quot;)) return false;  </div><div class="line"></div><div class="line">        if(method.getParameterTypes().length != 1) return false;  </div><div class="line"></div><div class="line">        return true;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Java泛型</p>
+<p>两个典型的使用泛型的场景：</p>
+<p>1、声明一个需要被参数化（parameterizable）的类/接口。</p>
+<p>2、使用一个参数化类。</p>
+<p>① 泛型方法返回类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Method method = MyClass.class.getMethod(&quot;getStringList&quot;, null);</div><div class="line"></div><div class="line">Type returnType = method.getGenericReturnType(); </div><div class="line"></div><div class="line">if(returnType instanceof ParameterizedType)&#123;   </div><div class="line"></div><div class="line">         ParameterizedType type = (ParameterizedType) returnType;    </div><div class="line"></div><div class="line">         Type[] typeArguments = type.getActualTypeArguments();   </div><div class="line"></div><div class="line">         //打印出 “typeArgClass = java.lang.String”，Type[]数组typeArguments 只有一个             结果 – 一个代表 java.lang.String 的 Class 类的实例。Class 类实现了 Type 接口。</div><div class="line"></div><div class="line">         for(Type typeArgument : typeArguments)&#123;       </div><div class="line"></div><div class="line">                 Class typeArgClass = (Class) typeArgument;     </div><div class="line"></div><div class="line">                   System.out.println(&quot;typeArgClass = &quot; + typeArgClass);    </div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>②泛型方法参数类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">method = Myclass.class.getMethod(&quot;setStringList&quot;, List.class);</div><div class="line"></div><div class="line">Type[] genericParameterTypes = method.getGenericParameterTypes();</div><div class="line"></div><div class="line">for(Type genericParameterType : genericParameterTypes)&#123; </div><div class="line"></div><div class="line">    if(genericParameterType instanceof ParameterizedType)&#123;       </div><div class="line"></div><div class="line">         ParameterizedType aType = (ParameterizedType) genericParameterType;        </div><div class="line"></div><div class="line">         Type[] parameterArgTypes = aType.getActualTypeArguments();        </div><div class="line"></div><div class="line">         for(Type parameterArgType : parameterArgTypes)&#123;            </div><div class="line"></div><div class="line">                 Class parameterArgClass = (Class) parameterArgType;           </div><div class="line"></div><div class="line">                 System.out.println(&quot;parameterArgClass = &quot; + parameterArgClass);       </div><div class="line"></div><div class="line">         &#125;    </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>③ 泛型变量类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">Field field = MyClass.class.getField(&quot;stringList&quot;);</div><div class="line"></div><div class="line">Type genericFieldType = field.getGenericType();</div><div class="line"></div><div class="line">if(genericFieldType instanceof ParameterizedType)&#123;    </div><div class="line"></div><div class="line">     ParameterizedType aType = (ParameterizedType) genericFieldType;   </div><div class="line"></div><div class="line">     Type[] fieldArgTypes = aType.getActualTypeArguments();   </div><div class="line"></div><div class="line">     for(Type fieldArgType : fieldArgTypes)&#123;        </div><div class="line"></div><div class="line">         Class fieldArgClass = (Class) fieldArgType;      </div><div class="line"></div><div class="line">         System.out.println(&quot;fieldArgClass = &quot; + fieldArgClass);   </div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Java 动态代理</p>
+<p>常见用例</p>
+<p>数据库连接以及事物管理</p>
+<p>单元测试中的动态 Mock 对象</p>
+<p>自定义工厂与依赖注入（DI）容器之间的适配器</p>
+<p>类似 AOP 的方法拦截器</p>
+<p>利用Java反射机制你可以在运行期动态的创建接口的实现。 java.lang.reflect.Proxy 类就可以实现这一功能。</p>
+<p>①创建代理</p>
+<p>Proxy.newProxyInstance()方法创建动态代理</p>
+<p>newProxyInstance()方法有三个参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">InvocationHandler handler = new MyInvocationHandler();</div><div class="line"></div><div class="line">MyInterface proxy = (MyInterface) Proxy.newProxyInstance(                            </div><div class="line"></div><div class="line">MyInterface.class.getClassLoader(), //1、类加载器（ClassLoader）用来加载动态代理类。new Class[] &#123; MyInterface.class &#125;, //2、一个要实现的接口的数组。handler); //3、一个 InvocationHandler 把所有方法的调用都转到代理上。</div></pre></td></tr></table></figure>
+<p>InvocationHandler 接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface InvocationHandler&#123;  </div><div class="line"></div><div class="line">    Object invoke(Object proxy, Method method, Object[] args)  throws Throwable;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class MyInvocationHandler implements InvocationHandler&#123;  </div><div class="line"></div><div class="line">     Object invoke(Object proxy, Method method, Object[] args)  throws Throwable &#123; &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>传入 invoke()方法中的 proxy 参数是实现要代理接口的动态代理对象。通常你是不需要他的。</p>
+<p>invoke()方法中的 Method 对象参数代表了被动态代理的接口中要调用的方法，从这个 method 对象中你可以获取到这个方法名字，方法的参数，参数类型等等信息。关于这部分内容可以查阅之前有关 Method 的文章。</p>
+<p>Object 数组参数包含了被动态代理的方法需要的方法参数。注意：原生数据类型（如int，long等等）方法参数传入等价的包装对象（如Integer， Long等等）。</p>
+<p>Java 动态类加载与重载</p>
+<p>①类加载器</p>
+<p> 所有 Java 应用中的类都是被 java.lang.ClassLoader 类的一系列子类加载的。因此要想动态加载类的话也必须使用 java.lang.ClassLoader 的子类。</p>
+<p>   <strong>一个类一旦被加载时，这个类引用的所有类也同时会被加载。类加载过程是一个递归的模式，所有相关的类都会被加载。但并不一定是一个应用里面所有类都会被加载，与这个被加载类的引用链无关的类是不会被加载的，</strong>直到有引用关系的时候它们才会被加载。</p>
+<p>②类加载体系<br>    在 Java 中类加载是一个有序的体系。当你新创建一个标准的 Java 类加载器时你必须提供它的父加载器。<strong>当一个类加载器被调用来加载一个类的时候，首先会调用这个加载器的父加载器来加载。如果父加载器无法找到这个类，这时候这个加载器才会尝试去加载这个类。</strong></p>
+<p>③类加载<br>    类加载器加载类的顺序如下： <strong>1、检查这个类是否已经被加载。 2、如果没有被加载，则首先调用父加载器加载。 3、如果父加载器不能加载这个类，则尝试加载这个类。</strong></p>
+<p>动态类加载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ClassLoader classLoader = MainClass.class.getClassLoader();   </div><div class="line"></div><div class="line">try &#123;      </div><div class="line"></div><div class="line">        Class aClass = classLoader.loadClass(&quot;com.jenkov.MyClass&quot;);        </div><div class="line"></div><div class="line">        System.out.println(&quot;aClass.getName() = &quot; + aClass.getName());  </div><div class="line"></div><div class="line">  &#125; catch (ClassNotFoundException e) &#123;       </div><div class="line"></div><div class="line">         e.printStackTrace();  </div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>④动态类重载</p>
+<p>动态类重载有一点复杂。Java 内置的类加载器在加载一个类之前会检查它是否已经被加载。<strong>因此重载一个类是无法使用 Java 内置的类加载器的，如果想要重载一个类你需要手动继承 ClassLoader。</strong></p>
+<p>在你定制 ClassLoader 的子类之后，你还有一些事需要做。所有被加载的类都需要被链接。这个过程是通过 ClassLoader.resolve()方法来完成的。由于这是一个 final 方法，因此这个方法在 ClassLoader 的子类中是无法被重写的。resolve()方法是不会允许给定的 ClassLoader 实例链接一个类两次。所以每当你想要重载一个类的时候你都需要使用一个新的 ClassLoader 的子类。你在设计类重载功能的时候这是必要的条件。</p>
+<p>⑤自定义类重载<br>在前面已经说过你不能使用已经加载过类的类加载器来重载一个类。因此你需要其他的 ClassLoader 实例来重载这个类。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Redis/" itemprop="url">【Linux】Centos6.8安装Redis</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:36+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1.下载源码并编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd /tmp &amp;&amp; wget http://download.redis.io/redis-stable.tar.gz#tar zxvf  redis-stable.tar.gz &amp;&amp; cd redis-stable &amp;&amp; make</div></pre></td></tr></table></figure>
+<p>2.为了能在任何路径下都能执行redis相关命令，我们需要copy以下两个文件到/usr/local/bin目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp src/redis-server /usr/local/bin/#cp src/redis-cli /usr/local/bin/</div></pre></td></tr></table></figure>
+<p>3.创建文件夹分别保存Redis的配置文件和数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /etc/redis#mkdir /var/redis</div></pre></td></tr></table></figure>
+<p>4.将Redis初始化文件copy进/etc/init.d，并重命名为redis_6379</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp utils/redis_init_script /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
+<p>5.查看文件redis_6379的内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
+<p>6.copy配置文件模板到上图中指定的路径并重命名为6379.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp redis.conf /etc/redis/6379.conf</div></pre></td></tr></table></figure>
+<p>7.在第3步新建的/var/redis路径下新建目录6379作为当前Redis实例的工作目录和数据存放目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /var/redis/6379</div></pre></td></tr></table></figure>
+<p>8.编辑配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/redis/6379.confport 6379#Redis默认监听端口daemonize yes   #是否作为守护进程运行，默认为nopidfile /var/run/redis_6379.pid   #如以后台进程运行，则需指定一个pid文件位置loglevel notice   #日志记录等级，有4个可选值，debug，verbose（默认值），notice，warninglogfile /var/log/redis_6379.log   #指定日志输出文件名，可设为/dev/null屏蔽日志dir /var/redis/6379#本地数据库存放路径和工作目录(非常重要！！！)bind 127.0.0.1#绑定主机IP，默认值为127.0.0.1</div></pre></td></tr></table></figure>
+<p>9.添加开机自启动。开机启动要配置在 rc.local 中，而 /etc/profile 文件，要有用户登录了，才会被执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo &quot;/etc/init.d/redis_6379 start &amp;&quot; &gt;&gt; /etc/rc.local</div></pre></td></tr></table></figure>
+<p>10.启动Redis并测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# /etc/init.d/redis_6379 start</div></pre></td></tr></table></figure>
+<p>Starting Redis server…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# redis-cli</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set test jinbitou.net</div></pre></td></tr></table></figure>
+<p>OK</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; get test</div></pre></td></tr></table></figure>
+<p>“jinbitou.net”</p>
+<p>127.0.0.1:6379&gt;</p>
+<p>11.检测是否开启远程连接<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps -ef | grep redis</div></pre></td></tr></table></figure></p>
+<p>12.配置密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; config set requirepass admin #密码为admin</div></pre></td></tr></table></figure>
+<p>13.如果java无法访问远程redis</p>
+<p>关闭虚拟机防火墙  <code>service iptables stop</code></p>
+<p>以上转载</p>
+<p><a href="http://jinbitou.net/2016/10/28/2110.html" target="_blank" rel="external">http://jinbitou.net/2016/10/28/2110.html</a></p>
+<p>相关资料</p>
+<p><a href="http://www.tianshouzhi.com/api/tutorials/redis/189" target="_blank" rel="external">http://www.tianshouzhi.com/api/tutorials/redis/189</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Nginx/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Nginx/" itemprop="url">【Linux】Centos6.8安装Nginx</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:00+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>安装条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">yum install -y gcc-c++</div><div class="line"></div><div class="line">yum install -y pcre pcre-devel</div><div class="line"></div><div class="line">yum install -y zlib zlib-devel</div><div class="line"></div><div class="line">yum install -y openssl openssl-devel</div></pre></td></tr></table></figure>
+<p>安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget  https://nginx.org/download/nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">tar zxvf nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">cd nginx-1.8.0</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
+<p>远程访问设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl http://172.16.41.156    在本机中检测是否可以访问</div><div class="line"></div><div class="line">iptables -F  （不然无法远程访问）</div></pre></td></tr></table></figure>
+<p><a href="http://172.16.41.156" target="_blank" rel="external">http://172.16.41.156</a></p>
+<p><a href="https://my.oschina.net/psuyun/blog/113694" target="_blank" rel="external">nginx常用命令</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装MongoDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装MongoDB/" itemprop="url">【Linux】Centos6.8安装MongoDB</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:43:19+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/mongodb/" itemprop="url" rel="index">
+                    <span itemprop="name">mongodb</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1.解压<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">wget  https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.4.0.tgz</div><div class="line"></div><div class="line">tar zxvf mongodb-linux-x86_64-amazon-3.4.0.tgz</div><div class="line"></div><div class="line">mv mongodb-linux-x86_64-amazon-3.4.0 /usr/local/mongodb</div><div class="line"></div><div class="line">cd /usr/local/mongodb</div></pre></td></tr></table></figure></p>
+<p>2.创建data目录和logs目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make -p data logs</div></pre></td></tr></table></figure>
+<p>3.启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">vi mongodb.conf 中添加</div><div class="line"></div><div class="line">port=27017</div><div class="line"></div><div class="line">logpath=/usr/local/mongodb/logs/mongodb.log</div><div class="line"></div><div class="line">logdbpath=/usr/local/mongodb/data/</div><div class="line"></div><div class="line">logappend=true</div><div class="line"></div><div class="line">fork=true</div></pre></td></tr></table></figure>
+<p>4.更新配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./mongod -f ../mongodb.conf</div></pre></td></tr></table></figure>
+<p>启动命令行界面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./mongo</div></pre></td></tr></table></figure>
+<p>访问成功</p>
+<p><a href="http://172.16.41.31:27017" target="_blank" rel="external">http://172.16.41.31:27017</a></p>
+<p>It looks like you are trying to access MongoDB over HTTP on the native driver port.</p>
+<p><a href="http://howiefh.github.io/2014/04/26/mongodb-note-1-install-mongodb/" target="_blank" rel="external">参考文档</a></p>
+<p>以上转载</p>
+<p><a href="https://my.oschina.net/u/2607587/blog/779404" target="_blank" rel="external">https://my.oschina.net/u/2607587/blog/779404</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装docker/" itemprop="url">【Linux】Centos6.8安装docker</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:42+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>检查系统版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">uname -a</div><div class="line"></div><div class="line">cat /etc/redhat-release</div></pre></td></tr></table></figure>
+<p>安装Epel</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -Uvh http://ftp.riken.jp/Linux/fedora/epel/6Server/x86_64/epel-release-6-8.noarch.rpm</div></pre></td></tr></table></figure>
+<p>安装docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install -y docker-io</div></pre></td></tr></table></figure>
+<p>开机自启动与启动Docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">service docker start</div><div class="line"></div><div class="line">chkconfig docker on</div><div class="line"></div><div class="line">chkconfig docker --list</div></pre></td></tr></table></figure>
           
         
       
@@ -685,6 +1872,10 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -727,7 +1918,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">71</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -738,7 +1929,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">29</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -749,7 +1940,7 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">63</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
