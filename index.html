@@ -254,7 +254,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/链表结构小记/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -273,7 +273,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/05/链表结构小记/" itemprop="url">链表结构小记</a></h1>
+                <a class="post-title-link" href="/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/" itemprop="url">【设计模式】行为型模式——命令模式（Command Pattern）</a></h1>
         
 
         <div class="post-meta">
@@ -285,7 +285,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:48:15+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:37:15+08:00">
                 2017-06-05
               </time>
             
@@ -308,8 +308,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -344,1498 +344,1618 @@
       
         
           
-            <h2 id="链表的概念"><a href="#链表的概念" class="headerlink" title="链表的概念"></a>链表的概念</h2><blockquote>
-<p>链表是一种递归的数据结构，它或者为空（null），或者是指向一个结点（node）的引用，该节点还有一个元素和一个指向另一条链表的引用。   </p>
+            <h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><blockquote>
+<p><strong>将一个请求封装为一个对象，从而让我们可用不同的请求对客户进行参数化；对请求排队或者记录请求日志，以及支持可撤销的操作。命令模式是一种对象行为型模式，其别名为动作(Action)模式或事务(Transaction)模式。</strong></p>
 </blockquote>
-<p>  在Java中LinkedList就是一个典型的(单向)链表结构（它的一个实例域保存了指向链表中第一个结点的引用）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">  </div><div class="line">class LinkedList&lt;Item&gt;&#123;</div><div class="line"></div><div class="line">     private Node first; //当前节点</div><div class="line"></div><div class="line">     private class  Node&#123;</div><div class="line"></div><div class="line">           Item data; </div><div class="line"></div><div class="line">           Node next; //下一节点</div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">             · · · · · ·</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="单向链表"><a href="#单向链表" class="headerlink" title="单向链表"></a>单向链表</h2><blockquote>
-<p>node包含指向后一个节点的引用</p>
+<p> <strong>命令模式可以将请求发送者和接收者完全解耦，发送者与接收者之间没有直接引用关系，发送请求的对象只需要知道如何发送请求，而不必知道如何完成请求。</strong></p>
+<h2 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h2><p>(1) 降低系统的耦合度。由于请求者与接收者之间不存在直接引用，因此请求者与接收者之间实现完全解耦，相同的请求者可以对应不同的接收者，同样，相同的接收者也可以供不同的请求者使用，两者之间具有良好的独立性。<br>       (2) 新的命令可以很容易地加入到系统中。由于增加新的具体命令类不会影响到其他类，因此增加新的具体命令类很容易，无须修改原有系统源代码，甚至客户类代码，满足“开闭原则”的要求。<br>       (3) 可以比较容易地设计一个命令队列或宏命令（组合命令）。<br>       (4) 为请求的撤销(Undo)和恢复(Redo)操作提供了一种设计和实现方案。</p>
+<h2 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h2><p> <strong>使用命令模式可能会导致某些系统有过多的具体命令类。</strong>因为针对每一个对请求接收者的调用操作都需要设计一个具体命令类，因此在某些系统中可能需要提供大量的具体命令类，这将影响命令模式的使用。</p>
+<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p> (1) 系统需要将请求调用者和请求接收者解耦，使得调用者和接收者不直接交互。请求调用者无须知道接收者的存在，也无须知道接收者是谁，接收者也无须关心何时被调用。<br>       (2) 系统需要在不同的时间指定请求、将请求排队和执行请求。一个命令对象和请求的初始调用者可以有不同的生命期，换言之，最初的请求发出者可能已经不在了，而命令对象本身仍然是活动的，可以通过该命令对象去调用请求接收者，而无须关心请求调用者的存在性，可以通过请求日志文件等机制来具体实现。<br>       (3) 系统需要支持命令的撤销(Undo)操作和恢复(Redo)操作。<br>       (4) 系统需要将一组操作组合在一起形成宏命令。</p>
+<h2 id="模式应用"><a href="#模式应用" class="headerlink" title="模式应用"></a>模式应用</h2><blockquote>
+<p><strong>Hystrix</strong></p>
 </blockquote>
-<h2 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h2><blockquote>
-<p>每个node不仅包含指向下后一个结点的引用，还包含着指向前一个结点的引用。</p>
+<h2 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h2><p><img src="http://img.blog.csdn.net/20170418143436113?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<blockquote>
+<p><strong>命令模式的本质是对请求进行封装，一个请求对应于一个命令，将发出命令的责任和执行命令的责任分割开。</strong>每一个命令都是一个操作：请求的一方发出请求要求执行一个操作；接收的一方收到请求，并执行相应的操作。命令模式允许请求的一方和接收的一方独立开来，使得请求的一方不必知道接收请求的一方的接口，更不必知道请求如何被接收、操作是否被执行、何时被执行，以及是怎么被执行的。<br>       <strong>命令模式的关键在于引入了抽象命令类，请求发送者针对抽象命令类编程，只有实现了抽象命令类的具体命令才与请求接收者相关联。</strong></p>
 </blockquote>
-<h4 id="链表的优点"><a href="#链表的优点" class="headerlink" title="链表的优点"></a>链表的优点</h4><ol>
-<li>链表支持<strong><em>插入和删除</em></strong>这两种操作，并且删除/插入链表头部/尾部结点的时间复杂度通常都是常数级别 [  O(1)  ]</li>
-<li>可以动态改变大小。</li>
+<h2 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">abstract class Command &#123;  </div><div class="line">    public abstract void execute();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Invoker &#123;  </div><div class="line">    private Command command;  </div><div class="line">      </div><div class="line">    //构造注入  </div><div class="line">    public Invoker(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //设值注入  </div><div class="line">    public void setCommand(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //业务方法，用于调用命令类的execute()方法  </div><div class="line">    public void call() &#123;  </div><div class="line">        command.execute();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">class ConcreteCommand extends Command &#123;  </div><div class="line">    private Receiver receiver; //维持一个对请求接收者对象的引用  </div><div class="line">  </div><div class="line">    public void execute() &#123;  </div><div class="line">        receiver.action(); //调用请求接收者的业务处理方法action()  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class Receiver &#123;  </div><div class="line">    public void action() &#123;  </div><div class="line">        //具体操作  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>每一个具体命令类对应一个请求的处理者（接收者），通过向请求发送者注入不同的具体命令对象可以使得相同的发送者对应不同的接收者，从而实现“将一个请求封装为一个对象，用不同的请求对客户进行参数化”</strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为性模式——模板方法模式-Template-Method-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】行为性模式——模板方法模式-Template-Method-Pattern/" itemprop="url">【设计模式】行为性模式——模板方法模式(Template Method Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:36:35+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><blockquote>
+<p><strong>定义一个操作中算法的框架，而将一些步骤延迟到子类中。模板方法模式使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤</strong></p>
+</blockquote>
+<p><strong>模板方法模式是一种基于继承的代码复用技术，它是一种类行为型模式。</strong></p>
+<h2 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h2><p>  (1) 在父类中形式化地定义一个算法，而由它的子类来实现细节的处理，在子类实现详细的处理算法时并不会改变算法中步骤的执行次序。<br>       (2) 模板方法模式是一种代码复用技术，它在类库设计中尤为重要，它提取了类库中的公共行为，将公共行为放在父类中，而通过其子类来实现不同的行为，它鼓励我们恰当使用继承来实现代码复用。<br>       (3) 可实现一种反向控制结构，通过子类覆盖父类的钩子方法来决定某一特定步骤是否需要执行。<br>       (4) 在模板方法模式中可以通过子类来覆盖父类的基本方法，不同的子类可以提供基本方法的不同实现，更换和增加新的子类很方便，符合单一职责原则和开闭原则。</p>
+<h2 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h2><p>   需要为每一个基本方法的不同实现提供一个子类，如果父类中可变的基本方法太多，将会导致类的个数增加，系统更加庞大，设计也更加抽象，此时，可结合桥接模式来进行设计。</p>
+<h2 id="模式适用场景"><a href="#模式适用场景" class="headerlink" title="模式适用场景"></a>模式适用场景</h2><p> (1) 对一些复杂的算法进行分割，将其算法中固定不变的部分设计为模板方法和父类具体方法，而一些可以改变的细节由其子类来实现。即：一次性实现一个算法的不变部分，并将可变的行为留给子类来实现。<br>(2) 各子类中公共的行为应被提取出来并集中到一个公共父类中以避免代码重复。<br>(3) 需要通过子类来决定父类算法中某个步骤是否执行，实现子类对父类的反向控制。</p>
+<h2 id="模式实际应用"><a href="#模式实际应用" class="headerlink" title="模式实际应用"></a>模式实际应用</h2><blockquote>
+<p>线程AQS类</p>
+</blockquote>
+<hr>
+<h2 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h2><p><img src="http://img.blog.csdn.net/20170418114145140?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<hr>
+<h2 id="模式实现"><a href="#模式实现" class="headerlink" title="模式实现"></a>模式实现</h2><blockquote>
+<p> 一个模板方法是定义在抽象类中的、把基本操作方法组合在一起形成一个总算法或一个总行为的方法。这个模板方法定义在抽象类中，并由子类不加以修改地完全继承下来。模板方法是一个具体方法，它给出了一个顶层逻辑框架，而逻辑的组成步骤在抽象类中可以是具体方法，也可以是抽象方法。由于模板方法是具体方法，因此模板方法模式中的抽象层只能是抽象类，而不是接口。</p>
+</blockquote>
+<hr>
+<h2 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">abstract class AbstractClass   </div><div class="line">&#123;  </div><div class="line">	//模板方法  </div><div class="line">	public void TemplateMethod()   </div><div class="line">	&#123;  </div><div class="line">	        PrimitiveOperation1();  </div><div class="line">	        PrimitiveOperation2();  </div><div class="line">	        PrimitiveOperation3();  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">	//基本方法—具体方法  </div><div class="line">	public void PrimitiveOperation1()   </div><div class="line">	&#123;  </div><div class="line">	    //实现代码  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">	//基本方法—抽象方法  </div><div class="line">    public abstract void PrimitiveOperation2();      </div><div class="line">  </div><div class="line">	//基本方法—钩子方法  </div><div class="line">	public virtual void PrimitiveOperation3()&#123;  &#125;</div><div class="line">  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">class ConcreteClass : AbstractClass   </div><div class="line">&#123;  </div><div class="line">	public override void PrimitiveOperation2()   </div><div class="line">	&#123;  </div><div class="line">	    //实现代码  </div><div class="line">	&#125;  </div><div class="line">	  </div><div class="line">	public override void PrimitiveOperation3()   </div><div class="line">	&#123;  </div><div class="line">	    //实现代码  </div><div class="line">	&#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>在模板方法模式中，由于面向对象的多态性，子类对象在运行时将覆盖父类对象，子类中定义的方法也将覆盖父类中定义的方法，因此程序在运行时，具体子类的基本方法将覆盖父类中定义的基本方法，子类的钩子方法也将覆盖父类的钩子方法，从而可以通过在子类中实现的钩子方法对父类方法的执行进行约束，实现子类对父类行为的反向控制。</strong></p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】Lambda表达式实现工厂模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】Lambda表达式实现工厂模式/" itemprop="url">【设计模式】Lambda表达式实现工厂模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:35:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="简单原始例子"><a href="#简单原始例子" class="headerlink" title="简单原始例子"></a>简单原始例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public interface Shape &#123;</div><div class="line">	void draw();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public class Rectangle implements Shape &#123;</div><div class="line">	@Override</div><div class="line">	public void draw() &#123;</div><div class="line">		System.out.println(&quot;Inside Rectangle::draw() method.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">public class Circle implements Shape &#123;</div><div class="line">	@Override</div><div class="line">	public void draw() &#123;</div><div class="line">		System.out.println(&quot;Inside Circle::draw() method.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ShapeFactory &#123;</div><div class="line">	//use getShape method to get object of type shape</div><div class="line">	public Shape getShape(String shapeType)&#123;</div><div class="line">		if(shapeType == null)&#123;</div><div class="line">		return null;</div><div class="line">		&#125;</div><div class="line">		if(shapeType.equalsIgnoreCase(&quot;CIRCLE&quot;))&#123;</div><div class="line">		return new Circle();</div><div class="line">		&#125; else if(shapeType.equalsIgnoreCase(&quot;RECTANGLE&quot;))&#123;</div><div class="line">		return new Rectangle();</div><div class="line">		&#125;</div><div class="line">		return null;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="使用Lambada实现工厂模式"><a href="#使用Lambada实现工厂模式" class="headerlink" title="使用Lambada实现工厂模式"></a>使用Lambada实现工厂模式</h3><p><strong>Lambda表达式允许我们定义一个匿名方法，并允许我们以函数式接口的方式使用它</strong></p>
+<p>方法引用和lambda表达式拥有相同的特性（例如，它们都需要一个目标类型，并需要被转化为函数式接口的实例），不过我们并不需要为方法引用提供方法体，我们可以直接通过方法名称引用已有方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Supplier&lt;Shape&gt; circleSupplier = Circle::new;</div><div class="line">Circle circle = circleSupplier.get();</div></pre></td></tr></table></figure>
+<hr>
+<p>根据构造方法引用的原理，我们可以重写之前的代码，定义一个Map来保存shape name 和它对应的构造方法引用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">final static Map&lt;String, Supplier&lt;Shape&gt;&gt; map = new HashMap&lt;&gt;();</div><div class="line">static &#123;</div><div class="line">	map.put(&quot;CIRCLE&quot;, Circle::new);</div><div class="line">	map.put(&quot;RECTANGLE&quot;, Rectangle::new);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="使用这个map来实例化不同的shapes"><a href="#使用这个map来实例化不同的shapes" class="headerlink" title="使用这个map来实例化不同的shapes"></a>使用这个map来实例化不同的shapes</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ShapeFactory &#123;</div><div class="line">final static Map&lt;String, Supplier&lt;Shape&gt;&gt; map = new HashMap&lt;&gt;();</div><div class="line">	static &#123;</div><div class="line">		map.put(&quot;CIRCLE&quot;, Circle::new);</div><div class="line">		map.put(&quot;RECTANGLE&quot;, Rectangle::new);</div><div class="line">	&#125;</div><div class="line">	public Shape getShape(String shapeType)&#123;</div><div class="line">		Supplier&lt;Shape&gt; shape = map.get(shapeType.toUpperCase());</div><div class="line">		if(shape != null) &#123;</div><div class="line">			return shape.get();</div><div class="line">		&#125;</div><div class="line">		throw new IllegalArgumentException(&quot;No such shape &quot; + shapeType.toUpperCase());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<p>使用lambada表达式实现的工厂方法来创建shape对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">	Supplier&lt;ShapeFactory&gt; shapeFactory = ShapeFactory::new;</div><div class="line">	//call draw method of circle</div><div class="line">	shapeFactory.get().getShape(&quot;circle&quot;).draw();</div><div class="line">	//call draw method of Rectangle</div><div class="line">	shapeFactory.get().getShape(&quot;rectangle&quot;).draw();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里的 Shape::new可以被看作为lambda表达式的简写形式。尽管方法引用不一定会把语法变的更紧凑，但它拥有更明确的语义——如果我们想要调用的方法拥有一个名字，我们就可以通过它的名字直接调用它。</p>
+<p>如果 Shape 构造函数需要多个参数，那么你就需要重新实现自己的Supplier</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">() -&gt; new Circe(args)</div></pre></td></tr></table></figure>
+<p><a href="https://blog.maxleap.cn/archives/1300" target="_blank" rel="external">原文转载</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构型模式——组合模式（Composite-Pattern）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】结构型模式——组合模式（Composite-Pattern）/" itemprop="url">【设计模式】结构型模式——组合模式（Composite Pattern）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:35:15+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="组合模式定义"><a href="#组合模式定义" class="headerlink" title="组合模式定义"></a>组合模式定义</h3><blockquote>
+<p><strong>组合多个对象形成树形结构以表示具有“整体—部分”关系的层次结构。组合模式对单个对象（即叶子对象）和组合对象（即容器对象）的使用具有一致性，组合模式又可以称为“整体—部分”(Part-Whole)模式，它是一种对象结构型模式。</strong></p>
+</blockquote>
+<hr>
+<blockquote>
+<p>组合模式为处理树形结构提供了一种较为完美的解决方案，它描述了如何将容器和叶子进行递归组合，使得用户在使用时无须对它们进行区分，可以一致地对待容器和叶子。</p>
+</blockquote>
+<h3 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h3><ul>
+<li>组合模式可以清楚地定义分层次的复杂对象，表示对象的全部或部分层次，它让客户端忽略了层次的差异，方便对整个层次结构进行控制。</li>
+<li>客户端可以一致地使用一个组合结构或其中单个对象，不必关心处理的是单个对象还是整个组合结构，简化了客户端代码。</li>
+<li>在组合模式中增加新的容器构件和叶子构件都很方便，无须对现有类库进行任何修改，符合“开闭原则”。</li>
+<li>组合模式为树形结构的面向对象实现提供了一种灵活的解决方案，通过叶子对象和容器对象的递归组合，可以形成复杂的树形结构，但对树形结构的控制却非常简单。<h3 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h3></li>
+<li>在增加新构件时很难对容器中的构件类型进行限制。有时候我们希望一个容器中只能有某些特定类型的对象，例如在某个文件夹中只能包含文本文件，使用组合模式时，不能依赖类型系统来施加这些约束，因为它们都来自于相同的抽象层，在这种情况下，必须通过在运行时进行类型检查来实现，这个实现过程较为复杂。</li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>在具有整体和部分的层次结构中，希望通过一种方式忽略整体与部分的差异，客户端可以一致地对待它们。</li>
+<li>在一个使用面向对象语言开发的系统中需要处理一个树形结构。</li>
+<li>在一个系统中能够分离出叶子对象和容器对象，而且它们的类型不固定，需要增加一些新的类型。</li>
+</ul>
+<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170405112743406?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><strong>组合模式的关键是定义了一个抽象构件类，它既可以代表叶子，又可以代表容器，而客户端针对该抽象构件类进行编程，无须知道它到底表示的是叶子还是容器，可以对其进行统一处理</strong></p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">abstract class Component &#123;  </div><div class="line">    public abstract void add(Component c); //增加成员  </div><div class="line">    public abstract void remove(Component c); //删除成员  </div><div class="line">    public abstract Component getChild(int i); //获取成员  </div><div class="line">    public abstract void operation();  //业务方法  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Leaf extends Component &#123;  </div><div class="line">    public void add(Component c) &#123;   </div><div class="line">        //异常处理或错误提示   </div><div class="line">    &#125;     </div><div class="line">          </div><div class="line">    public void remove(Component c) &#123;   </div><div class="line">        //异常处理或错误提示   </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public Component getChild(int i) &#123;   </div><div class="line">        //异常处理或错误提示  </div><div class="line">        return null;   </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void operation() &#123;  </div><div class="line">        //叶子构件具体业务方法的实现  </div><div class="line">    &#125;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">class Composite extends Component &#123;  </div><div class="line">    private ArrayList&lt;Component&gt; list = new ArrayList&lt;Component&gt;();  </div><div class="line">      </div><div class="line">    public void add(Component c) &#123;  </div><div class="line">        list.add(c);  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void remove(Component c) &#123;  </div><div class="line">        list.remove(c);  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public Component getChild(int i) &#123;  </div><div class="line">        return (Component)list.get(i);  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void operation() &#123;  </div><div class="line">        //容器构件具体业务方法的实现  </div><div class="line">        //递归调用成员构件的业务方法  </div><div class="line">        for(Object obj:list) &#123;  </div><div class="line">            ((Component)obj).operation();  </div><div class="line">        &#125;  </div><div class="line">    &#125;     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——策略模式-Strategy-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】行为型模式——策略模式-Strategy-Pattern/" itemprop="url">【设计模式】行为型模式——策略模式(Strategy Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:34:51+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="策略模式定义"><a href="#策略模式定义" class="headerlink" title="策略模式定义"></a>策略模式定义</h3><blockquote>
+<p><strong>实现某一个功能有多条途径，每一条途径对应一种算法，此时我们可以使用一种设计模式来实现灵活地选择解决途径，也能够方便地增加新的解决途径</strong></p>
+</blockquote>
+<p><strong>策略模式的主要目的是将算法的定义与使用分开，也就是将算法的行为和环境分开</strong></p>
+<h3 id="策略模式优点"><a href="#策略模式优点" class="headerlink" title="策略模式优点"></a>策略模式优点</h3><ul>
+<li>策略模式提供了对“开闭原则”的完美支持，用户可以在不修改原有系统的基础上选择算法或行为，也可以灵活地增加新的算法或行为。</li>
+<li>策略模式提供了管理相关的算法族的办法。策略类的等级结构定义了一个算法或行为族，恰当使用继承可以把公共的代码移到抽象策略类中，从而避免重复的代码。</li>
+<li>策略模式提供了一种可以替换继承关系的办法。如果不使用策略模式，那么使用算法的环境类就可能会有一些子类，每一个子类提供一种不同的算法。但是，这样一来算法的使用就和算法本身混在一起，不符合“单一职责原则”，决定使用哪一种算法的逻辑和该算法本身混合在一起，从而不可能再独立演化；而且使用继承无法实现算法或行为在程序运行时的动态切换。</li>
+<li>使用策略模式可以避免多重条件选择语句。多重条件选择语句不易维护，它把采取哪一种算法或行为的逻辑与算法或行为本身的实现逻辑混合在一起，将它们全部硬编码(Hard Coding)在一个庞大的多重条件选择语句中，比直接继承环境类的办法还要原始和落后。</li>
+<li>策略模式提供了一种算法的复用机制，由于将算法单独提取出来封装在策略类中，因此不同的环境类可以方便地复用这些策略类。<h3 id="策略模式缺点"><a href="#策略模式缺点" class="headerlink" title="策略模式缺点"></a>策略模式缺点</h3></li>
+</ul>
+<ul>
+<li>客户端必须知道所有的策略类，并自行决定使用哪一个策略类。这就意味着客户端必须理解这些算法的区别，以便适时选择恰当的算法。换言之，策略模式只适用于客户端知道所有的算法或行为的情况。</li>
+<li>策略模式将造成系统产生很多具体策略类，任何细小的变化都将导致系统要增加一个新的具体策略类。</li>
+<li>无法同时在客户端使用多个策略类，也就是说，在使用策略模式时，客户端每次只能使用一个策略类，不支持使用一个策略类完成部分功能后再使用另一个策略类来完成剩余功能的情况。</li>
+</ul>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ul>
+<li>一个系统需要动态地在几种算法中选择一种，那么可以将这些算法封装到一个个的具体算法类中，而这些具体算法类都是一个抽象算法类的子类。换言之，这些具体算法类均有统一的接口，根据“里氏代换原则”和面向对象的多态性，客户端可以选择使用任何一个具体算法类，并只需要维持一个数据类型是抽象算法类的对象。</li>
+<li>一个对象有很多的行为，如果不用恰当的模式，这些行为就只好使用多重条件选择语句来实现。此时，使用策略模式，把这些行为转移到相应的具体策略类里面，就可以避免使用难以维护的多重条件选择语句。</li>
+<li>不希望客户端知道复杂的、与算法相关的数据结构，在具体策略类中封装算法与相关的数据结构，可以提高算法的保密性与安全性。</li>
+</ul>
+<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170401153719791?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ul>
+<li>策略模式是对算法的封装，它把算法的责任和算法本身分割开，委派给不同的对象管理</li>
+<li>环境类是需要使用算法的类。在一个系统中可以存在多个环境类，它们可能需要重用一些相同的算法</li>
+</ul>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">abstract class AbstractStrategy &#123;  </div><div class="line">    public abstract void algorithm(); //声明抽象算法  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class ConcreteStrategyA extends AbstractStrategy &#123;  </div><div class="line">    //算法的具体实现  </div><div class="line">    public void algorithm() &#123;  </div><div class="line">       //算法A  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">class Context &#123;  </div><div class="line">private AbstractStrategy strategy; //维持一个对抽象策略类的引用  </div><div class="line">  </div><div class="line">    public void setStrategy(AbstractStrategy strategy) &#123;  </div><div class="line">        this.strategy= strategy;  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    //调用策略类中的算法  </div><div class="line">    public void algorithm() &#123;  </div><div class="line">        strategy.algorithm();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Context context = new Context();  </div><div class="line">AbstractStrategy strategy;  </div><div class="line">strategy = new ConcreteStrategyA(); //可在运行时指定类型  </div><div class="line">context.setStrategy(strategy);  </div><div class="line">context.algorithm();</div></pre></td></tr></table></figure>
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><h4 id="策略模式的两个典型应用"><a href="#策略模式的两个典型应用" class="headerlink" title="策略模式的两个典型应用"></a>策略模式的两个典型应用</h4><ul>
+<li>Java SE的容器布局管理</li>
+</ul>
+<hr>
+<blockquote>
+<p> 策略模式用于算法的自由切换和扩展，它是应用较为广泛的设计模式之一。策略模式对应于解决某一问题的一个算法族，允许用户从该算法族中任选一个算法来解决某一问题，同时可以方便地更换算法或者增加新的算法。只要涉及到算法的封装、复用和切换都可以考虑使用策略模式</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——原型模式-Prototype-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——原型模式-Prototype-Pattern/" itemprop="url">【设计模式】创建型模式——原型模式(Prototype Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:27:34+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="原型模式的定义"><a href="#原型模式的定义" class="headerlink" title="原型模式的定义"></a>原型模式的定义</h3><blockquote>
+<p><strong>使用原型实例指定创建对象的种类，并且通过拷贝这些原型创建新的对象。原型模式是一种对象创建型模式。</strong></p>
+</blockquote>
+<p>注意：通过克隆方法所创建的对象是全新的对象，它们在内存中拥有新的地址，通常对克隆所产生的对象进行修改对原型对象不会造成任何影响，每一个克隆对象都是相互独立的。通过不同的方式修改可以得到一系列相似但不完全相同的对象</p>
+<h3 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h3><ul>
+<li>当创建新的对象实例较为复杂时，使用原型模式可以简化对象的创建过程，通过复制一个已有实例可以提高新实例的创建效率。</li>
+<li>扩展性较好，由于在原型模式中提供了抽象原型类，在客户端可以针对抽象原型类进行编程，而将具体原型类写在配置文件中，增加或减少产品类对原有系统都没有任何影响。</li>
+<li>原型模式提供了简化的创建结构，工厂方法模式常常需要有一个与产品类等级结构相同的工厂等级结构，而原型模式就不需要这样，原型模式中产品的复制是通过封装在原型类中的克隆方法实现的，无须专门的工厂类来创建产品。</li>
+<li><p>可以使用深克隆的方式保存对象的状态，使用原型模式将对象复制一份并将其状态保存起来，以便在需要的时候使用（如恢复到某一历史状态），可辅助实现撤销操作。</p>
+<h3 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h3></li>
+<li><p>需要为每一个类配备一个克隆方法，而且该克隆方法位于一个类的内部，当对已有的类进行改造时，需要修改源代码，违背了“开闭原则”。</p>
+</li>
+<li>在实现深克隆时需要编写较为复杂的代码，而且当对象之间存在多重的嵌套引用时，为了实现深克隆，每一层对象对应的类都必须支持深克隆，实现起来可能会比较麻烦。</li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>创建新对象成本较大（如初始化需要占用较长的时间，占用太多的CPU资源或网络资源），新的对象可以通过原型模式对已有对象进行复制来获得，如果是相似对象，则可以对其成员变量稍作修改。</li>
+<li>如果系统要保存对象的状态，而对象的状态变化很小，或者对象本身占用内存较少时，可以使用原型模式配合备忘录模式来实现。</li>
+<li>需要避免使用分层次的工厂类来创建分层次的对象，并且类的实例对象只有一个或很少的几个组合状态，通过复制原型对象得到新实例可能比使用构造函数创建一个新实例更加方便。</li>
+</ul>
+<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170401114608369?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class ConcretePrototype implements Prototype</div><div class="line">&#123;</div><div class="line">	private String  attr; //成员属性</div><div class="line">	public void  setAttr(String attr)</div><div class="line">	&#123;</div><div class="line">	    this.attr = attr;</div><div class="line">	&#125;</div><div class="line">	public String  getAttr()</div><div class="line">	&#123;</div><div class="line">	    return this.attr;</div><div class="line">	&#125;</div><div class="line">	public Prototype  clone() //克隆方法</div><div class="line">	&#123;</div><div class="line">	    Prototype  prototype = new ConcretePrototype(); //创建新对象</div><div class="line">	    prototype.setAttr(this.attr);</div><div class="line">	    return prototype;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">Prototype obj1  = new ConcretePrototype();</div><div class="line">obj1.setAttr(&quot;andy&quot;);</div><div class="line">Prototype obj2  = obj1.clone();</div></pre></td></tr></table></figure>
+<p><strong>Java中可以直接使用Object提供的clone()方法来实现对象的克隆</strong><br><strong>需要注意的是能够实现克隆的Java类必须实现一个标识接口Cloneable，表示这个Java类支持被复制</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">class ConcretePrototype implements  Cloneable</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><h4 id="Java语言中的clone-方法满足"><a href="#Java语言中的clone-方法满足" class="headerlink" title="Java语言中的clone()方法满足"></a>Java语言中的clone()方法满足</h4><p>(1) 对任何对象x，都有x.clone() != x，即<strong>克隆对象与原型对象不是同一个对象</strong><br>(2) 对任何对象x，都有x.clone().getClass() == x.getClass()，即<strong>克隆对象与原型对象的类型一样</strong><br>(3) 如果对象x的equals()方法定义恰当，那么x.clone().equals(x)应该成立。</p>
+<h4 id="为了获取对象的一份拷贝，我们可以直接利用Object类的clone-方法，具体步骤如下："><a href="#为了获取对象的一份拷贝，我们可以直接利用Object类的clone-方法，具体步骤如下：" class="headerlink" title="为了获取对象的一份拷贝，我们可以直接利用Object类的clone()方法，具体步骤如下："></a>为了获取对象的一份拷贝，我们可以直接利用Object类的clone()方法，具体步骤如下：</h4><p>(1) 在派生类中覆盖基类的clone()方法，并声明为public；<br>(2) 在派生类的clone()方法中，调用super.clone()；<br>(3)派生类需实现Cloneable接口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">class ConcretePrototype implements  Cloneable</div><div class="line">&#123;</div><div class="line">……</div><div class="line">public Prototype  clone()</div><div class="line">&#123;</div><div class="line">　　Object object = null;</div><div class="line">　　try &#123;</div><div class="line">　　　　　object = super.clone();</div><div class="line">　　&#125; catch (CloneNotSupportedException exception) &#123;</div><div class="line">　　　　　System.err.println(&quot;Not support cloneable&quot;);</div><div class="line">　　&#125;</div><div class="line">　　return (Prototype )object;</div><div class="line">&#125;</div><div class="line">……</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Prototype obj1  = new ConcretePrototype();</div><div class="line">Prototype obj2  = obj1.clone();</div></pre></td></tr></table></figure>
+<h3 id="浅拷贝和深拷贝"><a href="#浅拷贝和深拷贝" class="headerlink" title="浅拷贝和深拷贝"></a>浅拷贝和深拷贝</h3><blockquote>
+<p><strong>主要区别在于是否支持引用类型的成员变量的复制</strong></p>
+</blockquote>
+<h4 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h4><blockquote>
+<p>如果原型对象的成员变量是值类型，将复制一份给克隆对象；如果原型对象的成员变量是引用类型，则将引用对象的地址复制一份给克隆对象，也就是说原型对象和克隆对象的成员变量指向相同的内存地址</p>
+</blockquote>
+<p><strong>当对象被复制时只复制它本身和其中包含的值类型的成员变量，而引用类型的成员对象并没有复制</strong></p>
+<p>浅拷贝<br><img src="http://img.blog.csdn.net/20170401132708197?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p> <strong>在Java中，通过覆盖Object类的clone()方法可以实现浅拷贝</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public CustomObject clone()</div><div class="line">       &#123;</div><div class="line">              Object obj = null;</div><div class="line">              try</div><div class="line">              &#123;</div><div class="line">                     obj = super.clone();</div><div class="line">                     return (CustomObject)obj;</div><div class="line">              &#125;</div><div class="line">              catch(CloneNotSupportedException  e)</div><div class="line">              &#123;</div><div class="line">                     System.out.println(&quot;不支持复制！&quot;);</div><div class="line">                     return null;</div><div class="line">              &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<h4 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h4><blockquote>
+<p>在深拷贝中，无论原型对象的成员变量是值类型还是引用类型，都将复制一份给克隆对象，深拷贝将原型对象的所有引用对象也复制一份给克隆对象。</p>
+</blockquote>
+<p><strong>在深拷贝中，除了对象本身被复制外，对象所包含的所有成员变量也将复制</strong></p>
+<p><img src="http://img.blog.csdn.net/20170401133153278?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<blockquote>
+<p>在Java中，如果需要实现深拷贝，可以通过序列化(Serialize)等方式来实现。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>序列化就是将对象写到流的过程，写到流中的对象是原有对象的一个拷贝，而原对象仍然存在于内存中。通过序列化实现的拷贝不仅可以复制对象本身，而且可以复制其引用的成员对象，因此通过序列化将对象写到一个流中，再从流里将其读出来，可以实现深拷贝</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">//使用序列化技术实现深克隆</div><div class="line">      public CustomObject deepClone() throws  IOException, ClassNotFoundException, OptionalDataException</div><div class="line">      &#123;</div><div class="line">             //将对象写入流中</div><div class="line">             ByteArrayOutputStream bao=new  ByteArrayOutputStream();</div><div class="line">             ObjectOutputStream oos=new  ObjectOutputStream(bao);</div><div class="line">             oos.writeObject(this);</div><div class="line">            </div><div class="line">             //将对象从流中取出</div><div class="line">             ByteArrayInputStream bis=new  ByteArrayInputStream(bao.toByteArray());</div><div class="line">             ObjectInputStream ois=new  ObjectInputStream(bis);</div><div class="line">             return  (CustomObject)ois.readObject();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>深拷贝实现了原型对象和克隆对象的完全独立，对任意克隆对象的修改都不会给其他对象产生影响，是一种更为理想的克隆实现方式</strong></p>
+<hr>
+<blockquote>
+<p>Cloneable接口和Serializable接口的代码非常简单，它们都是空接口，这种空接口也称为标识接口，标识接口中没有任何方法的定义，其作用是告诉JRE这些接口的实现类是否具有某个功能，如是否支持克隆、是否支持序列化等。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>  原型模式作为一种快速创建大量相同或相似对象的方式，在软件开发中应用较为广泛，很多软件提供的复制(Ctrl + C)和粘贴(Ctrl + V)操作就是原型模式的典型应用，</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构型模式——适配器模式（Adaper-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】结构型模式——适配器模式（Adaper-Pattern/" itemprop="url">【设计模式】结构型模式——适配器模式（Adaper Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:27:04+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="适配器模式定义"><a href="#适配器模式定义" class="headerlink" title="适配器模式定义"></a>适配器模式定义</h3><blockquote>
+<p><strong>将一个接口转换成客户希望的另一个接口，适配器模式使接口不兼容的那些类可以一起工作，其别名为包装器(Wrapper)。适配器模式既可以作为类结构型模式，也可以作为对象结构型模式。</strong></p>
+</blockquote>
+<hr>
+<p><strong>在对象适配器模式中，适配器与适配者之间是关联关系；在类适配器模式中，适配器与适配者之间是继承（或实现）关系</strong></p>
+<h3 id="适配器优点"><a href="#适配器优点" class="headerlink" title="适配器优点"></a>适配器优点</h3><ul>
+<li>将目标类和适配者类解耦，通过引入一个适配器类来重用现有的适配者类，而无须修改原有代码。</li>
+<li>增加了类的透明性和复用性，将具体的实现封装在适配者类中，对于客户端类来说是透明的，而且提高了适配者的复用性。</li>
+<li>灵活性和扩展性都非常好，通过使用配置文件，可以很方便地更换适配器，也可以在不修改原有代码的基础上增加新的适配器类，完全符合“开闭原则”。</li>
+</ul>
+<p>类适配器模式还具有如下优点：</p>
+<ul>
+<li>由于适配器类是适配者类的子类，因此可以在适配器类中置换一些适配者的方法，使得适配器的灵活性更强。</li>
+</ul>
+<p>对象适配器模式还具有如下优点：</p>
+<ul>
+<li>一个对象适配器可以把多个不同的适配者适配到同一个目标，也就是说，同一个适配器可以把适配者类和它的子类都适配到目标接口。</li>
+</ul>
+<h3 id="适配器缺点"><a href="#适配器缺点" class="headerlink" title="适配器缺点"></a>适配器缺点</h3><p>类适配器模式的缺点如下：</p>
+<ul>
+<li>对于Java、C#等不支持多重继承的语言，一次最多只能适配一个适配者类，而且目标抽象类只能为抽象类，不能为具体类，其使用有一定的局限性，不能将一个适配者类和它的子类都适配到目标接口。</li>
+</ul>
+<p>对象适配器模式的缺点如下：</p>
+<ul>
+<li>与类适配器模式相比，要想置换适配者类的方法就不容易。如果一定要置换掉适配者类的一个或多个方法，就只好先做一个适配者类的子类，将适配者类的方法置换掉，然后再把适配者类的子类当做真正的适配者进行适配，实现过程较为复杂。</li>
+</ul>
+<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170331155156128?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Adapter extends Target &#123;  </div><div class="line">    private Adaptee adaptee; //维持一个对适配者对象的引用  </div><div class="line">      </div><div class="line">    public Adapter(Adaptee adaptee) &#123;  </div><div class="line">        this.adaptee=adaptee;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void request() &#123;  </div><div class="line">        adaptee.specailRequest(); //转发调用  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>系统需要使用现有的类，而这些类的接口不符合系统的需要。</li>
+<li>想要建立一个可以重复使用的类，用于与一些彼此之间没有太大关联的一些类，包括一些可能在将来引进的类一起工作。</li>
+</ul>
+<h3 id="类适配器"><a href="#类适配器" class="headerlink" title="类适配器"></a>类适配器</h3><blockquote>
+<p>类适配器模式和对象适配器模式最大的区别<strong>在于适配器和适配者之间的关系不同，对象适配器模式中适配器和适配者之间是关联关系，而类适配器模式中适配器和适配者是继承关系</strong></p>
+</blockquote>
+<h3 id="类适配器结构"><a href="#类适配器结构" class="headerlink" title="类适配器结构"></a>类适配器结构</h3><p><img src="http://img.blog.csdn.net/20170331172347545?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="典型类适配器代码"><a href="#典型类适配器代码" class="headerlink" title="典型类适配器代码"></a>典型类适配器代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class Adapter extends Adaptee implements Target &#123;  </div><div class="line">    public void request() &#123;  </div><div class="line">        specificRequest();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="双向适配器"><a href="#双向适配器" class="headerlink" title="双向适配器"></a>双向适配器</h3><blockquote>
+<p>在适配器中同时包含对目标类和适配者类的引用，适配者可以通过它调用目标类中的方法，目标类也可以通过它调用适配者类中的方法，那么该适配器就是一个双向适配器</p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20170331174102303?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Adapter implements Target,Adaptee &#123;  </div><div class="line">    //同时维持对抽象目标类和适配者的引用  </div><div class="line">    private Target target;  </div><div class="line">    private Adaptee adaptee;  </div><div class="line">      </div><div class="line">    public Adapter(Target target) &#123;  </div><div class="line">        this.target = target;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public Adapter(Adaptee adaptee) &#123;  </div><div class="line">        this.adaptee = adaptee;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void request() &#123;  </div><div class="line">        adaptee.specificRequest();  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void specificRequest() &#123;  </div><div class="line">        target.request();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实际开发中很少适用双向适配器。</p>
+<h3 id="认适配器模式-Default-Adapter-Pattern-或缺省适配器模式"><a href="#认适配器模式-Default-Adapter-Pattern-或缺省适配器模式" class="headerlink" title="认适配器模式(Default Adapter Pattern)或缺省适配器模式"></a>认适配器模式(Default Adapter Pattern)或缺省适配器模式</h3><p>当不需要全部实现接口提供的方法时，可先设计一个抽象类实现接口，并为该接口中每个方法提供一个默认实现（空方法），那么该抽象类的子类可有选择地覆盖父类的某些方法来实现需求，它适用于一个接口不想使用其所有的方法的情况。因此也称为单接口适配器模式。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——建造者模式（Builder-Pattern）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——建造者模式（Builder-Pattern）/" itemprop="url">【设计模式】创建型模式——建造者模式（Builder Pattern）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:26:33+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="建造者模式定义"><a href="#建造者模式定义" class="headerlink" title="建造者模式定义"></a>建造者模式定义</h3><blockquote>
+<p><strong>将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示。</strong></p>
+</blockquote>
+<hr>
+<blockquote>
+<p>例如： 王者荣耀内的英雄角色。他们有多个组成部分（技能、着装、五官等）构成一个复杂的角色对象。但每个角色的组成部分又有差异，但创建步骤都大同小异。最后将各组成部分装配成一个完整的人物。</p>
+</blockquote>
+<hr>
+<h3 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h3><ul>
+<li>在建造者模式中， 客户端不必知道产品内部组成的细节，将产品本身与产品的创建过程解耦，使得相同的创建过程可以创建不同的产品对象。</li>
+<li>每一个具体建造者都相对独立，而与其他的具体建造者无关，因此可以很方便地替换具体建造者或增加新的具体建造者， 用户使用不同的具体建造者即可得到不同的产品对象 。</li>
+<li>可以更加精细地控制产品的创建过程 。将复杂产品的创建步骤分解在不同的方法中，使得创建过程更加清晰，也更方便使用程序来控制创建过程。</li>
+<li>增加新的具体建造者无须修改原有类库的代码，指挥者类针对抽象建造者类编程，系统扩展方便，符合“开闭原则”。</li>
+</ul>
+<h3 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h3><ul>
+<li>建造者模式所创建的产品一般具有较多的共同点，其组成部分相似，如果产品之间的差异性很大，则不适合使用建造者模式，因此其使用范围受到一定的限制。</li>
+<li>如果产品的内部变化复杂，可能会导致需要定义很多具体建造者类来实现这种变化，导致系统变得很庞大。</li>
+</ul>
+<h3 id="模式应用"><a href="#模式应用" class="headerlink" title="模式应用"></a>模式应用</h3><ul>
+<li>需要生成的产品对象有复杂的内部结构，这些产品对象通常包含多个成员属性。</li>
+<li>需要生成的产品对象的属性相互依赖，需要指定其生成顺序。</li>
+<li>对象的创建过程独立于创建该对象的类。在建造者模式中引入了指挥者类，将创建过程封装在指挥者类中，而不在建造者类中。</li>
+<li>隔离复杂对象的创建和使用，并使得相同的创建过程可以创建不同的产品。</li>
+</ul>
+<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170331113755091?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class Product  &#123;</div><div class="line">       private  String partA; //定义部件，部件可以是任意类型，包括值类型和引用类型</div><div class="line">       private  String partB;</div><div class="line">       private  String partC;</div><div class="line">       //partA的Getter方法和Setter方法省略</div><div class="line">       //partB的Getter方法和Setter方法省略</div><div class="line">       //partC的Getter方法和Setter方法省略</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">abstract class Builder &#123;</div><div class="line">     //创建产品对象</div><div class="line">       protected  Product product=new Product();</div><div class="line">      </div><div class="line">       public  abstract void buildPartA();</div><div class="line">       public  abstract void buildPartB();</div><div class="line">       public  abstract void buildPartC();</div><div class="line">      </div><div class="line">     //返回产品对象</div><div class="line">       public  Product getResult() &#123;</div><div class="line">              return  product;</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">class Director &#123;</div><div class="line">       private  Builder builder;</div><div class="line">      </div><div class="line">       public  Director(Builder builder) &#123;</div><div class="line">              this.builder=builder;</div><div class="line">       &#125;</div><div class="line">      </div><div class="line">       public  void setBuilder(Builder builder) &#123;</div><div class="line">              this.builder=builer;</div><div class="line">       &#125;</div><div class="line">      </div><div class="line">     //产品构建与组装方法</div><div class="line">       public Product construct() &#123;</div><div class="line">              builder.buildPartA();</div><div class="line">              builder.buildPartB();</div><div class="line">              builder.buildPartC();</div><div class="line">              return builder.getResult();</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">	//可通过配置文件实现</div><div class="line">	Builder  builder = new ConcreteBuilder(); </div><div class="line">	Director director = new  Director(builder);</div><div class="line">	Product product = director.construct();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="建造者和抽象工厂比较"><a href="#建造者和抽象工厂比较" class="headerlink" title="建造者和抽象工厂比较"></a>建造者和抽象工厂比较</h3><ul>
+<li>与抽象工厂模式相比， 建造者模式返回一个组装好的完整产品 ，而 抽象工厂模式返回一系列相关的产品，这些产品位于不同的产品等级结构，构成了一个产品族。</li>
+<li>在抽象工厂模式中，客户端实例化工厂类，然后调用工厂方法获取所需产品对象，而在建造者模式中，客户端可以不直接调用建造者的相关方法，而是通过指挥者类来指导如何生成对象，包括对象的组装过程和建造步骤，它侧重于一步步构造一个复杂对象，返回一个完整的对象。</li>
+<li>如果将抽象工厂模式看成 汽车配件生产工厂 ，生产一个产品族的产品，那么建造者模式就是一个 汽车组装工厂 ，通过对部件的组装可以返回一辆完整的汽车。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/" itemprop="url">【设计模式】结构性模式—— 代理模式（Proxy Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="代理模式定义"><a href="#代理模式定义" class="headerlink" title="代理模式定义"></a>代理模式定义</h3><blockquote>
+<p><strong>给某一个对象提供一个代理，并由代理对象控制对原对象的引用。它是一种对象结构型模式</strong></p>
+</blockquote>
+<h3 id="代理模式的优点"><a href="#代理模式的优点" class="headerlink" title="代理模式的优点"></a>代理模式的优点</h3><ul>
+<li>代理模式能够协调调用者和被调用者，在一定程度上降低了系统的耦合度。</li>
+<li>远程代理使得客户端可以访问在远程机器上的对象，远程机器 可能具有更好的计算性能与处理速度，可以快速响应并处理客户端请求。</li>
+<li>虚拟代理通过使用一个小对象来代表一个大对象，可以减少系 统资源的消耗，对系统进行优化并提高运行速度。</li>
+<li>保护代理可以控制对真实对象的使用权限。</li>
+</ul>
+<h3 id="代理模式缺点"><a href="#代理模式缺点" class="headerlink" title="代理模式缺点"></a>代理模式缺点</h3><ul>
+<li>由于在客户端和真实主题之间增加了代理对象，因此 有些类型的代理模式可能会造成请求的处理速度变慢。</li>
+<li>实现代理模式需要额外的工作，有些代理模式的实现 非常复杂。</li>
+</ul>
+<h3 id="代理模式结构"><a href="#代理模式结构" class="headerlink" title="代理模式结构"></a>代理模式结构</h3><p><img src="http://img.blog.csdn.net/20170331105829488?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class Subject  </div><div class="line">&#123;  </div><div class="line">    public abstract void doRequest();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class RealSubject extend Subject  </div><div class="line">&#123;  </div><div class="line">	@Override</div><div class="line">    public void doRequest()  </div><div class="line">    &#123;  </div><div class="line">        //业务方法具体实现代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Proxy extend Subject  </div><div class="line">&#123;  </div><div class="line">    private RealSubject realSubject = new RealSubject(); //维持一个对真实主题对象的引用  </div><div class="line">  </div><div class="line">    public void beforeRequest()   </div><div class="line">    &#123;  </div><div class="line">        …...  </div><div class="line">    &#125;  </div><div class="line">    @Override</div><div class="line">    public void doRequest()   </div><div class="line">    &#123;  </div><div class="line">        beforeRequest();  </div><div class="line">        realSubject.doRequest(); //调用真实主题对象的方法  </div><div class="line">        afterRequest();  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    public void afterRequest()   </div><div class="line">    &#123;  </div><div class="line">        ……  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p>代理类型</p>
+<ul>
+<li>远程(Remote)代理：为一个位于不同的地址空间的对象提供一个本地 的代理对象，这个不同的地址空间可以是在同一台主机中，也可是在 另一台主机中，远程代理又叫做大使(Ambassador)。</li>
+<li>虚拟(Virtual)代理：如果需要创建一个资源消耗较大的对象，先创建一个消耗相对较小的对象来表示，真实对象只在需要时才会被真正创建。</li>
+<li>Copy-on-Write代理：它是虚拟代理的一种，把复制（克隆）操作延迟 到只有在客户端真正需要时才执行。一般来说，对象的深克隆是一个 开销较大的操作，Copy-on-Write代理可以让这个操作延迟，只有对象被用到的时候才被克隆。</li>
+<li>保护(Protect or Access)代理：控制对一个对象的访问，可以给不同的用户提供不同级别的使用权限。</li>
+<li>缓冲(Cache)代理：为某一个目标操作的结果提供临时的存储空间，以便多个客户端可以共享这些结果。</li>
+<li>防火墙(Firewall)代理：保护目标不让恶意用户接近。<br>同步化(Synchronization)代理：使几个用户能够同时使用一个对象而没有冲突。</li>
+<li>智能引用(Smart Reference)代理：当一个对象被引用时，提供一些额外的操作，如将此对象被调用的次数记录下来等。</li>
+</ul>
+<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ul>
+<li>动态代理是一种较为高级的代理模式，它的典型应用就是Spring AOP。</li>
+<li>在传统的代理模式中，客户端通过Proxy调用RealSubject类的doRequest()方法，同时还在代理类中封装了其他方法(如beforeRequest()和afterRequest())，可以处理一些其他问题。</li>
+<li>如果按照这种方法使用代理模式，那么真实主题角色必须是事先已经存在的，并将其作为代理对象的内部成员属性。如果一个真实主题角色必须对应一个代理主题角色，这将导致系统中的类个数急剧增加，因此需要想办法减少系统中类的个数，此外，如何在事先不知道真实主题角色的情况下使用代理主题角色，这都是动态代理需要解决的问题。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/" itemprop="url">【设计模式】创建型模式—— 工厂模式(Factory Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ol>
+<li>简单工厂</li>
+<li>工厂方法</li>
+<li>抽象工厂</li>
 </ol>
-<h4 id="链表的缺点"><a href="#链表的缺点" class="headerlink" title="链表的缺点"></a>链表的缺点</h4><ol>
-<li>不支持高效的random access（随机访问）。</li>
+<h3 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h3><blockquote>
+<p><strong>根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。在简单工厂模式中用于创建实例的方法是静态方法，因此简单工厂模式又被称为静态工厂方法(StaticFactoryMethod)模式，属于类创建型模式</strong></p>
+</blockquote>
+<h3 id="简单工厂模式优点"><a href="#简单工厂模式优点" class="headerlink" title="简单工厂模式优点"></a>简单工厂模式优点</h3><ul>
+<li>工厂类含有必要的判断逻辑，可以决定在什么时候创建哪一个产品类的实例，客户端可以免除直接创建产品对象的责任，而仅仅“消费”产品；简单工厂模式通过这种做法实现了对责任的分割，它提供了专门的工厂类用于创建对象。</li>
+<li>客户端无须知道所创建的具体产品类的类名，只需要知道具体产品类所对应的参数即可，对于一些复杂的类名，通过简单工厂模式可以减少使用者的记忆量。</li>
+<li>通过引入配置文件，可以在不修改任何客户端代码的情况下更换和增加新的具体产品类，在一定程度上提高了系统的灵活性。</li>
+</ul>
+<h3 id="简单工厂模式缺点"><a href="#简单工厂模式缺点" class="headerlink" title="简单工厂模式缺点"></a>简单工厂模式缺点</h3><ul>
+<li>由于工厂类集中了所有产品创建逻辑，一旦不能正常工作，整个系统都要受到影响。</li>
+<li>使用简单工厂模式将会增加系统中类的个数，在一定程序上增加了系统的复杂度和理解难度。</li>
+<li>系统扩展困难，一旦添加新产品就不得不修改工厂逻辑，在产品类型较多时，有可能造成工厂逻辑过于复杂，不利于系统的扩展和维护。</li>
+<li>简单工厂模式由于使用了静态工厂方法，造成工厂角色无法形成基于继承的等级结构。</li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ol>
+<li>工厂类负责创建的对象比较少，由于创建的对象较少，不会造成工厂方法中的业务逻辑太过复杂。</li>
+<li>客户端只知道传入工厂类的参数，对于如何创建对象并不关心。</li>
+</ol>
+<h3 id="简单工厂结构"><a href="#简单工厂结构" class="headerlink" title="简单工厂结构"></a>简单工厂结构</h3><p><img src="http://img.blog.csdn.net/20170330163156608?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ul>
+<li>Factory（工厂角色）：工厂角色即工厂类，它是简单工厂模式的核心，负责实现创建所有产品实例的内部逻辑；工厂类可以被外界直接调用，创建所需的产品对象</li>
+<li>Product（抽象产品角色）：它是工厂类所创建的所有对象的父类，封装了各种产品对象的公有方法</li>
+<li>ConcreteProduct（具体产品角色）：它是简单工厂模式的创建目标，所有被创建的对象都充当这个角色的某个具体类的实例</li>
+</ul>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">abstract class Product &#123;  </div><div class="line">    //所有产品类的公共业务方法  </div><div class="line">    public void methodSame() &#123;  </div><div class="line">        //公共方法的实现  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    //声明抽象业务方法  </div><div class="line">    public abstract void methodDiff();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class ConcreteProduct extends Product &#123;  </div><div class="line">    //实现业务方法  </div><div class="line">    public void methodDiff() &#123;  </div><div class="line">        //业务方法的实现  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class StaticFactory &#123;  </div><div class="line">    //静态工厂方法  </div><div class="line">    public static Product createFactory(String type) &#123;  </div><div class="line">        Product product = null;  </div><div class="line">        if (type.equalsIgnoreCase(&quot;A&quot;)) &#123;  </div><div class="line">            product = new ConcreteProductA();  </div><div class="line">            //初始化设置product  </div><div class="line">        &#125;  </div><div class="line">        else if (type.equalsIgnoreCase(&quot;B&quot;)) &#123;  </div><div class="line">            product = new ConcreteProductB();  </div><div class="line">            //初始化设置product  </div><div class="line">        &#125;  </div><div class="line">        return product;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class Client &#123;  </div><div class="line">    public static void main(String args[]) &#123;  </div><div class="line">        Product product;   </div><div class="line">        product = StaticFactory.createFactory(&quot;A&quot;); //通过工厂类创建产品对象  </div><div class="line">        product.methodSame();  </div><div class="line">        product.methodDiff();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>总结：当系统中需要引入新产品时，由于静态工厂方法通过所传入参数的不同来创建不同的产品，这必定要修改工厂类的源代码，将违背“开闭原则”，如何实现增加新产品而不影响已有代码？工厂方法模式应运而生</p>
+</blockquote>
+<hr>
+<h3 id="工厂方法模式定义"><a href="#工厂方法模式定义" class="headerlink" title="工厂方法模式定义"></a>工厂方法模式定义</h3><blockquote>
+<p><strong>定义一个用于创建对象的接口，让子类决定将哪一个类实例化。工厂方法模式让一个类的实例化延迟到其子类</strong>。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>工厂方法模式又简称为工厂模式(Factory Pattern)，又可称作虚拟构造器模式(Virtual Constructor Pattern)或多态工厂模式(Polymorphic Factory Pattern)。工厂方法模式是一种类创建型模式。</p>
+</blockquote>
+<h3 id="工厂方法优点"><a href="#工厂方法优点" class="headerlink" title="工厂方法优点"></a>工厂方法优点</h3><ul>
+<li>在工厂方法模式中，工厂方法用来创建客户所需要的产品，同时还向客户隐藏了哪种具体产品类将被实例化这一细节，用户只需要关心所需产品对应的工厂，无须关心创建细节，甚至无须知道具体产品类的类名。</li>
+<li>基于工厂角色和产品角色的多态性设计是工厂方法模式的关键。它能够使工厂可以自主确定创建何种产品对象，而如何创建这个对象的细节则完全封装在具体工厂内部。工厂方法模式之所以又被称为多态工厂模式，是因为所有的具体工厂类都具有同一抽象父类。</li>
+<li>使用工厂方法模式的另一个优点是在系统中加入新产品时，无须修改抽象工厂和抽象产品提供的接口，无须修改客户端，也无须修改其他的具体工厂和具体产品，而只要添加一个具体工厂和具体产品就可以了。这样，系统的可扩展性也就变得非常好，完全符合“开闭原则”。</li>
+</ul>
+<h3 id="工厂方法缺点"><a href="#工厂方法缺点" class="headerlink" title="工厂方法缺点"></a>工厂方法缺点</h3><ul>
+<li>在添加新产品时，需要编写新的具体产品类，而且还要提供与之对应的具体工厂类，系统中类的个数将成对增加，在一定程度上增加了系统的复杂度，有更多的类需要编译和运行，会给系统带来一些额外的开销。</li>
+<li>由于考虑到系统的可扩展性，需要引入抽象层，在客户端代码中均使用抽象层进行定义，增加了系统的抽象性和理解难度，且在实现时可能需要用到DOM、反射等技术，增加了系统的实现难度。</li>
+</ul>
+<h3 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>一个类不知道它所需要的对象的类：在工厂方法模式中，客户端不需要知道具体产品类的类名，只需要知道所对应的工厂即可，具体的产品对象由具体工厂类创建；客户端需要知道创建具体产品的工厂类。</li>
+<li>一个类通过其子类来指定创建哪个对象：在工厂方法模式中，对于抽象工厂类只需要提供一个创建产品的接口，而由其子类来确定具体要创建的对象，利用面向对象的多态性和里氏代换原则，在程序运行时，子类对象将覆盖父类对象，从而使得系统更容易扩展。</li>
+<li>将创建对象的任务委托给多个工厂子类中的某一个，客户端在使用时可以无须关心是哪一个工厂子类创建产品子类，需要时再动态指定，可将具体工厂类的类名存储在配置文件或数据库中。</li>
+</ul>
+<h3 id="工厂方法结构"><a href="#工厂方法结构" class="headerlink" title="工厂方法结构"></a>工厂方法结构</h3><p><img src="http://img.blog.csdn.net/20170330170347737?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ol>
+<li><p>工厂方法的重载</p>
+<blockquote>
+<p>在抽象工厂中定义多个重载的工厂方法，在具体工厂中实现了这些工厂方法，这些方法可以包含不同的业务逻辑，以满足对不同产品对象的需求</p>
+</blockquote>
+</li>
+<li><p>工厂方法的隐藏</p>
+<blockquote>
+<p>客户端无须调用工厂方法创建产品，直接通过工厂即可使用所创建的对象中的业务方法</p>
+</blockquote>
+</li>
 </ol>
 <blockquote>
-<p>由于其链式存储的特性，链表不具备良好的空间局部性，也就是说，链表是一种缓存不友好的数据结构。</p>
+<p> <strong>工厂方法模式是简单工厂模式的延伸，它继承了简单工厂模式的优点，同时还弥补了简单工厂模式的不足。工厂方法模式是使用频率最高的设计模式之一，是很多开源框架和API类库的核心模式</strong></p>
 </blockquote>
-<h2 id="链表的实现"><a href="#链表的实现" class="headerlink" title="链表的实现"></a>链表的实现</h2><h4 id="单向链表-1"><a href="#单向链表-1" class="headerlink" title="单向链表"></a>单向链表</h4><p><strong>插入节点</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public void insert(Item item) &#123;</div><div class="line"></div><div class="line">    Node oldFirst = first; </div><div class="line"></div><div class="line">    first = new Node(); </div><div class="line"></div><div class="line">    first.item = item; </div><div class="line"></div><div class="line">    first.next = oldFirst; </div><div class="line"></div><div class="line">    itemCount++; </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>删除节点</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public Item delete() &#123;</div><div class="line"></div><div class="line">    if (first != null) &#123;</div><div class="line"></div><div class="line">        Item item = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        return item;</div><div class="line"></div><div class="line">    &#125; else &#123;</div><div class="line"></div><div class="line">        throw new NullPointerException(&quot;There&apos;s no Node in the linked list.&quot;);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="双向链表-1"><a href="#双向链表-1" class="headerlink" title="双向链表"></a>双向链表</h2><p>双向链表相比与单链表的优势在于它同时<strong><em>支持高效的正向及反向遍历</em></strong>，<strong><em>并且可以方便的在链表尾部删除结点</em></strong></p>
-<p>Java实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div></pre></td><td class="code"><pre><div class="line">public class DoubleLinkedList&lt;Item&gt; &#123;</div><div class="line"></div><div class="line">    private Node first; </div><div class="line"></div><div class="line">    private Node last;</div><div class="line"></div><div class="line">    private int itemCount;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    private class Node &#123;</div><div class="line"></div><div class="line">        Node prev; </div><div class="line"></div><div class="line">        Node next; </div><div class="line"></div><div class="line">        Item item;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    public void addFirst(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldFirst = first;</div><div class="line"></div><div class="line">        first = new Node();</div><div class="line"></div><div class="line">        first.item = item;</div><div class="line"></div><div class="line">        first.next = oldFirst;</div><div class="line"></div><div class="line">        if (oldFirst != null) &#123;</div><div class="line"></div><div class="line">            oldFirst.prev = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            last = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addLast(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldLast = last;</div><div class="line"></div><div class="line">        last = new Node();</div><div class="line"></div><div class="line">        last.item = item;</div><div class="line"></div><div class="line">        last.prev = oldLast;</div><div class="line"></div><div class="line">        if (oldLast != null) &#123;</div><div class="line"></div><div class="line">            oldLast.next = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            first = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delFirst() &#123;</div><div class="line"></div><div class="line">        if (first == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        if (first != null) &#123;</div><div class="line"></div><div class="line">            first.prev = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            last = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delLast() &#123;</div><div class="line"></div><div class="line">        if (last == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = last.item;</div><div class="line"></div><div class="line">        last = last.prev;</div><div class="line"></div><div class="line">        if (last != null) &#123;</div><div class="line"></div><div class="line">            last.next = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            first = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addBefore(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        //从头开始遍历寻找目标节点</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            //继续向后寻找目标节点</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //现在target为指向目标结点的引用</div><div class="line"></div><div class="line">        if (target.prev == null) &#123;</div><div class="line"></div><div class="line">            //此时相当于在表头插入结点</div><div class="line"></div><div class="line">            addFirst(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldPrev = target.prev;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.prev = newNode;</div><div class="line"></div><div class="line">            newNode.next = target;</div><div class="line"></div><div class="line">            newNode.prev = oldPrev;</div><div class="line"></div><div class="line">            oldPrev.next = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addAfter(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target.next == null) &#123;</div><div class="line"></div><div class="line">            addLast(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldNext = target.next;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.next = newNode;</div><div class="line"></div><div class="line">            newNode.prev = target;</div><div class="line"></div><div class="line">            newNode.next= oldNext;</div><div class="line"></div><div class="line">            oldNext.prev = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>注：实现链表使用的是pointer wrapper方式，这种方式的特点是prev/next指针包含在结点中，而数据由结点中的另一个指针（即item）所引用。采取这种方式，在获取结点数据时，我们需要进行double-dereferencing，而且这种方式实现的链表不是一种[局部化结构]，这意味着我们<strong>拿到链表的一个结点数据后，无法直接进行insert/delete操作</strong>。</p>
-<h4 id="常见面试题"><a href="#常见面试题" class="headerlink" title="常见面试题"></a>常见面试题</h4><ol>
-<li>输入一个链表，输出该链表中倒数第k个结点。</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public class Solution &#123;</div><div class="line"></div><div class="line">    public ListNode FindKthToTail(ListNode head,int k) &#123;</div><div class="line"></div><div class="line">        //先求得链表的尺寸，赋值给size</div><div class="line"></div><div class="line">        int size = 0;</div><div class="line"></div><div class="line">        ListNode current = head;</div><div class="line"></div><div class="line">        while (current != null) &#123;</div><div class="line"></div><div class="line">            size++;</div><div class="line"></div><div class="line">            current = current.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //获取next实例域size-k次，即可得到倒数第k个结点（从1开始计数）</div><div class="line"></div><div class="line">        for (int i = 0; i &lt; size - k; i++) &#123;</div><div class="line"></div><div class="line">            head = head.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return head;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>2.反转链表</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public ListNode ReverseList(ListNode head) &#123;</div><div class="line"></div><div class="line">    if (head == null) &#123;</div><div class="line"></div><div class="line">        return null;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ListNode current = head;</div><div class="line"></div><div class="line">    //原head的next node为null</div><div class="line"></div><div class="line">    ListNode prevNode = null;</div><div class="line"></div><div class="line">    ListNode newHead = null;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    while (current != null) &#123;</div><div class="line"></div><div class="line">        ListNode nextNode = current.next;</div><div class="line"></div><div class="line">        current.next = prevNode;</div><div class="line"></div><div class="line">        if (nextNode == null) &#123;</div><div class="line"></div><div class="line">            newHead = current;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        prevNode = current;</div><div class="line"></div><div class="line">        current = nextNode;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return newHead;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><a href="http://blog.csdn.net/qq_20597479/article/details/59492181" target="_blank" rel="external">LinkedList源码解析</a></p>
-<p>以上转载</p>
-<p><a href="http://www.cnblogs.com/absfree/p/5463372.html" target="_blank" rel="external">http://www.cnblogs.com/absfree/p/5463372.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java链表——LinkedList解析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Java链表——LinkedList解析/" itemprop="url">Java链表——LinkedList解析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:47:34+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><strong>LinkedList类结构</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">LinkedList&lt;E&gt;</div><div class="line">    extends AbstractSequentialList&lt;E&gt;</div><div class="line">    implements List&lt;E&gt;, Deque&lt;E&gt;, Cloneable, java.io.Serializable</div></pre></td></tr></table></figure>
-<p><strong>Node结构</strong><br><strong>双向链表结构（指向前一结点和后一节点的引用）</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Node&lt;E&gt; &#123;</div><div class="line">        E item; </div><div class="line">        Node&lt;E&gt; next; </div><div class="line">        Node&lt;E&gt; prev; </div><div class="line"></div><div class="line">        Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) &#123;</div><div class="line">            this.item = element;</div><div class="line">            this.next = next;</div><div class="line">            this.prev = prev;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><strong>声明变量</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * Pointer to first node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (first.prev == null &amp;&amp; first.item != null)</div><div class="line">    */</div><div class="line">transient Node&lt;E&gt; first;</div><div class="line"></div><div class="line">/**</div><div class="line">    * Pointer to last node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (last.next == null &amp;&amp; last.item != null)</div><div class="line">    */</div><div class="line">   transient Node&lt;E&gt; last;</div></pre></td></tr></table></figure></p>
-<p><strong>链表添加首位</strong><br><em>推导–&gt;（链表添加末尾）</em><br><em>同理。可得到添加addBefore()上一元素，根据条件不同</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**private void addLast(E e)&#123;*/</div><div class="line">private void andFirst(E e) &#123;</div><div class="line">        /**final Node&lt;E&gt; l = last;*/</div><div class="line">        final Node&lt;E&gt; f = first; </div><div class="line">        //assert：last.next == null &amp;&amp; first.item != null;</div><div class="line">        /**final Node&lt;E&gt; newNode = new Node&lt;&gt;(l,e,null);*/</div><div class="line">        //assert：first.prev == null &amp;&amp; first.item != null</div><div class="line">        //init newNode</div><div class="line">        final Node&lt;E&gt; newNode = new Node&lt;&gt;(null, e, f);</div><div class="line">        /**last = newNode*/</div><div class="line">        first = newNode; </div><div class="line">        //如果首位结点为空，则直接添加。否则添加到结点元素的上一结点</div><div class="line">        /** if(l == null) first = newNode else l.next = newNode */</div><div class="line">        if (f == null) </div><div class="line">            last = newNode;</div><div class="line">        else</div><div class="line">            f.prev = newNode;</div><div class="line">        size++; // init size=0</div><div class="line">        modCount++;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><strong>添加上一元素</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private void addBefore(E e,Node&lt;E&gt; target)&#123;</div><div class="line">//assert: node.next = target &amp;&amp; node.prev = target.prev != null</div><div class="line">	Node&lt;E&gt; newNode = (target.prev,e,target);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><strong>删除首元素,并且返回</strong><br><em>推导–&gt;删除末尾元素，并且返回下一个元素</em><br><em>如果需要删除任意一个未知结点Node X,需要判断两种极端情况（最末或者最前，然后往后（往前）推，当前位置清空回收</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">//private E removeLast(Node&lt;E&gt; f)&#123;</div><div class="line">private E removeFirst(Node&lt;E&gt; f) &#123;</div><div class="line">        //assert f == first &amp;&amp; f != null;</div><div class="line">        final E element = f.item; //得到该元素</div><div class="line">        //final Node&lt;E&gt; prev = f.prev;</div><div class="line">        final Node&lt;E&gt; next = f.next; //得到它下一个引用</div><div class="line">        f.item = null; //清空</div><div class="line">        //f.prev = null;</div><div class="line">        f.next = null; // 回收内存（GC）</div><div class="line">        //last = prev;</div><div class="line">        first = next; //将下一个Node移到首位</div><div class="line">        //if(prev == null) first= null; else prev.next = null</div><div class="line">        //如果为空，则代表List只有一个元素，回收</div><div class="line">        //否则，移除该元素</div><div class="line">        if (next == null) </div><div class="line">            last = null;</div><div class="line">        else</div><div class="line">            next.prev = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">E remove(Node&lt;E&gt; x) &#123;</div><div class="line">        // assert x != null;</div><div class="line">        final E element = x.item;</div><div class="line">        final Node&lt;E&gt; next = x.next;</div><div class="line">        final Node&lt;E&gt; prev = x.prev;</div><div class="line">		</div><div class="line">        if (prev == null) &#123;</div><div class="line">            first = next;</div><div class="line">        &#125; else &#123; //填充在后一元素的位置</div><div class="line">            prev.next = next;</div><div class="line">            x.prev = null; //之前的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (next == null) &#123; </div><div class="line">            last = prev;</div><div class="line">        &#125; else &#123; //填充在前一元素的位置</div><div class="line">            next.prev = prev;</div><div class="line">            x.next = null; //之后的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        x.item = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（二）——-GC策略-内存申请、对象衰老/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/jvm调优笔记（二）——-GC策略-内存申请、对象衰老/" itemprop="url">jvm调优笔记（二）—— GC策略&内存申请、对象衰老</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:47:05+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jvm调优/" itemprop="url" rel="index">
-                    <span itemprop="name">jvm调优</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>JVM里的GC(Garbage Collection)的算法有很多种，如标记清除收集器，压缩收集器，分代收集器等等,详见HotSpot VM GC 的种类</p>
-<p>堆内存GC<br>       JVM(采用<strong>分代回收</strong>的策略)，<strong>用较高的频率对年轻的对象(young generation)进行YGC，而对老对象(tenured generation)较少(tenured generation 满了后才进行)进行Full GC</strong>。这样就不需要每次GC都将内存中所有对象都检查一遍。</p>
-<p>非堆内存不GC</p>
-<p>GC不会在主程序运行期对PermGen Space进行清理，所以如果你的应用中有很多CLASS(特别是动态生成类，当然permgen space存放的内容不仅限于类)的话,就很可能出现PermGen Space错误。</p>
-<p>内存申请、对象衰老过程</p>
-<p>一、内存申请过程</p>
-<p>JVM会试图为相关Java对象在Eden中<strong>初始化一块内存区域</strong>；</p>
-<p>判断Eden空间（足够时），内存申请结束。否则到下一步；</p>
-<p>JVM试图<strong>释放在Eden中所有不活跃的对象</strong>（minor collection），释放后若Eden空间仍然不足以放入新对象，则<strong>试图将部分Eden中活跃对象放入Survivor区</strong>；</p>
-<p>Survivor区被用来<strong>作为Eden及old的中间交换区域</strong>，当OLD区空间足够时，Survivor区的对象会被移到Old区，否则会被保留在Survivor区；</p>
-<p>当old区空间不够时，JVM会在old区进行major collection；</p>
-<p>完全垃圾收集后，<strong>若Survivor及old区仍然无法存放从Eden复制过来的部分对象，导致JVM无法在Eden区为新对象创建内存区域，则出现”Out of memory错误</strong>“；</p>
-<p>二、对象衰老过程</p>
-<p>新创建的对象的内存都分配自eden。Minor collection的过程就是将eden和在用survivor space中的活对象copy到空闲survivor space中。对象在young generation里经历了一定次数(可以通过参数配置)的minor collection后，就会被移到old generation中，称为tenuring。</p>
-<p>转载</p>
-<p><a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html" target="_blank" rel="external">http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（一）——-基础概念/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/jvm调优笔记（一）——-基础概念/" itemprop="url">jvm调优笔记（一）—— 基础概念</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:46:17+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jvm调优/" itemprop="url" rel="index">
-                    <span itemprop="name">jvm调优</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存</p>
+<h3 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">interface Factory &#123;  </div><div class="line">    public Product factoryMethod();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactory implements Factory &#123;  </div><div class="line">    public Product factoryMethod() &#123;  </div><div class="line">        return new ConcreteProduct();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Factory factory;  </div><div class="line">factory = new ConcreteFactory(); //可通过配置文件实现  </div><div class="line">Product product;  </div><div class="line">product = factory.factoryMethod();</div></pre></td></tr></table></figure>
+<ul>
+<li>可以通过配置文件来存储具体工厂类ConcreteFactory的类名，更换新的具体工厂时无须修改源代码，系统扩展更为方便</li>
+<li>在实际使用时，具体工厂类在实现工厂方法时除了创建具体产品对象之外，还可以负责产品对象的初始化工作以及一些资源和环境配置工作，例如连接数据库、创建文件</li>
+</ul>
 <blockquote>
-<p>Java 虚拟机具有一个堆，<strong>堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。</strong>”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)</p>
+<p>总结：  工厂方法模式通过引入工厂等级结构，解决了简单工厂模式中工厂类职责太重的问题，但由于工厂方法模式中的每个工厂只生产一类产品，可能会导致系统中存在大量的工厂类，势必会增加系统的开销。此时，我们可以考虑将一些相关的产品组成一个“产品族”，由同一个工厂来统一生产</p>
 </blockquote>
-<p>方法栈&amp;本地方法栈:</p>
-<pre><code>&gt;线程创建时产生,方法执行时生成栈帧
-</code></pre><p>方法区</p>
-<pre><code>&gt;存储类的元数据信息 常量等
-</code></pre><p>堆</p>
-<blockquote>
-<p>java代码中所有的new操作</p>
+<hr>
+<h3 id="抽象工厂模式定义"><a href="#抽象工厂模式定义" class="headerlink" title="抽象工厂模式定义"></a>抽象工厂模式定义</h3><blockquote>
+<p><strong>提供一个创建一系列相关或相互依赖对象的接口，而无须指定它们具体的类。抽象工厂模式又称为Kit模式，属于对象创建型模式</strong></p>
 </blockquote>
-<pre><code>native Memory(C heap)
-Direct Bytebuffer JNI Compile GC;
-</code></pre><p>堆内存分配</p>
-<p><strong>JVM初始分配的内存由-Xms指定</strong>，默认是物理内存的1/64；<strong>JVM最大分配的内存由-Xmx指定</strong>，默认是物理内存的1/4。<strong><em>默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制</em></strong>。因此服务器一般设置-Xms、-Xmx相等以避免在每次GC 后调整堆的大小。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。</p>
-<p>  非堆内存分配<br>      JVM使用<strong>-XX:PermSize</strong>设置非堆内存初始值，默认是物理内存的1/64；由 <strong>-XX:MaxPermSize</strong>设置最大非堆内存的大小，默认是物理内存的1/4。</p>
-<p>JVM内存限制(最大值)</p>
-<blockquote>
-<p>JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处理器虽然 可控内存空间有4GB,但是具体的操作系统会给一个限制，这个限制一般是2GB-3GB（一般来说Windows系统下为1.5G-2G，Linux系统 下为2G-3G），而64bit以上的处理器就不会有限制了。</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java序列化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Java序列化/" itemprop="url">Java序列化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:51+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>什么是序列化</p>
-<blockquote>
-<p>序列化 (Serialization)是指将对象的状态信息转换为可以存储或传输的形式的过程。</p>
-</blockquote>
-<p>在序列化期间，<strong>对象将其当前状态写入到临时或持久性存储区。以后，可以通过从存储区中读取或反序列化对象的状态，重新创建该对象</strong>。</p>
-<p>简而言之</p>
-<p>序列化<br><strong>将数据结构或对象转换成二进制串的过程</strong></p>
-<p>反序列化<br><strong>将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程</strong></p>
-<p>具体例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public static void main(String args[]) throws Exception &#123;</div><div class="line"></div><div class="line">    String obj = “hello world!”;</div><div class="line"></div><div class="line">    // 将序列化对象写入文件object.txt中</div><div class="line"></div><div class="line">    FileOutputStream fos = new FileOutputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectOutputStream os = new ObjectOutputStream(fos);</div><div class="line"></div><div class="line">    os.writeObject(obj);</div><div class="line"></div><div class="line">    os.close();</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // 从文件object.txt中读取数据</div><div class="line">    FileInputStream fis = new FileInputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectInputStream ois = new ObjectInputStream(fis);</div><div class="line"></div><div class="line">    // 通过反序列化恢复对象obj</div><div class="line"></div><div class="line">    String obj2 = (String)ois.readObject();</div><div class="line"></div><div class="line">    ois.close();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>反序列化漏洞原理</p>
-<blockquote>
-<p>反序列化漏洞的本质就是反序列化机制打破了数据和对象的边界，导致攻击者注入的恶意序列化数据在反序列化过程中被还原成对象，控制了对象就可能在目标系统上面执行攻击代码。Java序列化应用于RMI JMX JMS 技术中。</p>
-</blockquote>
-<p>以上转载</p>
-<p><a href="http://techshow.ctrip.com/archives/1414.html" target="_blank" rel="external">http://techshow.ctrip.com/archives/1414.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java反射/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Java反射/" itemprop="url">Java反射</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:12+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Java反射机制作用</p>
-<p>1.<strong>编译期(Compile Time)之外的运行期(Runtime)</strong>检查类，接口，变量以及方法的信息。<br>2.运行期实例化对象，调用方法，通过调用 get/set 方法获取变量的值。（常用）</p>
-<p>Java6的反射机制例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//得到MyObject所有方法</div><div class="line">   Method[] methods = MyObject.class.getMethods();</div><div class="line"></div><div class="line">       for(Method method : methods)&#123;    </div><div class="line"></div><div class="line">           System.out.println(&quot;method = &quot; + method.getName()); </div><div class="line"></div><div class="line">       &#125;</div></pre></td></tr></table></figure>
-<p>Java反射可以获取类的如下内容</p>
-<p>①   编译期获得对象（已知类名）：MyObject.class //获取MyObject对象</p>
-<p>运行期获得对象(编译期未知类名，运行期获得类名字符串)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Class.forName(&quot;packageName.className&quot;);</div></pre></td></tr></table></figure>
-<p>②   cls.getName()  返回类的全限定类名（包含包名）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cls.getSimpleName()  //仅返回类的名称（不包含包名）</div></pre></td></tr></table></figure></p>
-<p>③   cls.getModifiers()    获得修饰符（public…)</p>
-<p>④   cls.getPackage()  获取包名</p>
-<p>⑤   cls.getSuperclass()  获取父类</p>
-<p>⑥   cls.getInterfaces()  获取实现接口集合</p>
-<p>⑦   cls.getConstructors()   获取所有构造方法</p>
-<p>⑧   cls.getMethods()  获取一个类的所有方法</p>
-<p>⑨   cls.getFields()  获取一个类的所有成员变量</p>
-<p>⑩   cls..getAnnotations()  获取一个类的所有注解</p>
-<p>Java构造器</p>
-<p>①Constructor constructor =  cls.getConstructor(new Class[]{String.class}); //获取指定构造器</p>
-<p>②<strong>Class[] constructor.getParameterTypes()</strong>  //获取指定构造方法的方法参数</p>
-<p>③ 利用 Constructor 对象实例化一个类</p>
-<pre><code>constructor.newInstance()方法的方法参数是一个可变参数列表，但是当你调用构造方法的时候你必须提供精确的参数，即形参与实参必须一一对应。
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Constructor constructor </div><div class="line">=MyObject.class.getConstructor(String.class);</div><div class="line"></div><div class="line">MyObject myObject = (MyObject) </div><div class="line">constructor.newInstance(&quot;args1&quot;);</div></pre></td></tr></table></figure>
-<p>Java变量</p>
-<p>① Field[]  cls.getFields();    //获取所有成员变量</p>
-<p>② Field cls.getField(“someField”)  //获取指定成员变量</p>
-<p>③ field.getName() //得到变量名称</p>
-<p>④ field.getType() //获取变量类型</p>
-<p>⑤ Class  aClass = MyObject.class</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Field field = aClass.getField(&quot;someField&quot;);</div><div class="line"></div><div class="line">MyObject objectInstance = new MyObject();</div><div class="line"></div><div class="line">Object value = field.get(objectInstance);</div><div class="line"></div><div class="line">field.set(objetInstance, value);</div></pre></td></tr></table></figure>
-<p>传入 Field.get()/Field.set()方法的参数 objetInstance 应该是拥有指定变量的类的实例。在上述的例子中传入的参数是 MyObjec t类的实例，是因为 someField 是 MyObject 类的实例。 如果变量是静态变量的话(public static)那么在调用 Field.get()/Field.set()方法的时候传入 null 做为参数而不用传递拥有该变量的类的实例。</p>
-<p>Java方法</p>
-<p>①  cls.getMethods(); //获取所有方法集合</p>
-<p>②  cls.getMethod(“doFunction”, new Class[]{String.class}); //获取制定方法，并且参数是String类型，若没有参数设置为null</p>
-<p>③ Class[] method.getParameterTypes();  //获取指定方法的参数</p>
-<p>④ Class method.getReturnType();  //获取指定方法的返回类型</p>
-<p>⑤ 通过Method调用方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//获取一个方法名为doSomesthing，参数类型为String的方法</div><div class="line"></div><div class="line"> Method method = MyObject.class.getMethod(&quot;doSomething&quot;, String.class);</div><div class="line"></div><div class="line"> Object returnValue = method.invoke(null, &quot;parameter-value1&quot;);</div></pre></td></tr></table></figure>
-<p>Java访问器</p>
-<p>Getter</p>
-<p>  Getter 方法的名字以 get 开头，没有方法参数，返回一个值。</p>
-<p>Setter<br>    Setter 方法的名字以 set 开头，有一个方法参数。</p>
-<pre><code>setters 方法有可能会有返回值也有可能没有，一些 Setter 方法返回 void，一些用来设置值，有一些对象的 setter 方法在方法链中被调用（译者注：这类的 setter 方法必须要有返回值），因此你不应该妄自假设 setter 方法的返回值，一切应该视情况而定。
-</code></pre><p>//判断getter/setter方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public static boolean isGetter(Method method)</div><div class="line"></div><div class="line">&#123; </div><div class="line"></div><div class="line">     if(!method.getName().startsWith(&quot;get&quot;))  return false; </div><div class="line"></div><div class="line">     if(method.getParameterTypes().length != 0)   return false; </div><div class="line"></div><div class="line">     if(void.class.equals(method.getReturnType()) return false;  </div><div class="line"></div><div class="line">    return true;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">public static boolean isSetter(Method method)</div><div class="line"></div><div class="line">&#123;  </div><div class="line"></div><div class="line">        if(!method.getName().startsWith(&quot;set&quot;)) return false;  </div><div class="line"></div><div class="line">        if(method.getParameterTypes().length != 1) return false;  </div><div class="line"></div><div class="line">        return true;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Java泛型</p>
-<p>两个典型的使用泛型的场景：</p>
-<p>1、声明一个需要被参数化（parameterizable）的类/接口。</p>
-<p>2、使用一个参数化类。</p>
-<p>① 泛型方法返回类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Method method = MyClass.class.getMethod(&quot;getStringList&quot;, null);</div><div class="line"></div><div class="line">Type returnType = method.getGenericReturnType(); </div><div class="line"></div><div class="line">if(returnType instanceof ParameterizedType)&#123;   </div><div class="line"></div><div class="line">         ParameterizedType type = (ParameterizedType) returnType;    </div><div class="line"></div><div class="line">         Type[] typeArguments = type.getActualTypeArguments();   </div><div class="line"></div><div class="line">         //打印出 “typeArgClass = java.lang.String”，Type[]数组typeArguments 只有一个             结果 – 一个代表 java.lang.String 的 Class 类的实例。Class 类实现了 Type 接口。</div><div class="line"></div><div class="line">         for(Type typeArgument : typeArguments)&#123;       </div><div class="line"></div><div class="line">                 Class typeArgClass = (Class) typeArgument;     </div><div class="line"></div><div class="line">                   System.out.println(&quot;typeArgClass = &quot; + typeArgClass);    </div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>②泛型方法参数类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">method = Myclass.class.getMethod(&quot;setStringList&quot;, List.class);</div><div class="line"></div><div class="line">Type[] genericParameterTypes = method.getGenericParameterTypes();</div><div class="line"></div><div class="line">for(Type genericParameterType : genericParameterTypes)&#123; </div><div class="line"></div><div class="line">    if(genericParameterType instanceof ParameterizedType)&#123;       </div><div class="line"></div><div class="line">         ParameterizedType aType = (ParameterizedType) genericParameterType;        </div><div class="line"></div><div class="line">         Type[] parameterArgTypes = aType.getActualTypeArguments();        </div><div class="line"></div><div class="line">         for(Type parameterArgType : parameterArgTypes)&#123;            </div><div class="line"></div><div class="line">                 Class parameterArgClass = (Class) parameterArgType;           </div><div class="line"></div><div class="line">                 System.out.println(&quot;parameterArgClass = &quot; + parameterArgClass);       </div><div class="line"></div><div class="line">         &#125;    </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>③ 泛型变量类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">Field field = MyClass.class.getField(&quot;stringList&quot;);</div><div class="line"></div><div class="line">Type genericFieldType = field.getGenericType();</div><div class="line"></div><div class="line">if(genericFieldType instanceof ParameterizedType)&#123;    </div><div class="line"></div><div class="line">     ParameterizedType aType = (ParameterizedType) genericFieldType;   </div><div class="line"></div><div class="line">     Type[] fieldArgTypes = aType.getActualTypeArguments();   </div><div class="line"></div><div class="line">     for(Type fieldArgType : fieldArgTypes)&#123;        </div><div class="line"></div><div class="line">         Class fieldArgClass = (Class) fieldArgType;      </div><div class="line"></div><div class="line">         System.out.println(&quot;fieldArgClass = &quot; + fieldArgClass);   </div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Java 动态代理</p>
-<p>常见用例</p>
-<p>数据库连接以及事物管理</p>
-<p>单元测试中的动态 Mock 对象</p>
-<p>自定义工厂与依赖注入（DI）容器之间的适配器</p>
-<p>类似 AOP 的方法拦截器</p>
-<p>利用Java反射机制你可以在运行期动态的创建接口的实现。 java.lang.reflect.Proxy 类就可以实现这一功能。</p>
-<p>①创建代理</p>
-<p>Proxy.newProxyInstance()方法创建动态代理</p>
-<p>newProxyInstance()方法有三个参数：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">InvocationHandler handler = new MyInvocationHandler();</div><div class="line"></div><div class="line">MyInterface proxy = (MyInterface) Proxy.newProxyInstance(                            </div><div class="line"></div><div class="line">MyInterface.class.getClassLoader(), //1、类加载器（ClassLoader）用来加载动态代理类。new Class[] &#123; MyInterface.class &#125;, //2、一个要实现的接口的数组。handler); //3、一个 InvocationHandler 把所有方法的调用都转到代理上。</div></pre></td></tr></table></figure>
-<p>InvocationHandler 接口</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface InvocationHandler&#123;  </div><div class="line"></div><div class="line">    Object invoke(Object proxy, Method method, Object[] args)  throws Throwable;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>实现类</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class MyInvocationHandler implements InvocationHandler&#123;  </div><div class="line"></div><div class="line">     Object invoke(Object proxy, Method method, Object[] args)  throws Throwable &#123; &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>传入 invoke()方法中的 proxy 参数是实现要代理接口的动态代理对象。通常你是不需要他的。</p>
-<p>invoke()方法中的 Method 对象参数代表了被动态代理的接口中要调用的方法，从这个 method 对象中你可以获取到这个方法名字，方法的参数，参数类型等等信息。关于这部分内容可以查阅之前有关 Method 的文章。</p>
-<p>Object 数组参数包含了被动态代理的方法需要的方法参数。注意：原生数据类型（如int，long等等）方法参数传入等价的包装对象（如Integer， Long等等）。</p>
-<p>Java 动态类加载与重载</p>
-<p>①类加载器</p>
-<p> 所有 Java 应用中的类都是被 java.lang.ClassLoader 类的一系列子类加载的。因此要想动态加载类的话也必须使用 java.lang.ClassLoader 的子类。</p>
-<p>   <strong>一个类一旦被加载时，这个类引用的所有类也同时会被加载。类加载过程是一个递归的模式，所有相关的类都会被加载。但并不一定是一个应用里面所有类都会被加载，与这个被加载类的引用链无关的类是不会被加载的，</strong>直到有引用关系的时候它们才会被加载。</p>
-<p>②类加载体系<br>    在 Java 中类加载是一个有序的体系。当你新创建一个标准的 Java 类加载器时你必须提供它的父加载器。<strong>当一个类加载器被调用来加载一个类的时候，首先会调用这个加载器的父加载器来加载。如果父加载器无法找到这个类，这时候这个加载器才会尝试去加载这个类。</strong></p>
-<p>③类加载<br>    类加载器加载类的顺序如下： <strong>1、检查这个类是否已经被加载。 2、如果没有被加载，则首先调用父加载器加载。 3、如果父加载器不能加载这个类，则尝试加载这个类。</strong></p>
-<p>动态类加载</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ClassLoader classLoader = MainClass.class.getClassLoader();   </div><div class="line"></div><div class="line">try &#123;      </div><div class="line"></div><div class="line">        Class aClass = classLoader.loadClass(&quot;com.jenkov.MyClass&quot;);        </div><div class="line"></div><div class="line">        System.out.println(&quot;aClass.getName() = &quot; + aClass.getName());  </div><div class="line"></div><div class="line">  &#125; catch (ClassNotFoundException e) &#123;       </div><div class="line"></div><div class="line">         e.printStackTrace();  </div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-<p>④动态类重载</p>
-<p>动态类重载有一点复杂。Java 内置的类加载器在加载一个类之前会检查它是否已经被加载。<strong>因此重载一个类是无法使用 Java 内置的类加载器的，如果想要重载一个类你需要手动继承 ClassLoader。</strong></p>
-<p>在你定制 ClassLoader 的子类之后，你还有一些事需要做。所有被加载的类都需要被链接。这个过程是通过 ClassLoader.resolve()方法来完成的。由于这是一个 final 方法，因此这个方法在 ClassLoader 的子类中是无法被重写的。resolve()方法是不会允许给定的 ClassLoader 实例链接一个类两次。所以每当你想要重载一个类的时候你都需要使用一个新的 ClassLoader 的子类。你在设计类重载功能的时候这是必要的条件。</p>
-<p>⑤自定义类重载<br>在前面已经说过你不能使用已经加载过类的类加载器来重载一个类。因此你需要其他的 ClassLoader 实例来重载这个类。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Redis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Redis/" itemprop="url">【Linux】Centos6.8安装Redis</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:36+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>1.下载源码并编译</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd /tmp &amp;&amp; wget http://download.redis.io/redis-stable.tar.gz#tar zxvf  redis-stable.tar.gz &amp;&amp; cd redis-stable &amp;&amp; make</div></pre></td></tr></table></figure>
-<p>2.为了能在任何路径下都能执行redis相关命令，我们需要copy以下两个文件到/usr/local/bin目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp src/redis-server /usr/local/bin/#cp src/redis-cli /usr/local/bin/</div></pre></td></tr></table></figure>
-<p>3.创建文件夹分别保存Redis的配置文件和数据</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /etc/redis#mkdir /var/redis</div></pre></td></tr></table></figure>
-<p>4.将Redis初始化文件copy进/etc/init.d，并重命名为redis_6379</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp utils/redis_init_script /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
-<p>5.查看文件redis_6379的内容</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
-<p>6.copy配置文件模板到上图中指定的路径并重命名为6379.conf</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp redis.conf /etc/redis/6379.conf</div></pre></td></tr></table></figure>
-<p>7.在第3步新建的/var/redis路径下新建目录6379作为当前Redis实例的工作目录和数据存放目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /var/redis/6379</div></pre></td></tr></table></figure>
-<p>8.编辑配置文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/redis/6379.confport 6379#Redis默认监听端口daemonize yes   #是否作为守护进程运行，默认为nopidfile /var/run/redis_6379.pid   #如以后台进程运行，则需指定一个pid文件位置loglevel notice   #日志记录等级，有4个可选值，debug，verbose（默认值），notice，warninglogfile /var/log/redis_6379.log   #指定日志输出文件名，可设为/dev/null屏蔽日志dir /var/redis/6379#本地数据库存放路径和工作目录(非常重要！！！)bind 127.0.0.1#绑定主机IP，默认值为127.0.0.1</div></pre></td></tr></table></figure>
-<p>9.添加开机自启动。开机启动要配置在 rc.local 中，而 /etc/profile 文件，要有用户登录了，才会被执行。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo &quot;/etc/init.d/redis_6379 start &amp;&quot; &gt;&gt; /etc/rc.local</div></pre></td></tr></table></figure>
-<p>10.启动Redis并测试</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# /etc/init.d/redis_6379 start</div></pre></td></tr></table></figure>
-<p>Starting Redis server…</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# redis-cli</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set test jinbitou.net</div></pre></td></tr></table></figure>
-<p>OK</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; get test</div></pre></td></tr></table></figure>
-<p>“jinbitou.net”</p>
-<p>127.0.0.1:6379&gt;</p>
-<p>11.检测是否开启远程连接<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps -ef | grep redis</div></pre></td></tr></table></figure></p>
-<p>12.配置密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; config set requirepass admin #密码为admin</div></pre></td></tr></table></figure>
-<p>13.如果java无法访问远程redis</p>
-<p>关闭虚拟机防火墙  <code>service iptables stop</code></p>
-<p>以上转载</p>
-<p><a href="http://jinbitou.net/2016/10/28/2110.html" target="_blank" rel="external">http://jinbitou.net/2016/10/28/2110.html</a></p>
-<p>相关资料</p>
-<p><a href="http://www.tianshouzhi.com/api/tutorials/redis/189" target="_blank" rel="external">http://www.tianshouzhi.com/api/tutorials/redis/189</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Nginx/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Nginx/" itemprop="url">【Linux】Centos6.8安装Nginx</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:00+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">nginx</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>安装条件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">yum install -y gcc-c++</div><div class="line"></div><div class="line">yum install -y pcre pcre-devel</div><div class="line"></div><div class="line">yum install -y zlib zlib-devel</div><div class="line"></div><div class="line">yum install -y openssl openssl-devel</div></pre></td></tr></table></figure>
-<p>安装</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget  https://nginx.org/download/nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">tar zxvf nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">cd nginx-1.8.0</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
-<p>远程访问设置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl http://172.16.41.156    在本机中检测是否可以访问</div><div class="line"></div><div class="line">iptables -F  （不然无法远程访问）</div></pre></td></tr></table></figure>
-<p><a href="http://172.16.41.156" target="_blank" rel="external">http://172.16.41.156</a></p>
-<p><a href="https://my.oschina.net/psuyun/blog/113694" target="_blank" rel="external">nginx常用命令</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装MongoDB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装MongoDB/" itemprop="url">【Linux】Centos6.8安装MongoDB</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:43:19+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/mongodb/" itemprop="url" rel="index">
-                    <span itemprop="name">mongodb</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>1.解压<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">wget  https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.4.0.tgz</div><div class="line"></div><div class="line">tar zxvf mongodb-linux-x86_64-amazon-3.4.0.tgz</div><div class="line"></div><div class="line">mv mongodb-linux-x86_64-amazon-3.4.0 /usr/local/mongodb</div><div class="line"></div><div class="line">cd /usr/local/mongodb</div></pre></td></tr></table></figure></p>
-<p>2.创建data目录和logs目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make -p data logs</div></pre></td></tr></table></figure>
-<p>3.启动</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">vi mongodb.conf 中添加</div><div class="line"></div><div class="line">port=27017</div><div class="line"></div><div class="line">logpath=/usr/local/mongodb/logs/mongodb.log</div><div class="line"></div><div class="line">logdbpath=/usr/local/mongodb/data/</div><div class="line"></div><div class="line">logappend=true</div><div class="line"></div><div class="line">fork=true</div></pre></td></tr></table></figure>
-<p>4.更新配置文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./mongod -f ../mongodb.conf</div></pre></td></tr></table></figure>
-<p>启动命令行界面</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./mongo</div></pre></td></tr></table></figure>
-<p>访问成功</p>
-<p><a href="http://172.16.41.31:27017" target="_blank" rel="external">http://172.16.41.31:27017</a></p>
-<p>It looks like you are trying to access MongoDB over HTTP on the native driver port.</p>
-<p><a href="http://howiefh.github.io/2014/04/26/mongodb-note-1-install-mongodb/" target="_blank" rel="external">参考文档</a></p>
-<p>以上转载</p>
-<p><a href="https://my.oschina.net/u/2607587/blog/779404" target="_blank" rel="external">https://my.oschina.net/u/2607587/blog/779404</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装docker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装docker/" itemprop="url">【Linux】Centos6.8安装docker</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:42+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>检查系统版本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">uname -a</div><div class="line"></div><div class="line">cat /etc/redhat-release</div></pre></td></tr></table></figure>
-<p>安装Epel</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -Uvh http://ftp.riken.jp/Linux/fedora/epel/6Server/x86_64/epel-release-6-8.noarch.rpm</div></pre></td></tr></table></figure>
-<p>安装docker</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install -y docker-io</div></pre></td></tr></table></figure>
-<p>开机自启动与启动Docker</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">service docker start</div><div class="line"></div><div class="line">chkconfig docker on</div><div class="line"></div><div class="line">chkconfig docker --list</div></pre></td></tr></table></figure>
+<h2 id="抽象工厂模式优点"><a href="#抽象工厂模式优点" class="headerlink" title="抽象工厂模式优点"></a>抽象工厂模式优点</h2><ul>
+<li>抽象工厂模式隔离了具体类的生成，使得客户并不需要知道什么被创建。由于这种隔离，更换一个具体工厂就变得相对容易。所有的具体工厂都实现了抽象工厂中定义的那些公共接口，因此只需改变具体工厂的实例，就可以在某种程度上改变整个软件系统的行为</li>
+<li>当一个产品族中的多个对象被设计成一起工作时，它能够保证客户端始终只使用同一个产品族中的对象。这对一些需要根据当前环境来决定其行为的软件系统来说，是一种非常实用的设计模式。</li>
+<li>增加新的具体工厂和产品族很方便，无须修改已有系统，符合“开闭原则”。<h2 id="抽象工厂模式缺点"><a href="#抽象工厂模式缺点" class="headerlink" title="抽象工厂模式缺点"></a>抽象工厂模式缺点</h2></li>
+<li>在添加新的产品对象时，难以扩展抽象工厂来生产新种类的产品，这是因为在抽象工厂角色中规定了所有可能被创建的产品集合，要支持新种类的产品就意味着要对该接口进行扩展，而这将涉及到对抽象工厂角色及其所有子类的修改，显然会带来较大的不便。</li>
+<li>开闭原则的倾斜性（增加新的工厂和产品族容易，增加新的产品等级结构麻烦）。<h2 id="适用场景-2"><a href="#适用场景-2" class="headerlink" title="适用场景"></a>适用场景</h2></li>
+<li>一个系统不应当依赖于产品类实例如何被创建、组合和表达的细节，这对于所有类型的工厂模式都是重要的。</li>
+<li>系统中有多于一个的产品族，而每次只使用其中某一产品族。</li>
+<li>属于同一个产品族的产品将在一起使用，这一约束必须在系统的设计中体现出来。</li>
+<li>系统提供一个产品类的库，所有的产品以同样的接口出现，从而使客户端不依赖于具体实现。<h2 id="抽象模式结构"><a href="#抽象模式结构" class="headerlink" title="抽象模式结构"></a>抽象模式结构</h2><img src="http://img.blog.csdn.net/20170330174255240?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></li>
+</ul>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class AbstractFactory &#123;  </div><div class="line">public abstract AbstractProductA createProductA(); //工厂方法一  </div><div class="line">public abstract AbstractProductB createProductB(); //工厂方法二  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryA extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductA1 createProductA1() &#123;  </div><div class="line">    return new ProductA1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductA2 createProductA2() &#123;  </div><div class="line">    return new ProductA2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryB extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductB1 createProductB1() &#123;  </div><div class="line">    return new ProductB1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductB2 createProductB2() &#123;  </div><div class="line">    return new ProductB2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
           
         
       
@@ -1873,7 +1993,7 @@ Direct Bytebuffer JNI Compile GC;
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1918,7 +2038,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-count">86</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1929,7 +2049,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-count">31</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1940,7 +2060,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">63</span>
+                <span class="site-state-item-count">76</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

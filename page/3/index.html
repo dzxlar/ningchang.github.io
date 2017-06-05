@@ -254,7 +254,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/zookeeper学习笔记（五）——具体应用：秒杀思路/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java反射/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -273,7 +273,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/05/zookeeper学习笔记（五）——具体应用：秒杀思路/" itemprop="url">zookeeper学习笔记（五）——具体应用：秒杀思路</a></h1>
+                <a class="post-title-link" href="/2017/06/05/Java反射/" itemprop="url">Java反射</a></h1>
         
 
         <div class="post-meta">
@@ -285,697 +285,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:32:14+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">Zookeeper</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="秒杀一般有几个场景"><a href="#秒杀一般有几个场景" class="headerlink" title="秒杀一般有几个场景"></a>秒杀一般有几个场景</h3><pre><code>1.电商秒杀商品 2.抢红包 3.抢票
-</code></pre><h3 id="假设一个场景如下"><a href="#假设一个场景如下" class="headerlink" title="假设一个场景如下"></a>假设一个场景如下</h3><pre><code>某电商公司搞活动,一折秒杀,推出几种秒杀的商品,每种商品1000个,预计100w人抢购 要求: 不能超卖.绝对不可以卖多了. 数据库要扣减库存,并且记录订单明细
-</code></pre><h3 id="难点分析"><a href="#难点分析" class="headerlink" title="难点分析"></a>难点分析</h3><p>1.不能<strong>阻塞</strong>. 海量的请求就像血栓一样,遍走周身,一旦遇到瓶颈,就会堵塞整个血管. 所以一定要让海量的用户请求,尽快结束.</p>
-<p>2.数据库单行更新 大量的 update 库存表 set 剩余数量=剩余数量-1 where 商品ID=? 这种单行更新,有<strong>行锁</strong>,会阻塞其他事务,占用宝贵的数据库处理能力.</p>
-<h3 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h3><p>1.<strong>Web服务器集群层,卸载流量</strong> 海量的用户秒杀请求,本质上是一个排序,先到先得. 但是如此之多的请求,完全响应,难度又很大. 所以在Web服务器集群,可以考虑卸载流量. 比如每十个请求,随机抛弃九个,只放行一个请求到后续处理环节. 把秒杀的排序模式,变为随机抽奖的模式.</p>
-<p>2.<strong>Web服务器集群层,缩小锁范围. 每次秒杀活动开始之前.先计算活动推出的商品数量,然后分配一个限额到每个Web服务器</strong>. 比如一个活动推出秒杀商品 电视,手机,衣服各1000件,那么每台服务器的限额就是125件. 将这个限额写入ZooKeeper,Web服务器监听到限额的变化,就会重新初始化各自的商品剩余数量.</p>
-<h3 id="模拟实例"><a href="#模拟实例" class="headerlink" title="模拟实例"></a>模拟实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">private static ConcurrentHashMap&lt;String,Integer&gt; map=new ConcurrentHashMap&lt;String, Integer&gt;();    </div><div class="line">    private void zooKeeperHandle()&#123;</div><div class="line">        //将ZooKeeper的变化,初始化到Web服务器全局容器</div><div class="line">        map.put(&quot;电视机&quot;, 125);</div><div class="line">        map.put(&quot;手机&quot;, 125);</div><div class="line">        map.put(&quot;衣服&quot;, 125);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>假设用户请求秒杀电视机,它只是锁了该Web服务器电视机的数量。(该Web服务器手机和衣服还可以继续并发处理,当然其他的Web服务器也在同时处理电视机的秒杀请求) 这样缩小了锁定的范围,增加了系统处理的吞吐量.</p>
-<p>如果这个剩余数量大于零,则将用户ID放入电视机购买队列,<br>然后告知用户秒杀成功如果这个剩余数量等于零,则告知用户秒杀失败.<br>即便别的Web服务器还有电视机的剩余配额.</p>
-<p>3.ZooKeeper层,ZooKeeper变更库存信息 假设活动期间,需要修改库存信息。 两种可能, 第一种,该商品已经卖了500件,电商不想继续卖了. 第二种,从仓库中又找到了一些积压库存..</p>
-<blockquote>
-<p>两种情况,都直接修改ZooKeeper中相应商品的配额.<br>Web服务器会监听变化,并重新初始化全局容器.</p>
-</blockquote>
-<p>4.消息队列层,多消费者处理<br>    消费者主要是从队列获取购买请求,发送至数据库<br>    扣减数据库库存<br>    写订单明细记录</p>
-<p>5.数据库层,使用存储过程代替JDBC调用 由于使用了多消费者处理同一队列,增加吞吐量,避免队列堆积过大. 但是多消费者,必然导致数据库出现单行更新问题(不推荐）</p>
-<p>单行更新问题就是多个线程,并发修改同一条记录,导致事务相互阻塞.浪费了数据库宝贵的处理能力.</p>
-<p>以上转载<br><a href="http://m.blog.itpub.net/29254281/viewspace-1800617/" target="_blank" rel="external">http://m.blog.itpub.net/29254281/viewspace-1800617/</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/多线程记录笔记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/多线程记录笔记/" itemprop="url">多线程记录笔记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:31:38+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>【一】什么是pu核心数？线程数？</p>
-<p>① 宽（32位/64位CPU位宽） ：  更大的cpu一次能处理更大范围的数据运算和支持更大容量的内存<br>② 多核心（单芯片多处理器，简称CMP）：其思想是将大规模并行处理器中的SMP（对称多处理器）集成到同一芯片中，各个处理器并行处理不同的线程<br>③ 多线程（简称SMT）：可复制多个处理器上的结构状态，让同一处理器的多个线程同步执行并共享处理器上的资源</p>
-<p>核心数和线程数之间的关系：<strong>增加核心数是为了增加线程数（核心数:线程数 = 1：1 由于intel引入超线程技术，核心数:线程数=1：2） </strong></p>
-<p>【二】cpu时间片轮转机制？</p>
-<p>时间片轮转调度（又称RR调度）：每个进程分配一个时间段（时间片，即该进程允许运行时间）</p>
-<p>【三】进程和线程的区别</p>
-<p> 进程：程序运行资源分配最小单位<br> 线程：cpu调度的最小单位，必须依赖进程而存在</p>
-<p>【四】并行运行？</p>
-<p> 程序同时所开启的运行的线程数    &lt;= cpu数量   * cpu线程数量</p>
-<p> 【五】并发运行？</p>
-<p>  程序同时所开启的运行的线程数    &gt; cpu数量   * cpu线程数量</p>
-<p>【六】吞吐量？</p>
-<p><strong>指对网络、设备、端口、虚电路或其他设施，单位时间内成功传送的数据量</strong></p>
-<p>① 网络吞吐量：在某个时刻，网络中亮哥节点之间，提供给网络应用的剩余带宽（在帧没有丢失的情况下，设备能够接收的最大速率），帮助寻找网络路径中的瓶颈</p>
-<p>② 系统吞吐量：系统在单位时间内所处理的信息量（每个时间段通过处理的进程量衡量）</p>
-<p>【七】多并发的优势</p>
-<p>   ①充分利用CPU资源<br>   ②增加用户响应时间<br>   ③让代码模块化、简单化（e.g：异步处理机制）</p>
-<p>  【八】线程生命周期<br>    <strong>new  –&gt; runnable –&gt; running –&gt; block –&gt; dead</strong></p>
-<p>  【九】守护线程？<br>    在后台运行的线程<br>    <strong>setDaemon(true)</strong><br>    e.g:JVM垃圾回收、内存管理、连接池、监控、超时、状态等都属于守护线程</p>
-<p>   【十】线程组</p>
-<p>   方便管理一些具有<strong>相同属性以及特性</strong>的线程</p>
-<p>   【十一】ThreadLocal线程副本</p>
-<p>   1.通常为static 2.可添加多个key值 3.线程安全 4.remove()，用完变量以后，请移除，不然会造成内存泄露</p>
-<p>   【十二】内存模型和多线程</p>
-<p>①线程读取数据优先级：寄存器 —&gt; 高速缓存 —&gt;  内存<br>②JLS（java统一规范）定义一个统一的内存模型JMM（规定了jvm有主内存（堆内存）和工作内存）<br>③多线程不能通过数据传递通讯，只能通过共享变量</p>
-<p>   【十三】什么是线程不安全？<br>线程操作一个<strong>数据结构出现修改和串行的情况，没有保证数据的一致性</strong></p>
-<p>   【十四】实现线程安全的3种方式<br>    1.多实例（非单例）<br>    2.java.util.concurrent下的类库<br>    3.锁机制synchronied，lock</p>
-<p>   【十五】线程同步synchronized（又称隐式锁）<br>    修饰一个方法或者代码块，<strong>保证在同一时刻最多只有一个线程执行</strong><br>方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public synchronized xxMethod()</div></pre></td></tr></table></figure>
-<p>代码块</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">synchronized(Object)&#123;&#125;</div></pre></td></tr></table></figure>
-<p>【十六】显式锁<br>  Lock对应API<br>getLock() 获取锁<br>lockInterruptibly() 如果当前线程未被中断，则获取锁，如果锁可用，则获取锁，并立即返回如果锁不可用，则禁用当前线程，并且将线程处于休眠状态<br>tryLock() 在调用时锁为空闲状态获得锁<br>unLock()  释放锁<br>new Condition()<br>ReentrantLock是Lock实现类，互斥的同步器</p>
-<p>【十七】ReadWriteLock 和   ReadTrantReadWriteLock</p>
-<p>Lock的子接口，用来实现读写两个锁并存、互斥操作机制<br>ReadTrantReadWriteLock是ReadWriteLock的实现类</p>
-<p>【十八】 .读写锁机制</p>
-<p>①读-读不互斥<br>②读-写互斥<br>③写-写互斥</p>
-<p>【十九】显示锁StampedLock<br>悲观锁：假定会发生并发冲突，屏蔽一切违反数据完整性的操作<br>乐观锁：假定不会发生并发冲突，只在提交操作时检查数据完整性</p>
-<p>【二十】线程安全的集合类<br>  HashTable、ConcurrentHashMap、CopyOnWriteArrayList<br>  CopyOnWriteArraySet、（后续会单出列出原理）<br><strong>HashTable</strong><br>性质：散列表<br>存储内容：键值对<br>继承：Dictionary<br>实现：Serializable、Map、Cloneable<br>影响性能因素：初始能量和加载因子<br>是否同步：是<br>是否顺序：否<br>如何实现线程安全：公开的方法都用synchronized修饰<br><strong>ConcurrentHashMap</strong><br>继承：AbstractHashMap<br>实现：Map、Serializable<br>效率：比Hashtable高<br>如何实现线程安全：锁分离技术（代码块锁），而非方法锁）<br>支持多个写入并发操作<br><strong>CopyOnWriteArrayList</strong><br>如何实现线程安全<br>1.set()、and()、remove()使用lock()加锁 unlock解锁<br>2.Array.copyOf() 拷贝副本<br>3，读操作不进行加锁、写操作进行加锁<br>使用情况：读操作明显大于写操作（高性能的并发读取）<br><strong>CopyOnWriteArraySet</strong><br>在CopyOnWriteArrayList的基础上实现Java的装饰模式<br>存储介质使用CopyOnWriteArrayList来存储数据</p>
-<p> 【二十一】CopyOnWrite机制<br>写时复制的容器<br>读写分离的思想：<strong>往容器中添加数据的时候，不是直接添加而是将容器复制，进而写入复制容器，因此不需要加锁</strong><br>用于<strong>读多写少</strong>的场景<br>缺点：①占用内存大 ② 数据一致性问题</p>
-<p> 【二十一】<strong>Stringbuffer是线程安全的</strong><br>                   <strong>Stringbuilder是非线程安全的</strong></p>
-<p> 【二十二】代码执行效率排序<br>   无锁、无同步安全的代码 &gt; 方法块锁 &gt; 类锁和方法锁</p>
-<p>  【二十三】多线程通过什么交互？<br>    <strong>线程阀</strong></p>
-<p>   【二十四】理解queue、deque、blockingQueue概念（后续研究)<br>     queue&lt;单向队列&gt;<br>        ①性质：线性表<br>        ②作用：用于保存一组元素（存取元素时必须遵循先进先出（FIFO）的原则）<br>        ③规范：只允许在表的前端进行删除操作（队头），表的后端进行插入操作（队尾）<br>        ④扩展： 队列中没有元素为空队列</p>
-<p>   deque&lt;双端队列&gt;<br>      ①两端都可以进出的队列<br>      ②当约束从队列一端进入队时，就形成了另外一种存取模式，先进后出（栈结构）<br>      ③作用：双端队列主要用于栈操作，让栈操作具有可追溯性（e.g:Windows窗体路径前进、后退栈）</p>
-<p>  BlockingQueue（阻塞队列）<br>  ①支持两个附加操作的队列（当队列为空时，获取元素的线程会等待元素变为非空;队列满时，存储元素的线程会等待队列可用）<br>  ②用途:常用于生产者和消费者的场景（生产者是往队列添加元素的线程，消费者是从队列拿取元素的线程，相当于生产者的存放容器）</p>
-<p>【二十五】ArrayBlockingQueue数组阻塞队列<br>        概念：由数组支持有界阻塞队列<br>        存取方式：FIFO<br>        类型：有界缓冲区（一旦固定容量，则不要再增加）<br>        适用：队等待的生产者线程和消费者线程进行排序的可选公平策略<br>        缺点：公平性会降低吞吐量<br>        优点：减少可变性和不平衡性</p>
-<p>【二十六】LinkedBlockingQueue链表阻塞队列<br>性质：链表<br>当生产者往队列放入一个数据时，队列会从生产者中获取数据，并缓存到队列内部，而生产者立即返回，只有当队列缓存区达到最大值缓存容量（可通过构造函数指定）时，才会阻塞队列<br>直到消费者从队列中消费一份数据才会生产者线程才被唤醒，反之，亦是。<br>之所以能高效处理并发数据是因为生产者和消费者端采用独立的锁来控制数据同步<br>并且意味着高并发情况下生产者和消费者可以并行的操作队列中数据</p>
-<p>【二十七】优先级阻塞队列PriorityBlockingQueue<br>支持优先级排序的无序阻塞队列（通过构造函数传下来的Compator对象决定）<br>不会阻塞数据生产者，而只会在没有可消费的数据阻塞消费者<br>注意：生产者的生产速度 &lt; 消费者接收数据的速度（否则会耗尽堆内存空间）<br>内部同步控制线程的锁：公平锁</p>
-<p>【二十八】延时队列DelayQueue<br>支持延时获取元素的使用优先级的实现无界阻塞队列<br>必须实现Delayed和Comparable接口（getDelay() 和 compareTo())<br>应用：缓存设计（保存缓存元素的有效期）和定时任务调度（保存当天将会执行的时间和任务）</p>
-<p>【二十九】同步队列SynchronousQueue<br>不存储元素的阻塞队列<br>每一个put操作必须等待take操作，否则不能继续添加元素<br>负责把生产者数据直接传递给消费者线程，队列本身不存储任何数据<br>吞吐量高于其他阻塞队列<br>声明同步队列有两种方式：公平模式（采用FIFO)和非公平模式(采用LIFO)</p>
-<p>【三十】链表双向阻塞队列LinkedTransferDueue<br>由链表组成的双向阻塞队列（可以从队列两端移除/插入元素）</p>
-<p>【三十一】链表传输队列LinkedTreansferQueue<br>链表构成的无界传输队列<br>继承BlockingQueue的一个实现类<br>transfer算法采用双重数据结构（之所以叫双重，是通过两个步骤完成：保留与完成）<br>e.g：消费者从队列中取一个元素，如果为空，则会补上空元素放入队列，消费者在这个线程上等待，这叫保留<br>直到生产者意欲向队列中放入一个元素，发现最前面的元素为Null，就把当前元素填充进前面元素中，完成了传送</p>
-<p>【三十二】同步计数器CountDownLatch<br>在完成一组正在其他线程执行的操作之前，允许一个或多个线程一直等待。用给定的计数初始化<br>由于调用了countDown()方法，所以在当前计数为0之前，await会一直阻塞，之后会释放所有等待线程<br>使用场景：在一些应用场景，需要等到某个条件达到要求后才能做后面的操作，同时当线程完成后也会触发事件，以便进行后面操作<br>countDown() 倒数一次<br>await() 等待倒数到0<br>应用场景1：开5个多线程去下载，5个都执行完了，才算下载成功<br>应用场景2：采用多文件上传，多线程上传，当多个文件上传成功才是真的成功</p>
-<p>【三十三】抽象队列化同步器AbstractQueuedSynchronizer<br>基于FIFO队列<br>利用int表示状态<br>使用方法是继承<br>子类通过同步器并需要实现它的方法管理状态<br>提供两种机制：排他模式和共享模式<br>可实现自定义锁</p>
-<p>【三十四】同步计数器Semaphore<br>排队执行</p>
-<p>【三十五】同步计数器CyclicBarrier<br>同步辅助类（循环栅栏）<br>多个线程像多个循环，循环到点后，才往后执行<br>实际应用场景：统计全国业务数据（其中各省数据库独立，统计量大）<br>为了提高并发效率，采取多个线程计算各省数据，每个省下面用多线程，在汇总数据</p>
-<p>【三十五】什么是线程池？<br>目的：减少对象创建和销毁的时间<br>Java线程池实现Java高并发、Java多线程、可管理的统一调度器<br><strong>Executors是线程的工厂类（工具类）：方便快速的创建线程池</strong></p>
-<p>【三十六】创建线程池常见的3种方法：<br>newSingleThreadExecutor 创建单线程的线程池<br>newFixedThreadPool 创建固定大小的线程池<br>newCachedThreadPool 创建可缓存线程池</p>
-<p>【三十七】线程池的优点<br>1.降低资源消耗（重复利用已创建线程）<br>2.提高响应速度<br>3.提高线程的可管理性<br>4.防止服务器过载，形成内存溢出</p>
-<p>【三十八】线程池工作机制<br>线程等待池 BlockingQueue<br>任务处理池PoolWorker，即正在工作的线程列表HashSet<br>核心池大小（corePoolSize） 线程池的稳定峰值，达到这个值之后的线程数大小不会释放的<br>最大处理线程池数（maxinumPoolSize） 线程池的线程数超过corePoolSize,小于maxPoolSize，会动态创建回收线程池内的资源</p>
-<p>【三十九】自定义线程池和ExecutorService<br>自定义线程池需要用到ThreadFactory</p>
-<p>Executor ： 执行线程池的工具</p>
-<p>ExecutorService ： 线程池的真正接口（继承了Executor）</p>
-<p>AbstractExecutorService：实现ExecutorService接口</p>
-<p>ThreadPoolExecutor：ExecutorService默认实现 </p>
-<p>ScheduleExecutorService：解决那些需要重复执行的问题</p>
-<p>ScheduleThreadPoolExecutor：解决周期性调度问题的真正实现</p>
-<p>Executors 工厂类（创建更多线程）</p>
-<p>【四十】RejectedExecutionHandler<br>处理被丢弃的线程和异常的接口</p>
-<p>【四十一】 ThreadPoolExecutor</p>
-<p>线程池最核心的类</p>
-<p>理解构造函数的参数<br>    corePoolSize<br>    maxinumPoolSize<br>    keepAliveTime<br>    TimeUnit<br>    BlockingQueue<br>    ThreadFactory<br>    RejectedExecutionHandler</p>
-<p>【四十二】线程池注意问题<br>线程池是单例的，不能放在services方法种<br>线程数不能设置过大，会造成线程负载<br>注意死锁问题</p>
-<p>【四十三】JDK7的Fork/Join<br>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
-<p>【四十四】Future任务机制和FutureTask<br>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
-<p>【四十五】Future相关<br>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
-<p>【四十六】Future原理<br>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
-<p>【四十七】计算最大并发量<br>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Object方法和排序/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Object方法和排序/" itemprop="url">【Java8】Guava——Object方法和排序</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:30:59+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Guava/" itemprop="url" rel="index">
-                    <span itemprop="name">Guava</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Objects"><a href="#Objects" class="headerlink" title="Objects"></a>Objects</h2><h3 id="Equal"><a href="#Equal" class="headerlink" title="Equal"></a>Equal</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String str = &quot;test&quot;;</div><div class="line">Objects.equal(str,null) //return false</div><div class="line">Objects.equal(null,str) //return false</div><div class="line">Objects.equal(str,&quot;test&quot;) //return true</div><div class="line">Objects.equal(null,null) //return true</div></pre></td></tr></table></figure>
-<h3 id="HashCode"><a href="#HashCode" class="headerlink" title="HashCode"></a>HashCode</h3><blockquote>
-<p>对传入的字段序列计算出合理的、顺序敏感的散列值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Objects.hashCode(field1,field2,field3...)</div></pre></td></tr></table></figure></p>
-</blockquote>
-<h3 id="toString-NaN"><a href="#toString-NaN" class="headerlink" title="toString"></a>toString</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//return ClassName&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(this).add(&quot;x&quot;, 1).toString();</div><div class="line">//return MyClass&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(&quot;MyClass&quot;).add(&quot;x&quot;, 1).toString();</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="Guava排序器——“流畅风格比较器”"><a href="#Guava排序器——“流畅风格比较器”" class="headerlink" title="Guava排序器——“流畅风格比较器”"></a>Guava排序器——“流畅风格比较器”</h2><blockquote>
-<p>从实现上说，Ordering实例就是一个特殊的Comparator实例。Ordering把很多基于Comparator的静态方法（如Collections.max）包装为自己的实例方法（非静态方法），并且提供了链式调用方法，来定制和增强现有的比较器</p>
-</blockquote>
-<h3 id="创建排序器"><a href="#创建排序器" class="headerlink" title="创建排序器"></a>创建排序器</h3><p><strong>官方排序</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">natural() //对可排序类型做自然排序，如数字按大小，日期按先后排序</div><div class="line">usingToString() //按对象的字符串形式做字典排序</div><div class="line">from(Comparator) //把给定的Comparator转化为排序器</div></pre></td></tr></table></figure></p>
-<p><strong>自定义排序</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//直接继承Ordering</div><div class="line">Ordering&lt;String&gt; strLenthSort = new Ordering&lt;String&gt;() &#123;</div><div class="line">  public int compare(String left, String right) &#123;</div><div class="line">    return Ints.compare(left.length(), right.length());</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p><strong>链式调用方法</strong></p>
-<blockquote>
-<p>通过链式调用，可以由给定的排序器衍生出其它排序器</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">reverse() //获取语义相反的排序器</div><div class="line">nullsFirst() //使用当前排序器，但额外把null值排到最前面</div><div class="line">nullsLast()  //使用当前排序器，但额外把null值排到最后面</div><div class="line">compound(Comparator) //合成另一个比较器，以处理当前排序器中的相等情况</div><div class="line">lexicographical() //基于处理类型T的排序器，返回该类型的可迭代对象Iterable&lt;T&gt;的排序器</div><div class="line">onResultOf(Function) //对集合中元素调用Function，再按返回值用当前排序器排序</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">//需要下面这个类的排序器</div><div class="line">class MyObject&#123;</div><div class="line">    @Nullable String sorted;</div><div class="line">    int notSortedBy;</div><div class="line">&#125;</div><div class="line">//考虑到排序器应该能处理sortedBy为null的情况</div><div class="line">Ordering&lt;MyObject&gt; ordering =</div><div class="line">Ordering</div><div class="line">		.natural() //自然排序</div><div class="line">		.nullsFirst() //空值优先</div><div class="line">		.onResultOf(</div><div class="line">			new Function&lt;MyObject, String&gt;() &#123;</div><div class="line">			  public String apply(MyObject foo) &#123;</div><div class="line">			    return foo.sorted; </div><div class="line">			  &#125;</div><div class="line">		&#125;);</div></pre></td></tr></table></figure>
-<p>注：链式调用产生的排序器时，应该从后往前读。</p>
-<blockquote>
-<p>排序器首先调用apply方法获取sorted值，并把sorted为null的元素都放到最前面，然后把剩下的元素按sorted进行自然排序。<strong>之所以要从后往前读，是因为每次链式调用都是用后面的方法包装了前面的排序器</strong></p>
-</blockquote>
-<p><em>注：用compound方法包装排序器时，就不应遵循从后往前读的原则。为了避免理解上的混乱，请不要把compound写在一长串链式调用的中间，你可以另起一行，在链中最先或最后调用compound。</em></p>
-<h3 id="运用排序器"><a href="#运用排序器" class="headerlink" title="运用排序器"></a>运用排序器</h3><p>Guava的排序器实现有若干操纵集合或元素值的API</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">greatestOf(Iterable iterable, int k) //获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable) //判断可迭代对象是否已按排序器排序:允许有排序值相等的元素。</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">greatestOf(Iterable iterable, int k)//获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable)	//判断可迭代对象是否已按排序器排序：允许有排序值相等的元素</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">min(E, E) //返回两个参数中最小的那个。如果相等，则返回第一个参数</div><div class="line">min(E, E, E, E...)//返回多个参数中最小的那个。如果有超过一个参数都最小，则返回第一个最小的参数</div><div class="line">min(Iterable) //返回迭代器中最小的元素。如果可迭代对象中没有元素，则抛出NoSuchElementException</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Optional/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Optional/" itemprop="url">【Java8】Guava——Optional</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:30:30+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Guava/" itemprop="url" rel="index">
-                    <span itemprop="name">Guava</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="Optional"><a href="#Optional" class="headerlink" title="Optional"></a>Optional</h3><p>####使用场景</p>
-<blockquote>
-<p>调用一个方法得到了返回值却不能直接将返回值作为参数去调用别的方法。我们首先要判断这个返回值是否为null，只有在非空的前提下才能将其作为其他方法的参数</p>
-</blockquote>
-<p>表示可能为null的T类型引用</p>
-<blockquote>
-<p>一个Optional&lt;<t>&gt;实例可能包含非null的引用（我们称之为引用存在），也可能什么也不包括（称之为引用缺失）</t></p>
-</blockquote>
-<h3 id="Of"><a href="#Of" class="headerlink" title="Of"></a>Of</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Optional.of(T) //为非null的值创建一个Optional</div><div class="line">//返回String的实例</div><div class="line">Optional&lt;String&gt; num = Optional.of(&quot;GuavaStudy&quot;) </div><div class="line">//传入参数为null，抛出NullPointerException</div><div class="line">Optional&lt;String&gt; someNull = Optional.of(null)</div></pre></td></tr></table></figure>
-<h3 id="ofNullable"><a href="#ofNullable" class="headerlink" title="ofNullable"></a>ofNullable</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//为指定的值创建一个Optional，如果指定的值为null，则返回一个空的Optional</div><div class="line">Optional.ofNullable() </div><div class="line">//不报错</div><div class="line">Optional&lt;String&gt; emptyValue = Optional.of(null)</div></pre></td></tr></table></figure>
-<h3 id="present-and-get"><a href="#present-and-get" class="headerlink" title="present and get"></a>present and get</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//如果值存在返回true，否则返回false</div><div class="line">Optional&lt;String&gt; name = Optional.of(&quot;test&quot;);</div><div class="line">if(name.isPresent()) </div><div class="line">//如果Optional有值则将其返回，否则抛出NoSuchElementException</div><div class="line">name.get(); //如果存在，则通过get取值</div></pre></td></tr></table></figure>
-<h3 id="ifPresent-and-orElse"><a href="#ifPresent-and-orElse" class="headerlink" title="ifPresent and orElse"></a>ifPresent and orElse</h3><blockquote>
-<p>如果Optional实例有值则为其调用consumer，否则不做处理<br>Consumer类包含一个抽象方法。该抽象方法对传入的值进行处理，但没有返回值。Java8支持不用接口直接通过lambda表达式传入参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">name.ifPresent((value) -&gt; System.out.println(value.length))</div><div class="line"></div><div class="line">//如果有值则将其返回，否则返回指定的其它值。</div><div class="line">//如果Optional实例有值则将其返回，否则返回orElse方法传入的参数</div><div class="line">//if name == null </div><div class="line">//print &quot;There is no value present!&quot;</div><div class="line">System.out.println(empty.orElse(&quot;There is no value present!&quot;))</div><div class="line">//if name != null</div><div class="line">//print &quot;test&quot;</div><div class="line">System.out.println(name.orElse(&quot;There is some value!&quot;));</div></pre></td></tr></table></figure></p>
-</blockquote>
-<h3 id="orElseGet"><a href="#orElseGet" class="headerlink" title="orElseGet"></a>orElseGet</h3><blockquote>
-<p>orElseGet与orElse方法类似，区别在于得到的默认值。orElse方法将传入的字符串作为默认值，orElseGet方法可以接受Supplier接口的实现用来生成默认值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//orElseGet可以接受一个lambda表达式生成默认值</div><div class="line">//if name == null</div><div class="line">//print &quot;Default Value&quot;</div><div class="line">System.out.println(empty.orElseGet(() -&gt; &quot;Default Value&quot;));</div><div class="line">//if name != null</div><div class="line">//print &quot;test&quot;</div><div class="line">System.out.println(name.orElseGet(() -&gt; &quot;Default Value&quot;));</div></pre></td></tr></table></figure></p>
-</blockquote>
-<h3 id="orElseThrow"><a href="#orElseThrow" class="headerlink" title="orElseThrow"></a>orElseThrow</h3><blockquote>
-<p>如果有值则将其返回，否则抛出supplier接口创建的异常<br>在orElseGet方法中，我们传入一个Supplier接口。然而，在orElseThrow中我们可以传入一个lambda表达式或方法，如果值不存在来抛出异常</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//if name == null 抛出异常</div><div class="line">name.orElseThrow(CustomerException::new);</div></pre></td></tr></table></figure>
-<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><blockquote>
-<p>如果有值，则对其执行调用mapping函数得到返回值。如果返回值不为null，则创建包含mapping返回值的Optional作为map方法返回值，否则返回空Optional</p>
-</blockquote>
-<p>1.map方法执行传入的lambda表达式参数对Optional实例的值进行修改<br>2.为lambda表达式的返回值创建新的Optional实例作为map方法的返回值。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//test -&gt; TEST</div><div class="line">Optional&lt;String&gt; upperName = name.map((value) -&gt; value.toUpperCase());</div><div class="line">System.out.println(upperName.orElse(&quot;No value found&quot;));</div></pre></td></tr></table></figure>
-<h3 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h3><blockquote>
-<p>如果有值，为其执行mapping函数返回Optional类型返回值，否则返回空Optional。flatMap与map（Funtion）方法类似，区别在于flatMap中的mapper返回值必须是Optional。调用结束时，flatMap不会对结果用Optional封装</p>
-</blockquote>
-<p><strong>flatMap方法与map方法类似，区别在于mapping函数的返回值不同。map方法的mapping函数返回值可以是任何类型T，而flatMap方法的mapping函数必须是Optional</strong></p>
-<p>1.flatMap与map（Function）非常类似，区别在于传入方法的lambda表达式的返回类型<br>2.map方法中的lambda表达式返回值可以是任意类型，在map函数返回之前会包装为Optional<br>3.但flatMap方法中的lambda表达式返回值必须是Optionl实例</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Optional&lt;String&gt; upperName = name.flatMap((value) -&gt; Optional.of(value.toUpperCase()))</div></pre></td></tr></table></figure>
-<h3 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h3><blockquote>
-<p>filter个方法通过传入限定条件对Optional实例的值进行过滤<br>如果有值并且满足断言条件返回包含该值的Optional，否则返回空Optional</p>
-</blockquote>
-<p>1.filter方法检查给定的Option值是否满足某些条件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//如果满足则返回同一个Option实例，否则返回空Optional</div><div class="line">Optional&lt;String&gt; longName = name.filter((value) -&gt; value.length() &gt; 3);</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//另一个例子是Optional值不满足filter指定的条件</div><div class="line">Optional&lt;String&gt; anotherName = Optional.of(&quot;a&quot;);</div><div class="line">Optional&lt;String&gt; shortName = anotherName.filter((value) -&gt; value.length() &gt; 3);</div></pre></td></tr></table></figure>
-<hr>
-<h3 id="其他API"><a href="#其他API" class="headerlink" title="其他API"></a>其他API</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">T   or(T) </div><div class="line">T   orNull()</div><div class="line">Set&lt;T&gt;  asSet()</div><div class="line">//这些方法主要用来与混淆null/空的API进行交互</div><div class="line">emptyToNull(String)</div><div class="line">nullToEmpty(String) </div><div class="line">isNullOrEmpty(String) </div><div class="line">Optional.of(first).or(second) //用一个默认值来替换可能的null</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java】字符串小记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java】字符串小记/" itemprop="url">【Java】字符串小记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:28:14+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:12+08:00">
                 2017-06-05
               </time>
             
@@ -1034,21 +344,91 @@
       
         
           
-            <h2 id="String和CharSequence的区别"><a href="#String和CharSequence的区别" class="headerlink" title="String和CharSequence的区别"></a>String和CharSequence的区别</h2><ul>
-<li>String 实现CharSequence接口，也就是说String也是CharSequence类型。</li>
-<li>CharSequence是一个可读序列（readable），对访问不同种类的序列，提供了一个统一的、只读的接口（etc.StringBuffer和StringBuilder实现CharSequence接口）</li>
-</ul>
-<p>CharSequence接口方法，只包括以下方法<br><img src="http://img.blog.csdn.net/20170321101940693?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="CharSequence接口方法"></p>
-<p>String类特性<br><img src="http://img.blog.csdn.net/20170321102117641?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="String类特性"></p>
-<p><strong>CharSequence是字符序列，String, StringBuilder和StringBuffer本质上都是通过字符数组实现的</strong></p>
-<h3 id="StringBuffer和StringBuilder之间的区别"><a href="#StringBuffer和StringBuilder之间的区别" class="headerlink" title="StringBuffer和StringBuilder之间的区别"></a>StringBuffer和StringBuilder之间的区别</h3><ul>
-<li>StringBuilder 和 StringBuffer都是可变的字符序列。它们都继承于AbstractStringBuilder，实现了CharSequence接口。</li>
-<li><strong>StringBuilder是非线程安全的，而StringBuffer是线程安全的</strong>。</li>
-</ul>
-<p><img src="http://img.blog.csdn.net/20170321102825353?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="StringBuffer"></p>
-<p><img src="http://img.blog.csdn.net/20170321102839307?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="StringBuilder"></p>
-<p><img src="http://img.blog.csdn.net/20170321103005183?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>它们之间的类关系图<br><img src="http://img.blog.csdn.net/20170321103548286?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="它们之间的类关系图"></p>
+            <p>Java反射机制作用</p>
+<p>1.<strong>编译期(Compile Time)之外的运行期(Runtime)</strong>检查类，接口，变量以及方法的信息。<br>2.运行期实例化对象，调用方法，通过调用 get/set 方法获取变量的值。（常用）</p>
+<p>Java6的反射机制例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//得到MyObject所有方法</div><div class="line">   Method[] methods = MyObject.class.getMethods();</div><div class="line"></div><div class="line">       for(Method method : methods)&#123;    </div><div class="line"></div><div class="line">           System.out.println(&quot;method = &quot; + method.getName()); </div><div class="line"></div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<p>Java反射可以获取类的如下内容</p>
+<p>①   编译期获得对象（已知类名）：MyObject.class //获取MyObject对象</p>
+<p>运行期获得对象(编译期未知类名，运行期获得类名字符串)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Class.forName(&quot;packageName.className&quot;);</div></pre></td></tr></table></figure>
+<p>②   cls.getName()  返回类的全限定类名（包含包名）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cls.getSimpleName()  //仅返回类的名称（不包含包名）</div></pre></td></tr></table></figure></p>
+<p>③   cls.getModifiers()    获得修饰符（public…)</p>
+<p>④   cls.getPackage()  获取包名</p>
+<p>⑤   cls.getSuperclass()  获取父类</p>
+<p>⑥   cls.getInterfaces()  获取实现接口集合</p>
+<p>⑦   cls.getConstructors()   获取所有构造方法</p>
+<p>⑧   cls.getMethods()  获取一个类的所有方法</p>
+<p>⑨   cls.getFields()  获取一个类的所有成员变量</p>
+<p>⑩   cls..getAnnotations()  获取一个类的所有注解</p>
+<p>Java构造器</p>
+<p>①Constructor constructor =  cls.getConstructor(new Class[]{String.class}); //获取指定构造器</p>
+<p>②<strong>Class[] constructor.getParameterTypes()</strong>  //获取指定构造方法的方法参数</p>
+<p>③ 利用 Constructor 对象实例化一个类</p>
+<pre><code>constructor.newInstance()方法的方法参数是一个可变参数列表，但是当你调用构造方法的时候你必须提供精确的参数，即形参与实参必须一一对应。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Constructor constructor </div><div class="line">=MyObject.class.getConstructor(String.class);</div><div class="line"></div><div class="line">MyObject myObject = (MyObject) </div><div class="line">constructor.newInstance(&quot;args1&quot;);</div></pre></td></tr></table></figure>
+<p>Java变量</p>
+<p>① Field[]  cls.getFields();    //获取所有成员变量</p>
+<p>② Field cls.getField(“someField”)  //获取指定成员变量</p>
+<p>③ field.getName() //得到变量名称</p>
+<p>④ field.getType() //获取变量类型</p>
+<p>⑤ Class  aClass = MyObject.class</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Field field = aClass.getField(&quot;someField&quot;);</div><div class="line"></div><div class="line">MyObject objectInstance = new MyObject();</div><div class="line"></div><div class="line">Object value = field.get(objectInstance);</div><div class="line"></div><div class="line">field.set(objetInstance, value);</div></pre></td></tr></table></figure>
+<p>传入 Field.get()/Field.set()方法的参数 objetInstance 应该是拥有指定变量的类的实例。在上述的例子中传入的参数是 MyObjec t类的实例，是因为 someField 是 MyObject 类的实例。 如果变量是静态变量的话(public static)那么在调用 Field.get()/Field.set()方法的时候传入 null 做为参数而不用传递拥有该变量的类的实例。</p>
+<p>Java方法</p>
+<p>①  cls.getMethods(); //获取所有方法集合</p>
+<p>②  cls.getMethod(“doFunction”, new Class[]{String.class}); //获取制定方法，并且参数是String类型，若没有参数设置为null</p>
+<p>③ Class[] method.getParameterTypes();  //获取指定方法的参数</p>
+<p>④ Class method.getReturnType();  //获取指定方法的返回类型</p>
+<p>⑤ 通过Method调用方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//获取一个方法名为doSomesthing，参数类型为String的方法</div><div class="line"></div><div class="line"> Method method = MyObject.class.getMethod(&quot;doSomething&quot;, String.class);</div><div class="line"></div><div class="line"> Object returnValue = method.invoke(null, &quot;parameter-value1&quot;);</div></pre></td></tr></table></figure>
+<p>Java访问器</p>
+<p>Getter</p>
+<p>  Getter 方法的名字以 get 开头，没有方法参数，返回一个值。</p>
+<p>Setter<br>    Setter 方法的名字以 set 开头，有一个方法参数。</p>
+<pre><code>setters 方法有可能会有返回值也有可能没有，一些 Setter 方法返回 void，一些用来设置值，有一些对象的 setter 方法在方法链中被调用（译者注：这类的 setter 方法必须要有返回值），因此你不应该妄自假设 setter 方法的返回值，一切应该视情况而定。
+</code></pre><p>//判断getter/setter方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public static boolean isGetter(Method method)</div><div class="line"></div><div class="line">&#123; </div><div class="line"></div><div class="line">     if(!method.getName().startsWith(&quot;get&quot;))  return false; </div><div class="line"></div><div class="line">     if(method.getParameterTypes().length != 0)   return false; </div><div class="line"></div><div class="line">     if(void.class.equals(method.getReturnType()) return false;  </div><div class="line"></div><div class="line">    return true;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">public static boolean isSetter(Method method)</div><div class="line"></div><div class="line">&#123;  </div><div class="line"></div><div class="line">        if(!method.getName().startsWith(&quot;set&quot;)) return false;  </div><div class="line"></div><div class="line">        if(method.getParameterTypes().length != 1) return false;  </div><div class="line"></div><div class="line">        return true;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Java泛型</p>
+<p>两个典型的使用泛型的场景：</p>
+<p>1、声明一个需要被参数化（parameterizable）的类/接口。</p>
+<p>2、使用一个参数化类。</p>
+<p>① 泛型方法返回类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Method method = MyClass.class.getMethod(&quot;getStringList&quot;, null);</div><div class="line"></div><div class="line">Type returnType = method.getGenericReturnType(); </div><div class="line"></div><div class="line">if(returnType instanceof ParameterizedType)&#123;   </div><div class="line"></div><div class="line">         ParameterizedType type = (ParameterizedType) returnType;    </div><div class="line"></div><div class="line">         Type[] typeArguments = type.getActualTypeArguments();   </div><div class="line"></div><div class="line">         //打印出 “typeArgClass = java.lang.String”，Type[]数组typeArguments 只有一个             结果 – 一个代表 java.lang.String 的 Class 类的实例。Class 类实现了 Type 接口。</div><div class="line"></div><div class="line">         for(Type typeArgument : typeArguments)&#123;       </div><div class="line"></div><div class="line">                 Class typeArgClass = (Class) typeArgument;     </div><div class="line"></div><div class="line">                   System.out.println(&quot;typeArgClass = &quot; + typeArgClass);    </div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>②泛型方法参数类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">method = Myclass.class.getMethod(&quot;setStringList&quot;, List.class);</div><div class="line"></div><div class="line">Type[] genericParameterTypes = method.getGenericParameterTypes();</div><div class="line"></div><div class="line">for(Type genericParameterType : genericParameterTypes)&#123; </div><div class="line"></div><div class="line">    if(genericParameterType instanceof ParameterizedType)&#123;       </div><div class="line"></div><div class="line">         ParameterizedType aType = (ParameterizedType) genericParameterType;        </div><div class="line"></div><div class="line">         Type[] parameterArgTypes = aType.getActualTypeArguments();        </div><div class="line"></div><div class="line">         for(Type parameterArgType : parameterArgTypes)&#123;            </div><div class="line"></div><div class="line">                 Class parameterArgClass = (Class) parameterArgType;           </div><div class="line"></div><div class="line">                 System.out.println(&quot;parameterArgClass = &quot; + parameterArgClass);       </div><div class="line"></div><div class="line">         &#125;    </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>③ 泛型变量类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">Field field = MyClass.class.getField(&quot;stringList&quot;);</div><div class="line"></div><div class="line">Type genericFieldType = field.getGenericType();</div><div class="line"></div><div class="line">if(genericFieldType instanceof ParameterizedType)&#123;    </div><div class="line"></div><div class="line">     ParameterizedType aType = (ParameterizedType) genericFieldType;   </div><div class="line"></div><div class="line">     Type[] fieldArgTypes = aType.getActualTypeArguments();   </div><div class="line"></div><div class="line">     for(Type fieldArgType : fieldArgTypes)&#123;        </div><div class="line"></div><div class="line">         Class fieldArgClass = (Class) fieldArgType;      </div><div class="line"></div><div class="line">         System.out.println(&quot;fieldArgClass = &quot; + fieldArgClass);   </div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Java 动态代理</p>
+<p>常见用例</p>
+<p>数据库连接以及事物管理</p>
+<p>单元测试中的动态 Mock 对象</p>
+<p>自定义工厂与依赖注入（DI）容器之间的适配器</p>
+<p>类似 AOP 的方法拦截器</p>
+<p>利用Java反射机制你可以在运行期动态的创建接口的实现。 java.lang.reflect.Proxy 类就可以实现这一功能。</p>
+<p>①创建代理</p>
+<p>Proxy.newProxyInstance()方法创建动态代理</p>
+<p>newProxyInstance()方法有三个参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">InvocationHandler handler = new MyInvocationHandler();</div><div class="line"></div><div class="line">MyInterface proxy = (MyInterface) Proxy.newProxyInstance(                            </div><div class="line"></div><div class="line">MyInterface.class.getClassLoader(), //1、类加载器（ClassLoader）用来加载动态代理类。new Class[] &#123; MyInterface.class &#125;, //2、一个要实现的接口的数组。handler); //3、一个 InvocationHandler 把所有方法的调用都转到代理上。</div></pre></td></tr></table></figure>
+<p>InvocationHandler 接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface InvocationHandler&#123;  </div><div class="line"></div><div class="line">    Object invoke(Object proxy, Method method, Object[] args)  throws Throwable;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class MyInvocationHandler implements InvocationHandler&#123;  </div><div class="line"></div><div class="line">     Object invoke(Object proxy, Method method, Object[] args)  throws Throwable &#123; &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>传入 invoke()方法中的 proxy 参数是实现要代理接口的动态代理对象。通常你是不需要他的。</p>
+<p>invoke()方法中的 Method 对象参数代表了被动态代理的接口中要调用的方法，从这个 method 对象中你可以获取到这个方法名字，方法的参数，参数类型等等信息。关于这部分内容可以查阅之前有关 Method 的文章。</p>
+<p>Object 数组参数包含了被动态代理的方法需要的方法参数。注意：原生数据类型（如int，long等等）方法参数传入等价的包装对象（如Integer， Long等等）。</p>
+<p>Java 动态类加载与重载</p>
+<p>①类加载器</p>
+<p> 所有 Java 应用中的类都是被 java.lang.ClassLoader 类的一系列子类加载的。因此要想动态加载类的话也必须使用 java.lang.ClassLoader 的子类。</p>
+<p>   <strong>一个类一旦被加载时，这个类引用的所有类也同时会被加载。类加载过程是一个递归的模式，所有相关的类都会被加载。但并不一定是一个应用里面所有类都会被加载，与这个被加载类的引用链无关的类是不会被加载的，</strong>直到有引用关系的时候它们才会被加载。</p>
+<p>②类加载体系<br>    在 Java 中类加载是一个有序的体系。当你新创建一个标准的 Java 类加载器时你必须提供它的父加载器。<strong>当一个类加载器被调用来加载一个类的时候，首先会调用这个加载器的父加载器来加载。如果父加载器无法找到这个类，这时候这个加载器才会尝试去加载这个类。</strong></p>
+<p>③类加载<br>    类加载器加载类的顺序如下： <strong>1、检查这个类是否已经被加载。 2、如果没有被加载，则首先调用父加载器加载。 3、如果父加载器不能加载这个类，则尝试加载这个类。</strong></p>
+<p>动态类加载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ClassLoader classLoader = MainClass.class.getClassLoader();   </div><div class="line"></div><div class="line">try &#123;      </div><div class="line"></div><div class="line">        Class aClass = classLoader.loadClass(&quot;com.jenkov.MyClass&quot;);        </div><div class="line"></div><div class="line">        System.out.println(&quot;aClass.getName() = &quot; + aClass.getName());  </div><div class="line"></div><div class="line">  &#125; catch (ClassNotFoundException e) &#123;       </div><div class="line"></div><div class="line">         e.printStackTrace();  </div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>④动态类重载</p>
+<p>动态类重载有一点复杂。Java 内置的类加载器在加载一个类之前会检查它是否已经被加载。<strong>因此重载一个类是无法使用 Java 内置的类加载器的，如果想要重载一个类你需要手动继承 ClassLoader。</strong></p>
+<p>在你定制 ClassLoader 的子类之后，你还有一些事需要做。所有被加载的类都需要被链接。这个过程是通过 ClassLoader.resolve()方法来完成的。由于这是一个 final 方法，因此这个方法在 ClassLoader 的子类中是无法被重写的。resolve()方法是不会允许给定的 ClassLoader 实例链接一个类两次。所以每当你想要重载一个类的时候你都需要使用一个新的 ClassLoader 的子类。你在设计类重载功能的时候这是必要的条件。</p>
+<p>⑤自定义类重载<br>在前面已经说过你不能使用已经加载过类的类加载器来重载一个类。因此你需要其他的 ClassLoader 实例来重载这个类。</p>
 
           
         
@@ -1092,7 +472,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java】异常小记/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Redis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -1111,7 +491,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/05/【Java】异常小记/" itemprop="url">【Java】异常小记</a></h1>
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Redis/" itemprop="url">【Linux】Centos6.8安装Redis</a></h1>
         
 
         <div class="post-meta">
@@ -1123,7 +503,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:26:56+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:36+08:00">
                 2017-06-05
               </time>
             
@@ -1146,8 +526,19 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
                   </a>
                 </span>
 
@@ -1182,667 +573,1330 @@
       
         
           
-            <ol>
-<li>Throwable</li>
-</ol>
-<ul>
-<li>是Java中所有错误或异常的超类。</li>
-<li>它的两个子类是Error和Exception。</li>
-</ul>
+            <p>1.下载源码并编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd /tmp &amp;&amp; wget http://download.redis.io/redis-stable.tar.gz#tar zxvf  redis-stable.tar.gz &amp;&amp; cd redis-stable &amp;&amp; make</div></pre></td></tr></table></figure>
+<p>2.为了能在任何路径下都能执行redis相关命令，我们需要copy以下两个文件到/usr/local/bin目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp src/redis-server /usr/local/bin/#cp src/redis-cli /usr/local/bin/</div></pre></td></tr></table></figure>
+<p>3.创建文件夹分别保存Redis的配置文件和数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /etc/redis#mkdir /var/redis</div></pre></td></tr></table></figure>
+<p>4.将Redis初始化文件copy进/etc/init.d，并重命名为redis_6379</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp utils/redis_init_script /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
+<p>5.查看文件redis_6379的内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
+<p>6.copy配置文件模板到上图中指定的路径并重命名为6379.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp redis.conf /etc/redis/6379.conf</div></pre></td></tr></table></figure>
+<p>7.在第3步新建的/var/redis路径下新建目录6379作为当前Redis实例的工作目录和数据存放目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /var/redis/6379</div></pre></td></tr></table></figure>
+<p>8.编辑配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/redis/6379.confport 6379#Redis默认监听端口daemonize yes   #是否作为守护进程运行，默认为nopidfile /var/run/redis_6379.pid   #如以后台进程运行，则需指定一个pid文件位置loglevel notice   #日志记录等级，有4个可选值，debug，verbose（默认值），notice，warninglogfile /var/log/redis_6379.log   #指定日志输出文件名，可设为/dev/null屏蔽日志dir /var/redis/6379#本地数据库存放路径和工作目录(非常重要！！！)bind 127.0.0.1#绑定主机IP，默认值为127.0.0.1</div></pre></td></tr></table></figure>
+<p>9.添加开机自启动。开机启动要配置在 rc.local 中，而 /etc/profile 文件，要有用户登录了，才会被执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo &quot;/etc/init.d/redis_6379 start &amp;&quot; &gt;&gt; /etc/rc.local</div></pre></td></tr></table></figure>
+<p>10.启动Redis并测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# /etc/init.d/redis_6379 start</div></pre></td></tr></table></figure>
+<p>Starting Redis server…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# redis-cli</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set test jinbitou.net</div></pre></td></tr></table></figure>
+<p>OK</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; get test</div></pre></td></tr></table></figure>
+<p>“jinbitou.net”</p>
+<p>127.0.0.1:6379&gt;</p>
+<p>11.检测是否开启远程连接<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps -ef | grep redis</div></pre></td></tr></table></figure></p>
+<p>12.配置密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; config set requirepass admin #密码为admin</div></pre></td></tr></table></figure>
+<p>13.如果java无法访问远程redis</p>
+<p>关闭虚拟机防火墙  <code>service iptables stop</code></p>
+<p>以上转载</p>
+<p><a href="http://jinbitou.net/2016/10/28/2110.html" target="_blank" rel="external">http://jinbitou.net/2016/10/28/2110.html</a></p>
+<p>相关资料</p>
+<p><a href="http://www.tianshouzhi.com/api/tutorials/redis/189" target="_blank" rel="external">http://www.tianshouzhi.com/api/tutorials/redis/189</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Nginx/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Nginx/" itemprop="url">【Linux】Centos6.8安装Nginx</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:00+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>安装条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">yum install -y gcc-c++</div><div class="line"></div><div class="line">yum install -y pcre pcre-devel</div><div class="line"></div><div class="line">yum install -y zlib zlib-devel</div><div class="line"></div><div class="line">yum install -y openssl openssl-devel</div></pre></td></tr></table></figure>
+<p>安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget  https://nginx.org/download/nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">tar zxvf nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">cd nginx-1.8.0</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
+<p>远程访问设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl http://172.16.41.156    在本机中检测是否可以访问</div><div class="line"></div><div class="line">iptables -F  （不然无法远程访问）</div></pre></td></tr></table></figure>
+<p><a href="http://172.16.41.156" target="_blank" rel="external">http://172.16.41.156</a></p>
+<p><a href="https://my.oschina.net/psuyun/blog/113694" target="_blank" rel="external">nginx常用命令</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装MongoDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装MongoDB/" itemprop="url">【Linux】Centos6.8安装MongoDB</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:43:19+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/mongodb/" itemprop="url" rel="index">
+                    <span itemprop="name">mongodb</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1.解压<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">wget  https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.4.0.tgz</div><div class="line"></div><div class="line">tar zxvf mongodb-linux-x86_64-amazon-3.4.0.tgz</div><div class="line"></div><div class="line">mv mongodb-linux-x86_64-amazon-3.4.0 /usr/local/mongodb</div><div class="line"></div><div class="line">cd /usr/local/mongodb</div></pre></td></tr></table></figure></p>
+<p>2.创建data目录和logs目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make -p data logs</div></pre></td></tr></table></figure>
+<p>3.启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">vi mongodb.conf 中添加</div><div class="line"></div><div class="line">port=27017</div><div class="line"></div><div class="line">logpath=/usr/local/mongodb/logs/mongodb.log</div><div class="line"></div><div class="line">logdbpath=/usr/local/mongodb/data/</div><div class="line"></div><div class="line">logappend=true</div><div class="line"></div><div class="line">fork=true</div></pre></td></tr></table></figure>
+<p>4.更新配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./mongod -f ../mongodb.conf</div></pre></td></tr></table></figure>
+<p>启动命令行界面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./mongo</div></pre></td></tr></table></figure>
+<p>访问成功</p>
+<p><a href="http://172.16.41.31:27017" target="_blank" rel="external">http://172.16.41.31:27017</a></p>
+<p>It looks like you are trying to access MongoDB over HTTP on the native driver port.</p>
+<p><a href="http://howiefh.github.io/2014/04/26/mongodb-note-1-install-mongodb/" target="_blank" rel="external">参考文档</a></p>
+<p>以上转载</p>
+<p><a href="https://my.oschina.net/u/2607587/blog/779404" target="_blank" rel="external">https://my.oschina.net/u/2607587/blog/779404</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装docker/" itemprop="url">【Linux】Centos6.8安装docker</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:42+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>检查系统版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">uname -a</div><div class="line"></div><div class="line">cat /etc/redhat-release</div></pre></td></tr></table></figure>
+<p>安装Epel</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -Uvh http://ftp.riken.jp/Linux/fedora/epel/6Server/x86_64/epel-release-6-8.noarch.rpm</div></pre></td></tr></table></figure>
+<p>安装docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install -y docker-io</div></pre></td></tr></table></figure>
+<p>开机自启动与启动Docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">service docker start</div><div class="line"></div><div class="line">chkconfig docker on</div><div class="line"></div><div class="line">chkconfig docker --list</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装RabbitMQ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装RabbitMQ/" itemprop="url">【Linux】Centos6.8安装RabbitMQ</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:03+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>####【步骤一】 安装依赖包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">yum -y install ncurses-devel</div><div class="line"></div><div class="line">yum list | grep ssl     yum install openssl-devel</div><div class="line"></div><div class="line">yum list | grep ODBC  yum install unixODBC-devel</div><div class="line"></div><div class="line">yum install gcc-c++   </div><div class="line"></div><div class="line">yum install perl （自己补充的，不然会报错）</div><div class="line"></div><div class="line">yum install libxslt yum install  rsync yum install  zip</div><div class="line"></div><div class="line">yum -y install xmlto  </div><div class="line"></div><div class="line">yum install gcc glibc-devel make ncurses-devel openssl-devel autoconf</div></pre></td></tr></table></figure>
+<p>####【步骤二】下载erlang</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget   http://www.erlang.org/download/otp_src_19.0.tar.gz</div></pre></td></tr></table></figure>
+<h4 id="【步骤三】解压erlang"><a href="#【步骤三】解压erlang" class="headerlink" title="【步骤三】解压erlang"></a>【步骤三】解压erlang</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">tar zvxf otp_src_19.0.tar.gz  -C /usr/local </div><div class="line"></div><div class="line">mv /user/otp_src_19.0.tar.gz /usr/local/otp (重命名）</div><div class="line"></div><div class="line">cd otp</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/erlang --without-javac  --with-opengl</div><div class="line">--enable-debug --enable-unicode</div><div class="line"></div><div class="line">make &amp;&amp; make install (编译erlang）</div><div class="line"></div><div class="line">vi /etc/profile (设置环境变量）</div><div class="line"></div><div class="line">PATH=$PATH:/usr/local/erlang/bin</div><div class="line">        export PATH</div><div class="line"></div><div class="line">cd /usr/local/erlang/bin</div></pre></td></tr></table></figure>
+<h4 id="【步骤四】测试erl是否安装成功"><a href="#【步骤四】测试erl是否安装成功" class="headerlink" title="【步骤四】测试erl是否安装成功"></a>【步骤四】测试erl是否安装成功</h4><p>8.1 erl</p>
+<p>退出erl命令行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">halt().</div></pre></td></tr></table></figure>
+<h4 id="【步骤五】安装python"><a href="#【步骤五】安装python" class="headerlink" title="【步骤五】安装python"></a>【步骤五】安装python</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz</div><div class="line"></div><div class="line">mv Python-2.7.6.tgz python</div><div class="line"></div><div class="line">cd python</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/python27</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
+<p>检测是否安装成功</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python -v</div></pre></td></tr></table></figure>
+<hr>
 <ol>
-<li><p>Error 是 Throwable 的子类，用于指示合理的应用程序不应该试图捕获的严重问题</p>
-</li>
-<li><p>Exception 类及其子类是 Throwable 的一种形式，它指出了合理的应用程序想要捕获的条件</p>
-</li>
-<li><p>RuntimeException 是那些可能在 Java 虚拟机正常运行期间抛出的异常的超类。可能在执行方法期间抛出但未被捕获的RuntimeException 的任何子类都无需在 throws 子句中进行声明。</p>
-</li>
-<li><p><strong>在子类中一个重写的方法可能只抛出父类中声明过的异常或者异常的子类</strong></p>
-</li>
-<li><p>Exception和Error的区别<br> Exception</p>
-<pre><code>1．可以是可被控制(checked) 或不可控制的(unchecked) 
-2．表示一个由程序员自身导致的错误 
-3．在应用程序级被处理
-</code></pre><p> Error（应用层面少用，了解即可）</p>
-<pre><code>1．总是不可控制的(unchecked) 
-2．用于表示系统错误或低层资源的错误 
-3．如何可能的话，应该在系统级被捕捉
-</code></pre></li>
+<li>wget 工具安装</li>
 </ol>
-<p>7.Java中的两类异常情况</p>
-<pre><code>1. Checked exception: 这类异常都是Exception的子类 。异常的向上抛出机制进行处理，假如子类可能产生A异常，那么在父类中也必须throws A异常。**可能导致的问题：代码效率低，耦合度过高**
- 2. Unchecked exception: 这类异常都是RuntimeException的子类，虽然RuntimeException同样也是Exception的子类，但是它们是非凡的，它们不能通过client code来试图解决，所以称为Unchecked exception
-</code></pre><p>异常类关系图<br><img src="http://img.blog.csdn.net/20170321111500322?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="异常类关系图"></p>
-<p><a href="https://my.oschina.net/hanzhankang/blog/195529" target="_blank" rel="external">异常参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-线程协作/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——-线程协作/" itemprop="url">线程笔记—— 线程协作</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:26:08+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p><strong>在 Java 中，可以通过配合调用 Object 对象的 wait() 方法和 notify()方法或 notifyAll() 方法来实现线程间的通信。</strong></p>
-</blockquote>
-<hr>
-<ul>
-<li>在线程中调用 wait() 方法，将阻塞等待其他线程的通知</li>
-<li>在线程中调用 notify() 方法或 notifyAll() 方法，将通知其他线程从 wait() 方法处返回</li>
-</ul>
-<hr>
-<blockquote>
-<p>Object 是所有类的超类，它有 5 个方法组成了等待/通知机制的核心：<strong>notify()、notifyAll()、wait()、wait(long)和 wait(long，int)</strong></p>
-</blockquote>
-<h3 id="wait"><a href="#wait" class="headerlink" title="wait()"></a>wait()</h3><blockquote>
-<p>该方法用来将当前线程置入休眠状态，直到接到通知或被中断为止。<br>① 在调用 wait()之前，线程必须要获得该对象的对象级别锁，即<strong>只能在同步方法或同步块中调用 wait()方法</strong>。② 进入 wait()方法后，当前线程释放锁。③ 在从 wait()返回前，线程与其他线程竞争重新获得锁。</p>
-</blockquote>
-<p><strong>如果调用 wait()时，没有持有适当的锁，则抛出 IllegalMonitorStateException，它是 RuntimeException 的一个子类，因此，不需要 try-catch 结构</strong></p>
-<h3 id="notify"><a href="#notify" class="headerlink" title="notify()"></a>notify()</h3><blockquote>
-<p>该方法也要在同步方法或同步块中调用，即在调用前，线程也必须要获得该对象的对象级别锁，如果没有持有适当的锁，也会抛出 IllegalMonitorStateException</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>该方法用来通知那些可能等待该对象的对象锁的其他线程。</strong>如果有多个线程等待，则线程规划器任意挑选出其中一个 wait()状态的线程来发出通知，并使它等待获取该对象的对象锁（notify 后，当前线程不会马上释放该对象锁，wait 所在的线程并不能马上获取该对象锁，要等到程序退出 synchronized 代码块后，当前线程才会释放锁，wait所在的线程也才可以获取该对象锁），但不惊动其他同样在等待被该对象notify的线程们。当第一个获得了该对象锁的 wait 线程运行完毕以后，它会释放掉该对象锁，此时如果该对象没有再次使用 notify 语句，则即便该对象已经空闲，其他 wait 状态等待的线程由于没有得到该对象的通知，会继续阻塞在 wait 状态，直到这个对象发出一个 notify 或 notifyAll</p>
-</blockquote>
-<h3 id="notifyAll"><a href="#notifyAll" class="headerlink" title="notifyAll()"></a>notifyAll()</h3><blockquote>
-<p>notifyAll 使所有原来在该对象上 wait 的线程统统退出 wait 的状态（即全部被唤醒，不再等待 notify 或 notifyAll，但由于此时还没有获取到该对象锁，因此还不能继续往下执行），变成等待获取该对象上的锁，一旦该对象锁被释放（notifyAll 线程退出调用了 notifyAll 的 synchronized 代码块的时候），他们就会去竞争。如果其中一个线程获得了该对象锁，它就会继续往下执行，在它退出 synchronized 代码块，释放锁后，其他的已经被唤醒的线程将会继续竞争获取该锁，一直进行下去，直到所有被唤醒的线程都执行完毕</p>
-</blockquote>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li><p>如果线程调用了对象的 wait()方法，那么线程便会处于该对象的等待池中，等待池中的线程不会去竞争该对象的锁。</p>
+<p><a href="http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm" target="_blank" rel="external">http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -ivh wget-1.12-8.el6.x86_64.rpm</div></pre></td></tr></table></figure>
+<ol>
+<li>xz工具安装<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">yum install xz</div><div class="line"></div><div class="line">xz -d xxx.tar.xz</div><div class="line"></div><div class="line">tar -xf xxx.tar -C /usr/local</div></pre></td></tr></table></figure>
 </li>
-<li><p>当有线程调用了对象的 notifyAll()方法（唤醒所有 wait 线程）或 notify()方法（只随机唤醒一个 wait 线程），被唤醒的的线程便会进入该对象的锁池中，锁池中的线程会去竞争该对象锁。</p>
-</li>
-<li><p>优先级高的线程竞争到对象锁的概率大，假若某线程没有竞争到该对象锁，它还会留在锁池中，唯有线程再次调用 wait()方法，它才会重新回到等待池中。而竞争到对象锁的线程则继续往下执行，直到执行完了 synchronized 代码块，它会释放掉该对象锁，这时锁池中的线程会继续竞争该对象锁。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——死锁/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——死锁/" itemprop="url">线程笔记——死锁</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:25:27+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>当线程需要同时持有多个锁时，有可能产生死锁</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>线程 A 当前持有互斥所锁 lock1，线程 B 当前持有互斥锁 lock2。接下来，当线程 A 仍然持有 lock1 时，它试图获取 lock2，因为线程 B 正持有 lock2，因此线程 A 会阻塞等待线程 B 对 lock2 的释放。如果此时线程 B 在持有 lock2 的时候，也在试图获取 lock1，因为线程 A 正持有 lock1，因此线程 B 会阻塞等待 A 对 lock1 的释放。二者都在等待对方所持有锁的释放，而二者却又都没释放自己所持有的锁，这时二者便会一直阻塞下去。这种情形称为死锁</p>
-</blockquote>
-<p>大部分代码并不容易产生死锁，死锁可能在代码中隐藏相当长的时间，等待不常见的条件地发生，但即使是很小的概率，一旦发生，便可能造成毁灭性的破坏。避免死锁是一件困难的事，遵循以下原则有助于规避死锁：</p>
-<ul>
-<li>只在必要的最短时间内持有锁，考虑使用同步语句块代替整个同步方法</li>
-<li>尽量编写不在同一时刻需要持有多个锁的代码，如果不可避免，则确保线程持有第二个锁的时间尽量短暂</li>
-<li>创建和使用一个大锁来代替若干小锁，并把这个锁用于互斥，而不是用作单个对象的对象级别锁</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div></pre></td><td class="code"><pre><div class="line">public class Deadlock &#123;</div><div class="line"></div><div class="line">	private String objID;  </div><div class="line"></div><div class="line">    public Deadlock(String id) &#123;  </div><div class="line">        objID = id;  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public synchronized void checkOther(Deadlock other) &#123;  </div><div class="line">        print(&quot;entering checkOther()&quot;);  </div><div class="line">        try &#123; Thread.sleep(2000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line">        print(&quot;in checkOther() - about to &quot; + &quot;invoke &apos;other.action()&apos;&quot;);  </div><div class="line"></div><div class="line">        //调用other对象的action方法，由于该方法是同步方法，因此会试图获取other对象的对象锁  </div><div class="line">        other.action();  </div><div class="line">        print(&quot;leaving checkOther()&quot;);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public synchronized void action() &#123;  </div><div class="line">        print(&quot;entering action()&quot;);  </div><div class="line">        try &#123; Thread.sleep(500); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line">        print(&quot;leaving action()&quot;);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public void print(String msg) &#123;  </div><div class="line">        threadPrint(&quot;objID=&quot; + objID + &quot; - &quot; + msg);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static void threadPrint(String msg) &#123;  </div><div class="line">        String threadName = Thread.currentThread().getName();  </div><div class="line">        System.out.println(threadName + &quot;: &quot; + msg);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static void main(String[] args) &#123;  </div><div class="line">        final Deadlock obj1 = new Deadlock(&quot;obj1&quot;);  </div><div class="line">        final Deadlock obj2 = new Deadlock(&quot;obj2&quot;);  </div><div class="line"></div><div class="line">        Runnable runA = new Runnable() &#123;  </div><div class="line">                public void run() &#123;  </div><div class="line">                    obj1.checkOther(obj2);  </div><div class="line">                &#125;  </div><div class="line">            &#125;;  </div><div class="line"></div><div class="line">        Thread threadA = new Thread(runA, &quot;threadA&quot;);  </div><div class="line">        threadA.start();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(200); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        Runnable runB = new Runnable() &#123;  </div><div class="line">                public void run() &#123;  </div><div class="line">                    obj2.checkOther(obj1);  </div><div class="line">                &#125;  </div><div class="line">            &#125;;  </div><div class="line"></div><div class="line">        Thread threadB = new Thread(runB, &quot;threadB&quot;);  </div><div class="line">        threadB.start();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(5000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        threadPrint(&quot;finished sleeping&quot;);  </div><div class="line"></div><div class="line">        threadPrint(&quot;about to interrupt() threadA&quot;);  </div><div class="line">        threadA.interrupt();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(1000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        threadPrint(&quot;about to interrupt() threadB&quot;);  </div><div class="line">        threadB.interrupt();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(1000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        threadPrint(&quot;did that break the deadlock?&quot;);  </div><div class="line">    &#125;  </div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">threadA: objID=obj1 - entering checkOther()</div><div class="line">threadB: objID=obj2 - entering checkOther()</div><div class="line">threadA: objID=obj1 - in checkOther() - about to invoke &apos;other.action()&apos;</div><div class="line">threadB: objID=obj2 - in checkOther() - about to invoke &apos;other.action()&apos;</div><div class="line">main: finished sleeping</div><div class="line">main: about to interrupt() threadA</div><div class="line">main: about to interrupt() threadB</div><div class="line">main: did that break the deadlock?</div></pre></td></tr></table></figure>
-<p>从结果中可以看出，在执行到 other.action() 时，由于两个线程都在试图获取对方的锁，但对方都没有释放自己的锁，因而便产生了死锁，在主线程中试图中断两个线程，但都无果。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——可重入内置锁/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——可重入内置锁/" itemprop="url">线程笔记——可重入内置锁</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><strong>每个 Java 对象都可以用做一个实现同步的锁，这些锁被称为内置锁或监视器锁</strong>。线程在进入同步代码块之前会自动获取锁，并且在退出同步代码块时会自动释放锁</p>
-<blockquote>
-<p><strong>获得内置锁的唯一途径就是进入由这个锁保护的同步代码块或方法</strong></p>
-</blockquote>
-<p>当某个线程请求一个由其他线程持有的锁时，发出请求的线程就会阻塞。然而，由于内置锁是可重入的，因此如果摸个线程试图获得一个已经由它自己持有的锁，那么这个请求就会成功</p>
-<p><strong>“重入”意味着获取锁的操作的粒度是“线程”，而不是调用</strong></p>
-<blockquote>
-<p>重入的一种实现方法是，<strong><em>为每个锁关联一个获取计数值和一个所有者线程。当计数值为 0 时，这个锁就被认为是没有被任何线程所持有，当线程请求一个未被持有的锁时，JVM 将记下锁的持有者，并且将获取计数值置为 1，如果同一个线程再次获取这个锁，计数值将递增，而当线程退出同步代码块时，计数器会相应地递减。当计数值为 0 时，这个锁将被释放</em></strong></p>
-</blockquote>
-<hr>
-<p>重入进一步提升了加锁行为的封装性，因此简化了面向对象并发代码的开发</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class Father  </div><div class="line">&#123;  </div><div class="line">    public synchronized void doSomething()&#123;  </div><div class="line">        System.out.println(&quot;father&quot;);   </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line"></div><div class="line">public class Child extends Father  </div><div class="line">&#123;  </div><div class="line">    public synchronized void doSomething()&#123;  </div><div class="line">        System.out.println(&quot;child&quot;);  </div><div class="line">        super.doSomething();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">child</div><div class="line">father</div></pre></td></tr></table></figure>
-<p><strong>子类覆写了父类的同步方法，然后调用父类中的方法，此时如果没有可重入的锁，那么这段代码件产生死锁。</strong></p>
-<p>子类调用doSomething方法时，除了获得自身类锁的同时还会获得父类的锁，如果内置锁不可重入，那调用super.doSomething时就会发生死锁。所谓重入就是，你拿了锁，再调用该锁包含的代码可以不用再次等待拿锁</p>
-<p><strong>重入则避免了这种死锁情况的发生</strong></p>
-<p>同一个线程在调用本类中其他 synchronized 方法/块或父类中的 synchronized 方法/块时，都不会阻碍该线程地执行，因为互斥锁时可重入的</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-Fork-Join/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——-Fork-Join/" itemprop="url">线程笔记—— Fork/Join</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:00+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="JDK7的Fork-Join"><a href="#JDK7的Fork-Join" class="headerlink" title="JDK7的Fork/Join"></a>JDK7的Fork/Join</h3><p>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
-<h3 id="Future任务机制和FutureTask"><a href="#Future任务机制和FutureTask" class="headerlink" title="Future任务机制和FutureTask"></a>Future任务机制和FutureTask</h3><p>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
-<h3 id="Future相关"><a href="#Future相关" class="headerlink" title="Future相关"></a>Future相关</h3><p>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
-<h3 id="Future原理"><a href="#Future原理" class="headerlink" title="Future原理"></a>Future原理</h3><p>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
-<h3 id="计算最大并发量"><a href="#计算最大并发量" class="headerlink" title="计算最大并发量"></a>计算最大并发量</h3><p>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
-<h3 id="Fork-Join优缺点"><a href="#Fork-Join优缺点" class="headerlink" title="Fork/Join优缺点"></a>Fork/Join优缺点</h3><ul>
-<li>优点 <ol>
-<li>充分实现并发程序任务拆分</li>
-<li>简化编程</li>
-<li>着重划分任务和组合中间结果</li>
 </ol>
-</li>
-<li>缺点 <ol>
-<li>拆分对象不宜过多，容易造成内存溢出</li>
+<p>#安装rabbitmq</p>
+<p>1.下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget  http://www.rabbitmq.com/releases/rabbitmq-server/v3.1.5/rabbitmq-server-unix-3.1.5.tar.gz</div></pre></td></tr></table></figure>
+<p>2.解压</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar xvf rabbitmq-server-unix-3.1.5.tar.gz</div><div class="line"></div><div class="line">mv rabbitmq-server-unix-3.1.5.tar.gz /usr/local/rabbitmq-server</div></pre></td></tr></table></figure>
+<p>#sbin命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">rabbitmqctl add_user admin admin 新增用户</div><div class="line"></div><div class="line">rabbitmqctl set_user_tags admin administrator 设置为管理员</div><div class="line"></div><div class="line">rabbitmqctl set_permissions -p &quot;/&quot; admin &quot;.*&quot; &quot;.*&quot; &quot;.*&quot; 设置权限</div><div class="line"></div><div class="line">rabbitmq-plugins enable rabbitmq_management  配置web插件</div></pre></td></tr></table></figure>
+<p>#远程访问rabbitmq</p>
+<p><strong>iptables -F 关闭防火墙，开放端口</strong></p>
+<p><a href="http://172.16.41.31:15672" target="_blank" rel="external">http://172.16.41.31:15672</a></p>
+<p>#Java访问rabbitmq</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">vi /etc/rabbitmq/rabbitmq.config 中添加</div><div class="line"></div><div class="line">[</div><div class="line"> &#123;rabbit,</div><div class="line"></div><div class="line">  [</div><div class="line">      &#123;tcp_listeners, [5672]&#125;,</div><div class="line">      &#123;loopback_users, [&quot;admin&quot;]&#125;</div><div class="line">  ]&#125;</div><div class="line">].</div></pre></td></tr></table></figure>
+<p>端口</p>
+<p>4369 (epmd)</p>
+<p>5672, 5671 (AMQP 0-9-1 and 1.0 without and with TLS)</p>
+<ol>
+<li>This port used by Erlang distribution for inter-node and CLI tools communication and is allocated from a dynamic range (limited to a single port by default, computed as AMQP port + 20000)</li>
 </ol>
-</li>
-</ul>
-<h3 id="Fork-Join应用场景"><a href="#Fork-Join应用场景" class="headerlink" title="Fork/Join应用场景"></a>Fork/Join应用场景</h3><blockquote>
-<p><strong>树形数据结构处理和遍历</strong></p>
+<p>15672 (if management plugin is enabled)</p>
+<p>61613, 61614 (if STOMP is enabled)</p>
+<p>1883, 8883 (if MQTT is enabled)</p>
+<p>   修改虚拟机ip</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/network-scripts/ifcfg-eth0</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/" itemprop="url">ActiveMQ学习笔记（一）—— HelloWorld</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:39:19+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/activemq/" itemprop="url" rel="index">
+                    <span itemprop="name">activemq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="HelloProducer-class"><a href="#HelloProducer-class" class="headerlink" title="HelloProducer.class"></a>HelloProducer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">// 生产者的主要流程  </div><div class="line"></div><div class="line">Connection conn = null;</div><div class="line"></div><div class="line">//1.初始化连接工厂</div><div class="line"></div><div class="line">ConnectionFactory factory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);</div><div class="line"></div><div class="line">// 2.创建Connection  </div><div class="line"></div><div class="line">conn = factory.createConnection();  </div><div class="line"></div><div class="line"> // 3.打开连接</div><div class="line"></div><div class="line">conn.start();</div><div class="line"></div><div class="line">// 4.创建session，是否支持事务</div><div class="line"></div><div class="line">Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);  </div><div class="line"></div><div class="line"> // 5.创建消息目标  </div><div class="line"></div><div class="line">Destination queue = session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line"> //6.创建生产者  </div><div class="line"></div><div class="line">MessageProducer producer = session.createProducer(queue);</div><div class="line"></div><div class="line">//7.配置消息是否持久化  </div><div class="line"></div><div class="line">/*  DeliverMode有2种方式： </div><div class="line"></div><div class="line"> *  </div><div class="line"></div><div class="line">     public interface DeliveryMode &#123; </div><div class="line"></div><div class="line">                static final int NON_PERSISTENT = 1;//不持久化：服务器重启之后，消息销毁 </div><div class="line"></div><div class="line">                static final int PERSISTENT = 2;//持久化：服务器重启之后，该消息仍存在 </div><div class="line"></div><div class="line">      &#125; </div><div class="line"></div><div class="line"> */  </div><div class="line"></div><div class="line">producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);  </div><div class="line"></div><div class="line"> //8.初始化要发送的消息  </div><div class="line"></div><div class="line">TextMessage message = session.createTextMessage(&quot; Hello World ! from activemq&quot;); </div><div class="line"></div><div class="line">//9.发送消息</div><div class="line"></div><div class="line">producer.send(message);</div><div class="line"></div><div class="line">//10.关闭连接</div><div class="line"></div><div class="line">conn.close();</div></pre></td></tr></table></figure>
+<h3 id="HelloCustomer-class"><a href="#HelloCustomer-class" class="headerlink" title="HelloCustomer.class"></a>HelloCustomer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line">HelloConsumer implements TextListener</div><div class="line"></div><div class="line">@Override</div><div class="line"></div><div class="line">public void onMessage(Message message) &#123;</div><div class="line"></div><div class="line">        //如果消息是TextMessage  </div><div class="line"></div><div class="line">        if (message instanceof TextMessage) &#123;  </div><div class="line"></div><div class="line">            //强制转换一下  </div><div class="line"></div><div class="line">            TextMessage txtMsg = (TextMessage) message;  </div><div class="line"></div><div class="line">            try &#123;  </div><div class="line"></div><div class="line">                //输出接收到的消息  </div><div class="line"></div><div class="line">                System.out.println(&quot;我爱罗接收到漩涡鸣人的信息 : &quot; + txtMsg.getText());  </div><div class="line"></div><div class="line">            &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">                e.printStackTrace();  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">        &#125;          </div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">public void receive() &#123;  </div><div class="line"></div><div class="line">        // 消费者的主要流程  </div><div class="line"></div><div class="line">        Connection connection = null;  </div><div class="line"></div><div class="line">        try &#123;  </div><div class="line"></div><div class="line">            // 1.初始化connection工厂  </div><div class="line"></div><div class="line">            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);  </div><div class="line"></div><div class="line">            // 2.创建Connection  </div><div class="line"></div><div class="line">            connection = connectionFactory.createConnection();  </div><div class="line"></div><div class="line">            // 3.打开连接  </div><div class="line"></div><div class="line">            connection.start();  </div><div class="line"></div><div class="line">            // 4.创建session  </div><div class="line"></div><div class="line">            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE); </div><div class="line"></div><div class="line">            // 5.创建消息目标  </div><div class="line"></div><div class="line">            Destination queue= session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line">            //6.创建消费者  </div><div class="line"></div><div class="line">            MessageConsumer consumer = session.createConsumer(queue);          </div><div class="line"></div><div class="line">            //7.配置监听  </div><div class="line"></div><div class="line">            consumer.setMessageListener(this);  </div><div class="line"></div><div class="line">        &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">            e.printStackTrace();  </div><div class="line"></div><div class="line">        &#125;  </div><div class="line"></div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<h3 id="运行测试"><a href="#运行测试" class="headerlink" title="运行测试"></a>运行测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line"></div><div class="line">        new HelloConsumer().receive();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ActiveMq如果与Spring配置</p>
+<p>  //有对应所需功能api，其余配置只需要在xml文件里面配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private JmsTemplate jmsTemplate;   </div><div class="line"></div><div class="line">public JmsTemplate getJmsTemplate() &#123;  </div><div class="line"></div><div class="line">   return jmsTemplate;  </div><div class="line"></div><div class="line">&#125;  </div><div class="line"></div><div class="line">public void setJmsTemplate(JmsTemplate jmsTemplate) &#123;  </div><div class="line"></div><div class="line">   this.jmsTemplate = jmsTemplate;  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>spring配置内容</p>
+<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714291" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714291</a></p>
+<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714739" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714739</a></p>
+<p>以上转载</p>
+<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12090505" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12090505</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（六）——-RPC调用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（六）——-RPC调用/" itemprop="url">RabbitMq学习笔记（六）—— RPC调用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:38:52+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="RpcClient-class"><a href="#RpcClient-class" class="headerlink" title="RpcClient.class"></a>RpcClient.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"> //生成Rpc队列</div><div class="line"></div><div class="line">            channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);  </div><div class="line"></div><div class="line">            channel.basicQos(1);  </div><div class="line"></div><div class="line">            //创建Rpc队列消费者</div><div class="line"></div><div class="line">            QueueingConsumer consumer = new QueueingConsumer(channel);  </div><div class="line"></div><div class="line">            channel.basicConsume(RPC_QUEUE_NAME, false, consumer);  </div><div class="line"></div><div class="line">            System.out.println(&quot;RPCServer [x] Awaiting RPC requests&quot;);  </div><div class="line"></div><div class="line">            while (true) &#123;  </div><div class="line"></div><div class="line">                String response = &quot;&quot;;      //返回RpcClient回调结果</div><div class="line"></div><div class="line">                //获取队列中消息，如果没有则会一直阻塞</div><div class="line"></div><div class="line">                QueueingConsumer.Delivery delivery = consumer.nextDelivery();    </div><div class="line"></div><div class="line">                BasicProperties props = delivery.getProperties();  </div><div class="line"></div><div class="line">                //开启Rpc</div><div class="line"></div><div class="line">                BasicProperties replyProps = new BasicProperties.Builder().correlationId(props.getCorrelationId()).build();  </div><div class="line"></div><div class="line">               try &#123;  </div><div class="line"></div><div class="line">                    //获取消息</div><div class="line"></div><div class="line">                    String message = new String(delivery.getBody(), &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                    int n = Integer.parseInt(message);  </div><div class="line"></div><div class="line">                    System.out.println(&quot;RPCServer [.] fib(&quot; + message + &quot;)&quot;);  </div><div class="line"></div><div class="line">                    response = &quot;&quot; + fib(n);  </div><div class="line"></div><div class="line">                &#125; catch (Exception e) &#123;  </div><div class="line"></div><div class="line">                    System.out.println(&quot; [.] &quot; + e.toString());  </div><div class="line"></div><div class="line">                    response = &quot;&quot;;  </div><div class="line"></div><div class="line">                &#125; finally &#123;  </div><div class="line"></div><div class="line">                    //完成</div><div class="line"></div><div class="line">                    channel.basicPublish(&quot;&quot;, props.getReplyTo(), replyProps, response.getBytes(&quot;UTF-8&quot;));  </div><div class="line"></div><div class="line">                    //传输失败，回退</div><div class="line"></div><div class="line">                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="RpcClient-class-1"><a href="#RpcClient-class-1" class="headerlink" title="RpcClient.class"></a>RpcClient.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">private Connection connection;  </div><div class="line"></div><div class="line">    private Channel channel;  </div><div class="line"></div><div class="line">    private String requestQueueName = &quot;rpc_queue&quot;;  </div><div class="line"></div><div class="line">    private String replyQueueName;  </div><div class="line"></div><div class="line">    private QueueingConsumer consumer;  </div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    public RpcClient() throws KeyManagementException, NoSuchAlgorithmException, URISyntaxException, IOException, TimeoutException&#123;</div><div class="line"></div><div class="line">         ConnectionFactory factory = new ConnectionFactory();  </div><div class="line"></div><div class="line">         factory.setUri(&quot;amqp://admin:admin@172.16.41.31:5672&quot;);  </div><div class="line"></div><div class="line">         connection = factory.newConnection();  </div><div class="line"></div><div class="line">         channel = connection.createChannel();  </div><div class="line"></div><div class="line">         replyQueueName = channel.queueDeclare().getQueue();  </div><div class="line"></div><div class="line">         consumer = new QueueingConsumer(channel);  </div><div class="line"></div><div class="line">         channel.basicConsume(replyQueueName, true, consumer);  </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    //计算结果，返回给RpcServer</div><div class="line"></div><div class="line">    public String call(String message) throws Exception &#123;  </div><div class="line"></div><div class="line">    String response = null;  </div><div class="line"></div><div class="line">        String corrId = UUID.randomUUID().toString();  </div><div class="line"></div><div class="line">        BasicProperties props = new BasicProperties.Builder().correlationId(corrId).replyTo(replyQueueName).build();  </div><div class="line"></div><div class="line">        channel.basicPublish(&quot;&quot;, requestQueueName, props, message.getBytes(&quot;UTF-8&quot;));  </div><div class="line"></div><div class="line">        while (true) &#123;  </div><div class="line"></div><div class="line">            QueueingConsumer.Delivery delivery = consumer.nextDelivery();  </div><div class="line"></div><div class="line">            if (delivery.getProperties().getCorrelationId().equals(corrId)) &#123;  </div><div class="line"></div><div class="line">                response = new String(delivery.getBody(), &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                break;  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">        &#125;  </div><div class="line"></div><div class="line">        return response;  </div><div class="line"></div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    public void close() throws Exception &#123;  </div><div class="line"></div><div class="line">        connection.close();  </div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h3 id="远程方法调用的注意事项"><a href="#远程方法调用的注意事项" class="headerlink" title="远程方法调用的注意事项"></a>远程方法调用的注意事项</h3><pre><code>RPC在软件开发中非常常见，也经常被批评。当一个程序员对代码不熟悉的时候，跟踪RPC的性能问题是出在本地还是远程服务器就非常麻烦，对于RPC的使用，有几点需要特别说明：
+</code></pre><p>使用远程调用时的本地函数最好独立出来</p>
+<p>保证代码组件之间的依赖关系清晰明了，并用日志记录不同的执行过程和时间</p>
+<p>发生客户端运行缓慢或者假死时，先确认RPC服务器是否还活着！</p>
+<p>尽量使用异步队列来处理RPC请求，尽量不要用同步阻塞的方式运行RPC请求</p>
+<h2 id="消息属性"><a href="#消息属性" class="headerlink" title="消息属性"></a>消息属性</h2><p>传输一条消息，AMQP协议预定义了14个属性，下面几个是使用比较频繁的几个属性：</p>
+<p>deliveryMode：配置一个消息是否持久化。（2表示持久化）这个在第二章中有说明。</p>
+<p>contentType ：用来描述编码的MIME类型。与html的MIME类型类似，例如，经常使用JSON编码是将此属性设置为一个很好的做法：application/json。</p>
+<p>replyTo ： 回调队列的名称。</p>
+<p>correlationId：RPC响应请求的相关编号。</p>
+<p>关联编号  Correlation Id</p>
+<blockquote>
+<p>如果一个客户端有很多的计算任务，按照上面的代码，我们会为每个任务创建一个请求，然后等待返回的结果，这种方法貌似很耗时，如果把所有的任务都放到同一个连接中，那么我们又没法分辨出返回的结果是那个任务的？为了解决这个问题，RabbitMQ提供了一个correlationid属性来解决这个问题。RabbitMQ为每个请求提供唯一的编号，然后在返回队列里如果看到了这个编号，就知道我们的任务处理完成了，如果收到的编号不认识，就可以安全的忽略。</p>
 </blockquote>
-<h3 id="api"><a href="#api" class="headerlink" title="api"></a>api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">fork() //异步执行任务</div><div class="line">join() //计算完成后返回结果</div><div class="line">RecursiveTask //用于无返回结果的任务</div><div class="line">RecursiveAction //用于有返回结果的任务</div><div class="line">ForkJoinPool //实现Executor接口</div><div class="line">//三个调度子方法</div><div class="line">execute() //异步执行</div><div class="line">invoke() //等待完成，返回结果</div><div class="line">submit() //异步执行execute任务，并立即返回Future对象</div></pre></td></tr></table></figure>
-<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class FutureTaskDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		</div><div class="line">		SonTask sonTask = new SonTask(&quot;线程2&quot;);</div><div class="line">		FutureTask&lt;String&gt; task1 = new FutureTask&lt;&gt;(sonTask);</div><div class="line">		new Thread(task1).start();</div><div class="line">		System.out.println(task1.get()); //获取结果</div><div class="line">		</div><div class="line">		FutureTask&lt;Integer&gt; task2 = new FutureTask&lt;Integer&gt;(new MySun(),2);</div><div class="line">		new Thread(task2).start();</div><div class="line">		System.out.println(&quot;result_&quot;+task2.get());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class SonTask implements Callable&lt;String&gt; &#123;</div><div class="line"></div><div class="line">	private String name = &quot;&quot;;</div><div class="line">	</div><div class="line">	SonTask(String name) &#123;</div><div class="line">		this.name = name;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public String call() throws Exception &#123;</div><div class="line">		Thread.sleep(1000L);</div><div class="line">		System.out.println(name + &quot;计算完成&quot;);</div><div class="line">		return &quot;result_1&quot;;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class MySun implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(500L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;线程2处理完成&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">result_1</div><div class="line">result_2</div></pre></td></tr></table></figure>
-<h3 id="Fork-Join"><a href="#Fork-Join" class="headerlink" title="Fork/Join"></a>Fork/Join</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class CountTask extends RecursiveTask&lt;Integer&gt;&#123;</div><div class="line"></div><div class="line">	private static final long serialVersionUID = 2148758397044775857L;</div><div class="line"></div><div class="line">	private static int splitSize = 2; </div><div class="line">	private int start , end; </div><div class="line">	</div><div class="line">	</div><div class="line">	public CountTask(int start, int end) &#123;</div><div class="line">		this.start = start;</div><div class="line">		this.end = end;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected Integer compute() &#123;</div><div class="line">		int sum = 0;</div><div class="line">		//如果任务不需要拆分就开始计算</div><div class="line">		boolean isSplit =  (end - start) &lt;= splitSize;</div><div class="line">		if(isSplit)&#123;</div><div class="line">			for (int i = start; i &lt;= end; i++) &#123;</div><div class="line">				sum += i;</div><div class="line">			&#125;</div><div class="line">		&#125;else&#123; //拆分成2个子任务</div><div class="line">			int middle = (start + end) / 2;</div><div class="line">			CountTask oneTask = new CountTask(start, middle);</div><div class="line">			CountTask twoTask = new CountTask(middle+1, end);</div><div class="line">			oneTask.fork();//开始执行</div><div class="line">			twoTask.fork();</div><div class="line">			</div><div class="line">			//获得第一个子任务结果</div><div class="line">			int oneResult = oneTask.join();</div><div class="line">			int twoResult = twoTask.join();</div><div class="line">			</div><div class="line">			sum = oneResult + twoResult;</div><div class="line">		&#125;</div><div class="line">		return sum;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public class FockJoinDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		ForkJoinPool pool = new ForkJoinPool();</div><div class="line">		CountTask count1 = new CountTask(1, 5);</div><div class="line">		</div><div class="line">		Future&lt;Integer&gt; res1 = pool.submit(count1);</div><div class="line">		System.out.println(&quot;1-5结果: &quot;+res1.get());</div><div class="line">		</div><div class="line">		CountTask count2 = new CountTask(1, 100);</div><div class="line">		Future&lt;Integer&gt; res2 = pool.submit(count2);</div><div class="line">		System.out.println(&quot;1-100结果：&quot;+res2.get());</div><div class="line">		</div><div class="line">		System.out.println(&quot;=============Fock/Join监控===============&quot;);</div><div class="line">		</div><div class="line">		System.out.println(pool.getActiveThreadCount());</div><div class="line">		System.out.println(pool.getQueuedTaskCount());</div><div class="line">		System.out.println(pool.getQueuedSubmissionCount());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">1-5结果: 15</div><div class="line">1-100结果：5050</div><div class="line">=============Fock/Join监控===============</div><div class="line">1</div><div class="line">0</div><div class="line">0</div></pre></td></tr></table></figure>
-<p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp11137.html" target="_blank" rel="external">IBM_Fork/Join分析</a></p>
+<p>你可能会疑问，如果忽略了，那么想知道这个返回结果的客户端是不是就收不到这个结果了？这个基本上不会出现，但是，理论上也可能发生，例如一个RPC服务器，在发送确认消息前挂了，你收到的消息可能就是不完整的。这种情况，RabbitMQ会重新发送任务处理请求。这也是为什么客户端必须处理这些重复请求以及RPC启用幂次模式。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>RPC工作方式</p>
+<p>当客户端启动时，会创建一个匿名的回调队列</p>
+<p>在RPC请求中，定义了两个属性：replyTo，表示回调队列的名称； correlationId，表示请求任务的唯一编号，用来区分不同请求的返回结果。</p>
+<p>将请求发送到rpc_queue队列中</p>
+<p>RPC服务器等待rpc_queue队列的请求，如果有消息，就处理，它将计算结果发送到请求中的回调队列里。</p>
+<p>客户端监听回调队列中的消息，如果有返回消息，它根据回调消息中的correlationid进行匹配计算结果。</p>
+<p>以上转载</p>
+<p><a href="http://blog.csdn.net/chwshuang/article/details/50518570" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50518570</a></p>
+<p>参考RabbitMQ中文文档</p>
+<p><a href="http://rabbitmq.mr-ping.com/tutorials_with_python/[5]Topics.html" target="_blank" rel="external">http://rabbitmq.mr-ping.com/tutorials_with_python/[5]Topics.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（五）——-Topic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（五）——-Topic/" itemprop="url">RabbitMq学习笔记（五）—— Topic</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:38:24+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">ReceiveTopicOne 匹配规则1</div><div class="line"></div><div class="line">//声明交换器和队列</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;topic&quot;);</div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line">//路由关键字规则</div><div class="line"></div><div class="line">String[] routingKeys = new String[]&#123;&quot;*.*.rabbit&quot;, &quot;lazy.#&quot;&#125;; </div><div class="line"></div><div class="line">//绑定路由关键字</div><div class="line"></div><div class="line">for (String bindingKey : routingKeys) &#123;  </div><div class="line"></div><div class="line">      channel.queueBind(queueName, EXCHANGE_NAME, bindingKey);  </div><div class="line"></div><div class="line"> &#125;  </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">ReceiveTopicTwo 匹配规则2</div><div class="line"></div><div class="line">//声明交换器和队列</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;topic&quot;);</div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line">//路由关键字规则</div><div class="line"></div><div class="line">String[] routingKeys = new String[]&#123;&quot;*.orange.*&quot;&#125;;  </div><div class="line"></div><div class="line">//绑定路由关键字</div><div class="line"></div><div class="line">for (String bindingKey : routingKeys) &#123;  </div><div class="line"></div><div class="line">     channel.queueBind(queueName, EXCHANGE_NAME, bindingKey);  </div><div class="line"></div><div class="line">&#125;  </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">TopicSend 发送</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;topic&quot;);  </div><div class="line"></div><div class="line">//待发送信息</div><div class="line"></div><div class="line">String[] routingKeys = new String[]&#123;&quot;quick.orange.rabbit&quot;,</div><div class="line"></div><div class="line">                                                            &quot;lazy.orange.elephant&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;quick.orange.fox&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;lazy.brown.fox&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;quick.brown.fox&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;quick.orange.male.rabbit&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;lazy.orange.male.rabbit&quot;&#125;;  </div><div class="line"></div><div class="line">for (String bindingKey : routingKeys) &#123;  </div><div class="line"></div><div class="line">     channel.queueBind(queueName, EXCHANGE_NAME, bindingKey);  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>用三个关键字来绑定，Q1绑定关键字是【<em>.orange.</em>】,Q2绑定关键字是【<em>.</em>.rabbit】和【lazy.#】，然后分析会发生什么：</p>
+<p><img src="http://img.blog.csdn.net/20160114155849562?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>Q1会收到所有orange这种颜色相关的消息</p>
+<p>Q2会收到所有rabbit这个动物相关的消息和所有速度lazy的动物的消息</p>
+<p> 分析：</p>
+<p>生产者发送“quick.orange.rabbit”的消息，两个队列都会收到</p>
+<p>生产者发送“lazy.orange.elephant”，两队列也都会收到。</p>
+<p>生产者发送”quick.orange.fox”，那么只有Q1会收到。</p>
+<p>生产者发送”lazy.brown.fox”，那么只会有Q2能收到。</p>
+<p>生产者发送”quick.brown.fox”，那么这条消息会被丢弃，谁也收不到。</p>
+<p>生产者发送”quick.orange.male.rabbit”，这个消息也会被丢弃，谁也收不到。</p>
+<p>生产者发送”lazy.orange.male.rabbit”，这个消息会被Q2的【lazy.#】规则匹配上，发送到Q2队列中。</p>
+<p>注意</p>
+<p>交换器在匹配模式下：</p>
+<p>如果消费者端的路由关键字只使用【#】来匹配消息，在匹配【topic】模式下，它会变成一个分发【fanout】模式，接收所有消息。</p>
+<p>如果消费者端的路由关键字中没有【#】或者【*】，它就变成直连【direct】模式来工作。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/" itemprop="url">RabbitMq学习笔记（四）—— 消息路由（Routing）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:37:53+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">//声明直连交换器</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;direct&quot;);  </div><div class="line"></div><div class="line">// 获取匿名队列名称  </div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">根据路由关键字进行多重绑定 </div><div class="line"></div><div class="line">for(String severity :routingKeys)&#123;  </div><div class="line"></div><div class="line">        channel.queueBind(queueName, EXCHANGE_NAME, severity);  </div><div class="line"></div><div class="line">&#125; </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//消费数据</div><div class="line"></div><div class="line">Consumer consumer = new DefaultConsumer(channel) &#123;  </div><div class="line"></div><div class="line">            @Override  </div><div class="line"></div><div class="line">            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException &#123;  </div><div class="line"></div><div class="line">                String message = new String(body, &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                System.out.println(&quot; [x] Received &apos;&quot; + envelope.getRoutingKey() + &quot;&apos;:&apos;&quot; + message + &quot;&apos;&quot;);  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">  &#125;;  </div><div class="line"></div><div class="line">        channel.basicConsume(queueName, true, consumer);</div></pre></td></tr></table></figure>
+<h4 id="直连类型交换器"><a href="#直连类型交换器" class="headerlink" title="直连类型交换器"></a>直连类型交换器</h4><blockquote>
+<p>上一章的例子是通过分发【fanout】类型的交换器【logs】广播日志信息，现在我们将日志分debug、info、warn、error这几种基本的级别，实际在生产环境中，避免磁盘空间浪费，应用只会将error级别的日志打印出来。而分发【fanout】类型的交换器会将所有基本的日志都发送出来，如果我们想只接收某一级别的日志信息，就需要使用直连【direct】类型的交换器了, 下面的图中，队列1通过ERROR这个routingkey绑定到E交换器，队列2通过WARN和INFO绑定到E交换器，E交换器的类型是直连【direct】的，如果生产者【P】发出ERROR的日志，只会有队列1会收到，如果生产者【P】发出INFO和WARN的日志，只有队列2会收到，如果生产者【P】发出DEBUG级别的日志，队列1和队列2都会忽略它。</p>
+</blockquote>
+<h4 id="多重绑定"><a href="#多重绑定" class="headerlink" title="多重绑定"></a>多重绑定</h4><blockquote>
+<p>我们允许多个队列以相同的路由关键字绑定到同一个交换器中，可以看到，交换器虽然是直连类型，但是绑定后的效果却跟分发类型的交换器类似，相同的是队列1和队列2都会收到同一条来自交换器的消息。</p>
+</blockquote>
+<p>他们的区别：分发模式下，队列1、队列2会收到所有级别（除ERROR级别以外）的消息，而直连模式下，他们仅仅只会收到ERROR关键字类型的消息。</p>
 
           
         
@@ -1881,7 +1935,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1926,7 +1980,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-count">86</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1937,7 +1991,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-count">31</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1948,7 +2002,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">63</span>
+                <span class="site-state-item-count">76</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
