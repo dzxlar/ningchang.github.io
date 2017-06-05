@@ -1,0 +1,825 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="高可用技术," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="《亿级流量网站架构核心技术》学习笔记 （五） —— 降级 当访问量剧增、服务出现问题(响应时间长或不响应)或非核心服务影响到核心服务性能时，仍然保证服务是可用的，即使有损服务    降级最终目的是保证服务可用，即使有损，有些服务是无法降级的（加入购物车、结算等）    降级需要根据吞吐量、响应时间、可用率等条件进行手工降级或自动降级   降级预案 一般：有些服务偶尔因为网络抖动或者服务正在上线而超">
+<meta name="keywords" content="高可用技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《亿级流量网站架构核心技术》学习笔记 （五） —— 降级">
+<meta property="og:url" content="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（五）-——-降级/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="《亿级流量网站架构核心技术》学习笔记 （五） —— 降级 当访问量剧增、服务出现问题(响应时间长或不响应)或非核心服务影响到核心服务性能时，仍然保证服务是可用的，即使有损服务    降级最终目的是保证服务可用，即使有损，有些服务是无法降级的（加入购物车、结算等）    降级需要根据吞吐量、响应时间、可用率等条件进行手工降级或自动降级   降级预案 一般：有些服务偶尔因为网络抖动或者服务正在上线而超">
+<meta property="og:updated_time" content="2017-06-05T09:04:53.289Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《亿级流量网站架构核心技术》学习笔记 （五） —— 降级">
+<meta name="twitter:description" content="《亿级流量网站架构核心技术》学习笔记 （五） —— 降级 当访问量剧增、服务出现问题(响应时间长或不响应)或非核心服务影响到核心服务性能时，仍然保证服务是可用的，即使有损服务    降级最终目的是保证服务可用，即使有损，有些服务是无法降级的（加入购物车、结算等）    降级需要根据吞吐量、响应时间、可用率等条件进行手工降级或自动降级   降级预案 一般：有些服务偶尔因为网络抖动或者服务正在上线而超">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（五）-——-降级/"/>
+
+
+
+
+
+  <title>《亿级流量网站架构核心技术》学习笔记 （五） —— 降级 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（五）-——-降级/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《亿级流量网站架构核心技术》学习笔记 （五） —— 降级</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:04:24+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="《亿级流量网站架构核心技术》学习笔记-（五）-——-降级"><a href="#《亿级流量网站架构核心技术》学习笔记-（五）-——-降级" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （五） —— 降级"></a>《亿级流量网站架构核心技术》学习笔记 （五） —— 降级</h2><blockquote>
+<p>当访问量剧增、服务出现问题(响应时间长或不响应)或非核心服务影响到核心服务性能时，仍然保证服务是可用的，即使有损服务</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>降级最终目的是保证服务可用，即使有损，有些服务是无法降级的（加入购物车、结算等）</strong></p>
+</blockquote>
+<hr>
+<blockquote>
+<p>降级需要根据吞吐量、响应时间、可用率等条件进行手工降级或自动降级</p>
+</blockquote>
+<hr>
+<h2 id="降级预案"><a href="#降级预案" class="headerlink" title="降级预案"></a>降级预案</h2><ul>
+<li>一般：有些服务偶尔因为网络抖动或者服务正在上线而超时，可以自动降级</li>
+<li>警告：有些服务在一段时间内成功率有波动，可以自动降级或人工降级，并发送警告</li>
+<li>错误：比如数据库连接池用完、访问量突增到系统能承受的最大阙值</li>
+<li>严重错误：因为特殊原因导致数据出错，需要紧急人工降级</li>
+</ul>
+<hr>
+<h3 id="降级分类"><a href="#降级分类" class="headerlink" title="降级分类"></a>降级分类</h3><ul>
+<li>按照是否自动化：自动开关降级和人工开关降级</li>
+<li>按照功能：读服务降级和写服务降级</li>
+<li>按照系统层次：多层降级</li>
+</ul>
+<hr>
+<p>降级功能点主要从服务器链路考虑(根据用户访问的服务调用链路来梳理哪里需要降级)</p>
+<ul>
+<li>页面降级<blockquote>
+<p>在大促或者某些特殊情况，某些页面占用了稀缺服务资源，紧急情况可对其整个降级，达到丢车保帅目的</p>
+</blockquote>
+</li>
+<li>页面片段降级<blockquote>
+<p>商品详情页中的商家部分因为数据错误，需对此进行降级</p>
+</blockquote>
+</li>
+<li>页面异步请求降级<blockquote>
+<p>商品详情页上推荐信息/配送等异步信息加载，如果响应慢或者后端服务出错，可考虑降级</p>
+</blockquote>
+</li>
+<li>服务功能降级<blockquote>
+<p>渲染商品详情，需要调用不太重要的数据(热销、分类等)，而这些服务在异常不获取，即降级</p>
+</blockquote>
+</li>
+<li>读降级<blockquote>
+<p>多级缓存模式，如果后端服务有问题，可以降级为只读缓存，适用于读一致性不高的场景</p>
+</blockquote>
+</li>
+<li>写降级<blockquote>
+<p>秒杀抢购，可以只进行Cache更新，然后异步扣减库存到DB，保证最终一致性即可，此时DB降级为Cache</p>
+</blockquote>
+</li>
+<li>爬虫降级<blockquote>
+<p>在大促活动时，可将爬虫流量导向静态页或者返回空数据，保护稀缺资源</p>
+</blockquote>
+</li>
+<li>风控降级<blockquote>
+<p>抢购/秒杀业务，完全可以识别机器人、用户画像或者根据用户风控进行降级处理</p>
+</blockquote>
+</li>
+</ul>
+<hr>
+<h2 id="自动开关降级"><a href="#自动开关降级" class="headerlink" title="自动开关降级"></a>自动开关降级</h2><blockquote>
+<p>自动降级时根据系统负载、资源使用情况、SLA等指标进行降级</p>
+</blockquote>
+<ul>
+<li>超时降级<blockquote>
+<p>当访问数据库/http服务/远程调用响应慢。且该服务不是核心服务可考虑在超时后自动降级。比如商品详情有推荐和评价，可以暂不显示，对用户购物流程不会有太大影响</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>要配置好超时时间和重试次数机制</strong></p>
+<ul>
+<li><p>统计失败次数降级</p>
+<blockquote>
+<p>有时依赖一些不稳定的API，调用外部机票服务，当失败调用到一定阙值自动降级(熔断器),通过异步线程探测服务是否恢复，恢复取消降级</p>
+</blockquote>
+</li>
+<li><p>故障降级</p>
+</li>
+</ul>
+<blockquote>
+<p>若调用的远程服务挂掉（网络故障、DNS故障、Http返回错误状态码、RPC异常），可直接降级。 </p>
+<p>降级后处理方案: 默认值、兜底数据、缓存</p>
+</blockquote>
+<ul>
+<li>限流降级</li>
+</ul>
+<blockquote>
+<p>去秒杀抢购一些商品，可能会因为访问量太大导致系统崩溃，通常使用限流限制访问量，当达到限流阙值，后续请求被降级</p>
+<p>降级后处理方案：排队、无货、错误页</p>
+</blockquote>
+<hr>
+<h2 id="人工开关降级"><a href="#人工开关降级" class="headerlink" title="人工开关降级"></a>人工开关降级</h2><blockquote>
+<p>在大促期间通过监控发现一些线上服务存在问题，这个时候需要暂时摘掉、通过任务系统调用一些服务，服务依赖的数据库可能占满了，数据库挂掉或者慢查询比较多，需要暂停任务系统让服务方进行处理、或者突然调用量增大</p>
+<p>处理方式：使用开关降级、开关可以存放到配置文件、数据库、Redis/Zk。如果不不存放到本地，则可定期同步开关数据，通过判断某个值是否降级</p>
+</blockquote>
+<hr>
+<h2 id="读服务降级"><a href="#读服务降级" class="headerlink" title="读服务降级"></a>读服务降级</h2><blockquote>
+<p>处理方案：暂时切换读(降级到读缓存、降级到静态化)、暂时屏蔽读(屏蔽读服务、屏蔽读入口)</p>
+</blockquote>
+<hr>
+<h2 id="写服务降级"><a href="#写服务降级" class="headerlink" title="写服务降级"></a>写服务降级</h2><blockquote>
+<p>写服务在大多场景不可降级，不过可以通过其他方案:同步转异步、限制写的比例</p>
+</blockquote>
+<hr>
+<h2 id="多级降级"><a href="#多级降级" class="headerlink" title="多级降级"></a>多级降级</h2><blockquote>
+<p>缓存离客户越近越高效；降级离客户越近保护更好</p>
+</blockquote>
+<ul>
+<li>页面JS降级开关</li>
+<li>接入层降级开关</li>
+<li>应用层降级开关</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/高可用技术/" rel="tag"># 高可用技术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（四）-——-限流/" rel="next" title="《亿级流量网站架构核心技术》学习笔记 （四） —— 限流">
+                <i class="fa fa-chevron-left"></i> 《亿级流量网站架构核心技术》学习笔记 （四） —— 限流
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存/" rel="prev" title="《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存">
+                《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">93</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">78</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#《亿级流量网站架构核心技术》学习笔记-（五）-——-降级"><span class="nav-number">1.</span> <span class="nav-text">《亿级流量网站架构核心技术》学习笔记 （五） —— 降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#降级预案"><span class="nav-number">2.</span> <span class="nav-text">降级预案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#降级分类"><span class="nav-number">2.1.</span> <span class="nav-text">降级分类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自动开关降级"><span class="nav-number">3.</span> <span class="nav-text">自动开关降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#人工开关降级"><span class="nav-number">4.</span> <span class="nav-text">人工开关降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读服务降级"><span class="nav-number">5.</span> <span class="nav-text">读服务降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写服务降级"><span class="nav-number">6.</span> <span class="nav-text">写服务降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多级降级"><span class="nav-number">7.</span> <span class="nav-text">多级降级</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

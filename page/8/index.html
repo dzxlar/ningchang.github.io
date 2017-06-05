@@ -254,6 +254,1140 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/docker真实应用场景/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/docker真实应用场景/" itemprop="url">docker真实应用场景</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:44:29+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>简化配置、代码流水线管理、提高开发效率、隔离应用、整合服务器、调试能力、多租户环境、快速部署分别是docker的8个使用场景</p>
+</blockquote>
+<p><img src="http://dockerone.com/uploads/article/20150106/802e00800b6dca3038b072bffdd56e15.png" alt="这里写图片描述"></p>
+<h3 id="Docker特性"><a href="#Docker特性" class="headerlink" title="Docker特性"></a>Docker特性</h3><ul>
+<li>Docker提供了轻量级的虚拟化 </li>
+<li>在同一台机器上创建更多数量的容器</li>
+<li>容器的启动与停止都能在几秒中内完成</li>
+</ul>
+<hr>
+<h3 id="1-简化配置"><a href="#1-简化配置" class="headerlink" title="1. 简化配置"></a>1. 简化配置</h3><blockquote>
+<p>这是Docker公司宣传的Docker的主要使用场景。虚拟机的最大好处是能在你的硬件设施上运行各种配置不一样的平台（软件、系统），<strong>Docker在降低额外开销的情况下提供了同样的功能。它能让你将运行环境和配置放在代码中然后部署</strong>，同一个Docker的配置可以在不同的环境中使用，这样就降低了硬件要求和应用环境之间耦合度。</p>
+</blockquote>
+<h3 id="2-代码流水线（Code-Pipeline）管理"><a href="#2-代码流水线（Code-Pipeline）管理" class="headerlink" title="2. 代码流水线（Code Pipeline）管理"></a>2. 代码流水线（Code Pipeline）管理</h3><blockquote>
+<p>前一个场景对于管理代码的流水线起到了很大的帮助。代码从开发者的机器到最终在生产环境上的部署，需要经过很多的中间环境。而每一个中间环境都有自己微小的差别，<strong>Docker给应用提供了一个从开发到上线均一致的环境，让代码的流水线变得简单不少。</strong></p>
+</blockquote>
+<h3 id="3-提高开发效率"><a href="#3-提高开发效率" class="headerlink" title="3. 提高开发效率"></a>3. 提高开发效率</h3><blockquote>
+<p>不同的开发环境中，我们都想把两件事做好。<strong>一是我们想让开发环境尽量贴近生产环境，二是我们想快速搭建开发环境。</strong><br>理想状态中，要达到第一个目标，我们需要将每一个服务都跑在独立的虚拟机中以便监控生产环境中服务的运行状态。然而，我们却不想每次都需要网络连接，每次重新编译的时候远程连接上去特别麻烦。这就是Docker做的特别好的地方，开发环境的机器通常内存比较小，之前使用虚拟的时候，我们经常需要为开发环境的机器加内存，而现在Docker可以轻易的让几十个服务在Docker中跑起来。</p>
+</blockquote>
+<h3 id="4-隔离应用"><a href="#4-隔离应用" class="headerlink" title="4. 隔离应用"></a>4. 隔离应用</h3><blockquote>
+<p><strong>有很多种原因会让你选择在一个机器上运行不同的应用</strong>，比如之前提到的提高开发效率的场景等。<br>我们经常需要考虑两点，一是因为要降低成本而进行服务器整合，二是将一个整体式的应用拆分成松耦合的单个服务（译者注：微服务架构）。</p>
+</blockquote>
+<h3 id="5-整合服务器"><a href="#5-整合服务器" class="headerlink" title="5. 整合服务器"></a>5. 整合服务器</h3><blockquote>
+<p>正如通过虚拟机来整合多个应用，<strong>Docker隔离应用的能力使得Docker可以整合多个服务器以降低成本。由于没有多个操作系统的内存占用，以及能在多个实例之间共享没有使用的内存</strong>，Docker可以比虚拟机提供更好的服务器整合解决方案。</p>
+</blockquote>
+<h3 id="6-调试能力"><a href="#6-调试能力" class="headerlink" title="6. 调试能力"></a>6. 调试能力</h3><blockquote>
+<p>Docker提供了很多的工具，这些工具不一定只是针对容器，但是却适用于容器。它们提供了很多的功能，包括可以为容器设置检查点、设置版本和查看两个容器之间的差别，这些特性可以帮助调试Bug。</p>
+</blockquote>
+<h3 id="7-多租户环境"><a href="#7-多租户环境" class="headerlink" title="7. 多租户环境"></a>7. 多租户环境</h3><blockquote>
+<p>另外一个Docker有意思的使用场景是在多租户的应用中，它可以避免关键应用的重写。我们一个特别的关于这个场景的例子是为IoT（译者注：物联网）的应用开发一个快速、易用的多租户环境。这种多租户的基本代码非常复杂，很难处理，重新规划这样一个应用不但消耗时间，也浪费金钱。<br>使用Docker，可以为每一个租户的应用层的多个实例创建隔离的环境，这不仅简单而且成本低廉，当然这一切得益于Docker环境的启动速度和其高效的diff命令。</p>
+</blockquote>
+<h3 id="8-快速部署"><a href="#8-快速部署" class="headerlink" title="8. 快速部署"></a>8. 快速部署</h3><blockquote>
+<p>在虚拟机之前，引入新的硬件资源需要消耗几天的时间。虚拟化技术（Virtualization）将这个时间缩短到了分钟级别。而Docker通过为进程仅仅创建一个容器而无需启动一个操作系统，再次将这个过程缩短到了秒级。</p>
+</blockquote>
+<hr>
+<p><a href="http://dockone.io/article/126" target="_blank" rel="external">译文转载</a><br><a href="http://blog.flux7.com/blogs/docker/8-ways-to-use-docker-in-the-real-world" target="_blank" rel="external">原文出处</a><br><a href="http://dockone.io/" target="_blank" rel="external">docker论坛</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】new-date-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Java8】new-date-api/" itemprop="url">【Java8】new date api</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:43:21+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div></pre></td><td class="code"><pre><div class="line">LocalDate yMd = LocalDate.of(2017, 4, 1);</div><div class="line">System.out.println(yMd);</div><div class="line">System.out.println(yMd.getYear());</div><div class="line">System.out.println(yMd.getMonth());</div><div class="line">System.out.println(yMd.getDayOfMonth());</div><div class="line">System.out.println(yMd.getDayOfYear());</div><div class="line">System.out.println(yMd.getDayOfWeek());</div><div class="line">System.out.println(yMd.isLeapYear());</div><div class="line">System.out.println(yMd.lengthOfMonth());</div><div class="line">System.out.println(yMd.lengthOfYear());</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate today = LocalDate.now();</div><div class="line">System.out.println(today);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">System.out.println(yMd.get(ChronoField.YEAR));</div><div class="line">System.out.println(yMd.get(ChronoField.MONTH_OF_YEAR));</div><div class="line">System.out.println(yMd.get(ChronoField.DAY_OF_MONTH));</div><div class="line">System.out.println(yMd.get(ChronoField.DAY_OF_WEEK));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalTime hMs = LocalTime.of(17, 50, 10);</div><div class="line">System.out.println(hMs);</div><div class="line">System.out.println(hMs.getHour());</div><div class="line">System.out.println(hMs.getMinute());</div><div class="line">System.out.println(hMs.getSecond());</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate parseDate = LocalDate.parse(&quot;2017-04-05&quot;);</div><div class="line">LocalTime parseTime = LocalTime.parse(&quot;18:10:10&quot;);</div><div class="line">System.out.println(parseDate);</div><div class="line">System.out.println(parseTime);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDateTime yMdhMs = LocalDateTime.of(yMd, hMs);</div><div class="line">LocalDateTime athMs = yMd.atTime(hMs);</div><div class="line">LocalDateTime atyMd = hMs.atDate(yMd);</div><div class="line">System.out.println(athMs);</div><div class="line">System.out.println(atyMd);</div><div class="line">System.out.println(yMdhMs);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate toDate = yMdhMs.toLocalDate();</div><div class="line">LocalTime toTime = yMdhMs.toLocalTime();</div><div class="line">System.out.println(toDate);</div><div class="line">System.out.println(toTime);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">System.out.println(Instant.ofEpochSecond(3));</div><div class="line">System.out.println(Instant.ofEpochSecond(2,1_000_000_000));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">Duration ofMin = Duration.ofMinutes(3);</div><div class="line">Duration of = Duration.of(3, ChronoUnit.MINUTES);</div><div class="line"></div><div class="line">System.out.println(ofMin);</div><div class="line">System.out.println(of);</div><div class="line"></div><div class="line">Period ofDay = Period.ofDays(10);</div><div class="line">Period ofWeek = Period.ofWeeks(3);</div><div class="line">Period yearMonthDay = Period.of(2, 6, 1);//2年6个月1天</div><div class="line"></div><div class="line">System.out.println(ofDay);</div><div class="line">System.out.println(ofWeek);</div><div class="line">System.out.println(yearMonthDay);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate editDate = LocalDate.of(2017, 4, 10);</div><div class="line"></div><div class="line">System.out.println(editDate);</div><div class="line">System.out.println(editDate.withYear(2020));</div><div class="line">System.out.println(editDate.withMonth(7));</div><div class="line">System.out.println(editDate.with(ChronoField.DAY_OF_MONTH,7));</div><div class="line"></div><div class="line">System.out.println(editDate.plusWeeks(1));</div><div class="line">System.out.println(editDate.minusWeeks(3));</div><div class="line">System.out.println(editDate.plus(10,ChronoUnit.MONTHS));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate tempDate = LocalDate.of(2017, 4, 6);</div><div class="line"></div><div class="line">System.out.println(tempDate.with(nextOrSame(DayOfWeek.SUNDAY)));</div><div class="line">System.out.println(tempDate.with(lastDayOfMonth()));</div><div class="line">	</div><div class="line">LocalDate lambdaDate = tempDate.with(temporal -&gt; &#123;</div><div class="line">	DayOfWeek dow = DayOfWeek.of(temporal.get(ChronoField.DAY_OF_WEEK));</div><div class="line">	int dayToAdd = 1;</div><div class="line">	if(dow == DayOfWeek.THURSDAY) dayToAdd = 3;</div><div class="line">	else if(dow == DayOfWeek.WEDNESDAY) dayToAdd = 2;</div><div class="line">	return temporal.plus(dayToAdd,ChronoUnit.DAYS);</div><div class="line">&#125;);</div><div class="line">System.out.println(lambdaDate);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">DateTimeFormatter dtf = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd hh:MM:ss&quot;);</div><div class="line">LocalDateTime date = LocalDateTime.of(yMd, hMs);</div><div class="line">String formatDate = dtf.format(date);</div><div class="line">System.out.println(formatDate);</div><div class="line">   </div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">DateTimeFormatter formatter = </div><div class="line">		new DateTimeFormatterBuilder()</div><div class="line">	    .appendText(ChronoField.DAY_OF_MONTH)</div><div class="line">	    .appendLiteral(&quot;.&quot;)</div><div class="line">	    .appendText(ChronoField.MONTH_OF_YEAR)</div><div class="line">	    .appendLiteral(&quot;.&quot;)</div><div class="line">	    .appendText(ChronoField.YEAR)</div><div class="line">	    .parseCaseInsensitive()</div><div class="line">	    .toFormatter(Locale.ITALIAN);</div><div class="line">System.out.println(formatter.format(date));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">ZoneId zoneId = TimeZone.getDefault().toZoneId();</div><div class="line">System.out.println(zoneId);</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">2017-04-01</div><div class="line">2017</div><div class="line">APRIL</div><div class="line">1</div><div class="line">91</div><div class="line">SATURDAY</div><div class="line">false</div><div class="line">30</div><div class="line">365</div><div class="line">==========================</div><div class="line">2017-04-06</div><div class="line">==========================</div><div class="line">2017</div><div class="line">4</div><div class="line">1</div><div class="line">6</div><div class="line">==========================</div><div class="line">17:50:10</div><div class="line">17</div><div class="line">50</div><div class="line">10</div><div class="line">==========================</div><div class="line">2017-04-05</div><div class="line">18:10:10</div><div class="line">==========================</div><div class="line">2017-04-01T17:50:10</div><div class="line">2017-04-01T17:50:10</div><div class="line">2017-04-01T17:50:10</div><div class="line">==========================</div><div class="line">2017-04-01</div><div class="line">17:50:10</div><div class="line">==========================</div><div class="line">1970-01-01T00:00:03Z</div><div class="line">1970-01-01T00:00:03Z</div><div class="line">==========================</div><div class="line">PT3M</div><div class="line">PT3M</div><div class="line">P10D</div><div class="line">P21D</div><div class="line">P2Y6M1D</div><div class="line">==========================</div><div class="line">2017-04-10</div><div class="line">2020-04-10</div><div class="line">2017-07-10</div><div class="line">2017-04-07</div><div class="line">2017-04-17</div><div class="line">2017-03-20</div><div class="line">2018-02-10</div><div class="line">==========================</div><div class="line">2017-04-09</div><div class="line">2017-04-30</div><div class="line">2017-04-09</div><div class="line">==========================</div><div class="line">2017-04-01 05:04:10</div><div class="line">==========================</div><div class="line">1.aprile.2017</div><div class="line">==========================</div><div class="line">Asia/Shanghai</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java各种对象名称详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java各种对象名称详解/" itemprop="url">Java各种对象名称详解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:41:55+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Object/" itemprop="url" rel="index">
+                    <span itemprop="name">Object</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="PO-persistant-object-持久对象"><a href="#PO-persistant-object-持久对象" class="headerlink" title="PO(persistant object) 持久对象"></a>PO(persistant object) 持久对象</h2><blockquote>
+<p>在 <strong>o/r 映射</strong>的时候出现的概念，如果没有 o/r 映射，没有这个概念存在了。<strong>通常对应数据模型 ( 数据库 ), 本身还有部分业务逻辑的处理。可以看成是与数据库中的表相映射的 java 对象。</strong>最简单的 PO 就是对应数据库中某个表中的一条记录，多个记录可以用 PO 的集合。 PO 中应该不包含任何对数据库的操作。</p>
+</blockquote>
+<p>##DO（Domain Object）领域对象</p>
+<blockquote>
+<p>就是从现实世界中抽象出来的有形或无形的业务实体。<strong>一般和数据中的表结构对应。</strong></p>
+</blockquote>
+<h2 id="TO-Transfer-Object"><a href="#TO-Transfer-Object" class="headerlink" title="TO(Transfer Object)"></a>TO(Transfer Object)</h2><blockquote>
+<p>数据传输对象<br>在应用程序不同 tie( 关系 ) 之间传输的对象</p>
+</blockquote>
+<h2 id="DTO（Data-Transfer-Object）数据传输对象"><a href="#DTO（Data-Transfer-Object）数据传输对象" class="headerlink" title="DTO（Data Transfer Object）数据传输对象"></a>DTO（Data Transfer Object）数据传输对象</h2><blockquote>
+<p>这个概念来源于J2EE的设计模式，原来的目的是为了EJB的分布式应用提供粗粒度的数据实体，以减少分布式调用的次数，从而提高分布式调用的性能和降低网络负载，但在这里，我泛指用于展示层与服务层之间的数据传输对象。</p>
+</blockquote>
+<h2 id="VO-view-object-值对象"><a href="#VO-view-object-值对象" class="headerlink" title="VO(view object) 值对象"></a>VO(view object) 值对象</h2><blockquote>
+<p>视图对象，用于展示层，它的作用是把某个指定页面（或组件）的所有数据封装起来。</p>
+</blockquote>
+<p>##BO(business object) 业务对象</p>
+<blockquote>
+<p>从业务模型的角度看 , 见 UML 元件领域模型中的领域对象。封装业务逻辑的 java 对象 , 通过调用 DAO 方法 , 结合 PO,VO 进行业务操作。 business object: 业务对象 主要作用是把业务逻辑封装为一个对象。这个对象可以包括一个或多个其它的对象。 比如一个简历，有教育经历、工作经历、社会关系等等。 我们可以把教育经历对应一个 PO ，工作经历对应一个 PO ，社会关系对应一个 PO 。 建立一个对应简历的 BO 对象处理简历，每个 BO 包含这些 PO 。 这样处理业务逻辑时，我们就可以针对 BO 去处理。</p>
+</blockquote>
+<h2 id="POJO-plain-ordinary-java-object-简单无规则-java-对象"><a href="#POJO-plain-ordinary-java-object-简单无规则-java-对象" class="headerlink" title="POJO(plain ordinary java object) 简单无规则 java 对象"></a>POJO(plain ordinary java object) 简单无规则 java 对象</h2><blockquote>
+<p>纯的传统意义的 java 对象。就是说在一些 Object/Relation Mapping 工具中，能够做到维护数据库表记录的 persisent object 完全是一个符合 Java Bean 规范的纯 Java 对象，没有增加别的属性和方法。我的理解就是最基本的 Java Bean ，只有属性字段及 setter 和 getter 方法！。</p>
+</blockquote>
+<h2 id="DAO-data-access-object-数据访问对象"><a href="#DAO-data-access-object-数据访问对象" class="headerlink" title="DAO(data access object) 数据访问对象"></a>DAO(data access object) 数据访问对象</h2><blockquote>
+<p>是一个 sun 的一个标准 j2ee 设计模式， 这个模式中有个接口就是 DAO ，它负持久层的操作。为业务层提供接口。此对象用于访问数据库。通常和 PO 结合使用， DAO 中包含了各种数据库的操作方法。通过它的方法 , 结合 PO 对数据库进行相关的操作。夹在业务逻辑与数据库资源中间。配合 VO, 提供数据库的 CRUD 操作</p>
+</blockquote>
+<p><a href="http://www.hollischuang.com/archives/553" target="_blank" rel="external">原文转自</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——LockSupport/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——LockSupport/" itemprop="url">线程笔记——LockSupport</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:41:08+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="LockSupport"><a href="#LockSupport" class="headerlink" title="LockSupport"></a>LockSupport</h2><p><img src="http://img.blog.csdn.net/20170410090804136?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>LocalSupport类特性</p>
+<ul>
+<li><p>不可实例化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">private LockSupport() &#123;&#125; // Cannot be instantiated.</div></pre></td></tr></table></figure>
+</li>
+<li><p>LockSupport的方法都是静态方法</p>
+</li>
+<li><p>私有变量</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">private static final sun.misc.Unsafe UNSAFE;</div><div class="line">   private static final long parkBlockerOffset;</div></pre></td></tr></table></figure>
+<h2 id="私有变量-unsafe"><a href="#私有变量-unsafe" class="headerlink" title="私有变量:unsafe"></a>私有变量:unsafe</h2><blockquote>
+<ol>
+<li><strong>sun.misc.Unsafe</strong>可以直接操控内存。被JDK广泛用于自己的包中，如java.nio和java.util.concurrent</li>
+<li>API十分不安全、不轻便、而且不稳定。不建议在生产环境中使用</li>
+<li>这个不安全的类提供了一个观察HotSpot JVM内部结构并且可以对其进行修改。有时它可以被用来在不适用C++调试的情况下学习虚拟机内部结构，有时也可以被拿来做性能监控和开发工具</li>
+</ol>
+</blockquote>
+<h2 id="私有变量-parkBlockerOffset"><a href="#私有变量-parkBlockerOffset" class="headerlink" title="私有变量: parkBlockerOffset"></a>私有变量: parkBlockerOffset</h2><ul>
+<li>被LockSupport的setBlocker和getBlocker调用</li>
+<li>这个对象是用来记录线程被阻塞时被谁阻塞的，用于线程监控和分析工具来定位原因</li>
+</ul>
+<h2 id="LockSupport-java"><a href="#LockSupport-java" class="headerlink" title="LockSupport.java"></a>LockSupport.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 通过反射机制获取Thread类的parkBlocker字段对象。然后通过   </div><div class="line"> * sun.misc.Unsafe对象的objectFieldOffset方法获取到</div><div class="line"> * parkBlocker在内存里的偏移量</div><div class="line"> */</div><div class="line">parkBlockerOffset = UNSAFE.objectFieldOffset</div><div class="line">                (tk.getDeclaredField(&quot;parkBlocker&quot;));</div></pre></td></tr></table></figure>
+<h2 id="Thread-java"><a href="#Thread-java" class="headerlink" title="Thread.java"></a>Thread.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * The argument supplied to the current call to</div><div class="line">    * java.util.concurrent.locks.LockSupport.park.</div><div class="line">    * Set by (private) java.util.concurrent.locks.LockSupport.setBlocker</div><div class="line">    * Accessed using java.util.concurrent.locks.LockSupport.getBlocker</div><div class="line">    */</div><div class="line">   volatile Object parkBlocker;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>JVM的实现可以自由选择如何实现Java对象的“布局”，也就是在内存里Java对象的各个部分放在哪里，包括对象的实例字段和一些元数据等。<br>sun.misc.Unsafe里关于对象字段访问的方法把对象布局抽象出来，它提供了objectFieldOffset()方法用于获取某个字段相对 Java对象的“起始地址”的偏移量，也提供了getInt、getLong、getObject之类的方法可以使用前面获取的偏移量来访问某个Java 对象的某个字段</p>
+</blockquote>
+<p><strong>为什么要用偏移量来获取对象？不直接调用get/set方法？</strong></p>
+<blockquote>
+<p>parkBlocker就是在线程处于阻塞的情况下才会被赋值。线程都已经阻塞了，如果不通过这种内存的方法，而是直接调用线程内的方法，线程是不会回应调用的</p>
+</blockquote>
+<hr>
+<h2 id="LockSupport-Method"><a href="#LockSupport-Method" class="headerlink" title="LockSupport Method"></a>LockSupport Method</h2><ul>
+<li>LockSupport中有且只有一个私有方法<ul>
+<li><strong>对给定线程t的parkBlocker赋值。为了防止这个parkBlocker被误用，该方法是不对外公开的</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private static void setBlocker(Thread t, Object arg) &#123;</div><div class="line">        // Even though volatile, hotspot doesn&apos;t need a write barrier here.</div><div class="line">        UNSAFE.putObject(t, parkBlockerOffset, arg);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>参数</p>
+<ul>
+<li>Thread t 需要被赋值Blocker的线程</li>
+<li>Object arg 具体的Blocker对象</li>
+</ul>
+<hr>
+<ul>
+<li>从线程t中获取它的parkBlocker对象，即返回的是阻塞线程t的Blocker对象<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static Object getBlocker(Thread t) &#123;  </div><div class="line">    if (t == null)  </div><div class="line">        throw new NullPointerException();  </div><div class="line">    return unsafe.getObjectVolatile(t, parkBlockerOffset);  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="以park开头的方法，用于阻塞线程"><a href="#以park开头的方法，用于阻塞线程" class="headerlink" title="以park开头的方法，用于阻塞线程"></a>以park开头的方法，用于阻塞线程</h3><p><strong>带blocker参数的park方法</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public static void park(Object blocker) &#123;</div><div class="line">        Thread t = Thread.currentThread();</div><div class="line">        setBlocker(t, blocker);</div><div class="line">        UNSAFE.park(false, 0L);</div><div class="line">        setBlocker(t, null);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkNanos(Object blocker, long nanos) &#123;</div><div class="line">        if (nanos &gt; 0) &#123;</div><div class="line">            Thread t = Thread.currentThread();</div><div class="line">            setBlocker(t, blocker);</div><div class="line">            UNSAFE.park(false, nanos);</div><div class="line">            setBlocker(t, null);</div><div class="line">        &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkUntil(Object blocker, long deadline) &#123;</div><div class="line">        Thread t = Thread.currentThread();</div><div class="line">        setBlocker(t, blocker);</div><div class="line">        UNSAFE.park(true, deadline);</div><div class="line">        setBlocker(t, null);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>参数：</p>
+<ul>
+<li>Object blocker：用于记录到线程中的parkBlocker对象。</li>
+<li>nanos：在nanos时间后线程自动恢复挂起</li>
+<li>deadline：在deadline时刻线程自动（这个毫秒其实就是自1970年1月1日0时起的毫秒数）</li>
+</ul>
+<p><strong>不带blocker参数的park方法</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public static void park() &#123;</div><div class="line">        UNSAFE.park(false, 0L);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkNanos(long nanos) &#123;</div><div class="line">        if (nanos &gt; 0)</div><div class="line">            UNSAFE.park(false, nanos);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkUntil(long deadline) &#123;</div><div class="line">        UNSAFE.park(true, deadline);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>没有做parkBlocker的赋值操作</li>
+</ul>
+<h3 id="以unpark开头的方法，用于解除阻塞"><a href="#以unpark开头的方法，用于解除阻塞" class="headerlink" title="以unpark开头的方法，用于解除阻塞"></a>以unpark开头的方法，用于解除阻塞</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public static void unpark(Thread thread) &#123;</div><div class="line">        if (thread != null)</div><div class="line">            UNSAFE.unpark(thread);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>park与unpark命令是成对出现的。unpark必须要在park命令后执行。但是线程的恢复并不一定要用unpark, 因为park的时间参数，有些情况下线程会自己恢复</p>
+</blockquote>
+<p><a href="https://my.oschina.net/readjava/blog/282882" target="_blank" rel="external">源码参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——AQS（AbstractQueuedSynchronizer）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——AQS（AbstractQueuedSynchronizer）/" itemprop="url">线程笔记——AQS（AbstractQueuedSynchronizer）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:39:35+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>AQS : <strong>java.util.concurrent.locks.AbstractQueuedSynchronizer</strong></p>
+<p>研究java.util.concurrent并发包的突破口(例如: ReentrantLock核心是内部类Sync，然而Sync继承AQS)</p>
+</blockquote>
+<h2 id="AQS核心"><a href="#AQS核心" class="headerlink" title="AQS核心"></a>AQS核心</h2><blockquote>
+<p><strong>通过一个共享变量来同步状态，变量的状态由子类去维护，</strong></p>
+</blockquote>
+<ul>
+<li>线程阻塞队列的维护</li>
+<li>线程阻塞和唤醒</li>
+</ul>
+<blockquote>
+<p>共享变量的修改都是通过Unsafe类提供的CAS操作完成的<br>AbstractQueuedSynchronizer类的主要方法是acquire和release（模板方法）</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">protected boolean tryAcquire(int arg)</div><div class="line">protected boolean tryRelease(int arg)</div><div class="line">protected int tryAcquireShared(int arg)</div><div class="line">protected boolean tryReleaseShared(int arg)</div></pre></td></tr></table></figure>
+<ul>
+<li>acquire方法用来获取锁，返回true说明线程获取成功继续执行，一旦返回false则线程加入到等待队列中，等待被唤醒。</li>
+<li>release方法用来释放锁。 一般来说实现的时候这两个方法被封装为lock和unlock方法。</li>
+</ul>
+<h2 id="AQS思路"><a href="#AQS思路" class="headerlink" title="AQS思路"></a>AQS思路</h2><blockquote>
+<p>在获取锁时候，先判断当前状态是否允许获取锁，若是可以则获取锁，否则获取不成功。获取不成功则会阻塞，进入阻塞队列。而释放锁时，一般会修改状态位，唤醒队列中的阻塞线程</p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20170410103109328?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170410103117469?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * 锁同步的基础Sync类</div><div class="line">    * AQS代表持有锁的数量</div><div class="line">    */</div><div class="line">   abstract static class Sync extends AbstractQueuedSynchronizer &#123;</div><div class="line">   </div><div class="line">       abstract void lock();</div><div class="line"></div><div class="line">       final boolean nonfairTryAcquire(int acquires) &#123;</div><div class="line">           final Thread current = Thread.currentThread();</div><div class="line">           int c = getState();</div><div class="line">           if (c == 0) &#123;</div><div class="line">               if (compareAndSetState(0, acquires)) &#123;</div><div class="line">                   setExclusiveOwnerThread(current);</div><div class="line">                   return true;</div><div class="line">               &#125;</div><div class="line">           &#125;</div><div class="line">           else if (current == getExclusiveOwnerThread()) &#123;</div><div class="line">               int nextc = c + acquires;</div><div class="line">               if (nextc &lt; 0) // overflow</div><div class="line">                   throw new Error(&quot;Maximum lock count exceeded&quot;);</div><div class="line">               setState(nextc);</div><div class="line">               return true;</div><div class="line">           &#125;</div><div class="line">           return false;</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       protected final boolean tryRelease(int releases) &#123;</div><div class="line">           int c = getState() - releases;</div><div class="line">           if (Thread.currentThread() != getExclusiveOwnerThread())</div><div class="line">               throw new IllegalMonitorStateException();</div><div class="line">           boolean free = false;</div><div class="line">           if (c == 0) &#123;</div><div class="line">               free = true;</div><div class="line">               setExclusiveOwnerThread(null);</div><div class="line">           &#125;</div><div class="line">           setState(c);</div><div class="line">           return free;</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       protected final boolean isHeldExclusively() &#123;</div><div class="line">           return getExclusiveOwnerThread() == Thread.currentThread();</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       final ConditionObject newCondition() &#123;</div><div class="line">           return new ConditionObject();</div><div class="line">       &#125;</div><div class="line"></div><div class="line">    </div><div class="line">       final Thread getOwner() &#123;</div><div class="line">           return getState() == 0 ? null : getExclusiveOwnerThread();</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       final int getHoldCount() &#123;</div><div class="line">           return isHeldExclusively() ? getState() : 0;</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       final boolean isLocked() &#123;</div><div class="line">           return getState() != 0;</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       private void readObject(java.io.ObjectInputStream s)</div><div class="line">           throws java.io.IOException, ClassNotFoundException &#123;</div><div class="line">           s.defaultReadObject();</div><div class="line">           setState(0); </div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://www.infoq.com/cn/articles/jdk1.8-abstractqueuedsynchronizer" target="_blank" rel="external">AQS概念理解</a><br><a href="http://ifeve.com/abstractqueuedsynchronizer-use/" target="_blank" rel="external">并发编程AQS参考</a><br><a href="http://www.cnblogs.com/zhanjindong/p/java-concurrent-package-aqs-overview.html" target="_blank" rel="external">AQS系列博文</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Predicate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Predicate/" itemprop="url">【Java8】Guava——Predicate</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:38:32+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Guava/" itemprop="url" rel="index">
+                    <span itemprop="name">Guava</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Predicate"><a href="#Predicate" class="headerlink" title="Predicate"></a>Predicate</h2><p>Guava</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">@GwtCompatible</div><div class="line">public interface Predicate&lt;T&gt; extends java.util.function.Predicate&lt;T&gt; &#123;</div><div class="line"> </div><div class="line">  @CanIgnoreReturnValue</div><div class="line">  boolean apply(@Nullable T input);</div><div class="line"></div><div class="line"> </div><div class="line">  @Override</div><div class="line">  boolean equals(@Nullable Object object);</div><div class="line"></div><div class="line">  @Override</div><div class="line">  default boolean test(@Nullable T input) &#123;</div><div class="line">    return apply(input);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>java8</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface Predicate&lt;T&gt; &#123;</div><div class="line"></div><div class="line">    boolean test(T t);</div><div class="line"></div><div class="line">    </div><div class="line">    default Predicate&lt;T&gt; and(Predicate&lt;? super T&gt; other) &#123;</div><div class="line">        Objects.requireNonNull(other);</div><div class="line">        return (t) -&gt; test(t) &amp;&amp; other.test(t);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    default Predicate&lt;T&gt; negate() &#123;</div><div class="line">        return (t) -&gt; !test(t);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    default Predicate&lt;T&gt; or(Predicate&lt;? super T&gt; other) &#123;</div><div class="line">        Objects.requireNonNull(other);</div><div class="line">        return (t) -&gt; test(t) || other.test(t);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    static &lt;T&gt; Predicate&lt;T&gt; isEqual(Object targetRef) &#123;</div><div class="line">        return (null == targetRef)</div><div class="line">                ? Objects::isNull</div><div class="line">                : object -&gt; targetRef.equals(object);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>Predicate是简化版的Function。唯一的区别Predicate返回boolean</strong></p>
+</blockquote>
+<h3 id="简单实例"><a href="#简单实例" class="headerlink" title="简单实例"></a>简单实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Predicate&lt;String&gt; lengthLessThen10 = new Predicate&lt;String&gt;() &#123;</div><div class="line">    public boolean apply(String input) &#123;</div><div class="line">        return input.length() &lt; 10;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">lengthLessThen10.apply(&quot;lessThen10&quot;);//false</div></pre></td></tr></table></figure>
+<p>相当于</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Function&lt;Integer, Predicate&lt;String&gt;&gt; lengthLessThen = new Function&lt;Integer, Predicate&lt;String&gt;&gt;() &#123;</div><div class="line">    public Predicate&lt;String&gt; apply(final Integer input) &#123;</div><div class="line">        return new Predicate&lt;String&gt;() &#123;</div><div class="line">            public boolean apply(String str) &#123;</div><div class="line">                return str.length() &lt; input;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">lengthLessThen.apply(10).apply(&quot;lessThen10&quot;);//false</div></pre></td></tr></table></figure>
+<blockquote>
+<p>定义了一个 Function，接受 Integer 类型的参数，返回 Predicate 实例；在实例化 Predicate 的时候，我们访问了匿名类外部的变量，也即 Function 实例的 apply 方法的参数，由于 Java 语言的限制，匿名类内部用到的外部变量必须声明为 final</p>
+</blockquote>
+<h2 id="Predicates"><a href="#Predicates" class="headerlink" title="Predicates"></a>Predicates</h2><blockquote>
+<p>Predicates 是 Guava 中与 Predicate 接口配套使用的工具类，提供了一些非常有用的工具类，比如使用 and 和 or 组合多个谓词，还有 not 将谓词的条件取反</p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20170410173435666?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170410173444323?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><a href="https://blog.jamespan.me/2015/03/30/guava-functional-programing-2" target="_blank" rel="external">Predicate具体参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Function/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Function/" itemprop="url">【Java8】Guava——Function</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:37:37+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Guava/" itemprop="url" rel="index">
+                    <span itemprop="name">Guava</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h2><blockquote>
+<p>函数式编程是一种历久弥新的编程范式，比起命令式编程，它更加关注程序的执行结果而不是执行过程。</p>
+</blockquote>
+<p>Java 始终是一个面向对象（命令式）的语言，在我们使用函数式编程这种黑魔法之前，需要确认：同样的功能，使用函数式编程来实现，能否在健壮性和可维护性上，超过使用面向对象（命令式）编程的实现？</p>
+<h2 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h2><p><strong>实例化这个仿函数接口要求至少要实现 apply 方法。只有在需要判断两个函数是否等价的时候才覆盖实现 equals 方法</strong></p>
+<p>Guava<br><img src="http://img.blog.csdn.net/20170410171245436?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>Java8</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface Function&lt;T, R&gt;&#123;</div><div class="line">	</div><div class="line">	R apply(T t);</div><div class="line">	</div><div class="line">	default &lt;V&gt; Function&lt;V, R&gt; compose(Function&lt;? super V, ? extends T&gt; before) &#123;</div><div class="line">        Objects.requireNonNull(before);</div><div class="line">        return (V v) -&gt; apply(before.apply(v));</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    default &lt;V&gt; Function&lt;T, V&gt; andThen(Function&lt;? super R, ? extends V&gt; after) &#123;</div><div class="line">        Objects.requireNonNull(after);</div><div class="line">        return (T t) -&gt; after.apply(apply(t));</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    static &lt;T&gt; Function&lt;T, T&gt; identity() &#123;</div><div class="line">        return t -&gt; t;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="简单实例"><a href="#简单实例" class="headerlink" title="简单实例"></a>简单实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Function&lt;Double, Double&gt; sqrt = new Function&lt;Double, Double&gt;() &#123;</div><div class="line">    public Double apply(Double input) &#123;</div><div class="line">        return Math.sqrt(input);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">sqrt.apply(4.0);//2.0</div></pre></td></tr></table></figure>
+<p>这里我们通过实例化一个匿名类的方式来完成了仿函数的定义、初始化和赋值。</p>
+<p>注意到仿函数始终不是一个函数，而是一个对象，我们只能调用这个对象的方法来模拟函数调用。</p>
+<p>这种 Function 接口的用法和函数式编程中将一个匿名函数赋值给变量的做法类似。当然，更加常见的函数定义方式是显式的声明一个函数然后实现它。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class SqrtFunction implements Function&lt;Double, Double&gt; &#123;</div><div class="line">    public Double apply(Double input) &#123;</div><div class="line">        return Math.sqrt(input);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">new SqrtFunction().apply(4.0);//2.0</div></pre></td></tr></table></figure>
+<h3 id="仅接收两个参数的函数"><a href="#仅接收两个参数的函数" class="headerlink" title="仅接收两个参数的函数"></a>仅接收两个参数的函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Function&lt;SimpleEntry&lt;Double, Double&gt;, Double&gt; power</div><div class="line">        = new Function&lt;SimpleEntry&lt;Double, Double&gt;, Double&gt;() &#123;</div><div class="line">    public Double apply(SimpleEntry&lt;Double, Double&gt; input) &#123;</div><div class="line">        return Math.pow(input.getKey(), input.getValue());</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">power.apply(new SimpleEntry&lt;Double, Double&gt;(3.0, 2.0));//9.0</div></pre></td></tr></table></figure>
+<h3 id="接收可变参数的函数"><a href="#接收可变参数的函数" class="headerlink" title="接收可变参数的函数"></a>接收可变参数的函数</h3><blockquote>
+<p>由于变长参数实际上是 Java 编译器提供的语法糖，在编译期间会被解语法糖变成对象数组 Object[]，而且变长参数无法作为泛型参数，这里直接使用对象数组作为参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Function&lt;Double[], Double&gt; sum = new Function&lt;Double[], Double&gt;() &#123;</div><div class="line">    public Double apply(Double[] input) &#123;</div><div class="line">        Double result = 0.0;</div><div class="line">        for (Double element : input) &#123;</div><div class="line">            result += element;</div><div class="line">        &#125;</div><div class="line">        return result;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">sum.apply(new Double[]&#123;3.0, 4.0, 5.1&#125;);//12.1</div></pre></td></tr></table></figure></p>
+</blockquote>
+<hr>
+<h2 id="Functions"><a href="#Functions" class="headerlink" title="Functions"></a>Functions</h2><p><img src="http://img.blog.csdn.net/20170410172300941?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ul>
+<li>toStringFunction() : f(x)=x.toString()f(x)=x.toString() </li>
+<li>identity()：f(x)=x</li>
+<li>constanct() :  f(x)=a</li>
+<li>compose() :  返回一个复合函数 h(x)=g(f(x))h(x)=g(f(x))，以两个函数为入参，返回这两个函数复合之后的函数。例如我们有函数 f:X→Yf:X→Y 和函数 g:Y→Zg:Y→Z，复合之后得到复合函数 g∘f:X→Z</li>
+</ul>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">forMap(java.util.Map&lt;K,V&gt;)  //f(x)=map.get(x)</div><div class="line">forMap(java.util.Map&lt;K,? extends V&gt;, V) //区别在于这个方法的第二个参数是一个默认值，当映射中不包含入参键的时候，第一个方法返回的函数会抛出异常，而第二个方法返回的函数会返回默认值</div><div class="line">forPredicate() //以 Guava 的谓词实例为入参 返回一个 Function 实例</div><div class="line">forSupplier() //以 Guava 的 Supplier 实例为入参，返回一个 Function 实例</div></pre></td></tr></table></figure>
+<p><a href="https://blog.jamespan.me/2015/03/22/guava-functional-programing-1" target="_blank" rel="external">Function更多参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Preconditions/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -691,1266 +1825,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Joiner/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Joiner/" itemprop="url">【Java8】Guava——Joiner</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:33:12+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Guava/" itemprop="url" rel="index">
-                    <span itemprop="name">Guava</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Joiner"><a href="#Joiner" class="headerlink" title="Joiner"></a>Joiner</h2><blockquote>
-<p>字符串拼接对象</p>
-</blockquote>
-<p><img src="http://img.blog.csdn.net/20170410153303919?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<hr>
-<h2 id="on"><a href="#on" class="headerlink" title="on"></a>on</h2><h3 id="基本实例"><a href="#基本实例" class="headerlink" title="基本实例"></a>基本实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Joiner.on(&quot; &quot;).join(&quot;四川省&quot;,&quot;成都市&quot;,&quot;金牛区&quot;).toString()</div></pre></td></tr></table></figure>
-<ul>
-<li>on 以空格为分隔符 </li>
-<li>join内是拼接的对象:迭代器对象、数组、可变参数等</li>
-</ul>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">四川省 成都市 金牛区</div></pre></td></tr></table></figure>
-<h3 id="特殊处理"><a href="#特殊处理" class="headerlink" title="特殊处理"></a>特殊处理</h3><h4 id="动态拼接"><a href="#动态拼接" class="headerlink" title="动态拼接"></a>动态拼接</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">StringBuffer result = new StringBuffer(&quot;result: &quot;);</div><div class="line">		Joiner.on(&quot; &quot;).appendTo(result,7,8);</div></pre></td></tr></table></figure>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">result: 7 8</div></pre></td></tr></table></figure>
-<h4 id="忽略空值"><a href="#忽略空值" class="headerlink" title="忽略空值"></a>忽略空值</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//直接忽略Null</div><div class="line">Joiner.on(&quot; &quot;).skipNulls().join(&quot;四川省&quot;,&quot;成都市&quot;,&quot;金牛区&quot;,null).toString()</div><div class="line">//找出Null，并用其他值代替</div><div class="line">Joiner.on(&quot; &quot;).useForNull(&quot;未填写&quot;).join(&quot;四川省&quot;,&quot;成都市&quot;,&quot;金牛区&quot;,null).toString()</div></pre></td></tr></table></figure>
-<hr>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">四川省 成都市 金牛区 </div><div class="line">四川省 成都市 金牛区 未填写</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="Joiner-MapJoiner"><a href="#Joiner-MapJoiner" class="headerlink" title="Joiner.MapJoiner"></a>Joiner.MapJoiner</h2><blockquote>
-<p>MapJoiner 是 Joiner 的内部静态类，用于帮助将 Map 对象拼接成字符串。</p>
-</blockquote>
-<h3 id="基本实例-1"><a href="#基本实例-1" class="headerlink" title="基本实例"></a>基本实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Joiner.on(&quot; &quot;).withKeyValueSeparator(&quot;=&quot;).join(ImmutableMap.of(&quot;收件人&quot;,&quot;Nimo&quot;,&quot;联系方式&quot;,&quot;123&quot;,&quot;收件地址&quot;,&quot;浙江省杭州市滨江区XXXX&quot;));</div></pre></td></tr></table></figure>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">收件人=Nimo 联系方式=123 收件地址=浙江省杭州市滨江区XXXX</div></pre></td></tr></table></figure>
-<p><a href="https://blog.jamespan.me/2015/02/08/guava-basic-utilities-1" target="_blank" rel="external">Joiner具体参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/深入理解JVM学习笔记（三）-——-GC收集器和内存分配/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/深入理解JVM学习笔记（三）-——-GC收集器和内存分配/" itemprop="url">深入理解JVM学习笔记（三） —— GC收集器和内存分配</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:32:08+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="判断对象是否存活"><a href="#判断对象是否存活" class="headerlink" title="判断对象是否存活"></a>判断对象是否存活</h2><h3 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h3><blockquote>
-<p>很多判断对象是否存活的方式就是引用计数算法：给对象添加一个引用计数器，每当一个地方引用它，计数器+1；引用失效，计数器-1。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>任何时刻计数器为0的对象是不可能再被使用的。</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>Java虚拟机没有使用主流的引用计数法管理内存。主要原因是难以解决对象之间相互循环引用的问题</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">classA.instance = classB</div><div class="line">classB.instance = classA</div></pre></td></tr></table></figure>
-<p>classA和classB已经不可能再被访问，但是classA和classB互相引用对方，导致计数器永远不可能是0，导致GC无法回收两个对象</p>
-<hr>
-<h2 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h2><blockquote>
-<p>通过一系列称为”GC Roots”对象作为起始点，从这些节点向下搜索，搜索过的路径称为引用链。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>当一个对象的GCRoots没有任何引用链相连时，则证明该对象不可用。</strong></p>
-</blockquote>
-<p>在java中可作为GCRoots对象的是</p>
-<ol>
-<li>虚拟机栈（栈帧本地变量表）引用的对象</li>
-<li>方法区中类属性引用对象</li>
-<li>方法区中常量引用对象</li>
-<li>本地方法栈（JNI）中引用对象</li>
-</ol>
-<hr>
-<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>Java引用分类(又上到下引用关系依次减弱)</p>
-<ul>
-<li>强引用<ul>
-<li>必须存在的对象</li>
-<li>类似ObjectA objA = new ObjectA()</li>
-</ul>
-</li>
-<li>软引用<ul>
-<li>有用但非必须的对象</li>
-<li>在发生内存溢出后，可进行二次回收</li>
-</ul>
-</li>
-<li>弱引用<ul>
-<li>非必须对象</li>
-<li>无论当前内存是否足够，都会回收掉只被弱关联对象</li>
-</ul>
-</li>
-<li>虚引用<ul>
-<li>是否存在不会对生存时间对其影响</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="生存或者死亡"><a href="#生存或者死亡" class="headerlink" title="生存或者死亡"></a>生存或者死亡</h2><blockquote>
-<p>判断一个对象死亡，<strong>至少经历两次标志过程</strong>：如果对象进行可达性分析，<strong>GCRoot没有相连的引用链，那么被第一次标记进行筛选</strong>；<strong>筛选的条件是是否有必要进行finalize()方法</strong>；对象没有覆盖finalize()方法或者已经被虚拟机调用过finalize()方法，则该对象没必要销毁；<strong>如果这个对象有必要执行finalize()方法，会将它放置在F-Queue队列中</strong>，并在稍后由一个虚拟机自动执行、低优先级的Finalizer线程去执行；<strong>GC稍后会对F-Queue中的对象进行二次标记</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p>如果对象需要拯救自己不被回收。只要重新与引用链的任何一个对象重新关联为止（例如.this)</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>注意：自救的机会只能使用一次；一个对象的finalize方法最多只被系统调用一次</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">private static FinallyProperty escapeGC = null;</div><div class="line"></div><div class="line">@Override</div><div class="line">void finalize() throws Throwable&#123;</div><div class="line">   super.finalize();</div><div class="line">   FinallyProperty.escapeGC = this;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="回收方法区"><a href="#回收方法区" class="headerlink" title="回收方法区"></a>回收方法区</h2><blockquote>
-<p>永久代的垃圾回收主要是2个部分:废弃变量和无用的类</p>
-</blockquote>
-<ul>
-<li>废弃变量：与Java堆中的回收类似；例如.没有任何一个地方引用常量池的”abc”字面量，这时发生了内存回收；这个”abc”会被清理出常量池</li>
-<li>无用的类需要满足的3个条件<ul>
-<li>java堆中不存在该类的任何实例</li>
-<li>加载该类的ClassLoader已被回收</li>
-<li>无法在任何地方通过反射访问该类的方法</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><h3 id="标记-清除"><a href="#标记-清除" class="headerlink" title="标记-清除"></a>标记-清除</h3><blockquote>
-<p>在回收之前，首先标志出需要回收的对象，在标志完成后统一回收所有标志对象<br>后面的算法都是基于”标记-清除”算法的改进</p>
-</blockquote>
-<p>该算法的主要缺点</p>
-<ol>
-<li>效率低下：产生过多内存碎片</li>
-<li>空间占用过多</li>
-</ol>
-<h3 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h3><blockquote>
-<p>解决”标记-清除”算法效率问题</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>将内存划分为容量相等的2个部分，每次只使用其中一块。当这块内存使用完毕，将还存活的对象复制在另一块上面。然后把已使用的空间一次性清理掉。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>每次对整个半区进行回收，而不讨论内存碎片等复杂情况，只需移动堆顶指针、按顺序分配内存即可。</p>
-</blockquote>
-<h3 id="标志-整理算法"><a href="#标志-整理算法" class="headerlink" title="标志-整理算法"></a>标志-整理算法</h3><blockquote>
-<p>复制收集算法在对象存活率过高时进行复制操作，影响效率。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>根据老年代特点，提出了标志-整理算法；标志过程和标志-清除的过程一样。整理：让所有存活对象向一端移动，然后直接清理掉边界以外的内存</p>
-</blockquote>
-<h3 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h3><blockquote>
-<p>一般把Java划分成新生代和老年代；根据各个年代的特点采用合适的收集算法<br>通常新生代采取：复制算法<br>老年代采取：标志-整理或者标志-清除算法</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/深入理解JVM学习笔记（二）-——-对象/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/深入理解JVM学习笔记（二）-——-对象/" itemprop="url">深入理解JVM学习笔记（二） —— 对象</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:29:38+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>【问题一】程序通过new一个普通对象的时候，虚拟机进行了哪些操作？<br>  解答： ①首先检查这个指令的参数是否能在常量池中定位到这个类引用<br>  ②并且检查这个符号引用代表的类是否被加载、解析、初始化过③若没有加载，必须执行相应类的类加载过程④<strong>虚拟机为新生对象分配内存</strong>(对象所需内存大小，在类加载时间可以完全确定)</p>
-<h3 id="④-分配内存"><a href="#④-分配内存" class="headerlink" title="④ 分配内存"></a>④ 分配内存</h3><blockquote>
-<p>为对象分配大小相当于把一块确定大小的内存从Java堆中划分出来。<strong>假设Java内存是规整的</strong>，所有用过的内存放在一边，所有空闲的内存放在一边，中间放着一个指针作为分界点的指示器。对象大小就是指针向空闲内存移动的距离，这种分配方式叫做<strong>指针碰撞</strong>。假设内存是不规整的，已使用的空间和空闲空间相互交错，虚拟机须维护一个列表，存放可用内存空间，在分配的时候根据列表找到一块足够大的空间给对象，并更新列表上的记录，这种分配被称为“空闲列表”<br>总结：选择哪种分配方式是通过Java内存是否规整决定，而Java是否规整又由采集的垃圾收集器（GC）是否带有压缩整理功能决定</p>
-<p><strong>Compact收集器采用指针碰撞方式，而Mark-Slweep采用空闲列表</strong></p>
-</blockquote>
-<hr>
-<p>分配对象可能是线程不安全的，虚拟机采用2种方式保证更新操作的原子性</p>
-<ul>
-<li>CAS+失败重试方式</li>
-<li>每个线程预分配一小块内存(本地线程分配缓冲区TLAB)。哪个线程需要分配内存，就在哪个线程的TLAB上分配，只有TLAB用完并分配新的TLAB，才同步锁定</li>
-</ul>
-<p>使用TLAB<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-XX:+/-UseTLAB</div></pre></td></tr></table></figure></p>
-<h3 id="⑤-初始化"><a href="#⑤-初始化" class="headerlink" title="⑤ 初始化"></a>⑤ 初始化</h3><blockquote>
-<p>虚拟机将分配到的内存空间初始化为0.如果使用TLAB，可将这一操作提前到分配TLAB时进行。<br>保证Java实例对象字段，不需要初始化，就可以直接使用。</p>
-</blockquote>
-<p>###⑥ 必要设置</p>
-<blockquote>
-<p>虚拟机对对象进行必要的设置。例如: 对象属于哪个类实例、如何找到类的元数据信息、对象哈希码、对象GC分代年龄等设置</p>
-</blockquote>
-<p>以上完成后。对于虚拟机来说，一个对象已经产生了，但是从Java的角度看，一个对象的创建刚刚开始——init()还未执行，所有字段还是0.</p>
-<blockquote>
-<p>注意：<strong>当一个对象初始化之后，一个真正可用的对象才算生成。</strong></p>
-</blockquote>
-<hr>
-<h2 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h2><p>对象在内存中的布局包含：<strong>对象头、实例数据、对齐填充</strong><br>HotSpot虚拟机对象头包括：<strong>存储自身对象运行数据和类型指针</strong></p>
-<ul>
-<li>存储自身对象<ul>
-<li>哈希码、GC分代年龄、锁标志、线程持有锁、偏向线程ID、偏向时间戳等</li>
-</ul>
-</li>
-<li>类型指针<ul>
-<li>通过这个指针确定这个对象属于哪个类实例。但是不是所有虚拟机都必须在对象数据类型保留类型指针，所以查找对象的元数据信息不一定要经过类本身。如果是一个数组，还需要记录长度数据。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<p>实例数据字段分配策略顺序：longs/doubles -&gt; int -&gt; short/chars -&gt; byte/boolean -&gt; oops </p>
-<ol>
-<li>相同宽度的字段总是分配在一起</li>
-<li>父类定义的变量总是在子类之前</li>
-<li>对其填充仅仅起占位符的作用</li>
-</ol>
-<hr>
-<h2 id="对象访问定位"><a href="#对象访问定位" class="headerlink" title="对象访问定位"></a>对象访问定位</h2><blockquote>
-<p>通过栈上的reference数据操作堆上数据<br>reference只提供了一个指向对象的引用，访问定位主流方式有使用句柄和直接指针两种方式实现</p>
-</blockquote>
-<p>访问方式</p>
-<ul>
-<li><p>使用句柄</p>
-<ul>
-<li>Java堆划分一块内存作为句柄池，reference存储对象句柄地址。而句柄中包含对象实例数据和类型数据各自的地址信息</li>
-</ul>
-</li>
-<li><p>使用直接指针</p>
-<ul>
-<li>reference存储的是对象地址</li>
-</ul>
-</li>
-</ul>
-<p>句柄访问方式<br><img src="http://img.blog.csdn.net/20170414155500400?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="句柄访问方式"></p>
-<p>直接指针访问方式<br><img src="http://img.blog.csdn.net/20170414155520041?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="直接指针访问方式"></p>
-<p>句柄访问优点：在对象移动时，改变的只是句柄中的实例数据本身，而reference本身并不改变</p>
-<p>直接指针的优点：访问速度快，节省了指针定位的开销</p>
-<ul>
-<li></li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/深入理解JVM学习笔记（一）-——-JVM数据区域/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/深入理解JVM学习笔记（一）-——-JVM数据区域/" itemprop="url">深入理解JVM学习笔记（一） —— JVM数据区域</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:28:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="JVM结构图"><a href="#JVM结构图" class="headerlink" title="JVM结构图"></a>JVM结构图</h3><p><img src="http://img.blog.csdn.net/20170413114755159?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="JVM结构"></p>
-<h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><blockquote>
-<p>是一块较小的内存空间。当前线程所执行的字节码的行号指示器。</p>
-</blockquote>
-<p>字节码解释器工作原理</p>
-<blockquote>
-<p>通过改变计数器的值来选取下一条需要执行的字节码指令。</p>
-</blockquote>
-<p>分支、循环、跳转、异常处理、线程恢复等操作都需要依赖计数器</p>
-<p>JAVA多线程实现方式</p>
-<blockquote>
-<p>线程之间轮流切换并分配处理器执行时间实现的</p>
-</blockquote>
-<p>运行Java方法时，执行虚拟机字节码指令地址。<br>运行Native方法时，计数器则为空(undefined)。<strong>是唯一一个在java虚拟机中没有规定outOfMemoryError的错误</strong></p>
-<hr>
-<h2 id="虚拟机栈"><a href="#虚拟机栈" class="headerlink" title="虚拟机栈"></a>虚拟机栈</h2><blockquote>
-<p>线程私有。虚拟机栈的生命周期和线程相同。用来描述java方法执行的内存模型。</p>
-</blockquote>
-<h3 id="栈帧"><a href="#栈帧" class="headerlink" title="栈帧"></a>栈帧</h3><blockquote>
-<p>每个方法创建时产生</p>
-<p>作用：存储局部变量表、操作数栈、动态链接、方法出口等。</p>
-<p><strong>每个方法调用到执行完成的过程，对应一个虚拟机栈帧入栈到出栈的过程</strong></p>
-</blockquote>
-<p>堆(Heap)栈(Stack)只是java虚拟机内存粗略的划分</p>
-<p>局部变量存储了编译时期各种基本类型、对象引用。不等于对象本身，可能是指向对象起始地址的引用指针，也可能是代表一个对象的句柄或其他与此对象相关的位置和returnAddress(字节码地址)</p>
-<p>特例：64位长度的long和double类型数据占用2个局部变量空间。其余只占用1个。</p>
-<h2 id="虚拟机栈异常"><a href="#虚拟机栈异常" class="headerlink" title="虚拟机栈异常"></a>虚拟机栈异常</h2><ol>
-<li><strong>线程请求的栈深度大于虚拟机所允许的栈深度，抛出StackOverException</strong></li>
-<li><strong>虚拟机动态扩展到无法申请到更多可用内存，抛出OutOfMemoryException</strong></li>
-</ol>
-<hr>
-<h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><blockquote>
-<p>虚拟机栈有的特性，本地方法栈都有。唯一的区别：<strong>虚拟机栈执行Java方法，本地方法栈执行Native方法</strong></p>
-</blockquote>
-<hr>
-<h2 id="堆（Heap）"><a href="#堆（Heap）" class="headerlink" title="堆（Heap）"></a>堆（Heap）</h2><blockquote>
-<p>虚拟机管理内存中最大的一块。<br>被所有线程共享的内存区域。<br>唯一作用就是存放对象实例。</p>
-</blockquote>
-<p>不过随着JIT编译器发展与逃逸分析技术成熟，栈上分配、标量替换也可以存放对象实例。</p>
-<p>Java堆是垃圾收集管理的主要区域，也叫做GC堆。</p>
-<p>从内存回收的角度看。由于垃圾回收分析采用分代收集算法。可细分为：新生代和老年代。也可分为：<strong>Eden空间、From Survivor空间、To Survivor空间。</strong></p>
-<p>从内存分配的角度看。线程共享的Java堆可划分<strong>多个线程私有的线程缓冲区。</strong></p>
-<p><strong>划分的目的是为了更好的回收内存、更快的分配内存。</strong></p>
-<p>-Xms 和 Xmx 控制Java堆大小。</p>
-<p><strong>堆异常</strong><br>如果堆中内存没有完成实例分配，抛出OutOfMemoryException</p>
-<hr>
-<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><blockquote>
-<p>各个线程的共享区域。存储<strong>已加载的类信息、常量、静态变量以及编译器编译后的代码数据。</strong><br>为了与Java堆区分开，方法区的另一个别名non-Heap(非堆)</p>
-</blockquote>
-<p><strong>非堆可以不实现垃圾收集。</strong></p>
-<h2 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h2><blockquote>
-<p>属于方法区一部分。用于存放编译时期生成的各种字面量和符号引用。<br>运行时常量池相当于Class常量池又一重要的特性：动态性。<br>运行期可将新的常量放入常量池。常用的是String的intern() </p>
-</blockquote>
-<h2 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h2><blockquote>
-<p>不属于虚拟机运行时数据区。也不属于虚拟机定义的内存区域。但是被频繁使用。可能导致OutOfMemoryException出现。</p>
-</blockquote>
-<p>NIO就使用了这个方式。通过使用Native函数直接分配给堆外内存。然后通过一个存储在Java堆中directByteBuffer对象作为这块内存的引用。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Servlet3新特性/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Servlet3新特性/" itemprop="url">【Servlet3】新特性</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:26:32+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Servlet/" itemprop="url" rel="index">
-                    <span itemprop="name">Servlet</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Servlet3新增功能"><a href="#Servlet3新增功能" class="headerlink" title="Servlet3新增功能"></a>Servlet3新增功能</h2><ul>
-<li>异步处理支持</li>
-<li>新增的注解支持</li>
-<li>可插性支持</li>
-</ul>
-<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><h3 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">@WebFilter(filterName = &quot;myFilter&quot;, urlPatterns=&quot;/*&quot;,</div><div class="line">        dispatcherTypes = &#123;DispatcherType.REQUEST, DispatcherType.FORWARD&#125;)</div><div class="line">public class MyFilter implements Filter &#123;</div><div class="line">    @Override</div><div class="line">    public void init(final FilterConfig filterConfig) throws ServletException &#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException &#123;</div><div class="line">        chain.doFilter(request, response);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void destroy() &#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="Listener"><a href="#Listener" class="headerlink" title="Listener"></a>Listener</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@WebListener</div><div class="line">public class MyServletContextListener implements ServletContextListener &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void contextInitialized(final ServletContextEvent ctx) &#123;</div><div class="line">        System.out.println(&quot;init servlet context&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void contextDestroyed(final ServletContextEvent ctx) &#123;</div><div class="line">        System.out.println(&quot;destroy servlet container&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@WebServlet(name = &quot;myServlet&quot;,</div><div class="line">		    urlPatterns = &#123;&quot;/servlet1&quot;, &quot;/servlet1/*&quot;&#125;, </div><div class="line">		    loadOnStartup = 1,</div><div class="line">	        initParams = &#123;</div><div class="line">                @WebInitParam(name = &quot;msg&quot;, value=&quot;test&quot;)</div><div class="line">	        &#125;)</div><div class="line">public class MyServlet extends HttpServlet &#123;</div><div class="line">    private String msg;</div><div class="line"></div><div class="line">    public MyServlet() &#123;</div><div class="line">        System.out.println(&quot;load on startup&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void init() throws ServletException &#123;</div><div class="line">        super.init();</div><div class="line">        msg = this.getInitParameter(&quot;msg&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException &#123;</div><div class="line">        System.out.println(msg);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@ComponentScan(</div><div class="line">        value = &#123;&quot;com.test.**.service&quot;, &quot;com.test.**.dao&quot;&#125;,</div><div class="line">        excludeFilters = &#123;</div><div class="line">                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)</div><div class="line">        &#125;)</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableWebMvc</div><div class="line">@ComponentScan(</div><div class="line">        value = &quot;com.test.**.web.controller&quot;,</div><div class="line">        includeFilters = &#123;</div><div class="line">                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)</div><div class="line">        &#125;)</div><div class="line">public class SpringMvcConfiguration &#123;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public ViewResolver createInternalResourceViewResolver() &#123;</div><div class="line">        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();</div><div class="line">        viewResolver.setViewClass(JstlView.class);</div><div class="line">        viewResolver.setContentType(&quot;text/html&quot;);</div><div class="line">        viewResolver.setPrefix(&quot;/WEB-INF/jsp/&quot;);</div><div class="line">        viewResolver.setSuffix(&quot;.jsp&quot;);</div><div class="line"></div><div class="line">        return viewResolver;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public DefaultServletHttpRequestHandler createDefaultServletHttpRequestHandler() &#123;</div><div class="line">        return new DefaultServletHttpRequestHandler();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h3 id="web-xml-代码配置"><a href="#web-xml-代码配置" class="headerlink" title="web.xml 代码配置"></a>web.xml 代码配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">public class NoXmlWebAppInitializer implements WebApplicationInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void onStartup(final ServletContext sc) throws ServletException &#123;</div><div class="line"></div><div class="line">        //1、根上下文</div><div class="line">        AnnotationConfigWebApplicationContext  rootContext = new AnnotationConfigWebApplicationContext();</div><div class="line">        rootContext.register(RootConfiguration.class);</div><div class="line">        sc.addListener(new ContextLoaderListener(rootContext));</div><div class="line"></div><div class="line">        //2、springmvc上下文</div><div class="line">        AnnotationConfigWebApplicationContext springMvcContext = new AnnotationConfigWebApplicationContext();</div><div class="line">        springMvcContext.register(SpringMvcConfiguration.class);</div><div class="line"></div><div class="line">        //3、DispatcherServlet</div><div class="line">        DispatcherServlet dispatcherServlet = new DispatcherServlet(springMvcContext);</div><div class="line"></div><div class="line">        ServletRegistration.Dynamic dynamic = sc.addServlet(&quot;dispatcherServlet&quot;, dispatcherServlet);</div><div class="line">        dynamic.setLoadOnStartup(1);</div><div class="line">        dynamic.addMapping(&quot;/&quot;);</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="异步处理"><a href="#异步处理" class="headerlink" title="异步处理"></a>异步处理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">@WebServlet(name = &quot;asyncServlet&quot;, urlPatterns = &quot;/async&quot;, asyncSupported = true)</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">private final ExecutorService executorService = Executors.newScheduledThreadPool(2);</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException &#123;</div><div class="line">        resp.setHeader(&quot;Connection&quot;, &quot;Keep-Alive&quot;);</div><div class="line">        resp.setContentType(&quot;text/html;charset=utf-8&quot;);</div><div class="line"></div><div class="line">        PrintWriter out = resp.getWriter();</div><div class="line">        out.write(&quot;hello async&quot;);</div><div class="line">        out.write(&quot;&lt;br/&gt;&quot;);</div><div class="line">        out.flush();</div><div class="line">        //1、开启异步</div><div class="line">        final AsyncContext asyncContext = req.startAsync();</div><div class="line">        //2、设置超时时间，如果不设置如jetty是30000L</div><div class="line">        asyncContext.setTimeout(10L * 1000); //设置为0表示永不超时</div><div class="line"></div><div class="line">        //把任务提交给自己的任务队列</div><div class="line">        executorService.submit(new Runnable() &#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line">                try &#123;</div><div class="line">                    Thread.sleep(3L * 1000);</div><div class="line">                    PrintWriter out = asyncContext.getResponse().getWriter();</div><div class="line">                    out.write(&quot;over&quot;);</div><div class="line">                    asyncContext.complete();</div><div class="line">                &#125; catch (Exception e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line"></div><div class="line">        //4、当前线程可立即返回</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h2 id="interceptor"><a href="#interceptor" class="headerlink" title="interceptor"></a>interceptor</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">public class MyCallableInterceptor extends CallableProcessingInterceptorAdapter &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void beforeConcurrentHandling(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        System.out.println(&quot;=====在startAsyc开启异步 和 提交异步任务到Executor 之前执行&quot;);</div><div class="line">        //此时可以保存一些数据到异步上下文，如spring security的SecurityContextHolder或Shiro的SecurityUtils(Subject)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void preProcess(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        //此时可以把在beforeConcurrentHandling保存的那些数据绑定到这个线程上（将在一个新线程执行）</div><div class="line">        System.out.println(&quot;在Callable.call运行之前执行&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void postProcess(final NativeWebRequest request, final Callable&lt;T&gt; task, final Object concurrentResult) throws Exception &#123;</div><div class="line">        System.out.println(&quot;在Callable.call运行之后执行&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; Object handleTimeout(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        //超时时调用，返回值将是超时后的结果</div><div class="line">        System.out.println(&quot;异步任务超时了&quot;);</div><div class="line">        return &quot;error&quot;;//返回出错时的结果，将替换掉正常时的结果</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public &lt;T&gt; void afterCompletion(final NativeWebRequest request, final Callable&lt;T&gt; task) throws Exception &#123;</div><div class="line">        //异步任务正常结束时调用</div><div class="line">        System.out.println(&quot;异步任务完成了&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">@Controller</div><div class="line">public class MyCallableController &#123;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/myCallable1&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    public Callable&lt;String&gt; callable1() &#123;</div><div class="line">        return new Callable&lt;String&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public String call() throws Exception &#123;</div><div class="line">                System.out.println(&quot;====执行Callable call&quot;);</div><div class="line">                return &quot;success&quot;;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">    @RequestMapping(&quot;/myCallable2&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    public Callable&lt;String&gt; callable2() &#123;</div><div class="line">        return new Callable&lt;String&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public String call() throws Exception &#123;</div><div class="line">                Thread.sleep(31L * 1000);</div><div class="line">                System.out.println(&quot;====执行Callable call&quot;);</div><div class="line">                return &quot;success&quot;;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * spring实现方式：</div><div class="line"> *   1、把任务提交给Executor 异步执行；</div><div class="line"> *   2、执行完成后RequestMappingHandlerAdapter使用内部的  ServletInvocableHandlerMethod包装返回值，即按照非异步方式再执行</div><div class="line"> */</div><div class="line">@Controller</div><div class="line">public class CallableController &#123;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/callable1&quot;)</div><div class="line">    public Callable&lt;String&gt; callable1(final Model model) &#123;</div><div class="line">        return new Callable&lt;String&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public String call() throws Exception &#123;</div><div class="line">                Thread.sleep(2L * 1000); //暂停两秒</div><div class="line">                String viewName = &quot;msg&quot;;</div><div class="line">                model.addAttribute(&quot;msg&quot;, &quot;hello callable&quot;);</div><div class="line">                return viewName; //然后返回到指定视图页面</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/callable2&quot;)</div><div class="line">    public Callable&lt;ModelAndView&gt; callable2() &#123;</div><div class="line">        return new Callable&lt;ModelAndView&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public ModelAndView call() throws Exception &#123;</div><div class="line">                Thread.sleep(2L * 1000); //暂停两秒</div><div class="line">                ModelAndView mv = new ModelAndView(&quot;msg&quot;);</div><div class="line">                mv.addObject(&quot;msg&quot;, &quot;hello callable&quot;);</div><div class="line">                return mv;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/callable3&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    public Callable&lt;Object&gt; callable3() &#123;</div><div class="line">        return new Callable&lt;Object&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public Object call() throws Exception &#123;</div><div class="line">                Thread.sleep(2L * 1000); //暂停两秒</div><div class="line">                return new User(1, &quot;zhang&quot;);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><a href="http://jinnianshilongnian.iteye.com/blog/1912455" target="_blank" rel="external">参考博客</a><br><a href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet30/" target="_blank" rel="external">Servlet3新特性详解</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Python学习笔记（二）——-正则表达式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Python学习笔记（二）——-正则表达式/" itemprop="url">Python学习笔记（二）—— 正则表达式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:23:53+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="正则表达式的大致匹配过程"><a href="#正则表达式的大致匹配过程" class="headerlink" title="正则表达式的大致匹配过程"></a>正则表达式的大致匹配过程</h3><p>1.依次拿出表达式和文本中的字符比较，<br>2.如果每一个字符都能匹配，则匹配成功；一旦有匹配不成功的字符则匹配失败。<br>3.如果表达式中有量词或边界，这个过程会稍微有一些不同。</p>
-<p><img src="http://img.blog.csdn.net/20170502103501561?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<hr>
-<h3 id="数量词的贪婪模式与非贪婪模式"><a href="#数量词的贪婪模式与非贪婪模式" class="headerlink" title="数量词的贪婪模式与非贪婪模式"></a>数量词的贪婪模式与非贪婪模式</h3><blockquote>
-<p>正则表达式通常用于在文本中查找匹配的字符串。Python里数量词默认是贪婪的（在少数语言里也可能是默认非贪婪），总是尝试匹配尽可能多的字符；非贪婪的则相反，总是尝试匹配尽可能少的字符。例如：正则表达式”ab<em>”如果用于查找”abbbc”，将找到”abbb”。而如果使用非贪婪的数量词”ab</em>?”，将找到”a”。</p>
-</blockquote>
-<p>注：一般使用非贪婪模式来提取。</p>
-<h3 id="反斜杠问题"><a href="#反斜杠问题" class="headerlink" title="反斜杠问题"></a>反斜杠问题</h3><blockquote>
-<p>与大多数编程语言相同，正则表达式里使用”\”作为转义字符，这就可能造成反斜杠困扰。假如你需要匹配文本中的字符”\”，那么使用编程语言表示的正则表达式里将需要4个反斜杠”\\”：前两个和后两个分别用于在编程语言里转义成反斜杠，转换成两个反斜杠后再在正则表达式里转义成一个反斜杠。</p>
-</blockquote>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">import re</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">re.compile(string[,flag])  </div><div class="line">#以下为匹配所用函数</div><div class="line">#参数flag是匹配模式，取值可以使用按位或运算符’|’表示同时生效，比如re.I | re.M。</div><div class="line">re.match(pattern, string[, flags])</div><div class="line">re.search(pattern, string[, flags])</div><div class="line">re.split(pattern, string[, maxsplit])</div><div class="line">re.findall(pattern, string[, flags])</div><div class="line">re.finditer(pattern, string[, flags])</div><div class="line">re.sub(pattern, repl, string[, count])</div><div class="line">re.subn(pattern, repl, string[, count])</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">• re.I(全拼：IGNORECASE): 忽略大小写（括号内是完整写法，下同）</div><div class="line">• re.M(全拼：MULTILINE): 多行模式，改变&apos;^&apos;和&apos;$&apos;的行为（参见上图）</div><div class="line">• re.S(全拼：DOTALL): 点任意匹配模式，改变&apos;.&apos;的行为</div><div class="line">• re.L(全拼：LOCALE): 使预定字符类 \w \W \b \B \s \S 取决于当前区域设定</div><div class="line">• re.U(全拼：UNICODE): 使预定字符类 \w \W \b \B \s \S \d \D 取决于unicode定义的字符属性</div><div class="line">• re.X(全拼：VERBOSE): 详细模式。这个模式下正则表达式可以是多行，忽略空白字符，并可以加入注释。</div></pre></td></tr></table></figure>
-<hr>
-<blockquote>
-<p>1.string: 匹配时使用的文本。<br>2.re: 匹配时使用的Pattern对象。<br>3.pos: 文本中正则表达式开始搜索的索引。值与Pattern.match()和Pattern.seach()方法的同名参数相同。<br>4.endpos: 文本中正则表达式结束搜索的索引。值与Pattern.match()和Pattern.seach()方法的同名参数相同。<br>5.lastindex: 最后一个被捕获的分组在文本中的索引。如果没有被捕获的分组，将为None。<br>6.lastgroup: 最后一个被捕获的分组的别名。如果这个分组没有别名或者没有被捕获的分组，将为None。<br>方法：<br>1.group([group1, …]):<br>获得一个或多个分组截获的字符串；指定多个参数时将以元组形式返回。group1可以使用编号也可以使用别名；编号0代表整个匹配的子串；不填写参数时，返回group(0)；没有截获字符串的组返回None；截获了多次的组返回最后一次截获的子串。<br>2.groups([default]):<br>以元组形式返回全部分组截获的字符串。相当于调用group(1,2,…last)。default表示没有截获字符串的组以这个值替代，默认为None。<br>3.groupdict([default]):<br>返回以有别名的组的别名为键、以该组截获的子串为值的字典，没有别名的组不包含在内。default含义同上。<br>4.start([group]):<br>返回指定的组截获的子串在string中的起始索引（子串第一个字符的索引）。group默认值为0。<br>5.end([group]):<br>返回指定的组截获的子串在string中的结束索引（子串最后一个字符的索引+1）。group默认值为0。<br>6.span([group]):<br>返回(start(group), end(group))。<br>7.expand(template):<br>将匹配到的分组代入template中然后返回。template中可以使用\id或\g、\g引用分组，但不能使用编号0。\id与\g是等价的；但\10将被认为是第10个分组，如果你想表达\1之后是字符’0’，只能使用\g0。</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Python学习笔记（一）——-Urllib类库-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Python学习笔记（一）——-Urllib类库-1/" itemprop="url">Python学习笔记（一）—— Urllib类库</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:23:53+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="导入类库"><a href="#导入类库" class="headerlink" title="导入类库"></a>导入类库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">import urllib  </div><div class="line">import urllib2</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="爬取数据"><a href="#爬取数据" class="headerlink" title="爬取数据"></a>爬取数据</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">request = urllib2.Request(url) #发送请求</div><div class="line">response = urllib2.urlopen(request) #得到响应内容</div><div class="line">response.read() #读取内容</div></pre></td></tr></table></figure>
-<h3 id="urlopen"><a href="#urlopen" class="headerlink" title="urlopen()"></a>urlopen()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"># url请求地址</div><div class="line"># data默认为空None</div><div class="line"># timeout默认为socket._GLOBAL_DEFAULT_TIMEOUT</div><div class="line">urlopen(url, data, timeout)</div></pre></td></tr></table></figure>
-<h3 id="read"><a href="#read" class="headerlink" title="read()"></a>read()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 保存返回信息</div><div class="line">response.read()</div></pre></td></tr></table></figure>
-<h3 id="构造request"><a href="#构造request" class="headerlink" title="构造request"></a>构造request</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 通过构建一个request，服务器响应请求得到应答</div><div class="line">urllib2.Request(url)</div></pre></td></tr></table></figure>
-<h3 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">values = &#123;&quot;username&quot;:&quot;dzxlar@163.com&quot;,&quot;password&quot;:&quot;XXXX&quot;&#125;</div><div class="line">data = urllib.urlencode(values)</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">values = &#123;&#125;</div><div class="line">values[&apos;username&apos;] = &quot;dzxlar@163.com&quot;</div><div class="line">values[&apos;password&apos;] = &quot;XXXX&quot;</div><div class="line">data = urllib.urlencode(values)</div></pre></td></tr></table></figure>
-<h2 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">values = &#123;&quot;username&quot;:&quot;dzxlar@163.com&quot;,&quot;password&quot;:&quot;XXXX&quot;&#125;</div><div class="line">data = urllib.urlencode(values) </div><div class="line">geturl = url + &quot;?&quot; + data</div></pre></td></tr></table></figure>
-<h2 id="设置Headers"><a href="#设置Headers" class="headerlink" title="设置Headers"></a>设置Headers</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">headers = &#123;&#125;</div><div class="line">request = urllib2.Request(url, data, headers)</div></pre></td></tr></table></figure>
-<h2 id="设置代理"><a href="#设置代理" class="headerlink" title="设置代理"></a>设置代理</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">proxy_handler = urllib2.ProxyHandler(&#123;&quot;http&quot; : &apos;http://host:port&apos;&#125;)</div><div class="line">null_proxy_handler = urllib2.ProxyHandler(&#123;&#125;)</div><div class="line">if enable_proxy == True:</div><div class="line">    opener = urllib2.build_opener(proxy_handler)</div><div class="line">else:</div><div class="line">    opener = urllib2.build_opener(null_proxy_handler)</div><div class="line">urllib2.install_opener(opener)</div></pre></td></tr></table></figure>
-<h2 id="爬虫异常-URLError"><a href="#爬虫异常-URLError" class="headerlink" title="爬虫异常:URLError"></a>爬虫异常:URLError</h2><ul>
-<li>网络无连接，即本机无法上网</li>
-<li>连接不到特定的服务器</li>
-<li>服务器不存在</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">try:</div><div class="line">     # ...</div><div class="line">except urllib2.URLError, e:</div><div class="line">    print e.reason</div></pre></td></tr></table></figure>
-<h2 id="HTTPError"><a href="#HTTPError" class="headerlink" title="HTTPError"></a>HTTPError</h2><p>HTTPError是URLError的子类，在你利用urlopen方法发出一个请求时，服务器上都会对应一个应答对象response，其中它包含一个数字”状态码”</p>
-<blockquote>
-<p>100：继续  客户端应当继续发送请求。客户端应当继续发送请求的剩余部分，或者如果请求已经完成，忽略这个响应。<br>101： 转换协议  在发送完这个响应最后的空行后，服务器将会切换到在Upgrade 消息头中定义的那些协议。只有在切换新的协议更有好处的时候才应该采取类似措施。<br>102：继续处理   由WebDAV（RFC 2518）扩展的状态码，代表处理将被继续执行。<br>200：请求成功      处理方式：获得响应的内容，进行处理<br>201：请求完成，结果是创建了新资源。新创建资源的URI可在响应的实体中得到    处理方式：爬虫中不会遇到<br>202：请求被接受，但处理尚未完成    处理方式：阻塞等待<br>204：服务器端已经实现了请求，但是没有返回新的信 息。如果客户是用户代理，则无须为此更新自身的文档视图。    处理方式：丢弃<br>300：该状态码不被HTTP/1.0的应用程序直接使用， 只是作为3XX类型回应的默认解释。存在多个可用的被请求资源。    处理方式：若程序中能够处理，则进行进一步处理，如果程序中不能处理，则丢弃<br>301：请求到的资源都会分配一个永久的URL，这样就可以在将来通过该URL来访问此资源    处理方式：重定向到分配的URL<br>302：请求到的资源在一个不同的URL处临时保存     处理方式：重定向到临时的URL<br>304：请求的资源未更新     处理方式：丢弃<br>400：非法请求     处理方式：丢弃<br>401：未授权     处理方式：丢弃<br>403：禁止     处理方式：丢弃<br>404：没有找到     处理方式：丢弃<br>500：服务器内部错误  服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。一般来说，这个问题都会在服务器端的源代码出现错误时出现。<br>501：服务器无法识别  服务器不支持当前请求所需要的某个功能。当服务器无法识别请求的方法，并且无法支持其对任何资源的请求。<br>502：错误网关  作为网关或者代理工作的服务器尝试执行请求时，从上游服务器接收到无效的响应。<br>503：服务出错   由于临时的服务器维护或者过载，服务器当前无法处理请求。这个状况是临时的，并且将在一段时间以后恢复。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">try:</div><div class="line">    # ...</div><div class="line">except urllib2.HTTPError, e:</div><div class="line">    print e.code</div><div class="line">    print e.reason</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">try:</div><div class="line">   # ...</div><div class="line">except urllib2.HTTPError, e:</div><div class="line">    print e.code</div><div class="line">except urllib2.URLError, e:</div><div class="line">    print e.reason</div></pre></td></tr></table></figure>
-<p><a href="http://cuiqingcai.com/1052.html" target="_blank" rel="external">python2学习教程</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1995,7 +1874,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">86</span>
+                <span class="site-state-item-count">93</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2006,7 +1885,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2017,7 +1896,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">76</span>
+                <span class="site-state-item-count">78</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

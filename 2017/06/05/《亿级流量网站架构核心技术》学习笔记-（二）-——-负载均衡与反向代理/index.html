@@ -1,0 +1,828 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="高可用技术," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理 单实例不能支撑用户请求的时候，就需要进行扩容  如果用户访问 https://www.tmall.com 的方式访问请求，浏览器首先会查询DNS服务器所对应IP，然后通过IP访问对应服务器 方式www.tmall.com 域名映射多个IP，但是如果某台服务器重启或出现故障，DNS存在一定缓存时间，故障后切换时间长，且没有对后端">
+<meta name="keywords" content="高可用技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理">
+<meta property="og:url" content="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理 单实例不能支撑用户请求的时候，就需要进行扩容  如果用户访问 https://www.tmall.com 的方式访问请求，浏览器首先会查询DNS服务器所对应IP，然后通过IP访问对应服务器 方式www.tmall.com 域名映射多个IP，但是如果某台服务器重启或出现故障，DNS存在一定缓存时间，故障后切换时间长，且没有对后端">
+<meta property="og:updated_time" content="2017-06-05T09:03:29.387Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理">
+<meta name="twitter:description" content="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理 单实例不能支撑用户请求的时候，就需要进行扩容  如果用户访问 https://www.tmall.com 的方式访问请求，浏览器首先会查询DNS服务器所对应IP，然后通过IP访问对应服务器 方式www.tmall.com 域名映射多个IP，但是如果某台服务器重启或出现故障，DNS存在一定缓存时间，故障后切换时间长，且没有对后端">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/"/>
+
+
+
+
+
+  <title>《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:02:52+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理"><a href="#《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理"></a>《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理</h2><blockquote>
+<p>单实例不能支撑用户请求的时候，就需要进行扩容</p>
+</blockquote>
+<p>如果用户访问 <a href="https://www.tmall.com" target="_blank" rel="external">https://www.tmall.com</a> 的方式访问请求，浏览器首先会查询DNS服务器所对应IP，然后通过IP访问对应服务器</p>
+<h4 id="方式"><a href="#方式" class="headerlink" title="方式"></a>方式</h4><p>www.tmall.com 域名映射多个IP，但是如果某台服务器重启或出现故障，DNS存在一定缓存时间，故障后切换时间长，且没有对后端服务进行心跳检测和失败重试的机制</p>
+<ul>
+<li>外网DNS通过GSLB(全局负载均衡)进行流量调度<ul>
+<li>查看公网ip<ul>
+<li>站长工具 - DNS查询 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>内网DNS通过简单的轮询负载均衡<ul>
+<li>HaProxy 和 Nginx</li>
+</ul>
+</li>
+</ul>
+<h3 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h3><p>Nginx通常用于七层负载，限制一定的吞吐量，为了提升吞吐量会在DNS和Nginx中引入接入层(LVS、F5做4层负载均衡)</p>
+<p><strong>首先通过DNS解析LVS/F5，然后LVS/F5转发给Nginx，再由Nginx转发给后端RealServer</strong></p>
+<p>业务开发人员只需关心Nginx层面，LVS/F5会由运维人员维护</p>
+<p>Nginx1.9.0以后开始支持TCP(ngx_stream_upstream_module)四层负载均衡</p>
+<h4 id="概念理解"><a href="#概念理解" class="headerlink" title="概念理解"></a>概念理解</h4><p>二层负载均衡<br>通过改写报文的目标MAC地址为上游服务器MAC地址</p>
+<ol>
+<li>源Ip地址和目标Ip地址不变</li>
+<li>负载均衡服务器和真实服务器共享一个VIP</li>
+</ol>
+<p>四层负载均衡</p>
+<ol>
+<li>根据端口将报文转发到上游服务器(不同的Ip的地址 + 端口)</li>
+</ol>
+<p>七层负载均衡</p>
+<ol>
+<li>根据端口号和应用层协议的主机名、URL、转发报文到上游服务器</li>
+</ol>
+<h2 id="负载均衡核心"><a href="#负载均衡核心" class="headerlink" title="负载均衡核心"></a>负载均衡核心</h2><ol>
+<li>上游服务器(upstream server)配置</li>
+<li>负载均衡算法</li>
+<li>失败重试机制</li>
+<li>服务器心跳检查</li>
+</ol>
+<hr>
+<h3 id="upstream-配置上游服务器（真实业务服务器）"><a href="#upstream-配置上游服务器（真实业务服务器）" class="headerlink" title="upstream 配置上游服务器（真实业务服务器）"></a>upstream 配置上游服务器（真实业务服务器）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>IP地址和端口</li>
+<li>权重：默认为1.权重越高分配给这台服务器的请求越多(如上每3次请求就有1次转发给8080，另外2次转发给8070)</li>
+</ul>
+<h3 id="proxy-pass-处理用户请求"><a href="#proxy-pass-处理用户请求" class="headerlink" title="proxy_pass 处理用户请求"></a>proxy_pass 处理用户请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    proxy_pass http://realServer;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>当访问Nginx时，会将请求反向代理到realServer配置的upstream server中</li>
+</ul>
+<hr>
+<h2 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h2><ul>
+<li>round-robin：轮询(默认)</li>
+<li>ip_hash：根据客户IP进行均衡负载（即相同的ip分配给同一个upstream server</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    ip_hash;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>hash 算法：根据请求uri进行负载均衡，可以使用Nginx变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    hash $uri;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>hash key[consistant]:对某一个key进行哈希或者使用一致性hash算法进行负载均衡</p>
+<ul>
+<li>使用hash算法存在的问题<ul>
+<li>当添加/删除一台服务器时，将导致很多key被重新负载均衡到不同服务器：所以建议使用一致性hash算法，只有少数key被重新负载均衡到不同服务器中</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>根据动态consistent_key指定<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    hash $consistent_key consistent;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>location指定一致性hash，会优先考虑请求参数cat，若没有，则根据请求uri进行负载<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    set $consistent_key $arg_cat;</div><div class="line">    if($consistent_key = &quot;&quot;)&#123;</div><div class="line">        set $consistent_key $request_uri;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="失败重试"><a href="#失败重试" class="headerlink" title="失败重试"></a>失败重试</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 max_fails=2 fail_timeout=10s weight=1;</div><div class="line">    server 172.16.42.81:8070 max_fails=2 fail_timeout=10s weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>当fail_timeout时间内失败了max_fails次，则认为该服务器不可用，然后摘掉该服务器，fail_timeouth后再次将服务器加入到存活服务器列表<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    proxy_connect_timeout 5s;</div><div class="line">    proxy_read_timeout 5s;</div><div class="line">    proxy_send_timeout 5s;</div><div class="line">    </div><div class="line">    proxy_next_upstream error timeout;</div><div class="line">    proxy_next_upstream_timeout 10s;</div><div class="line">    proxy_next_upstream_tries 2;</div><div class="line">    </div><div class="line">    proxy_pass http://realServer;</div><div class="line">    </div><div class="line">    add_header upstream_addr $upstream_addr;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h2 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h2><blockquote>
+<p>Nginx默认采用惰性策略，Nginx上夜班提供health_check进行主动健康检查; 也可以集成nginx_upstream_check_module模块进行健康检查</p>
+</blockquote>
+<h3 id="nginx-upstream-check-module"><a href="#nginx-upstream-check-module" class="headerlink" title="nginx_upstream_check_module"></a>nginx_upstream_check_module</h3><h4 id="TCP心跳检查"><a href="#TCP心跳检查" class="headerlink" title="TCP心跳检查"></a>TCP心跳检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">    check interval=3000 rise=1 fail=3 timeout=2000 type=tcp;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>interval 每个3s检测一次</li>
+<li>fail 失败多少次之后，目标不存活</li>
+<li>rise 成功多少次后，目标存活，并可以处理请求</li>
+<li>timeout 请求超时时间配置</li>
+</ul>
+<h4 id="Http心跳检查"><a href="#Http心跳检查" class="headerlink" title="Http心跳检查"></a>Http心跳检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">    check interval=3000 rise=1 fail=3 timeout=2000 type=http;</div><div class="line">    check_http_send &quot;HEAD /status HTTP/1.0\r\n\r\n&quot;;</div><div class="line">    check_http_expect_alive http_2xx http_3xx;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>check_http_send 检查时发出的http请求内容</li>
+<li>check_http_expect_alive 当上游服务器返回匹配的响应码，则认为上游服务器存活</li>
+</ul>
+<p>注意：间隔时间不能太短，否则可能因为心跳检查包太多造成上游服务器挂掉，同事设置合理超时时间</p>
+<p>安装健康检查模块需要先打nginx_upstream_check_module补丁，不然该模块不工作</p>
+<hr>
+<h2 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h2><h3 id="域名上游服务器"><a href="#域名上游服务器" class="headerlink" title="域名上游服务器"></a>域名上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server c0.3.cn;</div><div class="line">    server c1.3.cn;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Nginx社区版：在Nginx解析配置文件时将域名解析成IP地址并记到upstream上，当这两个域名对应ip发生变化时，不会更新，Nginx商业版支持动态更新</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">proxy_pass http://c0.3.cn</div></pre></td></tr></table></figure>
+<p>支持动态更新</p>
+<h3 id="备份上游服务器"><a href="#备份上游服务器" class="headerlink" title="备份上游服务器"></a>备份上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 backup;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="不可用上游服务器"><a href="#不可用上游服务器" class="headerlink" title="不可用上游服务器"></a>不可用上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 down;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="长连接"><a href="#长连接" class="headerlink" title="长连接"></a>长连接</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 backup;</div><div class="line">    keepalive 100;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>keepalive 每个Worker进程与上游服务器可缓存的空闲连接最大数量，当超过这个数量时，最近最少使用的链接被关闭</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    ## 支持keep-alive</div><div class="line">    proxy_http_version 1.1;</div><div class="line">    ## 支持http/1.0</div><div class="line">    proxy_set_header Connection &quot;Connection:Keep-Alive&quot;;</div><div class="line">    proxy_pass http://realServer;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>总长连接数 = 空闲连接池 + 释放连接池</p>
+<p>具体环境</p>
+<ul>
+<li>空闲连接池太小，连接不够用，需要不断建立连接</li>
+<li>空闲连接池太多，空闲连接太多，还未使用就超时</li>
+</ul>
+<p><strong>注意：尽量只对小报文开启长连接</strong></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/高可用技术/" rel="tag"># 高可用技术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则/" rel="next" title="《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则">
+                <i class="fa fa-chevron-left"></i> 《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术/" rel="prev" title="## 《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术">
+                ## 《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">93</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">78</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理"><span class="nav-number">1.</span> <span class="nav-text">《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#方式"><span class="nav-number">1.0.1.</span> <span class="nav-text">方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx"><span class="nav-number">1.1.</span> <span class="nav-text">Nginx</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#概念理解"><span class="nav-number">1.1.1.</span> <span class="nav-text">概念理解</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#负载均衡核心"><span class="nav-number">2.</span> <span class="nav-text">负载均衡核心</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#upstream-配置上游服务器（真实业务服务器）"><span class="nav-number">2.1.</span> <span class="nav-text">upstream 配置上游服务器（真实业务服务器）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#proxy-pass-处理用户请求"><span class="nav-number">2.2.</span> <span class="nav-text">proxy_pass 处理用户请求</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#负载均衡算法"><span class="nav-number">3.</span> <span class="nav-text">负载均衡算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#失败重试"><span class="nav-number">4.</span> <span class="nav-text">失败重试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#健康检查"><span class="nav-number">5.</span> <span class="nav-text">健康检查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nginx-upstream-check-module"><span class="nav-number">5.1.</span> <span class="nav-text">nginx_upstream_check_module</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP心跳检查"><span class="nav-number">5.1.1.</span> <span class="nav-text">TCP心跳检查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Http心跳检查"><span class="nav-number">5.1.2.</span> <span class="nav-text">Http心跳检查</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他配置"><span class="nav-number">6.</span> <span class="nav-text">其他配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#域名上游服务器"><span class="nav-number">6.1.</span> <span class="nav-text">域名上游服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份上游服务器"><span class="nav-number">6.2.</span> <span class="nav-text">备份上游服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不可用上游服务器"><span class="nav-number">6.3.</span> <span class="nav-text">不可用上游服务器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#长连接"><span class="nav-number">7.</span> <span class="nav-text">长连接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

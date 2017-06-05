@@ -254,6 +254,1146 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——可重入内置锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——可重入内置锁/" itemprop="url">线程笔记——可重入内置锁</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>每个 Java 对象都可以用做一个实现同步的锁，这些锁被称为内置锁或监视器锁</strong>。线程在进入同步代码块之前会自动获取锁，并且在退出同步代码块时会自动释放锁</p>
+<blockquote>
+<p><strong>获得内置锁的唯一途径就是进入由这个锁保护的同步代码块或方法</strong></p>
+</blockquote>
+<p>当某个线程请求一个由其他线程持有的锁时，发出请求的线程就会阻塞。然而，由于内置锁是可重入的，因此如果摸个线程试图获得一个已经由它自己持有的锁，那么这个请求就会成功</p>
+<p><strong>“重入”意味着获取锁的操作的粒度是“线程”，而不是调用</strong></p>
+<blockquote>
+<p>重入的一种实现方法是，<strong><em>为每个锁关联一个获取计数值和一个所有者线程。当计数值为 0 时，这个锁就被认为是没有被任何线程所持有，当线程请求一个未被持有的锁时，JVM 将记下锁的持有者，并且将获取计数值置为 1，如果同一个线程再次获取这个锁，计数值将递增，而当线程退出同步代码块时，计数器会相应地递减。当计数值为 0 时，这个锁将被释放</em></strong></p>
+</blockquote>
+<hr>
+<p>重入进一步提升了加锁行为的封装性，因此简化了面向对象并发代码的开发</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class Father  </div><div class="line">&#123;  </div><div class="line">    public synchronized void doSomething()&#123;  </div><div class="line">        System.out.println(&quot;father&quot;);   </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line"></div><div class="line">public class Child extends Father  </div><div class="line">&#123;  </div><div class="line">    public synchronized void doSomething()&#123;  </div><div class="line">        System.out.println(&quot;child&quot;);  </div><div class="line">        super.doSomething();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">child</div><div class="line">father</div></pre></td></tr></table></figure>
+<p><strong>子类覆写了父类的同步方法，然后调用父类中的方法，此时如果没有可重入的锁，那么这段代码件产生死锁。</strong></p>
+<p>子类调用doSomething方法时，除了获得自身类锁的同时还会获得父类的锁，如果内置锁不可重入，那调用super.doSomething时就会发生死锁。所谓重入就是，你拿了锁，再调用该锁包含的代码可以不用再次等待拿锁</p>
+<p><strong>重入则避免了这种死锁情况的发生</strong></p>
+<p>同一个线程在调用本类中其他 synchronized 方法/块或父类中的 synchronized 方法/块时，都不会阻碍该线程地执行，因为互斥锁时可重入的</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-Fork-Join/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——-Fork-Join/" itemprop="url">线程笔记—— Fork/Join</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:00+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="JDK7的Fork-Join"><a href="#JDK7的Fork-Join" class="headerlink" title="JDK7的Fork/Join"></a>JDK7的Fork/Join</h3><p>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
+<h3 id="Future任务机制和FutureTask"><a href="#Future任务机制和FutureTask" class="headerlink" title="Future任务机制和FutureTask"></a>Future任务机制和FutureTask</h3><p>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
+<h3 id="Future相关"><a href="#Future相关" class="headerlink" title="Future相关"></a>Future相关</h3><p>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
+<h3 id="Future原理"><a href="#Future原理" class="headerlink" title="Future原理"></a>Future原理</h3><p>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
+<h3 id="计算最大并发量"><a href="#计算最大并发量" class="headerlink" title="计算最大并发量"></a>计算最大并发量</h3><p>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
+<h3 id="Fork-Join优缺点"><a href="#Fork-Join优缺点" class="headerlink" title="Fork/Join优缺点"></a>Fork/Join优缺点</h3><ul>
+<li>优点 <ol>
+<li>充分实现并发程序任务拆分</li>
+<li>简化编程</li>
+<li>着重划分任务和组合中间结果</li>
+</ol>
+</li>
+<li>缺点 <ol>
+<li>拆分对象不宜过多，容易造成内存溢出</li>
+</ol>
+</li>
+</ul>
+<h3 id="Fork-Join应用场景"><a href="#Fork-Join应用场景" class="headerlink" title="Fork/Join应用场景"></a>Fork/Join应用场景</h3><blockquote>
+<p><strong>树形数据结构处理和遍历</strong></p>
+</blockquote>
+<h3 id="api"><a href="#api" class="headerlink" title="api"></a>api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">fork() //异步执行任务</div><div class="line">join() //计算完成后返回结果</div><div class="line">RecursiveTask //用于无返回结果的任务</div><div class="line">RecursiveAction //用于有返回结果的任务</div><div class="line">ForkJoinPool //实现Executor接口</div><div class="line">//三个调度子方法</div><div class="line">execute() //异步执行</div><div class="line">invoke() //等待完成，返回结果</div><div class="line">submit() //异步执行execute任务，并立即返回Future对象</div></pre></td></tr></table></figure>
+<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class FutureTaskDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		</div><div class="line">		SonTask sonTask = new SonTask(&quot;线程2&quot;);</div><div class="line">		FutureTask&lt;String&gt; task1 = new FutureTask&lt;&gt;(sonTask);</div><div class="line">		new Thread(task1).start();</div><div class="line">		System.out.println(task1.get()); //获取结果</div><div class="line">		</div><div class="line">		FutureTask&lt;Integer&gt; task2 = new FutureTask&lt;Integer&gt;(new MySun(),2);</div><div class="line">		new Thread(task2).start();</div><div class="line">		System.out.println(&quot;result_&quot;+task2.get());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class SonTask implements Callable&lt;String&gt; &#123;</div><div class="line"></div><div class="line">	private String name = &quot;&quot;;</div><div class="line">	</div><div class="line">	SonTask(String name) &#123;</div><div class="line">		this.name = name;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public String call() throws Exception &#123;</div><div class="line">		Thread.sleep(1000L);</div><div class="line">		System.out.println(name + &quot;计算完成&quot;);</div><div class="line">		return &quot;result_1&quot;;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class MySun implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(500L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;线程2处理完成&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">result_1</div><div class="line">result_2</div></pre></td></tr></table></figure>
+<h3 id="Fork-Join"><a href="#Fork-Join" class="headerlink" title="Fork/Join"></a>Fork/Join</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class CountTask extends RecursiveTask&lt;Integer&gt;&#123;</div><div class="line"></div><div class="line">	private static final long serialVersionUID = 2148758397044775857L;</div><div class="line"></div><div class="line">	private static int splitSize = 2; </div><div class="line">	private int start , end; </div><div class="line">	</div><div class="line">	</div><div class="line">	public CountTask(int start, int end) &#123;</div><div class="line">		this.start = start;</div><div class="line">		this.end = end;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected Integer compute() &#123;</div><div class="line">		int sum = 0;</div><div class="line">		//如果任务不需要拆分就开始计算</div><div class="line">		boolean isSplit =  (end - start) &lt;= splitSize;</div><div class="line">		if(isSplit)&#123;</div><div class="line">			for (int i = start; i &lt;= end; i++) &#123;</div><div class="line">				sum += i;</div><div class="line">			&#125;</div><div class="line">		&#125;else&#123; //拆分成2个子任务</div><div class="line">			int middle = (start + end) / 2;</div><div class="line">			CountTask oneTask = new CountTask(start, middle);</div><div class="line">			CountTask twoTask = new CountTask(middle+1, end);</div><div class="line">			oneTask.fork();//开始执行</div><div class="line">			twoTask.fork();</div><div class="line">			</div><div class="line">			//获得第一个子任务结果</div><div class="line">			int oneResult = oneTask.join();</div><div class="line">			int twoResult = twoTask.join();</div><div class="line">			</div><div class="line">			sum = oneResult + twoResult;</div><div class="line">		&#125;</div><div class="line">		return sum;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public class FockJoinDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		ForkJoinPool pool = new ForkJoinPool();</div><div class="line">		CountTask count1 = new CountTask(1, 5);</div><div class="line">		</div><div class="line">		Future&lt;Integer&gt; res1 = pool.submit(count1);</div><div class="line">		System.out.println(&quot;1-5结果: &quot;+res1.get());</div><div class="line">		</div><div class="line">		CountTask count2 = new CountTask(1, 100);</div><div class="line">		Future&lt;Integer&gt; res2 = pool.submit(count2);</div><div class="line">		System.out.println(&quot;1-100结果：&quot;+res2.get());</div><div class="line">		</div><div class="line">		System.out.println(&quot;=============Fock/Join监控===============&quot;);</div><div class="line">		</div><div class="line">		System.out.println(pool.getActiveThreadCount());</div><div class="line">		System.out.println(pool.getQueuedTaskCount());</div><div class="line">		System.out.println(pool.getQueuedSubmissionCount());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">1-5结果: 15</div><div class="line">1-100结果：5050</div><div class="line">=============Fock/Join监控===============</div><div class="line">1</div><div class="line">0</div><div class="line">0</div></pre></td></tr></table></figure>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp11137.html" target="_blank" rel="external">IBM_Fork/Join分析</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-线程池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——-线程池/" itemprop="url">线程笔记—— 线程池</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:23:29+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="什么是线程池？"><a href="#什么是线程池？" class="headerlink" title="什么是线程池？"></a>什么是线程池？</h3><p>目的：减少对象创建和销毁的时间<br>Java线程池实现Java高并发、Java多线程、可管理的统一调度器<br>Executors是线程的工厂类（工具类）：方便快速的创建线程池</p>
+<h3 id="创建线程池常见的3种方法"><a href="#创建线程池常见的3种方法" class="headerlink" title="创建线程池常见的3种方法"></a>创建线程池常见的3种方法</h3><p>newSingleThreadExecutor 创建单线程的线程池<br>newFixedThreadPool 创建固定大小的线程池<br>newCachedThreadPool 创建可缓存线程池</p>
+<h3 id="线程池的优点"><a href="#线程池的优点" class="headerlink" title="线程池的优点"></a>线程池的优点</h3><p>1.降低资源消耗（重复利用已创建线程）<br>2.提高响应速度<br>3.提高线程的可管理性<br>4.防止服务器过载，形成内存溢出</p>
+<h3 id="线程池工作机制"><a href="#线程池工作机制" class="headerlink" title="线程池工作机制"></a>线程池工作机制</h3><p>线程等待池 BlockingQueue<br>任务处理池PoolWorker，即正在工作的线程列表HashSet<br>核心池大小（corePoolSize） 线程池的稳定峰值，达到这个值之后的线程数大小不会释放的<br>最大处理线程池数（maxinumPoolSize） 线程池的线程数超过corePoolSize,小于maxPoolSize，会动态创建回收线程池内的资源</p>
+<h3 id="自定义线程池和ExecutorService"><a href="#自定义线程池和ExecutorService" class="headerlink" title="自定义线程池和ExecutorService"></a>自定义线程池和ExecutorService</h3><blockquote>
+<p>自定义线程池需要用到ThreadFactory<br>Executor ： 执行线程池的工具<br>ExecutorService ： 线程池的真正接口（继承了Executor）<br>AbstractExecutorService：实现ExecutorService接口<br>ThreadPoolExecutor：ExecutorService默认实现<br>ScheduleExecutorService：解决那些需要重复执行的问题<br>ScheduleThreadPoolExecutor：解决周期性调度问题的真正实现<br>Executors 工厂类（创建更多线程）</p>
+</blockquote>
+<h3 id="RejectedExecutionHandler"><a href="#RejectedExecutionHandler" class="headerlink" title="RejectedExecutionHandler"></a>RejectedExecutionHandler</h3><blockquote>
+<p>处理被丢弃的线程和异常的接口</p>
+</blockquote>
+<h3 id="ThreadPoolExecutor"><a href="#ThreadPoolExecutor" class="headerlink" title="ThreadPoolExecutor"></a>ThreadPoolExecutor</h3><p><strong>线程池最核心的类</strong></p>
+<p>理解构造函数的参数<br>corePoolSize<br>maxinumPoolSize<br>keepAliveTime<br>TimeUnit<br>BlockingQueue<br>ThreadFactory<br>RejectedExecutionHandler</p>
+<h3 id="线程池注意问题"><a href="#线程池注意问题" class="headerlink" title="线程池注意问题"></a>线程池注意问题</h3><p>线程池是单例的，不能放在services方法种<br>线程数不能设置过大，会造成线程负载<br>注意死锁问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * ClassName:SingleThreadExecutorDemo</div><div class="line"> * Function: TODO  单例线程池</div><div class="line"> * Reason:	 TODO  只有一个线程池在工作（串行执行所有线程）</div><div class="line"> *                 如果这个线程因为异常结束，会有新的线程替代它</div><div class="line"> *                 保证所有任务的执行任务按提交任务顺序执行</div><div class="line"> * @author   dzxla</div><div class="line"> * @version  </div><div class="line"> * @since    Ver 1.1</div><div class="line"> */</div><div class="line">public class SingleThreadExecutorDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//代码实现使用了LinkedBlockingQueue</div><div class="line">		ExecutorService executor = Executors.newSingleThreadExecutor();</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Thread Main End</div><div class="line">into --&gt; 0</div><div class="line">end --&gt; 0</div><div class="line">into --&gt; 1</div><div class="line">end --&gt; 1</div><div class="line">into --&gt; 2</div><div class="line">end --&gt; 2</div><div class="line">into --&gt; 3</div><div class="line">end --&gt; 3</div><div class="line">into --&gt; 4</div><div class="line">end --&gt; 4</div><div class="line">into --&gt; 5</div><div class="line">end --&gt; 5</div><div class="line">into --&gt; 6</div><div class="line">end --&gt; 6</div><div class="line">into --&gt; 7</div><div class="line">end --&gt; 7</div><div class="line">into --&gt; 8</div><div class="line">end --&gt; 8</div><div class="line">into --&gt; 9</div><div class="line">end --&gt; 9</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public class FixedThreadPoolDemo &#123;</div><div class="line"></div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//代码实现使用了LinkedBlockingQueue</div><div class="line">		ExecutorService executor = Executors.newFixedThreadPool(5);</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">into --&gt; 1</div><div class="line">into --&gt; 4</div><div class="line">Thread Main End</div><div class="line">into --&gt; 3</div><div class="line">into --&gt; 0</div><div class="line">into --&gt; 2</div><div class="line">end --&gt; 2</div><div class="line">into --&gt; 5</div><div class="line">end --&gt; 0</div><div class="line">into --&gt; 6</div><div class="line">end --&gt; 3</div><div class="line">into --&gt; 7</div><div class="line">end --&gt; 1</div><div class="line">into --&gt; 8</div><div class="line">end --&gt; 4</div><div class="line">into --&gt; 9</div><div class="line">end --&gt; 5</div><div class="line">end --&gt; 6</div><div class="line">end --&gt; 8</div><div class="line">end --&gt; 7</div><div class="line">end --&gt; 9</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * ClassName:CachedThreadPoolDemo</div><div class="line"> * Function: TODO 可缓存的线程池</div><div class="line"> * Reason:	 TODO 可重用之前的线程</div><div class="line"> * @author   dzxla</div><div class="line"> * @version  </div><div class="line"> * @since    Ver 1.1</div><div class="line"> * @Date	 2016年11月10日		下午3:22:40</div><div class="line"> */</div><div class="line">public class CachedThreadPoolDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//实现了SynchronousQueue队列</div><div class="line">		ExecutorService executor = Executors.newCachedThreadPool();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 20; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-2"><a href="#console-2" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">into --&gt; 0</div><div class="line">into --&gt; 2</div><div class="line">into --&gt; 1</div><div class="line">into --&gt; 3</div><div class="line">into --&gt; 4</div><div class="line">into --&gt; 5</div><div class="line">into --&gt; 6</div><div class="line">into --&gt; 7</div><div class="line">into --&gt; 8</div><div class="line">into --&gt; 9</div><div class="line">into --&gt; 10</div><div class="line">into --&gt; 11</div><div class="line">into --&gt; 12</div><div class="line">into --&gt; 13</div><div class="line">Thread Main End</div><div class="line">into --&gt; 15</div><div class="line">into --&gt; 17</div><div class="line">into --&gt; 16</div><div class="line">into --&gt; 14</div><div class="line">into --&gt; 19</div><div class="line">into --&gt; 18</div><div class="line">end --&gt; 3</div><div class="line">end --&gt; 4</div><div class="line">end --&gt; 5</div><div class="line">end --&gt; 0</div><div class="line">end --&gt; 1</div><div class="line">end --&gt; 2</div><div class="line">end --&gt; 6</div><div class="line">end --&gt; 10</div><div class="line">end --&gt; 9</div><div class="line">end --&gt; 7</div><div class="line">end --&gt; 8</div><div class="line">end --&gt; 11</div><div class="line">end --&gt; 12</div><div class="line">end --&gt; 13</div><div class="line">end --&gt; 19</div><div class="line">end --&gt; 14</div><div class="line">end --&gt; 16</div><div class="line">end --&gt; 17</div><div class="line">end --&gt; 15</div><div class="line">end --&gt; 18</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">public class CustomThreadFactory implements ThreadFactory &#123;</div><div class="line"></div><div class="line">	//原子操作进行计数</div><div class="line">	private static final AtomicInteger poolNum = new AtomicInteger(1);</div><div class="line">	</div><div class="line">	private final ThreadGroup group;</div><div class="line">	private final AtomicInteger threadNum = new AtomicInteger(1);</div><div class="line">	private final String namePrefix;</div><div class="line">	</div><div class="line">	CustomThreadFactory() &#123;</div><div class="line">		SecurityManager sm = System.getSecurityManager();</div><div class="line">		group = (sm != null) ? sm.getThreadGroup() : Thread.currentThread().getThreadGroup();</div><div class="line">		namePrefix = &quot;pool-&quot; + poolNum.getAndIncrement() + &quot;-thread-&quot;;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	@Override</div><div class="line">	public Thread newThread(Runnable r) &#123;</div><div class="line">		//自定义线程名称</div><div class="line">        Thread t = new Thread(group,r,namePrefix + threadNum.getAndIncrement(),0);</div><div class="line">        if(t.isDaemon())&#123;</div><div class="line">			t.setDaemon(false);</div><div class="line">		&#125;</div><div class="line">        if(t.getPriority() != Thread.NORM_PRIORITY)&#123;</div><div class="line">        	t.setPriority(Thread.NORM_PRIORITY);</div><div class="line">        &#125;</div><div class="line">        return t;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		Thread r = new Thread(new Runnable() &#123;</div><div class="line">			</div><div class="line">			@Override</div><div class="line">			public void run() &#123;</div><div class="line">				</div><div class="line">				System.out.println(&quot;自定义线程池&quot;);</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">		</div><div class="line">		CustomThreadFactory factory = new CustomThreadFactory();</div><div class="line">		</div><div class="line">		Thread t = factory.newThread(r);</div><div class="line">		System.out.println(t.getName());</div><div class="line">		t.start();</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-3"><a href="#console-3" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">pool-1-thread-1</div><div class="line">自定义线程池</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——多线程交互：线程阀/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——多线程交互：线程阀/" itemprop="url">线程笔记——多线程交互：线程阀</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:22:32+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p><strong>线程阀是线程与线程之间相互制约和交互的一种机制</strong></p>
+</blockquote>
+<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><ul>
+<li>Queue：保存一组元素，采用FIFO（先进先出）原则</li>
+<li>Deque：保存一组元素，采用先进后出原则（栈结构），双端队列主要用于栈操作</li>
+<li>阻塞队列：支持两个附加操作的队列。队列中元素为空时，获取元素的线程会等待队列变成非空；队列元素满时，存储元素的线程会等待队列变成可用（常用于生产者和消费者场景）。生产者往队列添加元素。消费者取出队列元素。</li>
+</ul>
+<h3 id="阻塞队列4种处理方法"><a href="#阻塞队列4种处理方法" class="headerlink" title="阻塞队列4种处理方法"></a>阻塞队列4种处理方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">method | throwException | return specialValue | block | exit</div><div class="line"></div><div class="line">插入方法 | add(e) | offer(e) | put(e) | offer(e,time,unit)</div><div class="line">移除方法 | remove() | poll() | take() | poll(time,unit)</div><div class="line">检查方法 | element() | peek() |  无   |     无</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="阻塞队列"><a href="#阻塞队列" class="headerlink" title="阻塞队列"></a>阻塞队列</h3><p>数组阻塞队列<br>链表阻塞队列<br>优先级阻塞队列<br>延时队列<br>同步队列<br>链表双向阻塞队列</p>
+<p>链表传输队列<br>同步计数器<br>抽象队列化同步器</p>
+<h3 id="数组阻塞队列（ArrayBlockingQueue）"><a href="#数组阻塞队列（ArrayBlockingQueue）" class="headerlink" title="数组阻塞队列（ArrayBlockingQueue）"></a>数组阻塞队列（ArrayBlockingQueue）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">public class ArrayBlockingQueueDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		//新建一个等待队列</div><div class="line">		final BlockingQueue&lt;String&gt; queue = new ArrayBlockingQueue&lt;&gt;(16);</div><div class="line">		//启动4个线程</div><div class="line">		for (int i = 0; i &lt; 4; i++) &#123;</div><div class="line">			new Thread(new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					while(true)&#123;</div><div class="line">						</div><div class="line">						try &#123;</div><div class="line">							String log = queue.take();</div><div class="line">							parseLong(log);</div><div class="line">						&#125; catch (InterruptedException e) &#123;</div><div class="line">							e.printStackTrace();</div><div class="line">						&#125;</div><div class="line">						</div><div class="line">					&#125;</div><div class="line">					</div><div class="line">				&#125;</div><div class="line">			&#125;).start();;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		//处理16条数据</div><div class="line">		for (int i = 0; i &lt; 16; i++) &#123;</div><div class="line">			String log =  (i + 1) + &quot;----&gt; &quot;;</div><div class="line">			try &#123;</div><div class="line">				queue.put(log);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void parseLong(String log)&#123;</div><div class="line">		System.out.println(log + System.currentTimeMillis());</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="链表阻塞队列（LinkedBlockingQueue）"><a href="#链表阻塞队列（LinkedBlockingQueue）" class="headerlink" title="链表阻塞队列（LinkedBlockingQueue）"></a>链表阻塞队列（LinkedBlockingQueue）</h3><blockquote>
+<p>生产者和消费者采用独立的锁控制数据同步，意味着高并发条件下可以并行操作队列中的数据，以此来提高队列的性能<br>构造LinkedBlockingQueue函数时，需要指定容量大小。否则默认是一个无限大的容量，当生产者&gt;消费者的速度时候，内存可能已经耗尽了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">public class LinckedBlockingQueueDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		//新建一个等待队列</div><div class="line">		final BlockingQueue&lt;String&gt; queue = new LinkedBlockingQueue&lt;String&gt;(16);</div><div class="line">		//产生4个线程</div><div class="line">		for (int i = 0; i &lt; 4; i++) &#123;</div><div class="line">			new Thread(new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					while(true)&#123;</div><div class="line">						</div><div class="line">						try &#123;</div><div class="line">							String log = queue.take();</div><div class="line">							parseLong(log);</div><div class="line">						&#125; catch (InterruptedException e) &#123;</div><div class="line">							e.printStackTrace();</div><div class="line">						&#125;</div><div class="line">						</div><div class="line">					&#125;</div><div class="line">					</div><div class="line">				&#125;</div><div class="line">			&#125;).start();;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		//将数据存入队列中</div><div class="line">		for (int i = 0; i &lt; 16; i++) &#123;</div><div class="line">			String log =  (i + 1) + &quot;----&gt; &quot;;</div><div class="line">			try &#123;</div><div class="line">				queue.put(log);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void parseLong(String log)&#123;</div><div class="line">		System.out.println(log + System.currentTimeMillis());</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="优先级阻塞队列（PriorityBlockingQueue）"><a href="#优先级阻塞队列（PriorityBlockingQueue）" class="headerlink" title="优先级阻塞队列（PriorityBlockingQueue）"></a>优先级阻塞队列（PriorityBlockingQueue）</h3><blockquote>
+<p>优先级对象通过传入Compator对象决定<br>PriorityBlockingQueue不会阻塞生产者，而只会在没有可消费的数据时候，阻塞消费者。<br><strong>生产者产生数据的速度绝不能大于消费者接收数据的速度。否则内存容易耗尽</strong><br>线程同步采用公平锁</p>
+<h3 id="延时队列（DelayQueue）"><a href="#延时队列（DelayQueue）" class="headerlink" title="延时队列（DelayQueue）"></a>延时队列（DelayQueue）</h3><p>在新增元素时需要指定多久获取队列当前对象（getDelay(TimeUnit unit)）<br>只有延迟期满了以后，才能获取元素<br>应用场景：缓存设计/定时任务调度</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class Student implements Delayed &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public int compareTo(Delayed delayed) &#123;</div><div class="line">		Student that = (Student) delayed;</div><div class="line">		return submitTime &gt; that.submitTime ? 1 : (submitTime &lt; that.submitTime ? -1 : 0);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@SuppressWarnings(&quot;static-access&quot;)</div><div class="line">	@Override</div><div class="line">	public long getDelay(TimeUnit unit) &#123;</div><div class="line">		</div><div class="line">		return unit.convert(submitTime - System.nanoTime(), unit.NANOSECONDS);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	private String name;</div><div class="line">	private long submitTime; </div><div class="line">	private long workTime; </div><div class="line"></div><div class="line">	public String getName() &#123;</div><div class="line">		return this.name + &quot;交卷时间&quot; + workTime;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public Student(String name, long submitTime) &#123;</div><div class="line">		this.name = name;</div><div class="line">		this.workTime = submitTime;</div><div class="line">		this.submitTime = TimeUnit.NANOSECONDS.convert(submitTime, TimeUnit.MILLISECONDS) + System.nanoTime();</div><div class="line">		System.out.println(this.name + &quot;交卷用时：&quot; + workTime);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		final DelayQueue&lt;Student&gt; dq = new DelayQueue&lt;Student&gt;();</div><div class="line">		for(int i = 0; i &lt; 5;i++)&#123;</div><div class="line">			Student stu = new Student(&quot;学生&quot;+i++,Math.round(Math.random()*10 + i));</div><div class="line">			dq.put(stu);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;peek()&quot;+dq.peek().getName());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="同步队列（SynchronizeQueue）"><a href="#同步队列（SynchronizeQueue）" class="headerlink" title="同步队列（SynchronizeQueue）"></a>同步队列（SynchronizeQueue）</h3><blockquote>
+<p>每个put操作必须等待take操作，否则不能添加元素。负责把生产者的数据直接传递给消费者，但是本身并不存储任何元素（适用传递性场景）<br>比如：在一个线程中的数据传递给另一个线程。它的吞吐量高于上面两个阻塞队列<br>声明同步队列：公平模式（采用公平锁，配合FIFO队列阻塞多余的生产者和消费者）和非公平模式管理多余的生产者和消费者。<br>后一种模式容易获取不到数据。</p>
+<h3 id="链表双向阻塞队列（LinkedBlockingDeque）"><a href="#链表双向阻塞队列（LinkedBlockingDeque）" class="headerlink" title="链表双向阻塞队列（LinkedBlockingDeque）"></a>链表双向阻塞队列（LinkedBlockingDeque）</h3><p>链表构成的双向阻塞队列，可以从队列两端操作元素。在多线程同时入队时减少一半竞争。相比LinkedBlockingQeque多了xxxFirst、xxxLast等方法。add()等同于addLast() remove()等同于removeFirst()</p>
+<h3 id="链表传输队列（LinkedTransferQueue）"><a href="#链表传输队列（LinkedTransferQueue）" class="headerlink" title="链表传输队列（LinkedTransferQueue）"></a>链表传输队列（LinkedTransferQueue）</h3><p>TransferQueue继承BlockingQueue接口<br>transfer采用双重数据结构算法（保留和完成）<br>大致理解：消费者从队列中取一个元素，发现元素为空，则生成一个空元素放入队列。则在该空元素上继续等待，叫保留。生产者意欲向队列中放入元素时，发现前面的数据字段项为空，则将该元素填入空字段中，完成数据传送。<br><strong>transfer提供了线程间直接交换对象的方法</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">transfer(E e) //若当前存在一个等待获取的消费者，则移交之。否则会插入当前元素e到队列尾部，从等待进入阻塞状态，直到消费者取出该线程</div><div class="line">tryTransfer(E e) //若当前存在一个等待获取的消费者(适用poll()或者take()，立刻转移传输对象e,若不存在返回false，不进入队列</div><div class="line">hasWaitingConsumer() //判断是否存在终端消费队列</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public class Producer implements Runnable&#123;</div><div class="line"></div><div class="line">	private final TransferQueue&lt;String&gt; queue;</div><div class="line">	public Producer(TransferQueue&lt;String&gt; queue) &#123;</div><div class="line">		this.queue = queue;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	/**</div><div class="line">	 * produce:产生数据，让消费者接收</div><div class="line">	 * @param  @return    设定文件</div><div class="line">	 * @return String    DOM对象</div><div class="line">	 * @throws </div><div class="line">	 * @since  CodingExample　Ver 1.1</div><div class="line">	 */</div><div class="line">	private String produce()&#123;</div><div class="line">		return &quot;lucky number : &quot; + (new Random().nextInt(100));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		while(true)&#123;</div><div class="line">			if(queue.hasWaitingConsumer())&#123;</div><div class="line">				try &#123;</div><div class="line">					queue.transfer(produce());</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">				try &#123;</div><div class="line">					TimeUnit.SECONDS.sleep(1);//等待生产者等待消费者接收数据</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class Consumer implements Runnable &#123;</div><div class="line"></div><div class="line">	private final TransferQueue&lt;String&gt; queue;</div><div class="line">	public Consumer(TransferQueue&lt;String&gt; queue) &#123;</div><div class="line">		this.queue = queue;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line"></div><div class="line"></div><div class="line">		try &#123;</div><div class="line">			System.out.println(&quot;Consumer 获取元素 --&gt; &quot; + queue.take());</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		TransferQueue&lt;String&gt; queue = new LinkedTransferQueue&lt;String&gt;();</div><div class="line">		</div><div class="line">		//生产者线程</div><div class="line">		Thread pt = new Thread(new Producer(queue));</div><div class="line">		pt.setDaemon(true);//设置为守护线程</div><div class="line">		pt.start();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			Thread ct = new Thread(new Consumer(queue));</div><div class="line">			ct.setDaemon(true);</div><div class="line">			ct.start();</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000);//让消费者休息1s，以便让生产者生产数据</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Consumer 接收数据 --&gt; lucky number : 94</div><div class="line">Consumer 接收数据 --&gt; lucky number : 97</div><div class="line">Consumer 接收数据 --&gt; lucky number : 68</div><div class="line">Consumer 接收数据 --&gt; lucky number : 38</div><div class="line">Consumer 接收数据 --&gt; lucky number : 39</div><div class="line">Consumer 接收数据 --&gt; lucky number : 17</div><div class="line">Consumer 接收数据 --&gt; lucky number : 70</div><div class="line">Consumer 接收数据 --&gt; lucky number : 25</div><div class="line">Consumer 接收数据 --&gt; lucky number : 71</div><div class="line">Consumer 接收数据 --&gt; lucky number : 9</div></pre></td></tr></table></figure>
+<h3 id="同步计数器（ConutDownLatch）"><a href="#同步计数器（ConutDownLatch）" class="headerlink" title="同步计数器（ConutDownLatch）"></a>同步计数器（ConutDownLatch）</h3><blockquote>
+<p>ConutDownLatch(直译：倒计时门闩)：在完成一组正在其他线程执行的操作前，允许一个或多个线程等待。<br>用给定计数初始化ConutDownLatch，由于调用了countdown()方法，计数达到0之前，await()方法会一直阻塞。之后释放所有线程。await之后所有后续调用立即返回。情况只出现一次，计数无法重置。<br><strong>使用场景：在一些应用场景中，需要等待某个条件达到要求后才能做后面的事情；同时当线程完成后，也会触发事件，以便进行后面操作</strong><br>ConutDownLatch最重要的方法countdown()和await()：前者倒数一次，后者等待倒数到0<br>应用场景：①开5个多线程下载，5个线程执行完毕才算成功 ② 当用户多文件上传，可采用多线程上传，多个文件都上传成功后，才算成功。</p>
+</blockquote>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">public class CountDownLatchDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		CountDownLatch latch = new CountDownLatch(3);</div><div class="line">	</div><div class="line">		Worker w1 = new Worker(&quot;Jack&quot;, latch);</div><div class="line">		Worker w2 = new Worker(&quot;Rose&quot;, latch);</div><div class="line">		Worker w3 = new Worker(&quot;Allen&quot;, latch);</div><div class="line">		w1.start();</div><div class="line">		w2.start();</div><div class="line">		w3.start();</div><div class="line">		try &#123;</div><div class="line">			latch.await();</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class Worker extends Thread&#123;</div><div class="line">		private String workerName;</div><div class="line">		private CountDownLatch latch;</div><div class="line">		public Worker(String workerName, CountDownLatch latch) &#123;</div><div class="line">			this.workerName = workerName;</div><div class="line">			this.latch = latch;</div><div class="line">		&#125;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				System.out.println(&quot;Worker:&quot;+workerName+&quot;is beginning.&quot;);</div><div class="line">				Thread.sleep(1000L);</div><div class="line">				System.out.println(&quot;Worker:&quot;+workerName+&quot;is ending.&quot;);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			latch.countDown();//模拟干活</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Worker:Jackis beginning.</div><div class="line">Worker:Allenis beginning.</div><div class="line">Worker:Roseis beginning.</div><div class="line">Worker:Roseis ending.</div><div class="line">Worker:Allenis ending.</div><div class="line">Worker:Jackis ending.</div><div class="line">Main Thread End</div></pre></td></tr></table></figure>
+<h3 id="同步计数器（Semaphore）"><a href="#同步计数器（Semaphore）" class="headerlink" title="同步计数器（Semaphore）"></a>同步计数器（Semaphore）</h3><blockquote>
+<p>Semaphore计数信号量。从概念入手，信号量维护一个许可集合。<br>如有必要，在许可可用前阻塞每一个acquire(),然后才获取该许可，每个release()添加一个许可，从而释放一个正在阻塞的获取者。<br>例如：就像排队进入博物馆一样，先放一批人进去，等这批人离开后，再放一批人进去，以此循环。类似一种排队机制</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Semaphore(int permits) //创建给定的许可数和给定非公平的公平设置的Semaphore数量</div><div class="line">Semaphore(int permits,boolean fair)创建给定的许可数和给定公平的公平设置的Semaphore数量</div><div class="line">acquire() //获取一个许可，提供一个许可之前线程阻塞</div><div class="line">release() //释放一个许可，将其返回给信号量</div></pre></td></tr></table></figure>
+<p><strong>所谓公平性就是先进来的先释放。默认false</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">public class SemaphoreDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		final Semaphore semaphore = new Semaphore(3);//一次只允许3个人访问</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable thread = new Runnable() &#123;</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					System.out.println(&quot;用户&quot;+num+&quot;进入成功&quot;);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(300L);</div><div class="line">						//获取执行许可</div><div class="line">						semaphore.acquire();</div><div class="line">						System.out.println(&quot;用户&quot;+num+&quot;正在进行支付...&quot;);</div><div class="line">						Thread.sleep(1000L);</div><div class="line">						//释放获取下一用户访问</div><div class="line">						semaphore.release();</div><div class="line">						System.out.println(&quot;用户&quot;+num+&quot;支付完成&quot;);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			</div><div class="line">			new Thread(thread).start();</div><div class="line">		&#125;</div><div class="line">		    System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-2"><a href="#console-2" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">用户1进入成功</div><div class="line">用户3进入成功</div><div class="line">用户2进入成功</div><div class="line">用户0进入成功</div><div class="line">Main Thread End</div><div class="line">用户4进入成功</div><div class="line">用户5进入成功</div><div class="line">用户7进入成功</div><div class="line">用户6进入成功</div><div class="line">用户8进入成功</div><div class="line">用户9进入成功</div><div class="line">用户9正在进行支付...</div><div class="line">用户6正在进行支付...</div><div class="line">用户7正在进行支付...</div><div class="line">用户6支付完成</div><div class="line">用户8正在进行支付...</div><div class="line">用户4正在进行支付...</div><div class="line">用户9支付完成</div><div class="line">用户5正在进行支付...</div><div class="line">用户7支付完成</div><div class="line">用户0正在进行支付...</div><div class="line">用户4支付完成</div><div class="line">用户8支付完成</div><div class="line">用户5支付完成</div><div class="line">用户3正在进行支付...</div><div class="line">用户2正在进行支付...</div><div class="line">用户0支付完成</div><div class="line">用户1正在进行支付...</div><div class="line">用户3支付完成</div><div class="line">用户2支付完成</div><div class="line">用户1支付完成</div></pre></td></tr></table></figure>
+<h3 id="同步计数器（CyclicBarrier）"><a href="#同步计数器（CyclicBarrier）" class="headerlink" title="同步计数器（CyclicBarrier）"></a>同步计数器（CyclicBarrier）</h3><blockquote>
+<p>CyclicBarrier(直译：循环栅栏)：允许一组线程互相等待，直到达到一个公共屏障点。然后所有这些线程才同步往后面执行。<br>使用场景：<br>大数据运算需要拆分多步骤的时候。<br>例如：统计全国的业务数据。数据库互相独立（按省分库），统计过程比较慢，数据量比较大，为了提高运算效率。采取并发方式，多个线程计算各省数据，最后汇总统计。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">public class CyclicBarrierDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">	</div><div class="line">		CyclicBarrier cb = new CyclicBarrier(3, new TotalTask());</div><div class="line">		</div><div class="line">		BillTask bt1 = new BillTask(&quot;重庆&quot;, cb);</div><div class="line">		BillTask bt2 = new BillTask(&quot;四川&quot;, cb);</div><div class="line">		BillTask bt3 = new BillTask(&quot;浙江&quot;, cb);</div><div class="line">		bt1.start();</div><div class="line">		bt2.start();</div><div class="line">		bt3.start();</div><div class="line">		</div><div class="line">		System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class TotalTask extends Thread&#123;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			System.out.println(&quot;所有任务执行完毕，就该执行主任务了&quot;);</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class BillTask extends Thread&#123;</div><div class="line">		private String billName;</div><div class="line">		private CyclicBarrier cb;</div><div class="line">		public BillTask(String billName, CyclicBarrier cb) &#123;</div><div class="line">			this.billName = billName;</div><div class="line">			this.cb = cb;</div><div class="line">		&#125;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			System.out.println(&quot;市区：&quot; + billName + &quot;运算开始&quot;);</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000L);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			System.out.println(&quot;市区：&quot; + billName + &quot;运算完成，等待中...&quot;);</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				cb.await();//假设第一次运算不完，第二次依赖第一次运算</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125; catch (BrokenBarrierException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			System.out.println(&quot;全部都结束&quot;+billName+&quot;开启后面的工作&quot;);</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-3"><a href="#console-3" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Main Thread End</div><div class="line">市区：四川运算开始</div><div class="line">市区：浙江运算开始</div><div class="line">市区：重庆运算开始</div><div class="line">市区：四川运算完成，等待中...</div><div class="line">市区：重庆运算完成，等待中...</div><div class="line">市区：浙江运算完成，等待中...</div><div class="line">所有任务执行完毕，就该执行主任务了</div><div class="line">全部都结束重庆开启后面的工作</div><div class="line">全部都结束浙江开启后面的工作</div><div class="line">全部都结束四川开启后面的工作</div></pre></td></tr></table></figure>
+<p>CountDownLatch和CyclicBarrier区别：一个线程等待其他线程完成某件事情的时候才能继续。N个线程互相等待，任何一个线程完成之前，所有线程必须等待。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——线程安全集合类/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——线程安全集合类/" itemprop="url">线程笔记——线程安全集合类</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:21:54+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ol>
+<li>HashTable</li>
+<li>ConcurrentHashMap</li>
+<li>CopyOnWrite</li>
+</ol>
+<h3 id="HashTable"><a href="#HashTable" class="headerlink" title="HashTable"></a>HashTable</h3><p>HashTable特点</p>
+<ol>
+<li>和HashMap都是散列表,储存键值对映射</li>
+<li>继承Dictionary、实现Serializable、Clone、Map接口</li>
+<li>初始容量（哈希表创建容量）和加载因子（哈希表中桶的数量），是影响性能的关键因素。默认加载因子0.75</li>
+<li>哈希表的方法都是同步的（线程安全）</li>
+<li>哈希表中集合元素都是无序的</li>
+<li>键值对的值都不能为null</li>
+<li>每个方法体通过synchronized修饰，保证线程安全<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class HashTableDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		Hashtable&lt;String,Integer&gt; ht = new Hashtable&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		Hashtable&lt;String,Integer&gt; htClone = (Hashtable&lt;String, Integer&gt;) ht.clone();</div><div class="line">		System.out.println(&quot;clone&apos;s two:&quot;+htClone.get(&quot;two&quot;));</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h3><ol>
+<li>继承AbstractMap、实现Serializable、Map接口</li>
+<li>性能比哈希表高，允许多个修改操作并发进行，采用锁分离（代码块锁，而不是方法锁）</li>
+<li>内部使用Segment表示哈希表的不同部分（每个段就是一个小的hashtable）。同时也有自己的锁（ReentrantLock）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		ConcurrentHashMap&lt;String,Integer&gt; ht = new ConcurrentHashMap&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		if(ht.containsKey(&quot;two&quot;))&#123;</div><div class="line">			ht.remove(&quot;two&quot;);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h3><ol>
+<li>set、add、remove使用ReentrantLock中的lock加锁/unlock解锁</li>
+<li>对于读操作大于写操作的特别合适（提供高性能读取，并保证正确率)</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		List&lt;String&gt; list = new CopyOnWriteArrayList&lt;String&gt;();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			list.add(&quot;num&quot;+i);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			System.out.println(list.get(i));</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		Object[] arr = list.toArray();</div><div class="line">		System.out.println(arr.length);</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>add方法源码<br><img src="http://img.blog.csdn.net/20170327112730634?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="CopyOnWriteArraySet"><a href="#CopyOnWriteArraySet" class="headerlink" title="CopyOnWriteArraySet"></a>CopyOnWriteArraySet</h3><ol>
+<li>CopyOnWriteArraySet是在CopyOnWriteArrayList使用了Java的装饰模式。所以CopyOnWriteArrayList的东西都可以在CopyOnWriteArraySet中应用</li>
+</ol>
+<hr>
+<h3 id="CopyOnWrite机制"><a href="#CopyOnWrite机制" class="headerlink" title="CopyOnWrite机制"></a>CopyOnWrite机制</h3><ol>
+<li>CopyOnWrite是写时复制的容器。向容器内添加元素的时候，不是在本身容器添加，而是将容器复制以后。再往里面添加元素。<ul>
+<li>优点：可以并发的读取数据，而不需要加锁（利用读写分离思想）</li>
+</ul>
+</li>
+<li>添加元素需要加锁，否则在多线程情况下会copy出N个复制容器</li>
+</ol>
+<p>根据CopyOnWirteList源码实现CopyOnWriteMap</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class CopyOnWriteMap&lt;K, V&gt; implements Map&lt;K,V&gt;,Cloneable&#123;</div><div class="line">	private volatile Map&lt;K,V&gt; interalMap; </div><div class="line">	</div><div class="line">	public CopyOnWriteMap()&#123;</div><div class="line">		interalMap = new HashMap&lt;K,V&gt;();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V put(K key, V value) &#123;</div><div class="line">	</div><div class="line">	synchronized (this) &#123;</div><div class="line">		Map&lt;K,V&gt; newMap = new HashMap&lt;K,V&gt;(interalMap);</div><div class="line">		V val = newMap.put(key, value);</div><div class="line">		interalMap = newMap;</div><div class="line">		return val;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V get(Object key) &#123;</div><div class="line">	return interalMap.get(key);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="CopyOnWrite应用场景"><a href="#CopyOnWrite应用场景" class="headerlink" title="CopyOnWrite应用场景"></a>CopyOnWrite应用场景</h3><blockquote>
+<p>用于读多写少的并发场景<br>比如白名单/黑名单，商品类别访问和更新等</p>
+</blockquote>
+<h2 id="CopyOnWriteMap注意事项"><a href="#CopyOnWriteMap注意事项" class="headerlink" title="CopyOnWriteMap注意事项"></a>CopyOnWriteMap注意事项</h2><ul>
+<li>减少扩容开销</li>
+<li>批量操作</li>
+</ul>
+<h3 id="CopyOnWrite缺点"><a href="#CopyOnWrite缺点" class="headerlink" title="CopyOnWrite缺点"></a>CopyOnWrite缺点</h3><ul>
+<li>内存占用（因为会涉及占用两个内存空间）</li>
+<li>数据一致性（不能保证实时数据一致）  </li>
+</ul>
+<h3 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h3><ol>
+<li>继承AbstractList，实现List，支持相关CRUD操作</li>
+<li>矢量队列，通过数组保存数据</li>
+<li>实现RandomAccess接口（随机访问），可以通过元素的序号快速获取对象</li>
+<li>实现CLoneable接口</li>
+<li>实现线程安全的方法类似哈希表<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		Vector&lt;String&gt; v = new Vector&lt;String&gt;();</div><div class="line">		v.addElement(&quot;one&quot;);</div><div class="line">		v.addElement(&quot;two&quot;);</div><div class="line">		v.addElement(&quot;three&quot;);</div><div class="line">		v.removeElement(&quot;two&quot;);</div><div class="line">		if(v.contains(&quot;three&quot;))&#123;</div><div class="line">			Iterator&lt;String&gt; iter = v.iterator();</div><div class="line">			while(iter.hasNext())&#123;</div><div class="line">				System.out.println(iter.next());</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——线程安全的单例模式的写法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——线程安全的单例模式的写法/" itemprop="url">线程笔记——线程安全的单例模式的写法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:20:56+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="线程安全，高并发性能不高"><a href="#线程安全，高并发性能不高" class="headerlink" title="线程安全，高并发性能不高"></a>线程安全，高并发性能不高</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class SingletonOne &#123;</div><div class="line"></div><div class="line">	private static SingletonOne instance;</div><div class="line">	</div><div class="line">	private static ReentrantLock lock = new ReentrantLock();</div><div class="line">	</div><div class="line">	private SingletonOne()&#123;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static SingletonOne getInstance()&#123;</div><div class="line">		if(instance == null)&#123;</div><div class="line">			lock.lock();</div><div class="line">			if(instance == null)&#123;</div><div class="line">				instance = new SingletonOne();</div><div class="line">			&#125;</div><div class="line">			lock.unlock();</div><div class="line">		&#125;</div><div class="line">		return instance;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="线程安全、性能高"><a href="#线程安全、性能高" class="headerlink" title="线程安全、性能高"></a>线程安全、性能高</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class SingletonTwo &#123;</div><div class="line"></div><div class="line">	private static SingletonTwo instance;</div><div class="line">	</div><div class="line">	private static byte[] lock = new byte[0];</div><div class="line">	</div><div class="line">	private SingletonTwo()&#123;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static SingletonTwo getInstance()&#123;</div><div class="line">		if(instance == null)&#123;</div><div class="line">			synchronized (lock) &#123;</div><div class="line">				if(instance == null)&#123;</div><div class="line">					instance = new SingletonTwo();</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		return instance;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——原子操作-atomic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——原子操作-atomic/" itemprop="url">线程笔记——原子操作:atomic</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:19:47+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>atomic不会阻塞线程。是加强版的volatile原子操作。主要用于高并发环境高效程序处理</p>
+</blockquote>
+<h3 id="了解volatile"><a href="#了解volatile" class="headerlink" title="了解volatile"></a>了解volatile</h3><ol>
+<li>修饰变量</li>
+<li>易变的、不稳定的</li>
+<li>从内存种获取值</li>
+<li>读取/写入不需要锁</li>
+<li>提供了内存可见性，但是没提供原子性。不适用高并发场景</li>
+</ol>
+<p><strong>volatile与加锁机制主要的区别：前者只提供了内存可见性。后者还提供了原子性</strong></p>
+<h3 id="atomic处理类"><a href="#atomic处理类" class="headerlink" title="atomic处理类"></a>atomic处理类</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">java.util.concurrent.atomic</div></pre></td></tr></table></figure>
+<ul>
+<li>基本类: AtomicInteger、AtomicLong、AtomicBoolean</li>
+<li>引用类型: AtomicReference</li>
+<li>数组类型: AtomicIntegerArray、AtomicLongArray、AtomicReferenceArray</li>
+<li>属性原子修改器:  AtomicIntegerFieldUpdater、AtomicLongFieldUpdater、AtomicReferenceFieldUpdater、</li>
+</ul>
+<p>相关api</p>
+<p><img src="http://img.blog.csdn.net/20170327105121557?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>get() 获取值<br>getAndSet() 取当前值并设置新值<br>getAndIncrement() 获取当前的值，自增<br>getAndDecrement() 获取当前的值，自减<br>getAndAdd() 获取当前的值，加上预期值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		AtomicInteger atomicNumber = new AtomicInteger(0);</div><div class="line">		System.out.println(atomicNumber.get());//0</div><div class="line">		System.out.println(atomicNumber.getAndSet(7));//0</div><div class="line">		System.out.println(atomicNumber.getAndIncrement());//7</div><div class="line">		System.out.println(atomicNumber.getAndDecrement());//8</div><div class="line">		System.out.println(atomicNumber.getAndAdd(10));//7</div><div class="line">		System.out.println(atomicNumber.get());//17</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>原理：利用CPU比较并交换(CAS) 和 非阻塞算法。有些方法是通过调用JNI(JavaNativeInterface)实现的</strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——显式锁StampedLock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -788,1234 +1928,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——Thread常用方法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——Thread常用方法/" itemprop="url">线程笔记——Thread常用方法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:16:26+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="线程的中断机制"><a href="#线程的中断机制" class="headerlink" title="线程的中断机制"></a>线程的中断机制</h3><p>第一种方法: Thread.stop() （已废弃）<br>【缺点】线程不安全，已不再使用</p>
-<p>第二种方法: <strong>Thread.interrupt()</strong></p>
-<p>当一个线程运行时，另一个线程可以调用对应的 Thread 对象的 interrupt()方法来中断它，该方法只是在目标线程中设置一个标志，表示它已经被中断，并立即返回。</p>
-<p><strong>如果只是单纯的调用 interrupt()方法，线程并没有实际被中断，会继续往下执行</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class InteruptThread implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">        </div><div class="line">		boolean stop = false;</div><div class="line">		</div><div class="line">		while(!stop)&#123;</div><div class="line">			System.out.println(&quot;This Thread is Running ......&quot;);</div><div class="line">			long time = System.currentTimeMillis();</div><div class="line">			while((System.currentTimeMillis() - time &lt; 1000))&#123;</div><div class="line">				 </div><div class="line">			&#125;</div><div class="line">			//当interrupt=true时，需要去处理它的中断状态，不然线程会一直运行</div><div class="line">			if(Thread.currentThread().isInterrupted())&#123;</div><div class="line">				Thread.currentThread().interrupt();</div><div class="line">				break;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;This Thread Exit Under Request&quot;);</div><div class="line">	&#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) throws InterruptedException &#123;</div><div class="line">		</div><div class="line">		Thread t = new Thread(new InteruptThread(),&quot;Interupt&quot;);</div><div class="line">		System.out.println(&quot;InteruptThread starting ...&quot;);</div><div class="line">		t.start();</div><div class="line">		Thread.sleep(3000);</div><div class="line">		System.out.println(&quot;InteruptThread interupted&quot;);</div><div class="line">		</div><div class="line">		t.interrupt();</div><div class="line">		</div><div class="line">		System.out.println(&quot;线程是否中断----&gt;&quot;+t.isInterrupted());</div><div class="line">		Thread.sleep(3000);</div><div class="line">		</div><div class="line">		System.out.println(&quot;Stop Application&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">InteruptThread starting ...</div><div class="line">This Thread is Running ......</div><div class="line">This Thread is Running ......</div><div class="line">This Thread is Running ......</div><div class="line">InteruptThread interupted</div><div class="line">线程是否中断----&gt;true</div><div class="line">This Thread Exit Under Request</div><div class="line">Stop Application</div></pre></td></tr></table></figure>
-<h3 id="如果去掉if语句判断去处理中断状态，线程一直会一直运行-形成死循环）"><a href="#如果去掉if语句判断去处理中断状态，线程一直会一直运行-形成死循环）" class="headerlink" title="如果去掉if语句判断去处理中断状态，线程一直会一直运行(形成死循环）"></a>如果去掉if语句判断去处理中断状态，线程一直会一直运行(形成死循环）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">InteruptThread starting ...</div><div class="line">This Thread is Running ......</div><div class="line">This Thread is Running ......</div><div class="line">This Thread is Running ......</div><div class="line">InteruptThread interupted</div><div class="line">线程是否中断----&gt;true</div><div class="line">This Thread is Running ......</div><div class="line">This Thread is Running ......</div><div class="line">This Thread is Running ......</div><div class="line">Stop Application</div><div class="line">This Thread is Running ......</div><div class="line">This Thread is Running ......</div></pre></td></tr></table></figure>
-<p><strong>注意：一定要对Thread.isInterrupted()状态进行处理</strong></p>
-<h3 id="补充（yield-和join-使用）"><a href="#补充（yield-和join-使用）" class="headerlink" title="补充（yield()和join()使用）"></a>补充（yield()和join()使用）</h3><ul>
-<li>join 方法用线程对象调用，如果在一个线程 A 中调用另一个线程 B 的 join 方法，线程 A 将会等待线程 B 执行完毕后再执行。</li>
-<li>yield 可以直接用 Thread 类调用，yield 让出 CPU 执行权给同等级的线程，如果没有相同级别的线程在等待 CPU 的执行权，则该线程继续执行。</li>
-</ul>
-<h3 id="守护线程（后台运行线程）"><a href="#守护线程（后台运行线程）" class="headerlink" title="守护线程（后台运行线程）"></a>守护线程（后台运行线程）</h3><p>守护线程不需要关心它何时结束，进程结束，守护线程自动结束</p>
-<p>不要在守护线程中执行业务逻辑操作（比如对数据的读写等）</p>
-<p>必须在启动线程前标记守护线程<br><strong>setDeamon(true);</strong></p>
-<p><strong>Java垃圾回收、内存管理就是一个守护线程</strong></p>
-<p>注意</p>
-<ul>
-<li><strong>setDaemon(true)必须在调用线程的 start()方法之前设置，否则会跑出 IllegalThreadStateException 异常。</strong></li>
-<li><strong>在守护线程中产生的新线程也是守护线程。</strong></li>
-<li><strong>不要认为所有的应用都可以分配给守护线程来进行服务，比如读写操作或者计算逻辑</strong></li>
-</ul>
-<h3 id="线程阻塞"><a href="#线程阻塞" class="headerlink" title="线程阻塞"></a>线程阻塞</h3><ol>
-<li>当线程执行 Thread.sleep()时，它一直阻塞到指定的毫秒时间之后，或者阻塞被另一个线程打断；</li>
-<li>当线程碰到一条 wait()语句时，它会一直阻塞到接到通知（notify()）、被中断或经过了指定毫秒时间为止（若制定了超时值的话）</li>
-<li>线程阻塞与不同 I/O 的方式有多种。常见的一种方式是 InputStream的read()方法，该方法一直阻塞到从流中读取一个字节的数据为止，它可以无限阻塞，因此不能指定超时时间；</li>
-<li>线程也可以阻塞等待获取某个对象锁的排他性访问权限（即等待获得 synchronized 语句必须的锁时阻塞）。</li>
-</ol>
-<h3 id="线程组"><a href="#线程组" class="headerlink" title="线程组"></a>线程组</h3><p>方便管理线程，并且可以为某些线程设置相同特定的属性<br>例如:setDeamon()、设置未处理异常的处理方法、设置统一的安全策略等</p>
-<p>每个ThreadGroup都可以包含一组子线程或者一组子线程组</p>
-<p>在一个进程中线程组是以树形存在</p>
-<p>system线程组是所有线程的顶级父线程组</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//获取当前线程的线程组</div><div class="line">Thread.currentThread().getThreadGroup()</div></pre></td></tr></table></figure>
-<ul>
-<li>Java中允许对一个线程组中所有线程进行操作</li>
-<li>Java多线程另一个重要的特性就是线程安全。线程组机制允许通过分组来区分不同特性的线程</li>
-</ul>
-<p><strong>线程池和线程组区别：线程组方便管理线程对象。线程池管理线程的声明周期，复用线程，减少创建销毁进程的开销</strong></p>
-<h3 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h3><h4 id="当前线程副本ThreadLocal"><a href="#当前线程副本ThreadLocal" class="headerlink" title="当前线程副本ThreadLocal"></a>当前线程副本ThreadLocal</h4><ul>
-<li><strong>ThreadLocal为每个使用该变量的线程提供独立的变量副本，所以每个线程都可以独立的改变自己的副本</strong>（Local想表达的意思）</li>
-</ul>
-<p><img src="http://img.blog.csdn.net/20170324121110440?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=" "></p>
-<ul>
-<li>remove() 是jdk5以后新增的方法，java会自动垃圾回收变量，调用该方法加快垃圾回收的速度</li>
-<li>get()/set() 得到/设置ThreadLocal的值<br>-initialValue()  返回变量的初始值，只执行一次。若缺省，直接返回一个null<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class ThreadLocalValue &#123;</div><div class="line"></div><div class="line">	private static ThreadLocal&lt;Integer&gt; seqNum = new ThreadLocal&lt;Integer&gt;()&#123;</div><div class="line">		protected Integer initialValue() &#123;return 0;&#125;;</div><div class="line">	&#125;;</div><div class="line">	</div><div class="line">	public Integer nextNum()&#123;</div><div class="line">		seqNum.set(seqNum.get() + 1);</div><div class="line">		return seqNum.get();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public ThreadLocal&lt;Integer&gt; getThreadLocal()&#123;</div><div class="line">		return seqNum;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="运行-1"><a href="#运行-1" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		ThreadLocalValue value = new ThreadLocalValue();</div><div class="line">		</div><div class="line">		TestClient t1 = new TestClient(value);</div><div class="line">		TestClient t2 = new TestClient(value);</div><div class="line">		TestClient t3 = new TestClient(value);</div><div class="line">		</div><div class="line">		t1.start();</div><div class="line">		t2.start();</div><div class="line">		t3.start();</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class TestClient extends Thread&#123;</div><div class="line">		private ThreadLocalValue tlv = null;</div><div class="line">		public TestClient(ThreadLocalValue tlv)&#123;</div><div class="line">			this.tlv = tlv;</div><div class="line">		&#125;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			for (int i = 0; i &lt; 3; i++) &#123;</div><div class="line">				System.out.println(&quot;thread[&quot;+Thread.currentThread().getName()+&quot;] ---&gt; value : &quot;+tlv.nextNum());</div><div class="line">			&#125;</div><div class="line">			tlv.getThreadLocal().remove();</div><div class="line">		&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">thread[Thread-2] ---&gt; value : 1</div><div class="line">thread[Thread-1] ---&gt; value : 1</div><div class="line">thread[Thread-0] ---&gt; value : 1</div><div class="line">thread[Thread-1] ---&gt; value : 2</div><div class="line">thread[Thread-2] ---&gt; value : 2</div><div class="line">thread[Thread-1] ---&gt; value : 3</div><div class="line">thread[Thread-0] ---&gt; value : 2</div><div class="line">thread[Thread-0] ---&gt; value : 3</div><div class="line">thread[Thread-2] ---&gt; value : 3</div></pre></td></tr></table></figure>
-<p>上面可得出<br><strong>所产生的序号虽然共享一个实例，但是没用互相干扰，而是各自独立产生序列号，确定每个线程单独提供了一个变量副本</strong></p>
-<p>源码解析<br>set<br><img src="http://img.blog.csdn.net/20170324131657111?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>1.首先通过getMap(t)得到当前相关<strong>ThreadLocalMap</strong>，将值放入map中，如果为空则重新创建Map createMap(t,value)</p>
-<p>ThreadLocalMap 是线程隔离的核心，它是ThreadLocal的静态内部类，实现了键值对的设置和获取（对比Map） 存储的值，只能被当前线程读取和修改，<strong>ThreadLocal操作每个线程特有的ThreadLocalMap，从而实现了变量在不同线程中的隔离</strong><br>ThreadLocalMap的键的this对象指的就是ThreadLocal，值就是所存储的值。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">static class ThreadLocalMap</div></pre></td></tr></table></figure>
-<p><img src="http://img.blog.csdn.net/20170324132759050?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<hr>
-<p><img src="http://img.blog.csdn.net/20170324132900490?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写代码片"></p>
-<hr>
-<p><img src="http://img.blog.csdn.net/20170324132931787?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
-<p>ThreadLocal处理线程的局部变量，要比synchronized同步机制解决线程问题更简单，更方便，而且结果程序拥有更高的并发性</p>
-</blockquote>
-<h3 id="线程的异常处理"><a href="#线程的异常处理" class="headerlink" title="线程的异常处理"></a>线程的异常处理</h3><p><strong>所有异常必须在run方法进行处理，不能抛出throw exception</strong></p>
-<ul>
-<li>方法一：在try…catch内处理</li>
-<li>方法二：实现一个UncaughtExceptionHandler接口</li>
-</ul>
-<p>处理unchecked异常<br><img src="http://img.blog.csdn.net/20170324133548889?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>设计一个异常线程B</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public class ThreadB implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		int num = Integer.parseInt(&quot;A&quot;);</div><div class="line">		System.out.println(num);</div><div class="line">		System.out.println(&quot;This is Exception Thread B &quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>处理线程异常</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class ExceptionOfThreadB implements UncaughtExceptionHandler &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void uncaughtException(Thread t, Throwable e) &#123;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Thread --&gt;&quot;+t.getName()+&quot;(&quot;+t.getId()+&quot;)&quot;);</div><div class="line">	</div><div class="line">	    System.out.println(&quot;Thread Exception --&gt;&quot;+e.getClass().getName());</div><div class="line">	    </div><div class="line">	    System.out.println(&quot;exception message --&gt;&quot;+e.getMessage());</div><div class="line">	    </div><div class="line">	    System.out.println(&quot;state --&gt;&quot; + t.getState());</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="运行-2"><a href="#运行-2" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		ThreadB threadException = new ThreadB();</div><div class="line">		Thread t = new Thread(threadException,&quot;threadException&quot;);</div><div class="line">		//设置异常</div><div class="line">		t.setUncaughtExceptionHandler(new ExceptionOfThreadB());</div><div class="line">		t.start();</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-2"><a href="#console-2" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Thread --&gt;threadException(10)</div><div class="line">Thread Exception --&gt;java.lang.NumberFormatException</div><div class="line">exception message --&gt;For input string: &quot;A&quot;</div><div class="line">state --&gt;RUNNABLE</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——创建线程的3种方式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——创建线程的3种方式/" itemprop="url">线程笔记——创建线程的3种方式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:11:27+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="http://img.blog.csdn.net/20170324103043780?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="最直接——继承Thread类"><a href="#最直接——继承Thread类" class="headerlink" title="最直接——继承Thread类"></a>最直接——继承Thread类</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ThreadA extends Thread &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(500L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;This is Thread A From Extending Thread Class&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="最常用——实现Runable接口"><a href="#最常用——实现Runable接口" class="headerlink" title="最常用——实现Runable接口"></a>最常用——实现Runable接口</h3><p>相比继承Thread类，实现Runable接口有以下优势</p>
-<ul>
-<li>避免 Java 的单继承特性而带来的局限；</li>
-<li>增强程序的健壮性，代码能够被多个线程共享，代码与数据是独立的；</li>
-<li>适合多个相同程序代码的线程区处理同一资源的情况。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ThreadB implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1000L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;This is Thread B From Implements Runnable &quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="返回值——Callable"><a href="#返回值——Callable" class="headerlink" title="返回值——Callable"></a>返回值——Callable</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class ThreadC implements Callable&lt;String&gt;&#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public String call() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1800L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;This is Thread C From Implements Callable&quot;);</div><div class="line">		return &quot;Thread C&quot;;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		ThreadA a = new ThreadA();</div><div class="line">		a.start(); </div><div class="line">		</div><div class="line">		</div><div class="line">		ThreadB b = new ThreadB();</div><div class="line">		new Thread(b).start();</div><div class="line">		</div><div class="line">		</div><div class="line">		ThreadC c = new ThreadC();</div><div class="line"></div><div class="line">		FutureTask&lt;String&gt; task = new FutureTask&lt;&gt;(c);</div><div class="line">		System.out.println(&quot;This is Main Thread -----&gt; Begin&quot;);</div><div class="line">		new Thread(task).start();</div><div class="line">		try &#123;</div><div class="line">			System.out.println(&quot;result is ------&gt;&quot;+task.get());;</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125; catch (ExecutionException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;This is Main Thread -----&gt; End&quot;);</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">This is Main Thread -----&gt; Begin</div><div class="line">This is Thread A From Extending Thread Class</div><div class="line">This is Thread B From Implements Runnable </div><div class="line">This is Thread C From Implements Callable</div><div class="line">result is ------&gt;Thread C</div><div class="line">This is Main Thread -----&gt; End</div></pre></td></tr></table></figure>
-<p>线程指的是程序中的执行线程，在JavaVM种允许程序并发运行多个执行线程</p>
-<p>每个线程有个优先级（高优先级执行优先于低优先级线程）</p>
-<p>每个线程都可以或不可以标记为一个守护线程（后台运行的线程）</p>
-<p>JavaVM启动时，最开始创建一个非守护线程（用来启动某个类指定的main方法），遇到下面情况线程才会停止执行<br>① 调用Runtime的exit()<br>② 安全管理器允许退出发生<br>③ 非守护线程全部停止执行</p>
-<p><img src="http://img.blog.csdn.net/20170324103211531?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Thread的构造方法"></p>
-<p>线程主要方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">currentThread() //获取当前线程</div><div class="line">yield() //暂停当前线程，执行其他线程</div><div class="line">sleep() //休眠</div><div class="line">start() //启动线程</div><div class="line">run() //如果线程是Runable构造，则调用Runable种run方法，否则，该方法不执行任何操作返回</div><div class="line">interrupt() //中断线程</div><div class="line">interrupted() //测试当前线程是否已经中断</div><div class="line">getPriority() //得到优先级</div><div class="line">getName() //线程名称</div><div class="line">getId() //线程唯一标识</div><div class="line">join() //等待该线程终止</div><div class="line">setDeamon() //设置守护线程</div><div class="line">activeCount() //当前线程的线程组活动线程</div><div class="line">checkAccess()//当前运行的线程是否有权修改该线程</div><div class="line">dumpStack() //当前线程的堆栈跟踪打印导标准错误流</div><div class="line">getContextClassLoader() //返回线程上下文</div><div class="line">getStackTrace() //返回活动线程堆栈跟踪的活动线程</div><div class="line">getState() //返回该线程状态</div><div class="line">getThreadGroup() //获取线程组</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Session跨域的几种方案/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Session跨域的几种方案/" itemprop="url">Session跨域的几种方案</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:10:33+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/跨域/" itemprop="url" rel="index">
-                    <span itemprop="name">跨域</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>之前项目中涉及到跨域问题（2个不同的域名访问同一个服务器）造成session丢失的问题，请求分发用的是nginx</p>
-<p>总结了以下，常用的session处理方式有以下几种</p>
-<h2 id="ip-hash"><a href="#ip-hash" class="headerlink" title="ip_hash"></a>ip_hash</h2><p>【概念】当对后端的多台动态应用服务器做负载均衡时，ip_hash指令能够将某个客户端IP的请求通过哈希算法定位到同一台后端服务器上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream myproject &#123;</div><div class="line">    ip_hash;</div><div class="line">    server 192.168.40.31:8070 //down 将服务器移除负载</div><div class="line">    server 192.168.40.16:8080; </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>【缺点】使用ip_hash指令<strong>无法保证后端服务器的负载均衡</strong>，可能有些后端服务器接收的请求多，有些后端服务器收到的请求少，而且设置后端服务权重等方法将不起作用</p>
-<p><a href="http://server.zzidc.com/fwqjs/222.html" target="_blank" rel="external">关于ip_hash</a></p>
-<h2 id="session共享"><a href="#session共享" class="headerlink" title="session共享"></a>session共享</h2><h3 id="第三方存储"><a href="#第三方存储" class="headerlink" title="第三方存储"></a>第三方存储</h3><p>【思路】把session数据保存到内存以外的一个统一的地方，例如Memcached/Redis等数据库中。那么问题又来了，如何替换掉Servlet容器创建和管理HttpSession的实现呢？（HttpSession是通过Servlet容器创建和管理的，像Tomcat/Jetty都是保存在内存中的）</p>
-<p>方法<br>1). 设计一个Filter，利用HttpServletRequestWrapper，实现自己的 getSession()方法，接管创建和管理Session数据的工作(SpringSession)</p>
-<blockquote>
-<p>Spring Session提供了一套创建和管理Servlet HttpSession的方案。Spring Session提供了集群Session（Clustered Sessions）功能，默认采用外置的Redis来存储Session数据，以此来解决Session共享的问题</p>
-</blockquote>
-<p>参考<br><a href="https://github.com/spring-projects/spring-session" target="_blank" rel="external">spring-session</a><br><a href="http://docs.spring.io/spring-session/docs/1.3.0.RELEASE/reference/html5/" target="_blank" rel="external">spring-session-官方英文文档</a><br><a href="http://blog.csdn.net/patrickyoung6625/article/details/45694157" target="_blank" rel="external">spring-session-csdn-blog</a></p>
-<p>2). 利用Servlet容器提供的插件功能，自定义HttpSession的创建和管理策略，并通过配置的方式替换掉默认的策略(需要耦合Tomcat/Jetty等Servlet容器的代码)</p>
-<p>参考(基于tomcat6或者7)<br><a href="https://github.com/jcoleman/tomcat-redis-session-manager" target="_blank" rel="external">tomcat-redis-manager</a><br><a href="https://github.com/magro/memcached-session-manager" target="_blank" rel="external">tomcat-memcached-manager</a></p>
-<h2 id="session复制"><a href="#session复制" class="headerlink" title="session复制"></a>session复制</h2><p>与服务器有关<br>参考<br><a href="http://wiki.jikexueyuan.com/project/tomcat/clustering.html" target="_blank" rel="external">tomcat中文文档</a><br><a href="http://tomcat.apache.org/tomcat-8.0-doc/config/cluster.html" target="_blank" rel="external">tomcat官方英文文档</a></p>
-<h2 id="http-无状态-token"><a href="#http-无状态-token" class="headerlink" title="http 无状态 token"></a>http 无状态 token</h2><p><a href="http://baike.baidu.com/item/HTTP%E6%97%A0%E7%8A%B6%E6%80%81%E5%8D%8F%E8%AE%AE" target="_blank" rel="external">百度百科（什么是无状态协议）</a><br><a href="http://wiki.jikexueyuan.com/project/oauth-2/" target="_blank" rel="external">OAuth2文档</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】lambda表达式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】lambda表达式/" itemprop="url">【Java8】lambda表达式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:09:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li><p>学习内容</p>
-<ul>
-<li>行为参数化</li>
-<li>lambda表达式</li>
-<li>方法引用</li>
-</ul>
-</li>
-<li><p>行为参数化</p>
-<ul>
-<li>让函数仅保留模板代码，而把筛选条件抽离出来当做参数传递进来</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;Apple&gt; filterApples = filterApplesByAppleFilter(apples,(Apple apple) -&gt; Color.RED.equals(apple.getColor()) &amp;&amp; apple.getWeight() &gt;= 100);</div></pre></td></tr></table></figure>
-<ul>
-<li>lambda表达式定义</li>
-</ul>
-<blockquote>
-<p>lambda表达式定义为一种 简洁、可传递的匿名函数，首先我们需要明确<strong>lambda表达式本质上是一个函数，虽然它不属于某个特定的类，但具备参数列表、函数主体、返回类型，以及能够抛出异常；其次它是匿名的，lambda表达式没有具体的函数名称</strong>；lambda表达式可以像参数一样进行传递，从而极大的简化代码的编写</p>
-</blockquote>
-<ul>
-<li>lambda表达式格式<ul>
-<li>格式一： 参数列表 -&gt; 表达式</li>
-<li>格式二： 参数列表 -&gt; {表达式集合}</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p><strong>lambda表达式隐含了return关键字</strong>，所以在单个的表达式中，我们无需显式的写return关键字，但是<strong>当表达式是一个语句集合的时候，则需要显式添加return，并用花括号{ }将多个表达式包围起来</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//返回给定字符串的长度，隐含return语句</div><div class="line">(String s) -&gt; s.length() </div><div class="line"></div><div class="line">// 始终返回42的无参方法</div><div class="line">() -&gt; 42 </div><div class="line"></div><div class="line">// 包含多行表达式，则用花括号括起来</div><div class="line">(int x, int y) -&gt; &#123;</div><div class="line">    int z = x * y;</div><div class="line">    return x + z;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><p>依托于函数式接口使用lambda表达式</p>
-<ul>
-<li>自定义函数式接口<ul>
-<li>函数式接口定义为只具备 一个抽象方法的接口</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>方法引用</p>
-</li>
-</ul>
-<p>静态方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line">(args) -&gt; ClassName.staticMethod(args) / ClassName::staticMethod</div></pre></td></tr></table></figure>
-<p> 参数的实例方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(args) -&gt; args.instanceMethod() / ClassName::instanceMethod //ClassName是args的类型</div></pre></td></tr></table></figure>
-<p>外部的实例方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(args) -&gt; ext.instanceMethod(args) / ext::instanceMethod(args)</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】foreach/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】foreach/" itemprop="url">【Java8】foreach</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:06:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="map-foreach"><a href="#map-foreach" class="headerlink" title="map foreach"></a>map foreach</h3><p>以前的方式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">for (Map.Entry&lt;String, String&gt; map : paramsMap.entrySet()) &#123;</div><div class="line">params.add(new BasicNameValuePair(map.getKey(), map.getValue()));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>java8</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">paramsMap.forEach((key,value) -&gt; params.add(new BasicNameValuePair(key,value)));</div></pre></td></tr></table></figure>
-<h3 id="List-foreach"><a href="#List-foreach" class="headerlink" title="List foreach"></a>List foreach</h3><p>以前方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">for (String item:arrayList)&#123;</div><div class="line">    System.out.println(item);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>java8</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">list.forEach(item-&gt;System.out.println(item));</div><div class="line"></div><div class="line">list.forEach(System.out::println);</div><div class="line"></div><div class="line">list.forEach(item-&gt;&#123;</div><div class="line">    if(&quot;zhangshan&quot;.equals(item))&#123;</div><div class="line">        System.out.println(item);</div><div class="line">    &#125;</div><div class="line">&#125;);</div><div class="line"></div><div class="line">list.stream()</div><div class="line">        .filter(s-&gt; s.contains(&quot;li&quot;)||s.contains(&quot;si&quot;))</div><div class="line">        .forEach(System.out::println);</div><div class="line"></div><div class="line">list.stream()</div><div class="line">        .filter(s-&gt;s.contains(&quot;E&quot;))</div><div class="line">        .findFirst().ifPresent(s -&gt; System.out.println(s));</div></pre></td></tr></table></figure>
-<hr>
-<p>【例1】select d.name from dish d where d.price &gt; 20<br> java8之前的写法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">List&lt;DishInfo&gt; dishes = new ArrayList&lt;DishInfo&gt;();</div><div class="line">for(DishInfo dish : dishes)&#123;</div><div class="line">	if(dish.getPrice() &gt; 20)&#123;</div><div class="line">		dishes.add(dish);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><strong>java8</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">List&lt;DishInfo&gt; dishes = Lists.newArrayList(</div><div class="line">new DishInfo(&quot;chiken&quot;, (float) 10.0,DishInfo.Type.OTHER),</div><div class="line">new DishInfo(&quot;beef&quot;,(float) 25.0,DishInfo.Type.BEAF)</div><div class="line">);</div><div class="line">		</div><div class="line">List&lt;String&gt; dishNames = </div><div class="line">             dishes.stream()</div><div class="line">           //dishes.parallelStream() //并行处理</div><div class="line">				   .filter(dish -&gt; dish.getPrice() &gt; 20)			                      </div><div class="line">                   .sorted(comparing(DishInfo::getType))</div><div class="line">                   .map(DishInfo::getName)	</div><div class="line">                   .limit(3)			                        </div><div class="line">				   .collect(toList());</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//.count()</div><div class="line">//.distinct()</div><div class="line">//.skip(2)</div><div class="line">//.map(String::length)</div><div class="line">//.flatMap()</div><div class="line">//.reduce()</div><div class="line">Stream.iterate()</div><div class="line">Stream.generate(Math::random).limit(6).forEach(System.out::println);</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; title = Arrays.asList(&quot;java&quot;,&quot;python&quot;,&quot;javascript&quot;);</div><div class="line">	    Stream&lt;String&gt; streamTitle = title.stream();</div><div class="line">	    streamTitle.forEach(System.out::println);</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——内存模型/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——内存模型/" itemprop="url">线程笔记——内存模型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:06:01+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="happen-before-规则"><a href="#happen-before-规则" class="headerlink" title="happen-before 规则"></a>happen-before 规则</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><blockquote>
-<p><strong>如果操作 A 先行发生于操作 B，在发生操作 B 之前，操作A产生的影响都能被操作 B 观察到。</strong>影响包括修改了内存中共享变量的值、发送了消息、调用了方法等</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>它与时间上的先后发生基本没有太大关系。它是判断数据是否存在竞争、线程是否安全的主要依据</strong></p>
-</blockquote>
-<p>###八条可保证 happen—before 的规则</p>
-<blockquote>
-<p>它们无需任何同步器协助就已经存在，可以在编码中直接使用。如果两个操作之间的关系不在此列，并且无法从下列规则推导出来的话，它们就没有顺序性保障，虚拟机可以对它们进行随机地重排序</p>
-</blockquote>
-<ol>
-<li><p><strong>程序次序规则</strong>：在一个单独的线程中，<strong>按照程序代码的执行流顺序</strong>，（时间上）先执行的操作 happen—before（时间上）后执行的操作。</p>
-</li>
-<li><p><strong>管理锁定规则</strong>：一个 unlock 操作 happen—before 后面对同一个锁的 lock 操作。</p>
-</li>
-<li><p><strong>volatile变量规则</strong>：对一个 volatile 变量的<strong>写操作</strong> happen—before 后面对该变量的<strong>读操作</strong>。</p>
-</li>
-<li><p><strong>线程启动规则</strong>：Thread 对象的 <strong>start()方法</strong> happen—before 此线程的每一个动作。</p>
-</li>
-<li><p><strong>线程终止规则</strong>：线程的所有操作都 happen—before 对此线程的终止检测，可以通过 Thread.join()方法结束。 Thread.isAlive()的返回值等手段检测到线程已经终止执行。</p>
-</li>
-<li><p><strong>线程中断规则</strong>：对线程 interrupt()方法的调用 happen—before 发生于被中断线程的代码检测到中断时事件的发生。</p>
-</li>
-<li><p><strong>对象终结规则</strong>：一个对象的初始化完成（构造函数执行结束）happen—before 它的 finalize()方法的开始。</p>
-</li>
-<li><p><strong>传递性</strong>：如果操作 A happen—before 操作 B，操作 B happen—before 操作 C，那么可以得出 A happen—before 操作 C。</p>
-</li>
-</ol>
-<p>【问题一】假设存在如下三个线程，分别执行对应的操作：线程 A 中执行如下操作：i=1，线程 B 中执行如下操作：j=i，线程 C 中执行如下操作：i=2。并且保持A与B之间的happen—before关系。同时C出现在A和B操作之间。C和B没有happen-before关系。线程B是否是线程安全的？<br>【回答】 <strong>由于C 与 B 并没有 happen—before 关系，j的值不确定，线程 C 对变量 i 的影响可能会被线程 B 观察到，也可能不会，这时线程 B 就存在读取到不是最新数据的风险</strong>，B不具备线程安全性</p>
-<p>【问题二】假设存在线程 A 和线程 B，线程 A 先（时间上）调用了 setValue(3)操作，然后（时间上）线程B调用了同一对象的 getValue()方法，那么线程B得到的返回值一定是3吗？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">private int value = 0;  </div><div class="line"></div><div class="line">public int get()&#123;  </div><div class="line">    return value;  </div><div class="line">&#125;  </div><div class="line">public void set(int value)&#123;  </div><div class="line">    this.value = value;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>【回答】上面八条原则不适用于该value变量。从而我们可以判定线程 A 中的 setValue(3)操作与线程 B 中的 getValue()操作不存在 happen—before 关系。因此，尽管线程 A 的 setValue(3)在操作时间上先于操作 B 的 getvalue()，但无法保证线程 B 的 getValue()操作一定观察到了线程 A 的 setValue(3)操作所产生的结果，也即是 getValue()的返回值不一定为 3</p>
-<blockquote>
-<p><strong>因此，”一个操作时间上先发生于另一个操作“并不代表”一个操作 happen—before 另一个操作”。</strong></p>
-</blockquote>
-<p>解决方案： 可以将 setValue（int）方法和 getValue()方法均定义为 synchronized 方法，也可以把 value 定义为 volatile 变量</p>
-<p>【问题三】 假设同一个线程执行上面两个操作：操作 A：x=1 和操作 B：y=2。从第一条规则判定操作Ahappen—before操作B。是否意味着操作 A 在时间上先与操作 B 发生？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">x = 1；  </div><div class="line">y = 2;</div></pre></td></tr></table></figure></p>
-<p>【回答】由于编译器的指令重排序等原因，操作 A 在时间上有可能后于操作 B 被处理器执行，但这并不影响 happen—before 原则的正确性</p>
-<blockquote>
-<p><strong>因此，”一个操作 happen—before 另一个操作“并不代表”一个操作时间上先发生于另一个操作”。</strong></p>
-</blockquote>
-<p>重排序：Java 语言规范规定了 JVM 线程内部维持顺序化语义，也就是说只要程序的最终结果等同于它在严格的顺序化环境下的结果，那么指令的执行顺序就可能与代码的顺序不一致。这个过程通过叫做指令的重排序。指令重排序存在的意义在于：JVM 能够根据处理器的特性（CPU 的多级缓存系统、多核处理器等）适当的重新排序机器指令，使机器指令更符合 CPU 的执行特点，最大限度的发挥机器的性能。在没有同步的情况下，编译器、处理器以及运行时等都可能对操作的执行顺序进行一些意想不到的调整</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
-<p>一个操作和另一个操作必定存在某个顺序，要么一个操作或者是先于或者是后于另一个操作，或者与两个操作同时发生。同时发生是完全可能存在的，特别是在多 CPU 的情况下。而两个操作之间却可能没有 happen-before 关系，也就是说有可能发生这样的情况，操作 A 不 happen-before 操作 B，操作 B 也不 happen-before 操作 A，用数学上的术语 happen-before 关系是个偏序关系。两个存在 happen-before 关系的操作不可能同时发生，一个操作 A happen-before 操作 B，它们必定在时间上是完全错开的，这实际上也是同步的语义之一（独占访问）</p>
-</blockquote>
-<h3 id="利用-happen—before-规则分析-DCL-双重检查加锁"><a href="#利用-happen—before-规则分析-DCL-双重检查加锁" class="headerlink" title="利用 happen—before 规则分析 DCL(双重检查加锁)"></a>利用 happen—before 规则分析 DCL(双重检查加锁)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public class LazySingleton &#123;  </div><div class="line">    private int someField;  </div><div class="line"></div><div class="line">    private static LazySingleton instance;  </div><div class="line"></div><div class="line">    private LazySingleton() &#123;  </div><div class="line">        this.someField = new Random().nextInt(200)+1;         // (1)  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static LazySingleton getInstance() &#123;  </div><div class="line">        if (instance == null) &#123;                               // (2)  </div><div class="line">            synchronized(LazySingleton.class) &#123;               // (3)  </div><div class="line">                if (instance == null) &#123;                       // (4)  </div><div class="line">                    instance = new LazySingleton();           // (5)  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">        return instance;                                      // (6)  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public int getSomeField() &#123;  </div><div class="line">        return this.someField;                                // (7)  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这里得到单一的 instance 实例是没有问题的，问题的关键在于尽管得到了 Singleton 的正确引用，但是却有可能访问到其成员变量的不正确值。具体来说 Singleton.getInstance().getSomeField() 有可能返回 someField 的默认值 0。</p>
-<p>如果程序行为正确的话，这应当是不可能发生的事，因为在构造函数里设置的 someField 的值不可能为 0。为也说明这种情况理论上有可能发生，我们只需要说明语句(1)和语句(7)并不存在 happen-before 关系</p>
-<p>【解释】假设线程Ⅰ是初次调用 getInstance()方法，紧接着线程Ⅱ也调用了 getInstance()方法和 getSomeField()方法，我们要说明的是线程Ⅰ的语句(1)并不 happen-before 线程Ⅱ的语句(7)。线程Ⅱ在执行 getInstance()方法的语句(2)时，由于对 instance 的访问并没有处于同步块中，因此线程Ⅱ可能观察到也可能观察不到线程Ⅰ在语句(5)时对 instance 的写入，也就是说 instance 的值可能为空也可能为非空。我们先假设 instance 的值非空，也就观察到了线程Ⅰ对 instance 的写入，这时线程Ⅱ就会执行语句(6)直接返回这个 instance 的值，然后对这个 instance 调用 getSomeField()方法，该方法也是在没有任何同步情况被调用，因此整个线程Ⅱ的操作都是在没有同步的情况下调用 ，这时我们便无法利用上述 8 条 happen-before 规则得到线程Ⅰ的操作和线程Ⅱ的操作之间的任何有效的 happen-before 关系</p>
-<p>主要考虑规则的第 2 条，<strong>由于线程Ⅱ没有在进入 synchronized 块，因此不存在 lock 与 unlock 锁的问题），这说明线程Ⅰ的语句(1)和线程Ⅱ的语句(7)之间并不存在 happen-before 关系，这就意味着线程Ⅱ在执行语句(7)完全有可能观测不到线程Ⅰ在语句(1)处对 someFiled 写入的值，这就是 DCL 的问题所在</strong></p>
-<p>对 DCL 的分析也告诉我们一条经验原则：<strong>对引用（包括对象引用和数组引用）的非同步访问，即使得到该引用的最新值，却并不能保证也能得到其成员变量（对数组而言就是每个数组元素）的最新值。</strong></p>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>最简单而且安全的解决方法是使用 static 内部类的思想，它利用的思想是：<strong>一个类直到被使用时才被初始化，而类初始化的过程是非并行的，这些都有 JLS 保证。</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class Singleton &#123;  </div><div class="line"></div><div class="line">  private Singleton() &#123;&#125;  </div><div class="line"></div><div class="line">  // Lazy initialization holder class idiom for static fields  </div><div class="line">  private static class InstanceHolder &#123;  </div><div class="line">   private static final Singleton instance = new Singleton();  </div><div class="line">  &#125;  </div><div class="line"></div><div class="line">  public static Singleton getSingleton() &#123;   </div><div class="line">    return InstanceHolder.instance;   </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ol>
-<li>可以将 instance 声明为 volatile，即<br> private volatile static LazySingleton instance;</li>
-</ol>
-<p>线程Ⅰ的语句(5) -&gt; 语线程Ⅱ的句(2)，根据单线程规则，线程Ⅰ的语句(1) -&gt; 线程Ⅰ的语句(5)和语线程Ⅱ的句(2) -&gt; 语线程Ⅱ的句(7)，再根据传递规则就有线程Ⅰ的语句(1) -&gt; 语线程Ⅱ的句(7)，这表示线程Ⅱ能够观察到线程Ⅰ在语句(1)时对 someFiled 的写入值，程序能够得到正确的行为</p>
-<h3 id="主内存与工作内存"><a href="#主内存与工作内存" class="headerlink" title="主内存与工作内存"></a>主内存与工作内存</h3><blockquote>
-<p><strong>Java 内存模型的主要目标是定义程序中各个变量的访问规则，即在虚拟机中将变量存储到内存和从内存中取出变量这样的底层细节</strong>(主要是指共享变量，存在竞争问题的变量)</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>Java 内存模型规定所有的变量都存储在主内存中，而每条线程还有自己的工作内存，线程的工作内存中保存了该线程使用到的变量的主内存副本拷贝，线程对变量的所有操作（读取、赋值等）都必须在工作内存中进行，而不能直接读写主内存中的变量。<strong>不同线程之间也无法直接访问对方工作内存中的变量，线程间变量值得传递均需要通过主内存来完成。</strong></p>
-</blockquote>
-<h3 id="内存间交互操作"><a href="#内存间交互操作" class="headerlink" title="内存间交互操作"></a>内存间交互操作</h3><h4 id="内存与工作内存之间交互的实现细节"><a href="#内存与工作内存之间交互的实现细节" class="headerlink" title="内存与工作内存之间交互的实现细节"></a>内存与工作内存之间交互的实现细节</h4><ol>
-<li><p><strong>luck（锁定）</strong>：作用于主内存的变量，它把一个变量标示为一条线程独占的状态。</p>
-</li>
-<li><p><strong>unlock（解锁）</strong>：作用于主内存的变量，它把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</p>
-</li>
-<li><p><strong>read（读取）</strong>：作用于主内存的变量，它把一个变量的值从主内存传输到工作内存中，以便随后的 load 动作使用。</p>
-</li>
-<li><p><strong>load（载入）</strong>：作用于工作内存的变量，它把 read 操作从主内存中得到的变量值放入工作内存的变量副本中。</p>
-</li>
-<li><p><strong>use（使用）</strong>：作用于工作内存的变量，它把工作内存中的一个变量的值传递给执行引擎，每当虚拟机遇到一个需要使用到变量的值得字节码指令时将会执行这个操作。</p>
-</li>
-<li><p><strong>assign（赋值）</strong>：作用于工作内存的变量，它把一个从执行引擎接收到的值赋给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令时执行这个操作。</p>
-</li>
-<li><p><strong>store（存储）</strong>：作用于工作内存的变量，它把工作内存中的一个变量的值传递到主内存中，以便随后的 write 操作使用。</p>
-</li>
-<li><p><strong>write（写入）</strong>：作用于主内存的变量，它把 store 操作从工作内存中得到的变量值放入主内存的变量中。</p>
-</li>
-</ol>
-<h4 id="Java-内存模型还规定了执行上述-8-种基本操作时必须满足如下规则"><a href="#Java-内存模型还规定了执行上述-8-种基本操作时必须满足如下规则" class="headerlink" title="Java 内存模型还规定了执行上述 8 种基本操作时必须满足如下规则"></a>Java 内存模型还规定了执行上述 8 种基本操作时必须满足如下规则</h4><ul>
-<li><p>不允许 read 和 load、store 和 write 操作之一单独出现，以上两个操作必须按顺序执行，但没有保证必须连续执行，也就是说，read 与 load 之间、store 与 write 之间是可插入其他指令的。</p>
-</li>
-<li><p>不允许一个线程丢弃它的最近的 assign 操作，即变量在工作内存中改变了之后必须把该变化同步回主内存。</p>
-</li>
-<li><p>不允许一个线程无原因地（没有发生过任何 assign 操作）把数据从线程的工作内存同步回主内存中。</p>
-</li>
-<li><p>一个新的变量只能从主内存中“诞生”，不允许在工作内存中直接使用一个未被初始化（load 或 assign）的变量，换句话说就是对一个变量实施 use 和 store 操作之前，必须先执行过了 assign 和 load 操作。</p>
-</li>
-<li><p>一个变量在同一个时刻只允许一条线程对其执行 lock 操作，但 lock 操作可以被同一个条线程重复执行多次，多次执行 lock 后，只有执行相同次数的 unlock 操作，变量才会被解锁。</p>
-</li>
-<li><p>如果对一个变量执行 lock 操作，将会清空工作内存中此变量的值，在执行引擎使用这个变量前，需要重新执行 load 或 assign 操作初始化变量的值。</p>
-</li>
-<li><p>如果一个变量实现没有被 lock 操作锁定，则不允许对它执行 unlock 操作，也不允许去 unlock 一个被其他线程锁定的变量。</p>
-</li>
-<li><p>对一个变量执行 unlock 操作之前，必须先把此变量同步回主内存（执行 store 和 write 操作）。</p>
-</li>
-</ul>
-<h3 id="final"><a href="#final" class="headerlink" title="final"></a>final</h3><blockquote>
-<p>final 类型的域是不能修改的，除了这一点外，在 Java 内存模型中，final 域还有着特殊的语义，<strong>final 域能确保初始化过程的安全性，从而可以不受限制地访问不可变对象，并在共享这些对象时无须同步。</strong></p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【热部署】JRebel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【热部署】JRebel/" itemprop="url">【热部署】JRebel</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:04:48+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/热部署/" itemprop="url" rel="index">
-                    <span itemprop="name">热部署</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://zeroturnaround.com/software/jrebel/quickstart/eclipse/" target="_blank" rel="external">官方文档</a></p>
-<h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><p><strong>1. Eclipse &gt; Help &gt; Install New Software &gt; Add</strong></p>
-<blockquote>
-<p>name : JRebel<br>location：<a href="http://update.zeroturnaround.com/update-site" target="_blank" rel="external">http://update.zeroturnaround.com/update-site</a></p>
-</blockquote>
-<h3 id="Active"><a href="#Active" class="headerlink" title="Active"></a>Active</h3><p><strong>2.1、Help &gt; JRebel &gt; Activation</strong><br><strong>2.2、Fill out the form</strong><br><strong>2.3、Activate JRebel</strong><br><strong>2.4、Next → Startup configuration</strong></p>
-<h3 id="Startup-Configuration"><a href="#Startup-Configuration" class="headerlink" title="Startup Configuration"></a>Startup Configuration</h3><blockquote>
-<p>将JRebel部署到服务器中或者在独立应用中</p>
-</blockquote>
-<h3 id="Project-configuration"><a href="#Project-configuration" class="headerlink" title="Project configuration"></a>Project configuration</h3><blockquote>
-<p>配置项目</p>
-</blockquote>
-<p><strong>3.1、Help &gt; JRebel &gt; Configuration &gt; Projects.</strong><br><img src="https://zeroturnaround.com/wp-content/uploads/2014/10/jrebel-ide-icon.png" alt="这里写图片描述">This will generate rebel.xml and keep it up to date</p>
-<p><img src="https://zeroturnaround.com/wp-content/uploads/2016/02/jrcloud.png" alt="这里写图片描述">This will generate rebel-remote.xml</p>
-<p><strong>重新部署应用</strong></p>
-<p><img src="http://img.blog.csdn.net/20170330154533605?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<hr>
-<p><img src="http://img.blog.csdn.net/20170330154543168?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<hr>
-<p><img src="http://img.blog.csdn.net/20170330154553668?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2060,7 +1977,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">86</span>
+                <span class="site-state-item-count">93</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2071,7 +1988,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2082,7 +1999,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">76</span>
+                <span class="site-state-item-count">78</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
