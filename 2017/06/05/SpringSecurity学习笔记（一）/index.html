@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="SpringSecurity," />
 
 
 
@@ -93,12 +93,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="dzxblog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="SpringSecurity学习笔记（一）—— Java配置目录概要 验证应用程序每一个URL 生成登录表单对象 通过用户/密码进行表单验证 用户注销 阻止CSRF攻击 设置安全请求头 集成servletAPI  Web安全 创建Security过滤器(通过springSecurityFilterChain负责所有安全过滤请求)  基本例子12345678910111213141516171819">
+<meta name="keywords" content="SpringSecurity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringSecurity学习笔记（一）—— Java配置">
+<meta property="og:url" content="http://yoursite.com/2017/06/05/SpringSecurity学习笔记（一）/index.html">
 <meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="SpringSecurity学习笔记（一）—— Java配置目录概要 验证应用程序每一个URL 生成登录表单对象 通过用户/密码进行表单验证 用户注销 阻止CSRF攻击 设置安全请求头 集成servletAPI  Web安全 创建Security过滤器(通过springSecurityFilterChain负责所有安全过滤请求)  基本例子12345678910111213141516171819">
+<meta property="og:updated_time" content="2017-06-05T02:07:15.181Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="dzxblog">
+<meta name="twitter:title" content="SpringSecurity学习笔记（一）—— Java配置">
+<meta name="twitter:description" content="SpringSecurity学习笔记（一）—— Java配置目录概要 验证应用程序每一个URL 生成登录表单对象 通过用户/密码进行表单验证 用户注销 阻止CSRF攻击 设置安全请求头 集成servletAPI  Web安全 创建Security过滤器(通过springSecurityFilterChain负责所有安全过滤请求)  基本例子12345678910111213141516171819">
 
 
 
@@ -126,13 +131,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/06/05/SpringSecurity学习笔记（一）/"/>
 
 
 
 
 
-  <title>dzxblog</title>
+  <title>SpringSecurity学习笔记（一）—— Java配置 | dzxblog</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -158,9 +163,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -243,9 +246,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -271,9 +274,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/SpringSecurity学习笔记（一）/" itemprop="url">SpringSecurity学习笔记（一）—— Java配置</a></h1>
+          <h1 class="post-title" itemprop="name headline">SpringSecurity学习笔记（一）—— Java配置</h1>
         
 
         <div class="post-meta">
@@ -342,9 +343,7 @@
       
 
       
-        
-          
-            <h2 id="SpringSecurity学习笔记（一）——-Java配置"><a href="#SpringSecurity学习笔记（一）——-Java配置" class="headerlink" title="SpringSecurity学习笔记（一）—— Java配置"></a>SpringSecurity学习笔记（一）—— Java配置</h2><h3 id="目录概要"><a href="#目录概要" class="headerlink" title="目录概要"></a>目录概要</h3><ul>
+        <h2 id="SpringSecurity学习笔记（一）——-Java配置"><a href="#SpringSecurity学习笔记（一）——-Java配置" class="headerlink" title="SpringSecurity学习笔记（一）—— Java配置"></a>SpringSecurity学习笔记（一）—— Java配置</h2><h3 id="目录概要"><a href="#目录概要" class="headerlink" title="目录概要"></a>目录概要</h3><ul>
 <li>验证应用程序每一个URL</li>
 <li>生成登录表单对象</li>
 <li>通过用户/密码进行表单验证</li>
@@ -418,273 +417,72 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
 <h3 id="自定义DSLs"><a href="#自定义DSLs" class="headerlink" title="自定义DSLs"></a>自定义DSLs</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">   public class MyCustomDsl extends AbstractHttpConfigurer&lt;CorsConfigurerMyCustomDsl, HttpSecurity&gt; &#123;</div><div class="line">private boolean flag;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void init(H http) throws Exception &#123;</div><div class="line">	// any method that adds another configurer</div><div class="line">	// must be done in the init method</div><div class="line">	http.csrf().disable();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void configure(H http) throws Exception &#123;</div><div class="line">	ApplicationContext context = http.getSharedObject(ApplicationContext.class);</div><div class="line"></div><div class="line">	// here we lookup from the ApplicationContext. You can also just create a new instance.</div><div class="line">	MyFilter myFilter = context.getBean(MyFilter.class);</div><div class="line">	myFilter.setFlag(flag);</div><div class="line">	http.addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public MyCustomDsl flag(boolean value) &#123;</div><div class="line">	this.flag = value;</div><div class="line">	return this;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static MyCustomDsl customDsl() &#123;</div><div class="line">	return new MyCustomDsl();</div><div class="line">&#125;		</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 <p>META-INF/spring.factories.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer = sample.MyCustomDsl</div></pre></td></tr></table></figure></p>
 
-          
+      
+    </div>
+
+    <div>
+      
         
+
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
     <div>
+      
+        
+
       
     </div>
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/SpringSecurity学习笔记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/SpringSecurity学习笔记/" itemprop="url">Untitled</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T09:55:13+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/SpringSecurity/" rel="tag"># SpringSecurity</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
+      
 
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
       
-        
-          
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/02/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/02/hello-world/" itemprop="url">Hello World</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+              <a href="/2017/06/05/SpringSecurity学习笔记/" rel="next" title="Untitled">
+                <i class="fa fa-chevron-left"></i> Untitled
+              </a>
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-02T14:35:26+08:00">
-                2017-06-02
-              </time>
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -692,6 +490,10 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -711,8 +513,17 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
@@ -774,6 +585,22 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringSecurity学习笔记（一）——-Java配置"><span class="nav-number">1.</span> <span class="nav-text">SpringSecurity学习笔记（一）—— Java配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#目录概要"><span class="nav-number">1.1.</span> <span class="nav-text">目录概要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Web安全"><span class="nav-number">1.2.</span> <span class="nav-text">Web安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Http安全和表单登录"><span class="nav-number">1.3.</span> <span class="nav-text">Http安全和表单登录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#认证请求"><span class="nav-number">1.4.</span> <span class="nav-text">认证请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注销"><span class="nav-number">1.5.</span> <span class="nav-text">注销</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LogoutSuccessHandler-的实现类"><span class="nav-number">1.5.1.</span> <span class="nav-text">LogoutSuccessHandler 的实现类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LogoutHandler-的实现类"><span class="nav-number">1.5.2.</span> <span class="nav-text">LogoutHandler 的实现类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#更多关于注销的文档"><span class="nav-number">1.5.3.</span> <span class="nav-text">更多关于注销的文档</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高级认证"><span class="nav-number">1.6.</span> <span class="nav-text">高级认证</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#In-Memory"><span class="nav-number">1.6.1.</span> <span class="nav-text">In-Memory</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JDBC"><span class="nav-number">1.6.2.</span> <span class="nav-text">JDBC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义授权认证"><span class="nav-number">1.6.3.</span> <span class="nav-text">自定义授权认证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义身份认证"><span class="nav-number">1.6.4.</span> <span class="nav-text">自定义身份认证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义密码加密"><span class="nav-number">1.6.5.</span> <span class="nav-text">自定义密码加密</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个HttpSecurity"><span class="nav-number">1.7.</span> <span class="nav-text">多个HttpSecurity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法安全"><span class="nav-number">1.8.</span> <span class="nav-text">方法安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后置处理"><span class="nav-number">1.9.</span> <span class="nav-text">后置处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义DSLs"><span class="nav-number">1.10.</span> <span class="nav-text">自定义DSLs</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -887,10 +714,10 @@ public SpringDataUserDetailsService springDataUserDetailsService() {
   
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
 
-  
+
 
   
 
