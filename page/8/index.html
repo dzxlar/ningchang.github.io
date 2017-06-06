@@ -254,6 +254,242 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——内存模型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——内存模型/" itemprop="url">线程笔记——内存模型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:06:01+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="happen-before-规则"><a href="#happen-before-规则" class="headerlink" title="happen-before 规则"></a>happen-before 规则</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><blockquote>
+<p><strong>如果操作 A 先行发生于操作 B，在发生操作 B 之前，操作A产生的影响都能被操作 B 观察到。</strong>影响包括修改了内存中共享变量的值、发送了消息、调用了方法等</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>它与时间上的先后发生基本没有太大关系。它是判断数据是否存在竞争、线程是否安全的主要依据</strong></p>
+</blockquote>
+<p>###八条可保证 happen—before 的规则</p>
+<blockquote>
+<p>它们无需任何同步器协助就已经存在，可以在编码中直接使用。如果两个操作之间的关系不在此列，并且无法从下列规则推导出来的话，它们就没有顺序性保障，虚拟机可以对它们进行随机地重排序</p>
+</blockquote>
+<ol>
+<li><p><strong>程序次序规则</strong>：在一个单独的线程中，<strong>按照程序代码的执行流顺序</strong>，（时间上）先执行的操作 happen—before（时间上）后执行的操作。</p>
+</li>
+<li><p><strong>管理锁定规则</strong>：一个 unlock 操作 happen—before 后面对同一个锁的 lock 操作。</p>
+</li>
+<li><p><strong>volatile变量规则</strong>：对一个 volatile 变量的<strong>写操作</strong> happen—before 后面对该变量的<strong>读操作</strong>。</p>
+</li>
+<li><p><strong>线程启动规则</strong>：Thread 对象的 <strong>start()方法</strong> happen—before 此线程的每一个动作。</p>
+</li>
+<li><p><strong>线程终止规则</strong>：线程的所有操作都 happen—before 对此线程的终止检测，可以通过 Thread.join()方法结束。 Thread.isAlive()的返回值等手段检测到线程已经终止执行。</p>
+</li>
+<li><p><strong>线程中断规则</strong>：对线程 interrupt()方法的调用 happen—before 发生于被中断线程的代码检测到中断时事件的发生。</p>
+</li>
+<li><p><strong>对象终结规则</strong>：一个对象的初始化完成（构造函数执行结束）happen—before 它的 finalize()方法的开始。</p>
+</li>
+<li><p><strong>传递性</strong>：如果操作 A happen—before 操作 B，操作 B happen—before 操作 C，那么可以得出 A happen—before 操作 C。</p>
+</li>
+</ol>
+<p>【问题一】假设存在如下三个线程，分别执行对应的操作：线程 A 中执行如下操作：i=1，线程 B 中执行如下操作：j=i，线程 C 中执行如下操作：i=2。并且保持A与B之间的happen—before关系。同时C出现在A和B操作之间。C和B没有happen-before关系。线程B是否是线程安全的？<br>【回答】 <strong>由于C 与 B 并没有 happen—before 关系，j的值不确定，线程 C 对变量 i 的影响可能会被线程 B 观察到，也可能不会，这时线程 B 就存在读取到不是最新数据的风险</strong>，B不具备线程安全性</p>
+<p>【问题二】假设存在线程 A 和线程 B，线程 A 先（时间上）调用了 setValue(3)操作，然后（时间上）线程B调用了同一对象的 getValue()方法，那么线程B得到的返回值一定是3吗？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">private int value = 0;  </div><div class="line"></div><div class="line">public int get()&#123;  </div><div class="line">    return value;  </div><div class="line">&#125;  </div><div class="line">public void set(int value)&#123;  </div><div class="line">    this.value = value;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>【回答】上面八条原则不适用于该value变量。从而我们可以判定线程 A 中的 setValue(3)操作与线程 B 中的 getValue()操作不存在 happen—before 关系。因此，尽管线程 A 的 setValue(3)在操作时间上先于操作 B 的 getvalue()，但无法保证线程 B 的 getValue()操作一定观察到了线程 A 的 setValue(3)操作所产生的结果，也即是 getValue()的返回值不一定为 3</p>
+<blockquote>
+<p><strong>因此，”一个操作时间上先发生于另一个操作“并不代表”一个操作 happen—before 另一个操作”。</strong></p>
+</blockquote>
+<p>解决方案： 可以将 setValue（int）方法和 getValue()方法均定义为 synchronized 方法，也可以把 value 定义为 volatile 变量</p>
+<p>【问题三】 假设同一个线程执行上面两个操作：操作 A：x=1 和操作 B：y=2。从第一条规则判定操作Ahappen—before操作B。是否意味着操作 A 在时间上先与操作 B 发生？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">x = 1；  </div><div class="line">y = 2;</div></pre></td></tr></table></figure></p>
+<p>【回答】由于编译器的指令重排序等原因，操作 A 在时间上有可能后于操作 B 被处理器执行，但这并不影响 happen—before 原则的正确性</p>
+<blockquote>
+<p><strong>因此，”一个操作 happen—before 另一个操作“并不代表”一个操作时间上先发生于另一个操作”。</strong></p>
+</blockquote>
+<p>重排序：Java 语言规范规定了 JVM 线程内部维持顺序化语义，也就是说只要程序的最终结果等同于它在严格的顺序化环境下的结果，那么指令的执行顺序就可能与代码的顺序不一致。这个过程通过叫做指令的重排序。指令重排序存在的意义在于：JVM 能够根据处理器的特性（CPU 的多级缓存系统、多核处理器等）适当的重新排序机器指令，使机器指令更符合 CPU 的执行特点，最大限度的发挥机器的性能。在没有同步的情况下，编译器、处理器以及运行时等都可能对操作的执行顺序进行一些意想不到的调整</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
+<p>一个操作和另一个操作必定存在某个顺序，要么一个操作或者是先于或者是后于另一个操作，或者与两个操作同时发生。同时发生是完全可能存在的，特别是在多 CPU 的情况下。而两个操作之间却可能没有 happen-before 关系，也就是说有可能发生这样的情况，操作 A 不 happen-before 操作 B，操作 B 也不 happen-before 操作 A，用数学上的术语 happen-before 关系是个偏序关系。两个存在 happen-before 关系的操作不可能同时发生，一个操作 A happen-before 操作 B，它们必定在时间上是完全错开的，这实际上也是同步的语义之一（独占访问）</p>
+</blockquote>
+<h3 id="利用-happen—before-规则分析-DCL-双重检查加锁"><a href="#利用-happen—before-规则分析-DCL-双重检查加锁" class="headerlink" title="利用 happen—before 规则分析 DCL(双重检查加锁)"></a>利用 happen—before 规则分析 DCL(双重检查加锁)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public class LazySingleton &#123;  </div><div class="line">    private int someField;  </div><div class="line"></div><div class="line">    private static LazySingleton instance;  </div><div class="line"></div><div class="line">    private LazySingleton() &#123;  </div><div class="line">        this.someField = new Random().nextInt(200)+1;         // (1)  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static LazySingleton getInstance() &#123;  </div><div class="line">        if (instance == null) &#123;                               // (2)  </div><div class="line">            synchronized(LazySingleton.class) &#123;               // (3)  </div><div class="line">                if (instance == null) &#123;                       // (4)  </div><div class="line">                    instance = new LazySingleton();           // (5)  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">        return instance;                                      // (6)  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public int getSomeField() &#123;  </div><div class="line">        return this.someField;                                // (7)  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里得到单一的 instance 实例是没有问题的，问题的关键在于尽管得到了 Singleton 的正确引用，但是却有可能访问到其成员变量的不正确值。具体来说 Singleton.getInstance().getSomeField() 有可能返回 someField 的默认值 0。</p>
+<p>如果程序行为正确的话，这应当是不可能发生的事，因为在构造函数里设置的 someField 的值不可能为 0。为也说明这种情况理论上有可能发生，我们只需要说明语句(1)和语句(7)并不存在 happen-before 关系</p>
+<p>【解释】假设线程Ⅰ是初次调用 getInstance()方法，紧接着线程Ⅱ也调用了 getInstance()方法和 getSomeField()方法，我们要说明的是线程Ⅰ的语句(1)并不 happen-before 线程Ⅱ的语句(7)。线程Ⅱ在执行 getInstance()方法的语句(2)时，由于对 instance 的访问并没有处于同步块中，因此线程Ⅱ可能观察到也可能观察不到线程Ⅰ在语句(5)时对 instance 的写入，也就是说 instance 的值可能为空也可能为非空。我们先假设 instance 的值非空，也就观察到了线程Ⅰ对 instance 的写入，这时线程Ⅱ就会执行语句(6)直接返回这个 instance 的值，然后对这个 instance 调用 getSomeField()方法，该方法也是在没有任何同步情况被调用，因此整个线程Ⅱ的操作都是在没有同步的情况下调用 ，这时我们便无法利用上述 8 条 happen-before 规则得到线程Ⅰ的操作和线程Ⅱ的操作之间的任何有效的 happen-before 关系</p>
+<p>主要考虑规则的第 2 条，<strong>由于线程Ⅱ没有在进入 synchronized 块，因此不存在 lock 与 unlock 锁的问题），这说明线程Ⅰ的语句(1)和线程Ⅱ的语句(7)之间并不存在 happen-before 关系，这就意味着线程Ⅱ在执行语句(7)完全有可能观测不到线程Ⅰ在语句(1)处对 someFiled 写入的值，这就是 DCL 的问题所在</strong></p>
+<p>对 DCL 的分析也告诉我们一条经验原则：<strong>对引用（包括对象引用和数组引用）的非同步访问，即使得到该引用的最新值，却并不能保证也能得到其成员变量（对数组而言就是每个数组元素）的最新值。</strong></p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>最简单而且安全的解决方法是使用 static 内部类的思想，它利用的思想是：<strong>一个类直到被使用时才被初始化，而类初始化的过程是非并行的，这些都有 JLS 保证。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class Singleton &#123;  </div><div class="line"></div><div class="line">  private Singleton() &#123;&#125;  </div><div class="line"></div><div class="line">  // Lazy initialization holder class idiom for static fields  </div><div class="line">  private static class InstanceHolder &#123;  </div><div class="line">   private static final Singleton instance = new Singleton();  </div><div class="line">  &#125;  </div><div class="line"></div><div class="line">  public static Singleton getSingleton() &#123;   </div><div class="line">    return InstanceHolder.instance;   </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>可以将 instance 声明为 volatile，即<br> private volatile static LazySingleton instance;</li>
+</ol>
+<p>线程Ⅰ的语句(5) -&gt; 语线程Ⅱ的句(2)，根据单线程规则，线程Ⅰ的语句(1) -&gt; 线程Ⅰ的语句(5)和语线程Ⅱ的句(2) -&gt; 语线程Ⅱ的句(7)，再根据传递规则就有线程Ⅰ的语句(1) -&gt; 语线程Ⅱ的句(7)，这表示线程Ⅱ能够观察到线程Ⅰ在语句(1)时对 someFiled 的写入值，程序能够得到正确的行为</p>
+<h3 id="主内存与工作内存"><a href="#主内存与工作内存" class="headerlink" title="主内存与工作内存"></a>主内存与工作内存</h3><blockquote>
+<p><strong>Java 内存模型的主要目标是定义程序中各个变量的访问规则，即在虚拟机中将变量存储到内存和从内存中取出变量这样的底层细节</strong>(主要是指共享变量，存在竞争问题的变量)</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Java 内存模型规定所有的变量都存储在主内存中，而每条线程还有自己的工作内存，线程的工作内存中保存了该线程使用到的变量的主内存副本拷贝，线程对变量的所有操作（读取、赋值等）都必须在工作内存中进行，而不能直接读写主内存中的变量。<strong>不同线程之间也无法直接访问对方工作内存中的变量，线程间变量值得传递均需要通过主内存来完成。</strong></p>
+</blockquote>
+<h3 id="内存间交互操作"><a href="#内存间交互操作" class="headerlink" title="内存间交互操作"></a>内存间交互操作</h3><h4 id="内存与工作内存之间交互的实现细节"><a href="#内存与工作内存之间交互的实现细节" class="headerlink" title="内存与工作内存之间交互的实现细节"></a>内存与工作内存之间交互的实现细节</h4><ol>
+<li><p><strong>luck（锁定）</strong>：作用于主内存的变量，它把一个变量标示为一条线程独占的状态。</p>
+</li>
+<li><p><strong>unlock（解锁）</strong>：作用于主内存的变量，它把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</p>
+</li>
+<li><p><strong>read（读取）</strong>：作用于主内存的变量，它把一个变量的值从主内存传输到工作内存中，以便随后的 load 动作使用。</p>
+</li>
+<li><p><strong>load（载入）</strong>：作用于工作内存的变量，它把 read 操作从主内存中得到的变量值放入工作内存的变量副本中。</p>
+</li>
+<li><p><strong>use（使用）</strong>：作用于工作内存的变量，它把工作内存中的一个变量的值传递给执行引擎，每当虚拟机遇到一个需要使用到变量的值得字节码指令时将会执行这个操作。</p>
+</li>
+<li><p><strong>assign（赋值）</strong>：作用于工作内存的变量，它把一个从执行引擎接收到的值赋给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令时执行这个操作。</p>
+</li>
+<li><p><strong>store（存储）</strong>：作用于工作内存的变量，它把工作内存中的一个变量的值传递到主内存中，以便随后的 write 操作使用。</p>
+</li>
+<li><p><strong>write（写入）</strong>：作用于主内存的变量，它把 store 操作从工作内存中得到的变量值放入主内存的变量中。</p>
+</li>
+</ol>
+<h4 id="Java-内存模型还规定了执行上述-8-种基本操作时必须满足如下规则"><a href="#Java-内存模型还规定了执行上述-8-种基本操作时必须满足如下规则" class="headerlink" title="Java 内存模型还规定了执行上述 8 种基本操作时必须满足如下规则"></a>Java 内存模型还规定了执行上述 8 种基本操作时必须满足如下规则</h4><ul>
+<li><p>不允许 read 和 load、store 和 write 操作之一单独出现，以上两个操作必须按顺序执行，但没有保证必须连续执行，也就是说，read 与 load 之间、store 与 write 之间是可插入其他指令的。</p>
+</li>
+<li><p>不允许一个线程丢弃它的最近的 assign 操作，即变量在工作内存中改变了之后必须把该变化同步回主内存。</p>
+</li>
+<li><p>不允许一个线程无原因地（没有发生过任何 assign 操作）把数据从线程的工作内存同步回主内存中。</p>
+</li>
+<li><p>一个新的变量只能从主内存中“诞生”，不允许在工作内存中直接使用一个未被初始化（load 或 assign）的变量，换句话说就是对一个变量实施 use 和 store 操作之前，必须先执行过了 assign 和 load 操作。</p>
+</li>
+<li><p>一个变量在同一个时刻只允许一条线程对其执行 lock 操作，但 lock 操作可以被同一个条线程重复执行多次，多次执行 lock 后，只有执行相同次数的 unlock 操作，变量才会被解锁。</p>
+</li>
+<li><p>如果对一个变量执行 lock 操作，将会清空工作内存中此变量的值，在执行引擎使用这个变量前，需要重新执行 load 或 assign 操作初始化变量的值。</p>
+</li>
+<li><p>如果一个变量实现没有被 lock 操作锁定，则不允许对它执行 unlock 操作，也不允许去 unlock 一个被其他线程锁定的变量。</p>
+</li>
+<li><p>对一个变量执行 unlock 操作之前，必须先把此变量同步回主内存（执行 store 和 write 操作）。</p>
+</li>
+</ul>
+<h3 id="final"><a href="#final" class="headerlink" title="final"></a>final</h3><blockquote>
+<p>final 类型的域是不能修改的，除了这一点外，在 Java 内存模型中，final 域还有着特殊的语义，<strong>final 域能确保初始化过程的安全性，从而可以不受限制地访问不可变对象，并在共享这些对象时无须同步。</strong></p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【热部署】JRebel/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1820,157 +2056,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Predicate/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Predicate/" itemprop="url">【Java8】Guava——Predicate</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:38:32+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Guava/" itemprop="url" rel="index">
-                    <span itemprop="name">Guava</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Predicate"><a href="#Predicate" class="headerlink" title="Predicate"></a>Predicate</h2><p>Guava</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">@GwtCompatible</div><div class="line">public interface Predicate&lt;T&gt; extends java.util.function.Predicate&lt;T&gt; &#123;</div><div class="line"> </div><div class="line">  @CanIgnoreReturnValue</div><div class="line">  boolean apply(@Nullable T input);</div><div class="line"></div><div class="line"> </div><div class="line">  @Override</div><div class="line">  boolean equals(@Nullable Object object);</div><div class="line"></div><div class="line">  @Override</div><div class="line">  default boolean test(@Nullable T input) &#123;</div><div class="line">    return apply(input);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>java8</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface Predicate&lt;T&gt; &#123;</div><div class="line"></div><div class="line">    boolean test(T t);</div><div class="line"></div><div class="line">    </div><div class="line">    default Predicate&lt;T&gt; and(Predicate&lt;? super T&gt; other) &#123;</div><div class="line">        Objects.requireNonNull(other);</div><div class="line">        return (t) -&gt; test(t) &amp;&amp; other.test(t);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    default Predicate&lt;T&gt; negate() &#123;</div><div class="line">        return (t) -&gt; !test(t);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    default Predicate&lt;T&gt; or(Predicate&lt;? super T&gt; other) &#123;</div><div class="line">        Objects.requireNonNull(other);</div><div class="line">        return (t) -&gt; test(t) || other.test(t);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    static &lt;T&gt; Predicate&lt;T&gt; isEqual(Object targetRef) &#123;</div><div class="line">        return (null == targetRef)</div><div class="line">                ? Objects::isNull</div><div class="line">                : object -&gt; targetRef.equals(object);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p><strong>Predicate是简化版的Function。唯一的区别Predicate返回boolean</strong></p>
-</blockquote>
-<h3 id="简单实例"><a href="#简单实例" class="headerlink" title="简单实例"></a>简单实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Predicate&lt;String&gt; lengthLessThen10 = new Predicate&lt;String&gt;() &#123;</div><div class="line">    public boolean apply(String input) &#123;</div><div class="line">        return input.length() &lt; 10;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">lengthLessThen10.apply(&quot;lessThen10&quot;);//false</div></pre></td></tr></table></figure>
-<p>相当于</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Function&lt;Integer, Predicate&lt;String&gt;&gt; lengthLessThen = new Function&lt;Integer, Predicate&lt;String&gt;&gt;() &#123;</div><div class="line">    public Predicate&lt;String&gt; apply(final Integer input) &#123;</div><div class="line">        return new Predicate&lt;String&gt;() &#123;</div><div class="line">            public boolean apply(String str) &#123;</div><div class="line">                return str.length() &lt; input;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">lengthLessThen.apply(10).apply(&quot;lessThen10&quot;);//false</div></pre></td></tr></table></figure>
-<blockquote>
-<p>定义了一个 Function，接受 Integer 类型的参数，返回 Predicate 实例；在实例化 Predicate 的时候，我们访问了匿名类外部的变量，也即 Function 实例的 apply 方法的参数，由于 Java 语言的限制，匿名类内部用到的外部变量必须声明为 final</p>
-</blockquote>
-<h2 id="Predicates"><a href="#Predicates" class="headerlink" title="Predicates"></a>Predicates</h2><blockquote>
-<p>Predicates 是 Guava 中与 Predicate 接口配套使用的工具类，提供了一些非常有用的工具类，比如使用 and 和 or 组合多个谓词，还有 not 将谓词的条件取反</p>
-</blockquote>
-<p><img src="http://img.blog.csdn.net/20170410173435666?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170410173444323?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><a href="https://blog.jamespan.me/2015/03/30/guava-functional-programing-2" target="_blank" rel="external">Predicate具体参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2020,7 +2105,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">97</span>
+                <span class="site-state-item-count">98</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2031,7 +2116,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">35</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2042,7 +2127,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-count">84</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
