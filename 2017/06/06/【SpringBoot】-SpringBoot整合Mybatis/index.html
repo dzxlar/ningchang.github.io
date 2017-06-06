@@ -1,0 +1,738 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="SpringBoot整合Mybatis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 创建SpringBoot项目 https://start.spring.io/  2.pom.xml文件1234567891011121314151617181920212223242526272829303132333435363738394041424344454647&amp;lt;parent&amp;gt;    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt">
+<meta name="keywords" content="SpringBoot整合Mybatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【SpringBoot】 SpringBoot整合Mybatis">
+<meta property="og:url" content="http://yoursite.com/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="1. 创建SpringBoot项目 https://start.spring.io/  2.pom.xml文件1234567891011121314151617181920212223242526272829303132333435363738394041424344454647&amp;lt;parent&amp;gt;    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt">
+<meta property="og:updated_time" content="2017-06-06T06:12:11.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【SpringBoot】 SpringBoot整合Mybatis">
+<meta name="twitter:description" content="1. 创建SpringBoot项目 https://start.spring.io/  2.pom.xml文件1234567891011121314151617181920212223242526272829303132333435363738394041424344454647&amp;lt;parent&amp;gt;    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/"/>
+
+
+
+
+
+  <title>【SpringBoot】 SpringBoot整合Mybatis | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【SpringBoot】 SpringBoot整合Mybatis</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T13:47:40+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/Mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">Mybatis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-创建SpringBoot项目"><a href="#1-创建SpringBoot项目" class="headerlink" title="1. 创建SpringBoot项目"></a>1. 创建SpringBoot项目</h2><blockquote>
+<p><a href="https://start.spring.io/" target="_blank" rel="external">https://start.spring.io/</a></p>
+</blockquote>
+<h2 id="2-pom-xml文件"><a href="#2-pom-xml文件" class="headerlink" title="2.pom.xml文件"></a>2.pom.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.5.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/parent&gt;</div><div class="line"> </div><div class="line">&lt;properties&gt;</div><div class="line">    &lt;mybatis-spring-boot&gt;1.2.0&lt;/mybatis-spring-boot&gt;</div><div class="line">    &lt;mysql-connector&gt;5.1.39&lt;/mysql-connector&gt;</div><div class="line">&lt;/properties&gt;</div><div class="line"> </div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;test&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;!-- start mybatis --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mybatis-spring-boot&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- mybatis end --&gt;</div><div class="line">   </div><div class="line">    &lt;!-- start mysql --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;mysql&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mysql-connector&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;!-- mysql end --&gt;</div><div class="line">     </div><div class="line">    &lt;!-- start junit --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;junit&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;junit&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;4.12&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- junit end --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
+<h2 id="3-application-yml"><a href="#3-application-yml" class="headerlink" title="3.application.yml"></a>3.application.yml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">     typeAliasesPackage: com.alex.spring.domain </div><div class="line">     mapperLocations: classpath:mapper/*.xml</div></pre></td></tr></table></figure>
+<ul>
+<li>typeAliasesPackage: 指向实体类包路径</li>
+<li>mapperLocations: classpath 路径下 mapper 包下，* 代表会扫描所有 xml 文件</li>
+</ul>
+<p>其他配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">    config: #配置文件名称</div><div class="line">    typeHandlersPackage: #处理器包路径</div><div class="line">    check-config-location: #检查 mybatis 配置是否存在，一般命名为 mybatis-config.xml</div><div class="line">    executorType: #执行模式。默认是 SIMPLE3.在 Application 应用启动类添加注解 MapperScan</div></pre></td></tr></table></figure>
+<h2 id="3-启动文件添加注解"><a href="#3-启动文件添加注解" class="headerlink" title="3. 启动文件添加注解"></a>3. 启动文件添加注解</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">@MapperScan(&quot;com.alex.spring.dao&quot;) //扫描mapper接口</div><div class="line">public class SpringMybatisApplication&#123;</div><div class="line">		public static void main(String[] args) &#123;</div><div class="line">       		 SpringApplication.run(SpringMybatisApplication.class,args);</div><div class="line">  	    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="4-创建实体"><a href="#4-创建实体" class="headerlink" title="4.创建实体"></a>4.创建实体</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class User&#123;</div><div class="line">      private String userId;</div><div class="line">      private String userName;</div><div class="line">      private String userPass;</div><div class="line">      private String userImage;</div><div class="line">      //省略getter/setter方法</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="5-创建Mapper接口"><a href="#5-创建Mapper接口" class="headerlink" title="5.创建Mapper接口"></a>5.创建Mapper接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface UserDao&#123;</div><div class="line">     </div><div class="line">     User findById(@Param(&quot;userId&quot;) String userId);</div><div class="line">     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h2><p><a href="http://www.bysocket.com/?p=1610" target="_blank" rel="external">原文参考</a><br><a href="https://segmentfault.com/a/1190000004316491" target="_blank" rel="external">application.properties属性详解</a><br><a href="https://git.oschina.net/baomidou/mybatis-plus" target="_blank" rel="external">mybatis增强工具包</a><br><a href="https://git.oschina.net/free/Mybatis_PageHelper" target="_blank" rel="external">mybatis分页助手</a><br><a href="https://git.oschina.net/ht896632/mybatis-generator-core" target="_blank" rel="external">mybatis自动生成工具</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SpringBoot整合Mybatis/" rel="tag"># SpringBoot整合Mybatis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/06/【Spring5】WebFlux-and-JDBC/" rel="next" title="【Spring5】WebFlux and JDBC">
+                <i class="fa fa-chevron-left"></i> 【Spring5】WebFlux and JDBC
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/06/ElasticSearch学习笔记-一-——-入门/" rel="prev" title="ElasticSearch学习笔记(一) —— 入门">
+                ElasticSearch学习笔记(一) —— 入门 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">107</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">85</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-创建SpringBoot项目"><span class="nav-number">1.</span> <span class="nav-text">1. 创建SpringBoot项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-pom-xml文件"><span class="nav-number">2.</span> <span class="nav-text">2.pom.xml文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-application-yml"><span class="nav-number">3.</span> <span class="nav-text">3.application.yml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-启动文件添加注解"><span class="nav-number">4.</span> <span class="nav-text">3. 启动文件添加注解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-创建实体"><span class="nav-number">5.</span> <span class="nav-text">4.创建实体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-创建Mapper接口"><span class="nav-number">6.</span> <span class="nav-text">5.创建Mapper接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资料"><span class="nav-number">7.</span> <span class="nav-text">资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

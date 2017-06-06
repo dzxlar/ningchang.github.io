@@ -1,0 +1,787 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ES," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="##启动ElasticSearch 1234#linux./bin/elasticsearch#windowsbin/elasticsearch.bat 注意：为了测试JavaApi所以采用windows方式启动。 启动成功页面 Mavenpom.xml1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta name="keywords" content="ES">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch学习笔记(四) —— Java CRUD">
+<meta property="og:url" content="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-四-——-Java-CRUD/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="##启动ElasticSearch 1234#linux./bin/elasticsearch#windowsbin/elasticsearch.bat 注意：为了测试JavaApi所以采用windows方式启动。 启动成功页面 Mavenpom.xml1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta property="og:image" content="http://img.blog.csdn.net/20170310095908283?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20170310100346399?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-06-06T06:30:52.717Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ElasticSearch学习笔记(四) —— Java CRUD">
+<meta name="twitter:description" content="##启动ElasticSearch 1234#linux./bin/elasticsearch#windowsbin/elasticsearch.bat 注意：为了测试JavaApi所以采用windows方式启动。 启动成功页面 Mavenpom.xml1234567891011121314151617181920212223242526272829303132333435363738394041">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20170310095908283?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-四-——-Java-CRUD/"/>
+
+
+
+
+
+  <title>ElasticSearch学习笔记(四) —— Java CRUD | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-四-——-Java-CRUD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ElasticSearch学习笔记(四) —— Java CRUD</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:28:18+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>##启动ElasticSearch</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#linux</div><div class="line">./bin/elasticsearch</div><div class="line">#windows</div><div class="line">bin/elasticsearch.bat</div></pre></td></tr></table></figure>
+<p>注意：为了测试JavaApi所以采用windows方式启动。</p>
+<h3 id="启动成功页面"><a href="#启动成功页面" class="headerlink" title="启动成功页面"></a>启动成功页面</h3><p><img src="http://img.blog.csdn.net/20170310095908283?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170310100346399?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="Maven"><a href="#Maven" class="headerlink" title="Maven"></a>Maven</h3><p><strong>pom.xml</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">  				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.elasticsearch.client&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;transport&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;5.2.2&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;log4j-api&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;2.7&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;log4j-core&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;2.7&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;joda-time&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;joda-time&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;2.9.7&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;lucene-core&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;6.4.2&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">  &lt;/dependencies&gt;</div><div class="line"></div><div class="line">&lt;plugin&gt;</div><div class="line">    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;maven-shade-plugin&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;2.4.1&lt;/version&gt;</div><div class="line">    &lt;executions&gt;</div><div class="line">        &lt;execution&gt;</div><div class="line">            &lt;phase&gt;package&lt;/phase&gt;</div><div class="line">            &lt;goals&gt;&lt;goal&gt;shade&lt;/goal&gt;&lt;/goals&gt;</div><div class="line">            &lt;configuration&gt;</div><div class="line">                &lt;transformers&gt;</div><div class="line">                    &lt;transformer implementation=&quot;org.apache.maven.plugins.shade.resource.ServicesResourceTransformer&quot;/&gt;</div><div class="line">                    &lt;!-- Main方法自动调用java -jar yourjar.jar --&gt;</div><div class="line">                    &lt;transformer implementation=&quot;org.apache.maven.plugins.shade.resource.ManifestResourceTransformer&quot;&gt;</div><div class="line">    &lt;mainClass&gt;org.elasticsearch.demo.Generate&lt;/mainClass&gt;</div><div class="line">&lt;/transformer&gt;</div><div class="line">                &lt;/transformers&gt;</div><div class="line">            &lt;/configuration&gt;</div><div class="line">        &lt;/execution&gt;</div><div class="line">    &lt;/executions&gt;</div><div class="line">&lt;/plugin&gt;</div></pre></td></tr></table></figure></p>
+<p><strong>src/main/resources/og4j2.properties</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">appender.console.type = Console</div><div class="line">appender.console.name = console</div><div class="line">appender.console.layout.type = PatternLayout</div><div class="line"></div><div class="line">rootLogger.level = info</div><div class="line">rootLogger.appenderRef.console.ref = console</div></pre></td></tr></table></figure>
+<h3 id="创建Java客户端"><a href="#创建Java客户端" class="headerlink" title="创建Java客户端"></a>创建Java客户端</h3><p>最常见的方式客户端是通过创建一个连接到一个clusteTransportClient</p>
+<h3 id="TransportClient"><a href="#TransportClient" class="headerlink" title="TransportClient"></a>TransportClient</h3><blockquote>
+<p>连接远程Elasticsearch集群使用传输模块</p>
+</blockquote>
+<hr>
+<p>es有一个集群”嗅探”功能，当开始”嗅探”，可以知道</p>
+<ol>
+<li>Client允许动态的增加或删除主机地址</li>
+<li>传输客户端将连接到节点的内部节点列表</li>
+<li>客户机将调用内部集群状态API在这些节点发现可用的数据节点上。客户端将被替换的内部节点列表中与数据节点（数据列表5s刷新一次）</li>
+</ol>
+<blockquote>
+<p>注意：如果节点不是一个数据节点，可能不包括原始节点连接。例如：如果开始连接一个主节点，通过”嗅探”后，没有将请求传递给主节点，而是请求到其他数据节点，是为了避免只在主节点上耗费搜索流量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">Settings settings = Settings.builder()</div><div class="line">        .put(&quot;cluster.name&quot;, &quot;myClusterName&quot;)//集群名称</div><div class="line">		.put(&quot;client.transport.sniff&quot;, true) //启动&quot;嗅探&quot;</div><div class="line">		.build();</div><div class="line">//开启连接</div><div class="line">TransportClient client = new PreBuiltTransportClient(Settings.EMPTY) //settings</div><div class="line">        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(&quot;host1&quot;), 9300)) </div><div class="line">        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(&quot;host2&quot;), 9300));</div><div class="line"></div><div class="line"></div><div class="line">//关闭连接</div><div class="line">client.close();</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p>其他参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//gnore cluster name validation of connected nodes</div><div class="line">client.transport.ignore_cluster_name </div><div class="line">//The time to wait for a ping response from a node（5s）</div><div class="line">client.transport.ping_timeout</div><div class="line">//ping the nodes listed and connected（5s)</div><div class="line">client.transport.nodes_sampler_interval</div></pre></td></tr></table></figure>
+<h3 id="协调节点"><a href="#协调节点" class="headerlink" title="协调节点"></a>协调节点</h3><blockquote>
+<p>在本地一个协调节点,然后简单地创建一个TransportClient在您的应用程序连接到这个协调节点。这样，只有协调节点可以加载任何你所需要的插件</p>
+</blockquote>
+<h2 id="DocumentAPI"><a href="#DocumentAPI" class="headerlink" title="DocumentAPI"></a>DocumentAPI</h2><h3 id="CRUD"><a href="#CRUD" class="headerlink" title="CRUD"></a>CRUD</h3><h4 id="简单的文档API"><a href="#简单的文档API" class="headerlink" title="简单的文档API"></a>简单的文档API</h4><ol>
+<li>Index API</li>
+<li>Get API</li>
+<li>Delete API</li>
+<li>Delete By Query API</li>
+<li>Update API</li>
+</ol>
+<h3 id="多文档API"><a href="#多文档API" class="headerlink" title="多文档API"></a>多文档API</h3><p>1.Multi Get API<br>2.Bulk API</p>
+<hr>
+<h2 id="Generate-JSON-Ways"><a href="#Generate-JSON-Ways" class="headerlink" title="Generate JSON Ways"></a>Generate JSON Ways</h2><blockquote>
+<p>index API 允许将一个索引类型的JSON文档转换成特定的索引，以便于搜索</p>
+<p>生成JSON文档的几种方式</p>
+</blockquote>
+<p>手动字符串拼接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String json = &quot;&#123;&quot; +</div><div class="line">        &quot;\&quot;user\&quot;:\&quot;kimchy\&quot;,&quot; +</div><div class="line">        &quot;\&quot;postDate\&quot;:\&quot;2013-01-30\&quot;,&quot; +</div><div class="line">        &quot;\&quot;message\&quot;:\&quot;trying out Elasticsearch\&quot;&quot; +</div><div class="line">    &quot;&#125;&quot;;</div></pre></td></tr></table></figure>
+<p>通过map自动转换</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Map&lt;String, Object&gt; json = new HashMap&lt;String, Object&gt;();</div><div class="line">json.put(&quot;user&quot;,&quot;kimchy&quot;);</div><div class="line">json.put(&quot;postDate&quot;,new Date());</div><div class="line">json.put(&quot;message&quot;,&quot;trying out Elasticsearch&quot;);</div></pre></td></tr></table></figure>
+<p>运用第三方工具，例如Jackson等</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">import com.fasterxml.jackson.databind.*;</div><div class="line">// instance a json mapper</div><div class="line">ObjectMapper mapper = new ObjectMapper(); // create once, reuse</div><div class="line">// generate json</div><div class="line">byte[] json = mapper.writeValueAsBytes(yourbeaninstance);</div></pre></td></tr></table></figure>
+<p> 使用 XContentFactory.jsonBuilder()（Es结构化工具）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.common.xcontent.XContentFactory.*;</div><div class="line"></div><div class="line">XContentBuilder builder = jsonBuilder()</div><div class="line">    .startObject()//拼接对象 </div><div class="line">        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">        .field(&quot;postDate&quot;, new Date())</div><div class="line">        .field(&quot;message&quot;, &quot;trying out Elasticsearch&quot;)</div><div class="line">    .endObject();</div><div class="line">    </div><div class="line">String json = builder.string();</div><div class="line">//拼接数组</div><div class="line">startArray(json);</div></pre></td></tr></table></figure>
+<h3 id="Index-API"><a href="#Index-API" class="headerlink" title="Index API"></a>Index API</h3><blockquote>
+<p>需要将拼接的数据填入_source字段<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.common.xcontent.XContentFactory.*;</div><div class="line">//以某网站的用户为例</div><div class="line">//查找tmall商城的编号为1的用户user</div><div class="line">IndexResponse response = </div><div class="line">client.prepareIndex(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .setSource(jsonBuilder()</div><div class="line">                    .startObject()</div><div class="line">                        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">                        .field(&quot;postDate&quot;, new Date())</div><div class="line">                        .field(&quot;message&quot;, &quot;Elasticsearch&quot;)</div><div class="line">                    .endObject()</div><div class="line">        ) //将json文档放入_source字段</div><div class="line">        .get();</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p>如果仅仅是字符串类型，则不需要id<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">String json = &quot;&#123;&quot; +</div><div class="line">        &quot;\&quot;user\&quot;:\&quot;kimchy\&quot;,&quot; +</div><div class="line">        &quot;\&quot;postDate\&quot;:\&quot;2013-01-30\&quot;,&quot; +</div><div class="line">        &quot;\&quot;message\&quot;:\&quot;trying out Elasticsearch\&quot;&quot; +</div><div class="line">    &quot;&#125;&quot;;</div><div class="line"></div><div class="line">IndexResponse response = client.prepareIndex(&quot;twitter&quot;, &quot;tweet&quot;)</div><div class="line">        .setSource(json)</div><div class="line">        .get();</div></pre></td></tr></table></figure></p>
+<h3 id="IndexResponse"><a href="#IndexResponse" class="headerlink" title="IndexResponse"></a>IndexResponse</h3><blockquote>
+<p>可以得到数据报告</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">// Index name</div><div class="line">String _index = response.getIndex();</div><div class="line">// Type name</div><div class="line">String _type = response.getType();</div><div class="line">// Document ID (generated or not)</div><div class="line">String _id = response.getId();</div><div class="line">// Version (if it&apos;s the first time you index this document, you will get: 1)</div><div class="line">long _version = response.getVersion();</div><div class="line">// status has stored current instance statement.</div><div class="line">RestStatus status = response.status();</div></pre></td></tr></table></figure>
+<h3 id="操作线程"><a href="#操作线程" class="headerlink" title="操作线程"></a>操作线程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">setOperationThreaded(boolean)</div></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/docs-index_.html" target="_blank" rel="external">关于IndexAPI更多请参考</a></p>
+<hr>
+<h2 id="Get-API"><a href="#Get-API" class="headerlink" title="Get API"></a>Get API</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GetResponse response = client.prepareGet(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;).get();</div></pre></td></tr></table></figure>
+<h2 id="Delete-API"><a href="#Delete-API" class="headerlink" title="Delete API"></a>Delete API</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DeleteResponse response = client.prepareDelete(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;).get();</div></pre></td></tr></table></figure>
+<h2 id="Delete-API-Update-API"><a href="#Delete-API-Update-API" class="headerlink" title="Delete API     Update API"></a>Delete API     Update API</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">BulkIndexByScrollResponse response =</div><div class="line">    DeleteByQueryAction.INSTANCE.newRequestBuilder(client)</div><div class="line">        .filter(QueryBuilders.matchQuery(&quot;sex&quot;, &quot;男&quot;))  //条件</div><div class="line">        .source(&quot;persons&quot;)    //索引                            </div><div class="line">        .get();                                             </div><div class="line"></div><div class="line">long deleted = response.getDeleted();</div></pre></td></tr></table></figure>
+<h2 id="异步删除"><a href="#异步删除" class="headerlink" title="异步删除"></a>异步删除</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">DeleteByQueryAction.INSTANCE.newRequestBuilder(client)</div><div class="line">    .filter(QueryBuilders.matchQuery(&quot;sex&quot;, &quot;男&quot;))                  </div><div class="line">    .source(&quot;persons&quot;)                                                   </div><div class="line">    .execute(new ActionListener&lt;BulkIndexByScrollResponse&gt;() &#123;           </div><div class="line">        @Override</div><div class="line">        public void onResponse(BulkIndexByScrollResponse response) &#123;</div><div class="line">            long deleted = response.getDeleted();                        </div><div class="line">        &#125;</div><div class="line">        @Override</div><div class="line">        public void onFailure(Exception e) &#123;</div><div class="line">            // Handle the exception</div><div class="line">        &#125;</div><div class="line">    &#125;);</div></pre></td></tr></table></figure>
+<h2 id="UpdateAPI"><a href="#UpdateAPI" class="headerlink" title="UpdateAPI"></a>UpdateAPI</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest();</div><div class="line">updateRequest.index(&quot;index&quot;);</div><div class="line">updateRequest.type(&quot;type&quot;);</div><div class="line">updateRequest.id(&quot;1&quot;);</div><div class="line">updateRequest.doc(jsonBuilder()</div><div class="line">        .startObject()</div><div class="line">            .field(&quot;sex&quot;, &quot;女&quot;)</div><div class="line">        .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
+<h3 id="Update-By-Script"><a href="#Update-By-Script" class="headerlink" title="Update By Script"></a>Update By Script</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">client.prepareUpdate(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .setScript(new Script(&quot;ctx._source.sex = \&quot;男\&quot;&quot;  , ScriptService.ScriptType.INLINE, null, null))</div><div class="line">        .get();</div><div class="line"></div><div class="line">client.prepareUpdate(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .setDoc(jsonBuilder()               </div><div class="line">            .startObject()</div><div class="line">                .field(&quot;sex&quot;, &quot;女&quot;)</div><div class="line">            .endObject())</div><div class="line">        .get();</div><div class="line">        </div><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .script(new Script(&quot;ctx._source.sex = \&quot;男\&quot;&quot;));</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
+<h2 id="更新后，通过部分文档合并到现有文档"><a href="#更新后，通过部分文档合并到现有文档" class="headerlink" title="更新后，通过部分文档合并到现有文档"></a>更新后，通过部分文档合并到现有文档</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;index&quot;, &quot;type&quot;, &quot;1&quot;)</div><div class="line">        .doc(jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;gender&quot;, &quot;male&quot;)</div><div class="line">            .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
+<h2 id="Upsert"><a href="#Upsert" class="headerlink" title="Upsert"></a>Upsert</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">IndexRequest indexRequest = new IndexRequest(&quot;index&quot;, &quot;type&quot;, &quot;1&quot;)</div><div class="line">        .source(jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;name&quot;, &quot;Joe Smith&quot;)</div><div class="line">                .field(&quot;gender&quot;, &quot;male&quot;)</div><div class="line">            .endObject());</div><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;index&quot;, &quot;type&quot;, &quot;1&quot;)</div><div class="line">        .doc(jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;gender&quot;, &quot;male&quot;)</div><div class="line">            .endObject())</div><div class="line">        .upsert(indexRequest);              </div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
+<h2 id="Multi-Get-API-批量查询"><a href="#Multi-Get-API-批量查询" class="headerlink" title="Multi Get API //批量查询"></a>Multi Get API //批量查询</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">MultiGetResponse multiGetItemResponses = client.prepareMultiGet()</div><div class="line">    .add(&quot;twitter&quot;, &quot;tweet&quot;, &quot;1&quot;)           </div><div class="line">    .add(&quot;twitter&quot;, &quot;tweet&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;) </div><div class="line">    .add(&quot;another&quot;, &quot;type&quot;, &quot;foo&quot;)          </div><div class="line">    .get();</div><div class="line"></div><div class="line">for (MultiGetItemResponse itemResponse : multiGetItemResponses) &#123; </div><div class="line">    GetResponse response = itemResponse.getResponse();</div><div class="line">    if (response.isExists()) &#123;                      </div><div class="line">        String json = response.getSourceAsString(); </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/docs-multi-get.html" target="_blank" rel="external">更多MultiGetAPI参考</a></p>
+<h2 id="Bulk-API-批量导入"><a href="#Bulk-API-批量导入" class="headerlink" title="Bulk API 批量导入"></a>Bulk API 批量导入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.common.xcontent.XContentFactory.*;</div><div class="line"></div><div class="line">BulkRequestBuilder bulkRequest = client.prepareBulk();</div><div class="line"></div><div class="line">// either use client#prepare, or use Requests# to directly build index/delete requests</div><div class="line">bulkRequest.add(client.prepareIndex(&quot;twitter&quot;, &quot;tweet&quot;, &quot;1&quot;)</div><div class="line">        .setSource(jsonBuilder()</div><div class="line">                    .startObject()</div><div class="line">                        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">                        .field(&quot;postDate&quot;, new Date())</div><div class="line">                        .field(&quot;message&quot;, &quot;trying out Elasticsearch&quot;)</div><div class="line">                    .endObject()</div><div class="line">                  )</div><div class="line">        );</div><div class="line"></div><div class="line">bulkRequest.add(client.prepareIndex(&quot;twitter&quot;, &quot;tweet&quot;, &quot;2&quot;)</div><div class="line">        .setSource(jsonBuilder()</div><div class="line">                    .startObject()</div><div class="line">                        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">                        .field(&quot;postDate&quot;, new Date())</div><div class="line">                        .field(&quot;message&quot;, &quot;another post&quot;)</div><div class="line">                    .endObject()</div><div class="line">                  )</div><div class="line">        );</div><div class="line"></div><div class="line">BulkResponse bulkResponse = bulkRequest.get();</div><div class="line">if (bulkResponse.hasFailures()) &#123;</div><div class="line">    // process failures by iterating through each bulk response item</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Bulk-Processer（批处理器）"><a href="#Bulk-Processer（批处理器）" class="headerlink" title="Bulk Processer（批处理器）"></a>Bulk Processer（批处理器）</h3><blockquote>
+<p>在给定的时间段或者请求达到一定的数量之后自动”冲洗”批处理请求<br>The BulkProcessor class offers a simple interface to flush bulk operations automatically based on the number or size of requests, or after a given period<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">import org.elasticsearch.action.bulk.BackoffPolicy;</div><div class="line">import org.elasticsearch.action.bulk.BulkProcessor;</div><div class="line">import org.elasticsearch.common.unit.ByteSizeUnit;</div><div class="line">import org.elasticsearch.common.unit.ByteSizeValue;</div><div class="line">import org.elasticsearch.common.unit.TimeValue;</div><div class="line"></div><div class="line">//添加elasticsearch客户端</div><div class="line">BulkProcessor bulkProcessor = BulkProcessor.builder(</div><div class="line">        client,  </div><div class="line">        new BulkProcessor.Listener() &#123;</div><div class="line">            @Override</div><div class="line">            public void beforeBulk(long executionId,</div><div class="line">                                   BulkRequest request) &#123; </div><div class="line">				//etc.request.numberOfActions()</div><div class="line">			 &#125; </div><div class="line"></div><div class="line">            @Override</div><div class="line">            public void afterBulk(long executionId,</div><div class="line">                                  BulkRequest request,</div><div class="line">                                  BulkResponse response) &#123; </div><div class="line">				//etc.response.hasFailures()</div><div class="line">			&#125; </div><div class="line"></div><div class="line">            @Override</div><div class="line">            public void afterBulk(long executionId,</div><div class="line">                                  BulkRequest request,</div><div class="line">                                  Throwable failure) &#123; </div><div class="line">			   //etc.raise Throwable</div><div class="line">			&#125; </div><div class="line">        &#125;)</div><div class="line">        .setBulkActions(10000) //批量执行请求数目（10000）</div><div class="line">        .setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB))//清洗大小（5Mb) </div><div class="line">        //清洗间隔（5s）</div><div class="line">        .setFlushInterval(TimeValue.timeValueSeconds(5)) </div><div class="line">        //设置并发请求的数量。的值为0意味着只有一个单一的请求将被允许执行。值为1时表示1并发请求允许同时积累新的批量执行请求。</div><div class="line">        .setConcurrentRequests(1) </div><div class="line">        //请求失败最多尝试的次数（3）和时间间隔（100ms）</div><div class="line">        .setBackoffPolicy(</div><div class="line">            BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)) </div><div class="line">        .build();</div></pre></td></tr></table></figure></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ES/" rel="tag"># ES</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/06/ElasticSearch学习笔记（三）——-聚合/" rel="next" title="ElasticSearch学习笔记（三）—— 聚合">
+                <i class="fa fa-chevron-left"></i> ElasticSearch学习笔记（三）—— 聚合
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/06/ElasticSearch学习笔记-五-——-查询/" rel="prev" title="ElasticSearch学习笔记(五) —— 查询">
+                ElasticSearch学习笔记(五) —— 查询 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">107</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">85</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动成功页面"><span class="nav-number">1.</span> <span class="nav-text">启动成功页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Maven"><span class="nav-number">2.</span> <span class="nav-text">Maven</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Java客户端"><span class="nav-number">3.</span> <span class="nav-text">创建Java客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TransportClient"><span class="nav-number">4.</span> <span class="nav-text">TransportClient</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协调节点"><span class="nav-number">5.</span> <span class="nav-text">协调节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DocumentAPI"><span class="nav-number"></span> <span class="nav-text">DocumentAPI</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CRUD"><span class="nav-number">1.</span> <span class="nav-text">CRUD</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简单的文档API"><span class="nav-number">1.1.</span> <span class="nav-text">简单的文档API</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多文档API"><span class="nav-number">2.</span> <span class="nav-text">多文档API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Generate-JSON-Ways"><span class="nav-number"></span> <span class="nav-text">Generate JSON Ways</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Index-API"><span class="nav-number">1.</span> <span class="nav-text">Index API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IndexResponse"><span class="nav-number">2.</span> <span class="nav-text">IndexResponse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作线程"><span class="nav-number">3.</span> <span class="nav-text">操作线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-API"><span class="nav-number"></span> <span class="nav-text">Get API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Delete-API"><span class="nav-number"></span> <span class="nav-text">Delete API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Delete-API-Update-API"><span class="nav-number"></span> <span class="nav-text">Delete API     Update API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步删除"><span class="nav-number"></span> <span class="nav-text">异步删除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UpdateAPI"><span class="nav-number"></span> <span class="nav-text">UpdateAPI</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Update-By-Script"><span class="nav-number">1.</span> <span class="nav-text">Update By Script</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新后，通过部分文档合并到现有文档"><span class="nav-number"></span> <span class="nav-text">更新后，通过部分文档合并到现有文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Upsert"><span class="nav-number"></span> <span class="nav-text">Upsert</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Multi-Get-API-批量查询"><span class="nav-number"></span> <span class="nav-text">Multi Get API //批量查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bulk-API-批量导入"><span class="nav-number"></span> <span class="nav-text">Bulk API 批量导入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bulk-Processer（批处理器）"><span class="nav-number">1.</span> <span class="nav-text">Bulk Processer（批处理器）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

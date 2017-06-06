@@ -254,6 +254,1496 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/" itemprop="url">RabbitMq学习笔记（四）—— 消息路由（Routing）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:37:53+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">//声明直连交换器</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;direct&quot;);  </div><div class="line"></div><div class="line">// 获取匿名队列名称  </div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">根据路由关键字进行多重绑定 </div><div class="line"></div><div class="line">for(String severity :routingKeys)&#123;  </div><div class="line"></div><div class="line">        channel.queueBind(queueName, EXCHANGE_NAME, severity);  </div><div class="line"></div><div class="line">&#125; </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//消费数据</div><div class="line"></div><div class="line">Consumer consumer = new DefaultConsumer(channel) &#123;  </div><div class="line"></div><div class="line">            @Override  </div><div class="line"></div><div class="line">            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException &#123;  </div><div class="line"></div><div class="line">                String message = new String(body, &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                System.out.println(&quot; [x] Received &apos;&quot; + envelope.getRoutingKey() + &quot;&apos;:&apos;&quot; + message + &quot;&apos;&quot;);  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">  &#125;;  </div><div class="line"></div><div class="line">        channel.basicConsume(queueName, true, consumer);</div></pre></td></tr></table></figure>
+<h4 id="直连类型交换器"><a href="#直连类型交换器" class="headerlink" title="直连类型交换器"></a>直连类型交换器</h4><blockquote>
+<p>上一章的例子是通过分发【fanout】类型的交换器【logs】广播日志信息，现在我们将日志分debug、info、warn、error这几种基本的级别，实际在生产环境中，避免磁盘空间浪费，应用只会将error级别的日志打印出来。而分发【fanout】类型的交换器会将所有基本的日志都发送出来，如果我们想只接收某一级别的日志信息，就需要使用直连【direct】类型的交换器了, 下面的图中，队列1通过ERROR这个routingkey绑定到E交换器，队列2通过WARN和INFO绑定到E交换器，E交换器的类型是直连【direct】的，如果生产者【P】发出ERROR的日志，只会有队列1会收到，如果生产者【P】发出INFO和WARN的日志，只有队列2会收到，如果生产者【P】发出DEBUG级别的日志，队列1和队列2都会忽略它。</p>
+</blockquote>
+<h4 id="多重绑定"><a href="#多重绑定" class="headerlink" title="多重绑定"></a>多重绑定</h4><blockquote>
+<p>我们允许多个队列以相同的路由关键字绑定到同一个交换器中，可以看到，交换器虽然是直连类型，但是绑定后的效果却跟分发类型的交换器类似，相同的是队列1和队列2都会收到同一条来自交换器的消息。</p>
+</blockquote>
+<p>他们的区别：分发模式下，队列1、队列2会收到所有级别（除ERROR级别以外）的消息，而直连模式下，他们仅仅只会收到ERROR关键字类型的消息。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（三）——-交换器（Pub-Topic）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（三）——-交换器（Pub-Topic）/" itemprop="url">RabbitMq学习笔记（三）—— 交换器（Pub/Topic）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:37:25+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//声明交换器（fanout：分发）rabbitmqctl list_exchanges 查看交换器规则</div><div class="line"></div><div class="line">channel.exchangeDeclare(&quot;logs&quot;, &quot;fanout&quot;);</div><div class="line"></div><div class="line">//创建临时队列</div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line">String message = &quot;this is message in the fanout&apos;exchange &quot;;</div><div class="line"></div><div class="line">//发送消息到交换器中</div><div class="line"></div><div class="line">channel.basicPublish( &quot;logs&quot;, &quot;&quot;, null, message.getBytes());</div><div class="line"></div><div class="line">//交换器绑定队列</div><div class="line"></div><div class="line">channel.queueBind(queueName, &quot;logs&quot;, &quot;&quot;);</div></pre></td></tr></table></figure>
+<blockquote>
+<p>RabbitMQ中消息传递模型的核心思想是：生产者不直接发送消息到队列。实际的运行环境中，生产者是不知道消息会发送到那个队列上，她只会将消息发送到一个交换器，交换器也像一个生产线，她一边接收生产者发来的消息，另外一边则根据交换规则，将消息放到队列中。</p>
+</blockquote>
+<h3 id="交换器的规则有："><a href="#交换器的规则有：" class="headerlink" title="交换器的规则有："></a>交换器的规则有：</h3><ol>
+<li><p>direct （直连）</p>
+</li>
+<li><p>topic （主题）</p>
+</li>
+<li><p>headers （标题）</p>
+</li>
+<li><p>fanout （分发）</p>
+</li>
+</ol>
+<h3 id="匿名交换器"><a href="#匿名交换器" class="headerlink" title="匿名交换器"></a>匿名交换器</h3><blockquote>
+<p>在之前的教程中，我们知道，发送消息到队列时根本没有使用交换器，但是消息也能发送到队列。这是因为RabbitMQ选择了一个空“”字符串的默认交换器。</p>
+</blockquote>
+<p>第一个参数就是交换器的名称。如果输入“”空字符串，表示使用默认的匿名交换器。<br>第二个参数是【routingKey】路由线索<br>匿名交换器规则：<br>发送到routingKey名称对应的队列。</p>
+<h3 id="临时队列"><a href="#临时队列" class="headerlink" title="临时队列"></a>临时队列</h3><p>如果要在生产者和消费者之间创建一个新的队列，又不想使用原来的队列，临时队列就是为这个场景而生的：</p>
+<p>首先，每当我们连接到RabbitMQ，我们需要一个新的空队列，我们可以用一个随机名称来创建，或者说让服务器选择一个随机队列名称给我们。</p>
+<p>一旦我们断开消费者，队列应该立即被删除。</p>
+<p>以上转载</p>
+<p><a href="http://blog.csdn.net/chwshuang/article/details/50512057" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50512057</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（二）——-工作队列（WorkQueue）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（二）——-工作队列（WorkQueue）/" itemprop="url">RabbitMq学习笔记（二）—— 工作队列（WorkQueue）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:36:23+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>WorkQueue：有序的处理消息（etc：流水线作业）</p>
+</blockquote>
+<h3 id="消费者消费数据"><a href="#消费者消费数据" class="headerlink" title="消费者消费数据"></a>消费者消费数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">boolean durable = true;//持久化，保证数据不丢失</div><div class="line"></div><div class="line">channel.queueDeclare(&quot;queue_task&quot;, durable, false, false, null); </div><div class="line"></div><div class="line">        //避免负载不均衡，保证一个消费者处理一个消息</div><div class="line">		int prefetchCount = 1;</div><div class="line">		channel.basicQos(prefetchCount);</div><div class="line"></div><div class="line">        //消费者</div><div class="line">        Consumer consumer = new DefaultConsumer(channel)&#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties,byte[] body)   throws IOException &#123;</div><div class="line">        String message = new String(body, &quot;UTF-8&quot;);</div><div class="line">        System.out.println(&quot;Worker 接收 &apos;&quot; + message + &quot;&apos;&quot;);</div><div class="line">        try &#123;</div><div class="line"></div><div class="line">             doWork(message);</div><div class="line"></div><div class="line">        &#125; finally &#123;</div><div class="line"></div><div class="line">            System.out.println(&quot;Worker 处理完成&quot;);</div><div class="line"></div><div class="line">            //消息处理完成确认</div><div class="line"></div><div class="line">            //如果发生异常，未处理完的消息，将会重新放回队列</div><div class="line">			channel.basicAck(envelope.getDeliveryTag(), false);</div><div class="line"></div><div class="line">                &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        &#125;;</div><div class="line"></div><div class="line">        //消息消费完成确认</div><div class="line">        channel.basicConsume(&quot;queue_task&quot;, false, consumer);</div></pre></td></tr></table></figure>
+<blockquote>
+<p>主要场景是消费者需要根据消息中的内容进行业务逻辑处理，这种消息可以看成是一个任务指令，处理起来比较耗时，通过多个消费者来处理这些消息，来提高数据的吞吐能力</p>
+</blockquote>
+<h3 id="消息确认"><a href="#消息确认" class="headerlink" title="消息确认"></a>消息确认</h3><blockquote>
+<p>为了确保消息或者任务不会丢失，RabbitMQ支持消息确认–ACK。ACK机制是消费者端从RabbitMQ收到消息并处理完成后，反馈给RabbitMQ，RabbitMQ收到反馈后才将此消息从队列中删除。如果一个消费者在处理消息时挂掉（网络不稳定、服务器异常、网站故障等原因导致频道、连接关闭或者TCP连接丢失等），那么他就不会有ACK反馈，RabbitMQ会认为这个消息没有正常消费，会将此消息重新放入队列中。如果有其他消费者同时在线，RabbitMQ会立即将这个消息推送给这个在线的消费者。这种机制保证了在消费者服务器故障的时候，能不丢失任何消息和任务。 </p>
+</blockquote>
+<p><strong>消息的ACK确认机制默认是打开的。</strong></p>
+<h3 id="忘记确认"><a href="#忘记确认" class="headerlink" title="忘记确认"></a>忘记确认</h3><blockquote>
+<p>忘记通过basicAck返回确认信息是常见的错误。这个错误非常严重，将导致消费者客户端退出或者关闭后，消息会被退回RabbitMQ服务器，这会使RabbitMQ服务器内存爆满，而且RabbitMQ也不会主动删除这些被退回的消息。 </p>
+</blockquote>
+<p><strong>注：使用rabbitmqctl messages_unacknowledged命令打印上面信息</strong></p>
+<h3 id="消息持久化"><a href="#消息持久化" class="headerlink" title="消息持久化"></a>消息持久化</h3><blockquote>
+<p>标记为持久化后的消息也不能完全保证不会丢失。虽然已经告诉RabbitMQ消息要保存到磁盘上，但是理论上，RabbitMQ已经接收到生产者的消息，但是还没有来得及保存到磁盘上，服务器就挂了（比如机房断电），那么重启后，RabbitMQ中的这条未及时保存的消息就会丢失。因为RabbitMQ不做实时立即的磁盘同步（fsync）。这种情况下，对于持久化要求不是特别高的简单任务队列来说，还是可以满足的。如果需要更强大的保证，那么你可以考虑使用生产者确认反馈机制。</p>
+</blockquote>
+<h3 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h3><blockquote>
+<p>默认情况下，RabbitMQ将队列消息随机分配给每个消费者，这时可能出现消息调度不均衡的问题。例如有两台消费者服务器，一个服务器可能非常繁忙，消息不断，另外一个却很悠闲，没有什么负载。RabbitMQ不会主动介入这些情况，还是会随机调度消息到每台服务器。 </p>
+</blockquote>
+<p><strong>int prefetchCount = 1;channel.basicQos(prefetchCount);</strong></p>
+<p>为了解决这个问题，我们可以使用【prefetchcount = 1】这个设置。这个设置告诉RabbitMQ，不要一次将多个消息发送给一个消费者。这样做的好处是只有当消费者处理完成当前消息并反馈后，才会收到另外一条消息或任务。这样就避免了负载不均衡的事情了。</p>
+<p>以上转载<br><a href="http://blog.csdn.net/chwshuang/article/details/50512057" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50512057</a></p>
+<p>RabbitMq在线API文档<br><a href="http://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/" target="_blank" rel="external">http://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（一）——-HelloWorld/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（一）——-HelloWorld/" itemprop="url">RabbitMq学习笔记（一）—— HelloWorld</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:35:29+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div></pre></td><td class="code"><pre><div class="line">Maven：</div><div class="line"></div><div class="line">&lt;!-- rabbitmq --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line"></div><div class="line">  &lt;groupId&gt;com.rabbitmq&lt;/groupId&gt;</div><div class="line"></div><div class="line">  &lt;artifactId&gt;amqp-client&lt;/artifactId&gt;</div><div class="line"></div><div class="line">  &lt;version&gt;4.0.0&lt;/version&gt;</div><div class="line"></div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;dependency&gt;</div><div class="line"></div><div class="line">    &lt;groupId&gt;com.rabbitmq&lt;/groupId&gt;</div><div class="line"></div><div class="line">    &lt;artifactId&gt;rabbitmq-client&lt;/artifactId&gt;</div><div class="line"></div><div class="line">    &lt;version&gt;1.3.0&lt;/version&gt;</div><div class="line"></div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//① 配置连接工厂（ConnectionFactory）</div><div class="line"></div><div class="line">ConnectionFactory factory = new ConnectionFactory();</div><div class="line"></div><div class="line">方式一：</div><div class="line"></div><div class="line">factory.setUri(&quot;amqp://admin:admin@172.16.41.31:5672&quot;);</div><div class="line"></div><div class="line">方式二：</div><div class="line"></div><div class="line">factory.setUsername(&quot;admin&quot;);</div><div class="line"></div><div class="line">factory.setPassword(&quot;admin&quot;);</div><div class="line"></div><div class="line">factory.setHost(&quot;172.16.41.31&quot;);</div><div class="line"></div><div class="line">factory.setPort(5672);</div><div class="line"></div><div class="line">factory.setVirtualHost(&quot;/&quot;);</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//② 开启连接（Connection）</div><div class="line"></div><div class="line">Connection conn = factory.newConnection();</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">// ③ 开启通道（Channel）</div><div class="line"></div><div class="line">Channel channel = conn.createChannel();</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">// ④ 声明队列名称</div><div class="line"></div><div class="line">channel.queueDeclare(&quot;queue_hello&quot;, false, false, false, null);</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">// ⑤ 构造消息</div><div class="line"></div><div class="line">String message = &quot;Hello World&quot;;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">// ⑥ 发送消息到队列中</div><div class="line"></div><div class="line">channel.basicPublish(&quot;&quot;,&quot;queue_hello&quot;, null, message.getBytes(&quot;UTF-8&quot;));</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">// ⑦ 释放资源</div><div class="line"></div><div class="line">conn.close()</div><div class="line"></div><div class="line">channel.close()</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/zookeeper学习笔记（三）——-应用场景概览/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/zookeeper学习笔记（三）——-应用场景概览/" itemprop="url">zookeeper学习笔记（二） —— 应用场景概览</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:33:56+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">Zookeeper</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>概念·</p>
+<blockquote>
+<p>ZooKeeper是一个高可用的分布式数据管理与系统协调框架。</p>
+</blockquote>
+<p>优点</p>
+<blockquote>
+<p>保证了分布式环境中数据的强一致性（基于对Paxos算法的实现）</p>
+</blockquote>
+<p>ZooKeeper典型应用场景一览</p>
+<h3 id="数据发布与订阅（配置中心）"><a href="#数据发布与订阅（配置中心）" class="headerlink" title="数据发布与订阅（配置中心）"></a>数据发布与订阅（配置中心）</h3><blockquote>
+<p>顾名思义就是<strong>发布者将数据发布到ZK节点上，供订阅者动态获取数据，实现配置信息的集中式管理和动态更新</strong>。例如全局的配置信息，服务式服务框架的服务地址列表等就非常适合使用。</p>
+</blockquote>
+<ol>
+<li>应用中用到的一些配置信息放到ZK上进行集中管理<br>具体场景应用<pre><code>① 应用在启动的时候会主动来获取一次配置，同时，在节点上注册一个Watcher，这样一来，以后每次配置有更新的时候，都会实时通知到订阅的客户端，从来达到获取最新配置信息的目的    
+② 分布式搜索服务中，索引的元信息和服务器集群机器的节点状态存放在ZK的一些指定节点，供各个客户端订阅使用
+③ 分布式日志收集系统。这个系统的核心工作是收集分布在不同机器的日志。收集器通常是按照应用来分配收集任务单元，因此需要在ZK上创建一个以应用名作为path的节点P，并将这个应用的所有机器ip，以子节点的形式注册到节点P上，这样一来就能够实现机器变动的时候，能够实时通知到收集器调整任务分配。
+④ 系统中有些信息需要动态获取，并且还会存在人工手动去修改这个信息的发问。常是暴露出接口，例如JMX接口，来获取一些运行时的信息。引入ZK之后，就不用自己实现一套方案了，只要将这些信息存放到指定的ZK节点上即可
+</code></pre></li>
+</ol>
+<p>注意：在上面提到的应用场景中，有个默认前提是：数据量很小，但是数据更新可能会比较快的场景。</p>
+<h3 id="负载均衡-指软负载均衡"><a href="#负载均衡-指软负载均衡" class="headerlink" title="负载均衡(指软负载均衡)"></a>负载均衡(指软负载均衡)</h3><blockquote>
+<p>在分布式环境中，为了保证高可用性，通常<strong>同一个应用或同一个服务的提供方都会部署多份，达到对等服务</strong>。而消费者就须要在这些对等的服务器中选择一个来执行相关的业务逻辑，其中比较典型的是消息中间件中的生产者，消费者负载均衡。</p>
+</blockquote>
+<p>消息中间件中发布者和订阅者的负载均衡：linkedin开源的KafkaMQ和阿里开源的metaq都是通过zookeeper来做到生产者、消费者的负载均衡。</p>
+<h4 id="以metaQ为例讲解zk在中间件中的应用"><a href="#以metaQ为例讲解zk在中间件中的应用" class="headerlink" title="以metaQ为例讲解zk在中间件中的应用"></a>以metaQ为例讲解zk在中间件中的应用</h4><blockquote>
+<p>metaQ发送消息的时候，生产者在发送消息的时候必须选择一台broker上的一个分区来发送消息，因此metaQ在运行过程中，会把所有broker和对应的分区信息全部注册到ZK指定节点上，默认的策略是一个依次轮询的过程，生产者在通过ZK获取分区列表之后，会按照brokerId和partition的顺序排列组织成一个有序的分区列表，发送的时候按照从头到尾循环往复的方式选择一个分区来发送消息。</p>
+</blockquote>
+<ol>
+<li>选择(Broker)分区   2. (Broker和分区信息)注册zk节点   3. （brokerId和partition）获取分区列表  4. （有序/循环）发送信息</li>
+</ol>
+<h4 id="消费负载均衡"><a href="#消费负载均衡" class="headerlink" title="消费负载均衡"></a>消费负载均衡</h4><blockquote>
+<p>在消费过程中，一个消费者会消费一个或多个分区中的消息，但是一个分区只会由一个消费者来消费。</p>
+</blockquote>
+<p>原因：每个分区针对同一个group只挂载一个消费者。 如果同一个group的消费者数目大于分区数目，则多出来的消费者将不参与消费。如果同一个group的消费者数目小于分区数目，则有部分消费者需要额外承担消费任务。在某个消费者故障或者重启等情况下，其他消费者会感知到这一变化（通过 zookeeper watch消费者列表），然后重新进行负载均衡，保证所有的分区都有消费者进行消费。</p>
+<h3 id="命名服务-Naming-Service"><a href="#命名服务-Naming-Service" class="headerlink" title="命名服务(Naming Service)"></a>命名服务(Naming Service)</h3><blockquote>
+<p>在分布式系统中，通过使用命名服务，客户端应用能够根据指定名字来获取资源或服务的地址，提供者等信息</p>
+</blockquote>
+<p>被命名的实体通常可以是集群中的机器，提供的服务地址，远程对象等等——这些我们都可以统称他们为名字（Name）。其中较为常见的就是一些分布式服务框架中的服务地址列表。通过调用ZK提供的创建节点的API，能够很容易创建一个全局唯一的path，这个path就可以作为一个名称<br>具体应用<br>        Dubbo中使用ZooKeeper来作为其命名服务，维护全局的服务地址列表<br>            服务提供者在启动的时候，向ZK上的指定节点/dubbo/${serviceName}/providers目录下写入自己的URL地址，这个操作就完成了服务的发布。 服务消费者启动的时候，订阅/dubbo/${serviceName}/providers目录下的提供者URL地址， 并向/dubbo/${serviceName} /consumers目录下写入自己的URL地址。 注意，所有向ZK上注册的地址都是临时节点，这样就能够保证服务提供者和消费者能够自动感应资源的变化。另外，Dubbo还有针对服务粒度的监控，方法是订阅/dubbo/${serviceName}目录下所有提供者和消费者的信息</p>
+<h3 id="分布式通知-协调"><a href="#分布式通知-协调" class="headerlink" title="分布式通知/协调"></a>分布式通知/协调</h3><blockquote>
+<p>ZooKeeper中特有watcher注册与异步通知机制，能够很好的实现分布式环境下不同系统之间的通知与协调，实现对数据变更的实时处理</p>
+</blockquote>
+<p>通常是不同系统都对ZK上同一个znode进行注册，监听znode的变化（包括znode本身内容及子节点的），其中一个系统update了znode，那么另一个系统能够收到通知，并作出相应处理<br>        另一种心跳检测机制：检测系统和被检测系统之间并不直接关联起来，而是通过zk上某个节点关联，大大减少系统耦合。 另一种系统调度模式：某系统有控制台和推送系统两部分组成，控制台的职责是控制推送系统进行相应的推送工作。管理人员在控制台作的一些操作，实际上是修改了ZK上某些节点的状态，而ZK就把这些变化通知给他们注册Watcher的客户端，即推送系统，于是，作出相应的推送任务。<br>        另一种工作汇报模式：一些类似于任务分发系统，子任务启动后，到zk来注册一个临时节点，并且定时将自己的进度进行汇报（将进度写回这个临时节点），这样任务管理者就能够实时知道任务进度<br>使用zookeeper来进行分布式通知和协调能够大大降低系统之间的耦合</p>
+<h3 id="集群管理与Master选举"><a href="#集群管理与Master选举" class="headerlink" title="集群管理与Master选举"></a>集群管理与Master选举</h3><blockquote>
+<p>集群机器监控：这通常用于那种对集群中机器状态，机器在线率有较高要求的场景，能够快速对集群中机器变化作出响应。这样的场景中，往往有一个监控系统，实时检测集群机器是否存活。</p>
+</blockquote>
+<p> 利用ZooKeeper有两个特性，就可以实时另一种集群机器存活性监控系统：</p>
+<pre><code>1. 客户端在节点 x 上注册一个Watcher，那么如果 x?的子节点变化了，会通知该客户端。
+2. 创建EPHEMERAL类型的节点，一旦客户端和服务器的会话结束或过期，那么该节点就会消失。
+</code></pre><p>举个栗子<br>    监控系统在 /clusterServers 节点上注册一个Watcher，以后每动态加机器，那么就往 /clusterServers 下创建一个 EPHEMERAL类型的节点：/clusterServers/{hostname}. 这样，监控系统就能够实时知道机器的增减情况，至于后续处理就是监控系统的业务了。 Master选举则是zookeeper中最为经典的应用场景了。</p>
+<p>在分布式环境中，相同的业务应用分布在不同的机器上，有些业务逻辑（例如一些耗时的计算，网络I/O处理），往往只需要让整个集群中的某一台机器进行执行，其余机器可以共享这个结果，这样可以大大减少重复劳动，提高性能，于是这个master选举便是这种场景下的碰到的主要问题。</p>
+<p>利用ZooKeeper的强一致性，能够保证在分布式高并发情况下节点创建的全局唯一性，即：同时有多个客户端请求创建 /currentMaster 节点，最终一定只有一个客户端请求能够创建成功。利用这个特性，就能很轻易的在分布式环境中进行集群选取了。</p>
+<p>另外，这种场景演化一下，就是动态Master选举。这就要用到?EPHEMERAL_SEQUENTIAL类型节点的特性了。<br>所有客户端创建请求，最终只有一个能够创建成功。在这里稍微变化下，就是允许所有请求都能够创建成功，但是得有个创建顺序，于是所有的请求最终在ZK上创建结果的一种可能情况是这样： /currentMaster/{sessionId}-1 ,?/currentMaster/{sessionId}-2 ,?/currentMaster/{sessionId}-3 ….. 每次选取序列号最小的那个机器作为Master，如果这个机器挂了，由于他创建的节点会马上小时，那么之后最小的那个机器就是Master了</p>
+<p>在搜索系统中，如果集群中每个机器都生成一份全量索引，不仅耗时，而且不能保证彼此之间索引数据一致。因此让集群中的Master来进行全量索引的生成，然后同步到集群中其它机器。<br>Master选举的容灾措施是，可以随时进行手动指定master，就是说应用在zk在无法获取master信息时，可以通过比如http方式，向一个地方获取master</p>
+<h3 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h3><blockquote>
+<p>分布式锁，这个主要得益于ZooKeeper为我们保证了数据的强一致性。锁服务可以分为两类，一个是保持独占，另一个是控制时序。</p>
+</blockquote>
+<p>所谓保持独占，就是所有试图来获取这个锁的客户端，最终只有一个可以成功获得这把锁。通常的做法是把zk上的一个znode看作是一把锁，通过create znode的方式来实现。所有客户端都去创建 /distribute_lock 节点，最终成功创建的那个客户端也即拥有了这把锁。 控制时序，就是所有视图来获取这个锁的客户端，最终都是会被安排执行，只是有个全局时序了。做法和上面基本类似，只是这里 /distribute_lock 已经预先存在，客户端在它下面创建临时有序节点（这个可以通过节点的属性控制：CreateMode.EPHEMERAL_SEQUENTIAL来指定）。Zk的父节点（/distribute_lock）维持一份sequence,保证子节点创建的时序性，从而也形成了每个客户端的全局时序</p>
+<h3 id="分布式队列"><a href="#分布式队列" class="headerlink" title="分布式队列"></a>分布式队列</h3><blockquote>
+<p>队列方面，简单地讲有两种，一种是常规的先进先出队列，另一种是要等到队列成员聚齐之后的才统一按序执行。对于第一种先进先出队列，和分布式锁服务中的控制时序场景基本原理一致</p>
+</blockquote>
+<p>第二种队列其实是在FIFO队列的基础上作了一个增强。通常可以在 /queue 这个znode下预先建立一个/queue/num 节点，并且赋值为n（或者直接给/queue赋值n），表示队列大小，之后每次有队列成员加入后，就判断下是否已经到达队列大小，决定是否可以开始执行了。这种用法的典型场景是，分布式环境中，一个大任务Task A，需要在很多子任务完成（或条件就绪）情况下才能进行。这个时候，凡是其中一个子任务完成（就绪），那么就去 /taskList 下建立自己的临时时序节点（CreateMode.EPHEMERAL_SEQUENTIAL），当 /taskList 发现自己下面的子节点满足指定个数，就可以进行下一步按序进行处理了。</p>
+<p>原文转载<br><a href="http://jm.taobao.org/2011/10/08/1232/​" target="_blank" rel="external">http://jm.taobao.org/2011/10/08/1232/​</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/zookeeper学习笔记（三）-——-分布式锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/zookeeper学习笔记（三）-——-分布式锁/" itemprop="url">zookeeper学习笔记（三） —— 分布式锁</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:32:55+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">Zookeeper</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h2><ol>
+<li>ZooKeeper <strong>调用create()方法来创建一个路径格式为“ <em>locknode</em>/lock- ”的节点</strong>，此节点类型为 sequence （连续）和 ephemeral（临时）。也就是说，创建的节点为临时节点，并且所有的节点连续编号，即“ lock-i ”的格式</li>
+<li>在创建的锁节点上<strong>调用 getChildren （）方法，来获取锁目录下的最小编号节点</strong>，并且不设置 watch </li>
+<li>步骤 2 中获取的节点恰好是步骤 1 中客户端创建的节点，那么此客户端获得此种类型的锁，然后退出操作</li>
+<li>客户端在锁目录上<strong>调用 exists （）方法，并且设置 watch 来监视锁目录下比自己小一个的连续临时节点的状态</strong></li>
+<li>果监视节点状态发生变化，则跳转到第 2 步，继续进行后续的操作，直到退出锁竞争</li>
+</ol>
+<h2 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h2><blockquote>
+<p>客户端只需要将加锁操作步骤中创建的临时节点删除即可</p>
+</blockquote>
+<h2 id="羊群效应"><a href="#羊群效应" class="headerlink" title="羊群效应"></a>羊群效应</h2><p>“羊群效应”就是指大量客户端收到同一事件的通知，但实际只有很少一部分需要处理这一事件。<br>设想当有成百上千客户端，都在尝试获得锁，<strong>每个客户端都会在锁上设置观察，来捕捉节点的变化。每次锁被释放或另一个进程申请获取锁时，观察都会被触发并且每个客户端都会收到一个通知，但只有一个客户端会成功获得锁</strong>。这时就会造成大量的峰值流量，给zookeeper服务器造成压力。</p>
+<p>为了避免羊群效应，我们需要优化通知事件，将没必要的观察通知去掉，如删除等，只有在前一个顺序号的子节点消失时才需要通知下一个客户端。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/zookeeper学习笔记（五）——具体应用：秒杀思路/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/zookeeper学习笔记（五）——具体应用：秒杀思路/" itemprop="url">zookeeper学习笔记（五）——具体应用：秒杀思路</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:32:14+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">Zookeeper</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="秒杀一般有几个场景"><a href="#秒杀一般有几个场景" class="headerlink" title="秒杀一般有几个场景"></a>秒杀一般有几个场景</h3><pre><code>1.电商秒杀商品 2.抢红包 3.抢票
+</code></pre><h3 id="假设一个场景如下"><a href="#假设一个场景如下" class="headerlink" title="假设一个场景如下"></a>假设一个场景如下</h3><pre><code>某电商公司搞活动,一折秒杀,推出几种秒杀的商品,每种商品1000个,预计100w人抢购 要求: 不能超卖.绝对不可以卖多了. 数据库要扣减库存,并且记录订单明细
+</code></pre><h3 id="难点分析"><a href="#难点分析" class="headerlink" title="难点分析"></a>难点分析</h3><p>1.不能<strong>阻塞</strong>. 海量的请求就像血栓一样,遍走周身,一旦遇到瓶颈,就会堵塞整个血管. 所以一定要让海量的用户请求,尽快结束.</p>
+<p>2.数据库单行更新 大量的 update 库存表 set 剩余数量=剩余数量-1 where 商品ID=? 这种单行更新,有<strong>行锁</strong>,会阻塞其他事务,占用宝贵的数据库处理能力.</p>
+<h3 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h3><p>1.<strong>Web服务器集群层,卸载流量</strong> 海量的用户秒杀请求,本质上是一个排序,先到先得. 但是如此之多的请求,完全响应,难度又很大. 所以在Web服务器集群,可以考虑卸载流量. 比如每十个请求,随机抛弃九个,只放行一个请求到后续处理环节. 把秒杀的排序模式,变为随机抽奖的模式.</p>
+<p>2.<strong>Web服务器集群层,缩小锁范围. 每次秒杀活动开始之前.先计算活动推出的商品数量,然后分配一个限额到每个Web服务器</strong>. 比如一个活动推出秒杀商品 电视,手机,衣服各1000件,那么每台服务器的限额就是125件. 将这个限额写入ZooKeeper,Web服务器监听到限额的变化,就会重新初始化各自的商品剩余数量.</p>
+<h3 id="模拟实例"><a href="#模拟实例" class="headerlink" title="模拟实例"></a>模拟实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">private static ConcurrentHashMap&lt;String,Integer&gt; map=new ConcurrentHashMap&lt;String, Integer&gt;();    </div><div class="line">    private void zooKeeperHandle()&#123;</div><div class="line">        //将ZooKeeper的变化,初始化到Web服务器全局容器</div><div class="line">        map.put(&quot;电视机&quot;, 125);</div><div class="line">        map.put(&quot;手机&quot;, 125);</div><div class="line">        map.put(&quot;衣服&quot;, 125);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>假设用户请求秒杀电视机,它只是锁了该Web服务器电视机的数量。(该Web服务器手机和衣服还可以继续并发处理,当然其他的Web服务器也在同时处理电视机的秒杀请求) 这样缩小了锁定的范围,增加了系统处理的吞吐量.</p>
+<p>如果这个剩余数量大于零,则将用户ID放入电视机购买队列,<br>然后告知用户秒杀成功如果这个剩余数量等于零,则告知用户秒杀失败.<br>即便别的Web服务器还有电视机的剩余配额.</p>
+<p>3.ZooKeeper层,ZooKeeper变更库存信息 假设活动期间,需要修改库存信息。 两种可能, 第一种,该商品已经卖了500件,电商不想继续卖了. 第二种,从仓库中又找到了一些积压库存..</p>
+<blockquote>
+<p>两种情况,都直接修改ZooKeeper中相应商品的配额.<br>Web服务器会监听变化,并重新初始化全局容器.</p>
+</blockquote>
+<p>4.消息队列层,多消费者处理<br>    消费者主要是从队列获取购买请求,发送至数据库<br>    扣减数据库库存<br>    写订单明细记录</p>
+<p>5.数据库层,使用存储过程代替JDBC调用 由于使用了多消费者处理同一队列,增加吞吐量,避免队列堆积过大. 但是多消费者,必然导致数据库出现单行更新问题(不推荐）</p>
+<p>单行更新问题就是多个线程,并发修改同一条记录,导致事务相互阻塞.浪费了数据库宝贵的处理能力.</p>
+<p>以上转载<br><a href="http://m.blog.itpub.net/29254281/viewspace-1800617/" target="_blank" rel="external">http://m.blog.itpub.net/29254281/viewspace-1800617/</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/多线程记录笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/多线程记录笔记/" itemprop="url">多线程记录笔记</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:31:38+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>【一】什么是pu核心数？线程数？</p>
+<p>① 宽（32位/64位CPU位宽） ：  更大的cpu一次能处理更大范围的数据运算和支持更大容量的内存<br>② 多核心（单芯片多处理器，简称CMP）：其思想是将大规模并行处理器中的SMP（对称多处理器）集成到同一芯片中，各个处理器并行处理不同的线程<br>③ 多线程（简称SMT）：可复制多个处理器上的结构状态，让同一处理器的多个线程同步执行并共享处理器上的资源</p>
+<p>核心数和线程数之间的关系：<strong>增加核心数是为了增加线程数（核心数:线程数 = 1：1 由于intel引入超线程技术，核心数:线程数=1：2） </strong></p>
+<p>【二】cpu时间片轮转机制？</p>
+<p>时间片轮转调度（又称RR调度）：每个进程分配一个时间段（时间片，即该进程允许运行时间）</p>
+<p>【三】进程和线程的区别</p>
+<p> 进程：程序运行资源分配最小单位<br> 线程：cpu调度的最小单位，必须依赖进程而存在</p>
+<p>【四】并行运行？</p>
+<p> 程序同时所开启的运行的线程数    &lt;= cpu数量   * cpu线程数量</p>
+<p> 【五】并发运行？</p>
+<p>  程序同时所开启的运行的线程数    &gt; cpu数量   * cpu线程数量</p>
+<p>【六】吞吐量？</p>
+<p><strong>指对网络、设备、端口、虚电路或其他设施，单位时间内成功传送的数据量</strong></p>
+<p>① 网络吞吐量：在某个时刻，网络中亮哥节点之间，提供给网络应用的剩余带宽（在帧没有丢失的情况下，设备能够接收的最大速率），帮助寻找网络路径中的瓶颈</p>
+<p>② 系统吞吐量：系统在单位时间内所处理的信息量（每个时间段通过处理的进程量衡量）</p>
+<p>【七】多并发的优势</p>
+<p>   ①充分利用CPU资源<br>   ②增加用户响应时间<br>   ③让代码模块化、简单化（e.g：异步处理机制）</p>
+<p>  【八】线程生命周期<br>    <strong>new  –&gt; runnable –&gt; running –&gt; block –&gt; dead</strong></p>
+<p>  【九】守护线程？<br>    在后台运行的线程<br>    <strong>setDaemon(true)</strong><br>    e.g:JVM垃圾回收、内存管理、连接池、监控、超时、状态等都属于守护线程</p>
+<p>   【十】线程组</p>
+<p>   方便管理一些具有<strong>相同属性以及特性</strong>的线程</p>
+<p>   【十一】ThreadLocal线程副本</p>
+<p>   1.通常为static 2.可添加多个key值 3.线程安全 4.remove()，用完变量以后，请移除，不然会造成内存泄露</p>
+<p>   【十二】内存模型和多线程</p>
+<p>①线程读取数据优先级：寄存器 —&gt; 高速缓存 —&gt;  内存<br>②JLS（java统一规范）定义一个统一的内存模型JMM（规定了jvm有主内存（堆内存）和工作内存）<br>③多线程不能通过数据传递通讯，只能通过共享变量</p>
+<p>   【十三】什么是线程不安全？<br>线程操作一个<strong>数据结构出现修改和串行的情况，没有保证数据的一致性</strong></p>
+<p>   【十四】实现线程安全的3种方式<br>    1.多实例（非单例）<br>    2.java.util.concurrent下的类库<br>    3.锁机制synchronied，lock</p>
+<p>   【十五】线程同步synchronized（又称隐式锁）<br>    修饰一个方法或者代码块，<strong>保证在同一时刻最多只有一个线程执行</strong><br>方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public synchronized xxMethod()</div></pre></td></tr></table></figure>
+<p>代码块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">synchronized(Object)&#123;&#125;</div></pre></td></tr></table></figure>
+<p>【十六】显式锁<br>  Lock对应API<br>getLock() 获取锁<br>lockInterruptibly() 如果当前线程未被中断，则获取锁，如果锁可用，则获取锁，并立即返回如果锁不可用，则禁用当前线程，并且将线程处于休眠状态<br>tryLock() 在调用时锁为空闲状态获得锁<br>unLock()  释放锁<br>new Condition()<br>ReentrantLock是Lock实现类，互斥的同步器</p>
+<p>【十七】ReadWriteLock 和   ReadTrantReadWriteLock</p>
+<p>Lock的子接口，用来实现读写两个锁并存、互斥操作机制<br>ReadTrantReadWriteLock是ReadWriteLock的实现类</p>
+<p>【十八】 .读写锁机制</p>
+<p>①读-读不互斥<br>②读-写互斥<br>③写-写互斥</p>
+<p>【十九】显示锁StampedLock<br>悲观锁：假定会发生并发冲突，屏蔽一切违反数据完整性的操作<br>乐观锁：假定不会发生并发冲突，只在提交操作时检查数据完整性</p>
+<p>【二十】线程安全的集合类<br>  HashTable、ConcurrentHashMap、CopyOnWriteArrayList<br>  CopyOnWriteArraySet、（后续会单出列出原理）<br><strong>HashTable</strong><br>性质：散列表<br>存储内容：键值对<br>继承：Dictionary<br>实现：Serializable、Map、Cloneable<br>影响性能因素：初始能量和加载因子<br>是否同步：是<br>是否顺序：否<br>如何实现线程安全：公开的方法都用synchronized修饰<br><strong>ConcurrentHashMap</strong><br>继承：AbstractHashMap<br>实现：Map、Serializable<br>效率：比Hashtable高<br>如何实现线程安全：锁分离技术（代码块锁），而非方法锁）<br>支持多个写入并发操作<br><strong>CopyOnWriteArrayList</strong><br>如何实现线程安全<br>1.set()、and()、remove()使用lock()加锁 unlock解锁<br>2.Array.copyOf() 拷贝副本<br>3，读操作不进行加锁、写操作进行加锁<br>使用情况：读操作明显大于写操作（高性能的并发读取）<br><strong>CopyOnWriteArraySet</strong><br>在CopyOnWriteArrayList的基础上实现Java的装饰模式<br>存储介质使用CopyOnWriteArrayList来存储数据</p>
+<p> 【二十一】CopyOnWrite机制<br>写时复制的容器<br>读写分离的思想：<strong>往容器中添加数据的时候，不是直接添加而是将容器复制，进而写入复制容器，因此不需要加锁</strong><br>用于<strong>读多写少</strong>的场景<br>缺点：①占用内存大 ② 数据一致性问题</p>
+<p> 【二十一】<strong>Stringbuffer是线程安全的</strong><br>                   <strong>Stringbuilder是非线程安全的</strong></p>
+<p> 【二十二】代码执行效率排序<br>   无锁、无同步安全的代码 &gt; 方法块锁 &gt; 类锁和方法锁</p>
+<p>  【二十三】多线程通过什么交互？<br>    <strong>线程阀</strong></p>
+<p>   【二十四】理解queue、deque、blockingQueue概念（后续研究)<br>     queue&lt;单向队列&gt;<br>        ①性质：线性表<br>        ②作用：用于保存一组元素（存取元素时必须遵循先进先出（FIFO）的原则）<br>        ③规范：只允许在表的前端进行删除操作（队头），表的后端进行插入操作（队尾）<br>        ④扩展： 队列中没有元素为空队列</p>
+<p>   deque&lt;双端队列&gt;<br>      ①两端都可以进出的队列<br>      ②当约束从队列一端进入队时，就形成了另外一种存取模式，先进后出（栈结构）<br>      ③作用：双端队列主要用于栈操作，让栈操作具有可追溯性（e.g:Windows窗体路径前进、后退栈）</p>
+<p>  BlockingQueue（阻塞队列）<br>  ①支持两个附加操作的队列（当队列为空时，获取元素的线程会等待元素变为非空;队列满时，存储元素的线程会等待队列可用）<br>  ②用途:常用于生产者和消费者的场景（生产者是往队列添加元素的线程，消费者是从队列拿取元素的线程，相当于生产者的存放容器）</p>
+<p>【二十五】ArrayBlockingQueue数组阻塞队列<br>        概念：由数组支持有界阻塞队列<br>        存取方式：FIFO<br>        类型：有界缓冲区（一旦固定容量，则不要再增加）<br>        适用：队等待的生产者线程和消费者线程进行排序的可选公平策略<br>        缺点：公平性会降低吞吐量<br>        优点：减少可变性和不平衡性</p>
+<p>【二十六】LinkedBlockingQueue链表阻塞队列<br>性质：链表<br>当生产者往队列放入一个数据时，队列会从生产者中获取数据，并缓存到队列内部，而生产者立即返回，只有当队列缓存区达到最大值缓存容量（可通过构造函数指定）时，才会阻塞队列<br>直到消费者从队列中消费一份数据才会生产者线程才被唤醒，反之，亦是。<br>之所以能高效处理并发数据是因为生产者和消费者端采用独立的锁来控制数据同步<br>并且意味着高并发情况下生产者和消费者可以并行的操作队列中数据</p>
+<p>【二十七】优先级阻塞队列PriorityBlockingQueue<br>支持优先级排序的无序阻塞队列（通过构造函数传下来的Compator对象决定）<br>不会阻塞数据生产者，而只会在没有可消费的数据阻塞消费者<br>注意：生产者的生产速度 &lt; 消费者接收数据的速度（否则会耗尽堆内存空间）<br>内部同步控制线程的锁：公平锁</p>
+<p>【二十八】延时队列DelayQueue<br>支持延时获取元素的使用优先级的实现无界阻塞队列<br>必须实现Delayed和Comparable接口（getDelay() 和 compareTo())<br>应用：缓存设计（保存缓存元素的有效期）和定时任务调度（保存当天将会执行的时间和任务）</p>
+<p>【二十九】同步队列SynchronousQueue<br>不存储元素的阻塞队列<br>每一个put操作必须等待take操作，否则不能继续添加元素<br>负责把生产者数据直接传递给消费者线程，队列本身不存储任何数据<br>吞吐量高于其他阻塞队列<br>声明同步队列有两种方式：公平模式（采用FIFO)和非公平模式(采用LIFO)</p>
+<p>【三十】链表双向阻塞队列LinkedTransferDueue<br>由链表组成的双向阻塞队列（可以从队列两端移除/插入元素）</p>
+<p>【三十一】链表传输队列LinkedTreansferQueue<br>链表构成的无界传输队列<br>继承BlockingQueue的一个实现类<br>transfer算法采用双重数据结构（之所以叫双重，是通过两个步骤完成：保留与完成）<br>e.g：消费者从队列中取一个元素，如果为空，则会补上空元素放入队列，消费者在这个线程上等待，这叫保留<br>直到生产者意欲向队列中放入一个元素，发现最前面的元素为Null，就把当前元素填充进前面元素中，完成了传送</p>
+<p>【三十二】同步计数器CountDownLatch<br>在完成一组正在其他线程执行的操作之前，允许一个或多个线程一直等待。用给定的计数初始化<br>由于调用了countDown()方法，所以在当前计数为0之前，await会一直阻塞，之后会释放所有等待线程<br>使用场景：在一些应用场景，需要等到某个条件达到要求后才能做后面的操作，同时当线程完成后也会触发事件，以便进行后面操作<br>countDown() 倒数一次<br>await() 等待倒数到0<br>应用场景1：开5个多线程去下载，5个都执行完了，才算下载成功<br>应用场景2：采用多文件上传，多线程上传，当多个文件上传成功才是真的成功</p>
+<p>【三十三】抽象队列化同步器AbstractQueuedSynchronizer<br>基于FIFO队列<br>利用int表示状态<br>使用方法是继承<br>子类通过同步器并需要实现它的方法管理状态<br>提供两种机制：排他模式和共享模式<br>可实现自定义锁</p>
+<p>【三十四】同步计数器Semaphore<br>排队执行</p>
+<p>【三十五】同步计数器CyclicBarrier<br>同步辅助类（循环栅栏）<br>多个线程像多个循环，循环到点后，才往后执行<br>实际应用场景：统计全国业务数据（其中各省数据库独立，统计量大）<br>为了提高并发效率，采取多个线程计算各省数据，每个省下面用多线程，在汇总数据</p>
+<p>【三十五】什么是线程池？<br>目的：减少对象创建和销毁的时间<br>Java线程池实现Java高并发、Java多线程、可管理的统一调度器<br><strong>Executors是线程的工厂类（工具类）：方便快速的创建线程池</strong></p>
+<p>【三十六】创建线程池常见的3种方法：<br>newSingleThreadExecutor 创建单线程的线程池<br>newFixedThreadPool 创建固定大小的线程池<br>newCachedThreadPool 创建可缓存线程池</p>
+<p>【三十七】线程池的优点<br>1.降低资源消耗（重复利用已创建线程）<br>2.提高响应速度<br>3.提高线程的可管理性<br>4.防止服务器过载，形成内存溢出</p>
+<p>【三十八】线程池工作机制<br>线程等待池 BlockingQueue<br>任务处理池PoolWorker，即正在工作的线程列表HashSet<br>核心池大小（corePoolSize） 线程池的稳定峰值，达到这个值之后的线程数大小不会释放的<br>最大处理线程池数（maxinumPoolSize） 线程池的线程数超过corePoolSize,小于maxPoolSize，会动态创建回收线程池内的资源</p>
+<p>【三十九】自定义线程池和ExecutorService<br>自定义线程池需要用到ThreadFactory</p>
+<p>Executor ： 执行线程池的工具</p>
+<p>ExecutorService ： 线程池的真正接口（继承了Executor）</p>
+<p>AbstractExecutorService：实现ExecutorService接口</p>
+<p>ThreadPoolExecutor：ExecutorService默认实现 </p>
+<p>ScheduleExecutorService：解决那些需要重复执行的问题</p>
+<p>ScheduleThreadPoolExecutor：解决周期性调度问题的真正实现</p>
+<p>Executors 工厂类（创建更多线程）</p>
+<p>【四十】RejectedExecutionHandler<br>处理被丢弃的线程和异常的接口</p>
+<p>【四十一】 ThreadPoolExecutor</p>
+<p>线程池最核心的类</p>
+<p>理解构造函数的参数<br>    corePoolSize<br>    maxinumPoolSize<br>    keepAliveTime<br>    TimeUnit<br>    BlockingQueue<br>    ThreadFactory<br>    RejectedExecutionHandler</p>
+<p>【四十二】线程池注意问题<br>线程池是单例的，不能放在services方法种<br>线程数不能设置过大，会造成线程负载<br>注意死锁问题</p>
+<p>【四十三】JDK7的Fork/Join<br>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
+<p>【四十四】Future任务机制和FutureTask<br>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
+<p>【四十五】Future相关<br>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
+<p>【四十六】Future原理<br>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
+<p>【四十七】计算最大并发量<br>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Object方法和排序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Object方法和排序/" itemprop="url">【Java8】Guava——Object方法和排序</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:30:59+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Guava/" itemprop="url" rel="index">
+                    <span itemprop="name">Guava</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Objects"><a href="#Objects" class="headerlink" title="Objects"></a>Objects</h2><h3 id="Equal"><a href="#Equal" class="headerlink" title="Equal"></a>Equal</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String str = &quot;test&quot;;</div><div class="line">Objects.equal(str,null) //return false</div><div class="line">Objects.equal(null,str) //return false</div><div class="line">Objects.equal(str,&quot;test&quot;) //return true</div><div class="line">Objects.equal(null,null) //return true</div></pre></td></tr></table></figure>
+<h3 id="HashCode"><a href="#HashCode" class="headerlink" title="HashCode"></a>HashCode</h3><blockquote>
+<p>对传入的字段序列计算出合理的、顺序敏感的散列值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Objects.hashCode(field1,field2,field3...)</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="toString-NaN"><a href="#toString-NaN" class="headerlink" title="toString"></a>toString</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//return ClassName&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(this).add(&quot;x&quot;, 1).toString();</div><div class="line">//return MyClass&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(&quot;MyClass&quot;).add(&quot;x&quot;, 1).toString();</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="Guava排序器——“流畅风格比较器”"><a href="#Guava排序器——“流畅风格比较器”" class="headerlink" title="Guava排序器——“流畅风格比较器”"></a>Guava排序器——“流畅风格比较器”</h2><blockquote>
+<p>从实现上说，Ordering实例就是一个特殊的Comparator实例。Ordering把很多基于Comparator的静态方法（如Collections.max）包装为自己的实例方法（非静态方法），并且提供了链式调用方法，来定制和增强现有的比较器</p>
+</blockquote>
+<h3 id="创建排序器"><a href="#创建排序器" class="headerlink" title="创建排序器"></a>创建排序器</h3><p><strong>官方排序</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">natural() //对可排序类型做自然排序，如数字按大小，日期按先后排序</div><div class="line">usingToString() //按对象的字符串形式做字典排序</div><div class="line">from(Comparator) //把给定的Comparator转化为排序器</div></pre></td></tr></table></figure></p>
+<p><strong>自定义排序</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//直接继承Ordering</div><div class="line">Ordering&lt;String&gt; strLenthSort = new Ordering&lt;String&gt;() &#123;</div><div class="line">  public int compare(String left, String right) &#123;</div><div class="line">    return Ints.compare(left.length(), right.length());</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p><strong>链式调用方法</strong></p>
+<blockquote>
+<p>通过链式调用，可以由给定的排序器衍生出其它排序器</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">reverse() //获取语义相反的排序器</div><div class="line">nullsFirst() //使用当前排序器，但额外把null值排到最前面</div><div class="line">nullsLast()  //使用当前排序器，但额外把null值排到最后面</div><div class="line">compound(Comparator) //合成另一个比较器，以处理当前排序器中的相等情况</div><div class="line">lexicographical() //基于处理类型T的排序器，返回该类型的可迭代对象Iterable&lt;T&gt;的排序器</div><div class="line">onResultOf(Function) //对集合中元素调用Function，再按返回值用当前排序器排序</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">//需要下面这个类的排序器</div><div class="line">class MyObject&#123;</div><div class="line">    @Nullable String sorted;</div><div class="line">    int notSortedBy;</div><div class="line">&#125;</div><div class="line">//考虑到排序器应该能处理sortedBy为null的情况</div><div class="line">Ordering&lt;MyObject&gt; ordering =</div><div class="line">Ordering</div><div class="line">		.natural() //自然排序</div><div class="line">		.nullsFirst() //空值优先</div><div class="line">		.onResultOf(</div><div class="line">			new Function&lt;MyObject, String&gt;() &#123;</div><div class="line">			  public String apply(MyObject foo) &#123;</div><div class="line">			    return foo.sorted; </div><div class="line">			  &#125;</div><div class="line">		&#125;);</div></pre></td></tr></table></figure>
+<p>注：链式调用产生的排序器时，应该从后往前读。</p>
+<blockquote>
+<p>排序器首先调用apply方法获取sorted值，并把sorted为null的元素都放到最前面，然后把剩下的元素按sorted进行自然排序。<strong>之所以要从后往前读，是因为每次链式调用都是用后面的方法包装了前面的排序器</strong></p>
+</blockquote>
+<p><em>注：用compound方法包装排序器时，就不应遵循从后往前读的原则。为了避免理解上的混乱，请不要把compound写在一长串链式调用的中间，你可以另起一行，在链中最先或最后调用compound。</em></p>
+<h3 id="运用排序器"><a href="#运用排序器" class="headerlink" title="运用排序器"></a>运用排序器</h3><p>Guava的排序器实现有若干操纵集合或元素值的API</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">greatestOf(Iterable iterable, int k) //获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable) //判断可迭代对象是否已按排序器排序:允许有排序值相等的元素。</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">greatestOf(Iterable iterable, int k)//获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable)	//判断可迭代对象是否已按排序器排序：允许有排序值相等的元素</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">min(E, E) //返回两个参数中最小的那个。如果相等，则返回第一个参数</div><div class="line">min(E, E, E, E...)//返回多个参数中最小的那个。如果有超过一个参数都最小，则返回第一个最小的参数</div><div class="line">min(Iterable) //返回迭代器中最小的元素。如果可迭代对象中没有元素，则抛出NoSuchElementException</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Optional/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -417,1489 +1907,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java】字符串小记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java】字符串小记/" itemprop="url">【Java】字符串小记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:28:14+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="String和CharSequence的区别"><a href="#String和CharSequence的区别" class="headerlink" title="String和CharSequence的区别"></a>String和CharSequence的区别</h2><ul>
-<li>String 实现CharSequence接口，也就是说String也是CharSequence类型。</li>
-<li>CharSequence是一个可读序列（readable），对访问不同种类的序列，提供了一个统一的、只读的接口（etc.StringBuffer和StringBuilder实现CharSequence接口）</li>
-</ul>
-<p>CharSequence接口方法，只包括以下方法<br><img src="http://img.blog.csdn.net/20170321101940693?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="CharSequence接口方法"></p>
-<p>String类特性<br><img src="http://img.blog.csdn.net/20170321102117641?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="String类特性"></p>
-<p><strong>CharSequence是字符序列，String, StringBuilder和StringBuffer本质上都是通过字符数组实现的</strong></p>
-<h3 id="StringBuffer和StringBuilder之间的区别"><a href="#StringBuffer和StringBuilder之间的区别" class="headerlink" title="StringBuffer和StringBuilder之间的区别"></a>StringBuffer和StringBuilder之间的区别</h3><ul>
-<li>StringBuilder 和 StringBuffer都是可变的字符序列。它们都继承于AbstractStringBuilder，实现了CharSequence接口。</li>
-<li><strong>StringBuilder是非线程安全的，而StringBuffer是线程安全的</strong>。</li>
-</ul>
-<p><img src="http://img.blog.csdn.net/20170321102825353?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="StringBuffer"></p>
-<p><img src="http://img.blog.csdn.net/20170321102839307?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="StringBuilder"></p>
-<p><img src="http://img.blog.csdn.net/20170321103005183?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>它们之间的类关系图<br><img src="http://img.blog.csdn.net/20170321103548286?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="它们之间的类关系图"></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java】异常小记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java】异常小记/" itemprop="url">【Java】异常小记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:26:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li>Throwable</li>
-</ol>
-<ul>
-<li>是Java中所有错误或异常的超类。</li>
-<li>它的两个子类是Error和Exception。</li>
-</ul>
-<ol>
-<li><p>Error 是 Throwable 的子类，用于指示合理的应用程序不应该试图捕获的严重问题</p>
-</li>
-<li><p>Exception 类及其子类是 Throwable 的一种形式，它指出了合理的应用程序想要捕获的条件</p>
-</li>
-<li><p>RuntimeException 是那些可能在 Java 虚拟机正常运行期间抛出的异常的超类。可能在执行方法期间抛出但未被捕获的RuntimeException 的任何子类都无需在 throws 子句中进行声明。</p>
-</li>
-<li><p><strong>在子类中一个重写的方法可能只抛出父类中声明过的异常或者异常的子类</strong></p>
-</li>
-<li><p>Exception和Error的区别<br> Exception</p>
-<pre><code>1．可以是可被控制(checked) 或不可控制的(unchecked) 
-2．表示一个由程序员自身导致的错误 
-3．在应用程序级被处理
-</code></pre><p> Error（应用层面少用，了解即可）</p>
-<pre><code>1．总是不可控制的(unchecked) 
-2．用于表示系统错误或低层资源的错误 
-3．如何可能的话，应该在系统级被捕捉
-</code></pre></li>
-</ol>
-<p>7.Java中的两类异常情况</p>
-<pre><code>1. Checked exception: 这类异常都是Exception的子类 。异常的向上抛出机制进行处理，假如子类可能产生A异常，那么在父类中也必须throws A异常。**可能导致的问题：代码效率低，耦合度过高**
- 2. Unchecked exception: 这类异常都是RuntimeException的子类，虽然RuntimeException同样也是Exception的子类，但是它们是非凡的，它们不能通过client code来试图解决，所以称为Unchecked exception
-</code></pre><p>异常类关系图<br><img src="http://img.blog.csdn.net/20170321111500322?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="异常类关系图"></p>
-<p><a href="https://my.oschina.net/hanzhankang/blog/195529" target="_blank" rel="external">异常参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-线程协作/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——-线程协作/" itemprop="url">线程笔记—— 线程协作</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:26:08+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p><strong>在 Java 中，可以通过配合调用 Object 对象的 wait() 方法和 notify()方法或 notifyAll() 方法来实现线程间的通信。</strong></p>
-</blockquote>
-<hr>
-<ul>
-<li>在线程中调用 wait() 方法，将阻塞等待其他线程的通知</li>
-<li>在线程中调用 notify() 方法或 notifyAll() 方法，将通知其他线程从 wait() 方法处返回</li>
-</ul>
-<hr>
-<blockquote>
-<p>Object 是所有类的超类，它有 5 个方法组成了等待/通知机制的核心：<strong>notify()、notifyAll()、wait()、wait(long)和 wait(long，int)</strong></p>
-</blockquote>
-<h3 id="wait"><a href="#wait" class="headerlink" title="wait()"></a>wait()</h3><blockquote>
-<p>该方法用来将当前线程置入休眠状态，直到接到通知或被中断为止。<br>① 在调用 wait()之前，线程必须要获得该对象的对象级别锁，即<strong>只能在同步方法或同步块中调用 wait()方法</strong>。② 进入 wait()方法后，当前线程释放锁。③ 在从 wait()返回前，线程与其他线程竞争重新获得锁。</p>
-</blockquote>
-<p><strong>如果调用 wait()时，没有持有适当的锁，则抛出 IllegalMonitorStateException，它是 RuntimeException 的一个子类，因此，不需要 try-catch 结构</strong></p>
-<h3 id="notify"><a href="#notify" class="headerlink" title="notify()"></a>notify()</h3><blockquote>
-<p>该方法也要在同步方法或同步块中调用，即在调用前，线程也必须要获得该对象的对象级别锁，如果没有持有适当的锁，也会抛出 IllegalMonitorStateException</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>该方法用来通知那些可能等待该对象的对象锁的其他线程。</strong>如果有多个线程等待，则线程规划器任意挑选出其中一个 wait()状态的线程来发出通知，并使它等待获取该对象的对象锁（notify 后，当前线程不会马上释放该对象锁，wait 所在的线程并不能马上获取该对象锁，要等到程序退出 synchronized 代码块后，当前线程才会释放锁，wait所在的线程也才可以获取该对象锁），但不惊动其他同样在等待被该对象notify的线程们。当第一个获得了该对象锁的 wait 线程运行完毕以后，它会释放掉该对象锁，此时如果该对象没有再次使用 notify 语句，则即便该对象已经空闲，其他 wait 状态等待的线程由于没有得到该对象的通知，会继续阻塞在 wait 状态，直到这个对象发出一个 notify 或 notifyAll</p>
-</blockquote>
-<h3 id="notifyAll"><a href="#notifyAll" class="headerlink" title="notifyAll()"></a>notifyAll()</h3><blockquote>
-<p>notifyAll 使所有原来在该对象上 wait 的线程统统退出 wait 的状态（即全部被唤醒，不再等待 notify 或 notifyAll，但由于此时还没有获取到该对象锁，因此还不能继续往下执行），变成等待获取该对象上的锁，一旦该对象锁被释放（notifyAll 线程退出调用了 notifyAll 的 synchronized 代码块的时候），他们就会去竞争。如果其中一个线程获得了该对象锁，它就会继续往下执行，在它退出 synchronized 代码块，释放锁后，其他的已经被唤醒的线程将会继续竞争获取该锁，一直进行下去，直到所有被唤醒的线程都执行完毕</p>
-</blockquote>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li><p>如果线程调用了对象的 wait()方法，那么线程便会处于该对象的等待池中，等待池中的线程不会去竞争该对象的锁。</p>
-</li>
-<li><p>当有线程调用了对象的 notifyAll()方法（唤醒所有 wait 线程）或 notify()方法（只随机唤醒一个 wait 线程），被唤醒的的线程便会进入该对象的锁池中，锁池中的线程会去竞争该对象锁。</p>
-</li>
-<li><p>优先级高的线程竞争到对象锁的概率大，假若某线程没有竞争到该对象锁，它还会留在锁池中，唯有线程再次调用 wait()方法，它才会重新回到等待池中。而竞争到对象锁的线程则继续往下执行，直到执行完了 synchronized 代码块，它会释放掉该对象锁，这时锁池中的线程会继续竞争该对象锁。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——死锁/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——死锁/" itemprop="url">线程笔记——死锁</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:25:27+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>当线程需要同时持有多个锁时，有可能产生死锁</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>线程 A 当前持有互斥所锁 lock1，线程 B 当前持有互斥锁 lock2。接下来，当线程 A 仍然持有 lock1 时，它试图获取 lock2，因为线程 B 正持有 lock2，因此线程 A 会阻塞等待线程 B 对 lock2 的释放。如果此时线程 B 在持有 lock2 的时候，也在试图获取 lock1，因为线程 A 正持有 lock1，因此线程 B 会阻塞等待 A 对 lock1 的释放。二者都在等待对方所持有锁的释放，而二者却又都没释放自己所持有的锁，这时二者便会一直阻塞下去。这种情形称为死锁</p>
-</blockquote>
-<p>大部分代码并不容易产生死锁，死锁可能在代码中隐藏相当长的时间，等待不常见的条件地发生，但即使是很小的概率，一旦发生，便可能造成毁灭性的破坏。避免死锁是一件困难的事，遵循以下原则有助于规避死锁：</p>
-<ul>
-<li>只在必要的最短时间内持有锁，考虑使用同步语句块代替整个同步方法</li>
-<li>尽量编写不在同一时刻需要持有多个锁的代码，如果不可避免，则确保线程持有第二个锁的时间尽量短暂</li>
-<li>创建和使用一个大锁来代替若干小锁，并把这个锁用于互斥，而不是用作单个对象的对象级别锁</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div></pre></td><td class="code"><pre><div class="line">public class Deadlock &#123;</div><div class="line"></div><div class="line">	private String objID;  </div><div class="line"></div><div class="line">    public Deadlock(String id) &#123;  </div><div class="line">        objID = id;  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public synchronized void checkOther(Deadlock other) &#123;  </div><div class="line">        print(&quot;entering checkOther()&quot;);  </div><div class="line">        try &#123; Thread.sleep(2000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line">        print(&quot;in checkOther() - about to &quot; + &quot;invoke &apos;other.action()&apos;&quot;);  </div><div class="line"></div><div class="line">        //调用other对象的action方法，由于该方法是同步方法，因此会试图获取other对象的对象锁  </div><div class="line">        other.action();  </div><div class="line">        print(&quot;leaving checkOther()&quot;);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public synchronized void action() &#123;  </div><div class="line">        print(&quot;entering action()&quot;);  </div><div class="line">        try &#123; Thread.sleep(500); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line">        print(&quot;leaving action()&quot;);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public void print(String msg) &#123;  </div><div class="line">        threadPrint(&quot;objID=&quot; + objID + &quot; - &quot; + msg);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static void threadPrint(String msg) &#123;  </div><div class="line">        String threadName = Thread.currentThread().getName();  </div><div class="line">        System.out.println(threadName + &quot;: &quot; + msg);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static void main(String[] args) &#123;  </div><div class="line">        final Deadlock obj1 = new Deadlock(&quot;obj1&quot;);  </div><div class="line">        final Deadlock obj2 = new Deadlock(&quot;obj2&quot;);  </div><div class="line"></div><div class="line">        Runnable runA = new Runnable() &#123;  </div><div class="line">                public void run() &#123;  </div><div class="line">                    obj1.checkOther(obj2);  </div><div class="line">                &#125;  </div><div class="line">            &#125;;  </div><div class="line"></div><div class="line">        Thread threadA = new Thread(runA, &quot;threadA&quot;);  </div><div class="line">        threadA.start();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(200); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        Runnable runB = new Runnable() &#123;  </div><div class="line">                public void run() &#123;  </div><div class="line">                    obj2.checkOther(obj1);  </div><div class="line">                &#125;  </div><div class="line">            &#125;;  </div><div class="line"></div><div class="line">        Thread threadB = new Thread(runB, &quot;threadB&quot;);  </div><div class="line">        threadB.start();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(5000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        threadPrint(&quot;finished sleeping&quot;);  </div><div class="line"></div><div class="line">        threadPrint(&quot;about to interrupt() threadA&quot;);  </div><div class="line">        threadA.interrupt();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(1000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        threadPrint(&quot;about to interrupt() threadB&quot;);  </div><div class="line">        threadB.interrupt();  </div><div class="line"></div><div class="line">        try &#123; Thread.sleep(1000); &#125;   </div><div class="line">        catch ( InterruptedException x ) &#123; &#125;  </div><div class="line"></div><div class="line">        threadPrint(&quot;did that break the deadlock?&quot;);  </div><div class="line">    &#125;  </div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">threadA: objID=obj1 - entering checkOther()</div><div class="line">threadB: objID=obj2 - entering checkOther()</div><div class="line">threadA: objID=obj1 - in checkOther() - about to invoke &apos;other.action()&apos;</div><div class="line">threadB: objID=obj2 - in checkOther() - about to invoke &apos;other.action()&apos;</div><div class="line">main: finished sleeping</div><div class="line">main: about to interrupt() threadA</div><div class="line">main: about to interrupt() threadB</div><div class="line">main: did that break the deadlock?</div></pre></td></tr></table></figure>
-<p>从结果中可以看出，在执行到 other.action() 时，由于两个线程都在试图获取对方的锁，但对方都没有释放自己的锁，因而便产生了死锁，在主线程中试图中断两个线程，但都无果。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——可重入内置锁/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——可重入内置锁/" itemprop="url">线程笔记——可重入内置锁</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><strong>每个 Java 对象都可以用做一个实现同步的锁，这些锁被称为内置锁或监视器锁</strong>。线程在进入同步代码块之前会自动获取锁，并且在退出同步代码块时会自动释放锁</p>
-<blockquote>
-<p><strong>获得内置锁的唯一途径就是进入由这个锁保护的同步代码块或方法</strong></p>
-</blockquote>
-<p>当某个线程请求一个由其他线程持有的锁时，发出请求的线程就会阻塞。然而，由于内置锁是可重入的，因此如果摸个线程试图获得一个已经由它自己持有的锁，那么这个请求就会成功</p>
-<p><strong>“重入”意味着获取锁的操作的粒度是“线程”，而不是调用</strong></p>
-<blockquote>
-<p>重入的一种实现方法是，<strong><em>为每个锁关联一个获取计数值和一个所有者线程。当计数值为 0 时，这个锁就被认为是没有被任何线程所持有，当线程请求一个未被持有的锁时，JVM 将记下锁的持有者，并且将获取计数值置为 1，如果同一个线程再次获取这个锁，计数值将递增，而当线程退出同步代码块时，计数器会相应地递减。当计数值为 0 时，这个锁将被释放</em></strong></p>
-</blockquote>
-<hr>
-<p>重入进一步提升了加锁行为的封装性，因此简化了面向对象并发代码的开发</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class Father  </div><div class="line">&#123;  </div><div class="line">    public synchronized void doSomething()&#123;  </div><div class="line">        System.out.println(&quot;father&quot;);   </div><div class="line">    &#125;  </div><div class="line">&#125;  </div><div class="line"></div><div class="line">public class Child extends Father  </div><div class="line">&#123;  </div><div class="line">    public synchronized void doSomething()&#123;  </div><div class="line">        System.out.println(&quot;child&quot;);  </div><div class="line">        super.doSomething();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">child</div><div class="line">father</div></pre></td></tr></table></figure>
-<p><strong>子类覆写了父类的同步方法，然后调用父类中的方法，此时如果没有可重入的锁，那么这段代码件产生死锁。</strong></p>
-<p>子类调用doSomething方法时，除了获得自身类锁的同时还会获得父类的锁，如果内置锁不可重入，那调用super.doSomething时就会发生死锁。所谓重入就是，你拿了锁，再调用该锁包含的代码可以不用再次等待拿锁</p>
-<p><strong>重入则避免了这种死锁情况的发生</strong></p>
-<p>同一个线程在调用本类中其他 synchronized 方法/块或父类中的 synchronized 方法/块时，都不会阻碍该线程地执行，因为互斥锁时可重入的</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-Fork-Join/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——-Fork-Join/" itemprop="url">线程笔记—— Fork/Join</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:00+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="JDK7的Fork-Join"><a href="#JDK7的Fork-Join" class="headerlink" title="JDK7的Fork/Join"></a>JDK7的Fork/Join</h3><p>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
-<h3 id="Future任务机制和FutureTask"><a href="#Future任务机制和FutureTask" class="headerlink" title="Future任务机制和FutureTask"></a>Future任务机制和FutureTask</h3><p>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
-<h3 id="Future相关"><a href="#Future相关" class="headerlink" title="Future相关"></a>Future相关</h3><p>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
-<h3 id="Future原理"><a href="#Future原理" class="headerlink" title="Future原理"></a>Future原理</h3><p>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
-<h3 id="计算最大并发量"><a href="#计算最大并发量" class="headerlink" title="计算最大并发量"></a>计算最大并发量</h3><p>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
-<h3 id="Fork-Join优缺点"><a href="#Fork-Join优缺点" class="headerlink" title="Fork/Join优缺点"></a>Fork/Join优缺点</h3><ul>
-<li>优点 <ol>
-<li>充分实现并发程序任务拆分</li>
-<li>简化编程</li>
-<li>着重划分任务和组合中间结果</li>
-</ol>
-</li>
-<li>缺点 <ol>
-<li>拆分对象不宜过多，容易造成内存溢出</li>
-</ol>
-</li>
-</ul>
-<h3 id="Fork-Join应用场景"><a href="#Fork-Join应用场景" class="headerlink" title="Fork/Join应用场景"></a>Fork/Join应用场景</h3><blockquote>
-<p><strong>树形数据结构处理和遍历</strong></p>
-</blockquote>
-<h3 id="api"><a href="#api" class="headerlink" title="api"></a>api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">fork() //异步执行任务</div><div class="line">join() //计算完成后返回结果</div><div class="line">RecursiveTask //用于无返回结果的任务</div><div class="line">RecursiveAction //用于有返回结果的任务</div><div class="line">ForkJoinPool //实现Executor接口</div><div class="line">//三个调度子方法</div><div class="line">execute() //异步执行</div><div class="line">invoke() //等待完成，返回结果</div><div class="line">submit() //异步执行execute任务，并立即返回Future对象</div></pre></td></tr></table></figure>
-<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class FutureTaskDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		</div><div class="line">		SonTask sonTask = new SonTask(&quot;线程2&quot;);</div><div class="line">		FutureTask&lt;String&gt; task1 = new FutureTask&lt;&gt;(sonTask);</div><div class="line">		new Thread(task1).start();</div><div class="line">		System.out.println(task1.get()); //获取结果</div><div class="line">		</div><div class="line">		FutureTask&lt;Integer&gt; task2 = new FutureTask&lt;Integer&gt;(new MySun(),2);</div><div class="line">		new Thread(task2).start();</div><div class="line">		System.out.println(&quot;result_&quot;+task2.get());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class SonTask implements Callable&lt;String&gt; &#123;</div><div class="line"></div><div class="line">	private String name = &quot;&quot;;</div><div class="line">	</div><div class="line">	SonTask(String name) &#123;</div><div class="line">		this.name = name;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public String call() throws Exception &#123;</div><div class="line">		Thread.sleep(1000L);</div><div class="line">		System.out.println(name + &quot;计算完成&quot;);</div><div class="line">		return &quot;result_1&quot;;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class MySun implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(500L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;线程2处理完成&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">result_1</div><div class="line">result_2</div></pre></td></tr></table></figure>
-<h3 id="Fork-Join"><a href="#Fork-Join" class="headerlink" title="Fork/Join"></a>Fork/Join</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class CountTask extends RecursiveTask&lt;Integer&gt;&#123;</div><div class="line"></div><div class="line">	private static final long serialVersionUID = 2148758397044775857L;</div><div class="line"></div><div class="line">	private static int splitSize = 2; </div><div class="line">	private int start , end; </div><div class="line">	</div><div class="line">	</div><div class="line">	public CountTask(int start, int end) &#123;</div><div class="line">		this.start = start;</div><div class="line">		this.end = end;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected Integer compute() &#123;</div><div class="line">		int sum = 0;</div><div class="line">		//如果任务不需要拆分就开始计算</div><div class="line">		boolean isSplit =  (end - start) &lt;= splitSize;</div><div class="line">		if(isSplit)&#123;</div><div class="line">			for (int i = start; i &lt;= end; i++) &#123;</div><div class="line">				sum += i;</div><div class="line">			&#125;</div><div class="line">		&#125;else&#123; //拆分成2个子任务</div><div class="line">			int middle = (start + end) / 2;</div><div class="line">			CountTask oneTask = new CountTask(start, middle);</div><div class="line">			CountTask twoTask = new CountTask(middle+1, end);</div><div class="line">			oneTask.fork();//开始执行</div><div class="line">			twoTask.fork();</div><div class="line">			</div><div class="line">			//获得第一个子任务结果</div><div class="line">			int oneResult = oneTask.join();</div><div class="line">			int twoResult = twoTask.join();</div><div class="line">			</div><div class="line">			sum = oneResult + twoResult;</div><div class="line">		&#125;</div><div class="line">		return sum;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public class FockJoinDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		ForkJoinPool pool = new ForkJoinPool();</div><div class="line">		CountTask count1 = new CountTask(1, 5);</div><div class="line">		</div><div class="line">		Future&lt;Integer&gt; res1 = pool.submit(count1);</div><div class="line">		System.out.println(&quot;1-5结果: &quot;+res1.get());</div><div class="line">		</div><div class="line">		CountTask count2 = new CountTask(1, 100);</div><div class="line">		Future&lt;Integer&gt; res2 = pool.submit(count2);</div><div class="line">		System.out.println(&quot;1-100结果：&quot;+res2.get());</div><div class="line">		</div><div class="line">		System.out.println(&quot;=============Fock/Join监控===============&quot;);</div><div class="line">		</div><div class="line">		System.out.println(pool.getActiveThreadCount());</div><div class="line">		System.out.println(pool.getQueuedTaskCount());</div><div class="line">		System.out.println(pool.getQueuedSubmissionCount());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">1-5结果: 15</div><div class="line">1-100结果：5050</div><div class="line">=============Fock/Join监控===============</div><div class="line">1</div><div class="line">0</div><div class="line">0</div></pre></td></tr></table></figure>
-<p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp11137.html" target="_blank" rel="external">IBM_Fork/Join分析</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-线程池/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——-线程池/" itemprop="url">线程笔记—— 线程池</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:23:29+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="什么是线程池？"><a href="#什么是线程池？" class="headerlink" title="什么是线程池？"></a>什么是线程池？</h3><p>目的：减少对象创建和销毁的时间<br>Java线程池实现Java高并发、Java多线程、可管理的统一调度器<br>Executors是线程的工厂类（工具类）：方便快速的创建线程池</p>
-<h3 id="创建线程池常见的3种方法"><a href="#创建线程池常见的3种方法" class="headerlink" title="创建线程池常见的3种方法"></a>创建线程池常见的3种方法</h3><p>newSingleThreadExecutor 创建单线程的线程池<br>newFixedThreadPool 创建固定大小的线程池<br>newCachedThreadPool 创建可缓存线程池</p>
-<h3 id="线程池的优点"><a href="#线程池的优点" class="headerlink" title="线程池的优点"></a>线程池的优点</h3><p>1.降低资源消耗（重复利用已创建线程）<br>2.提高响应速度<br>3.提高线程的可管理性<br>4.防止服务器过载，形成内存溢出</p>
-<h3 id="线程池工作机制"><a href="#线程池工作机制" class="headerlink" title="线程池工作机制"></a>线程池工作机制</h3><p>线程等待池 BlockingQueue<br>任务处理池PoolWorker，即正在工作的线程列表HashSet<br>核心池大小（corePoolSize） 线程池的稳定峰值，达到这个值之后的线程数大小不会释放的<br>最大处理线程池数（maxinumPoolSize） 线程池的线程数超过corePoolSize,小于maxPoolSize，会动态创建回收线程池内的资源</p>
-<h3 id="自定义线程池和ExecutorService"><a href="#自定义线程池和ExecutorService" class="headerlink" title="自定义线程池和ExecutorService"></a>自定义线程池和ExecutorService</h3><blockquote>
-<p>自定义线程池需要用到ThreadFactory<br>Executor ： 执行线程池的工具<br>ExecutorService ： 线程池的真正接口（继承了Executor）<br>AbstractExecutorService：实现ExecutorService接口<br>ThreadPoolExecutor：ExecutorService默认实现<br>ScheduleExecutorService：解决那些需要重复执行的问题<br>ScheduleThreadPoolExecutor：解决周期性调度问题的真正实现<br>Executors 工厂类（创建更多线程）</p>
-</blockquote>
-<h3 id="RejectedExecutionHandler"><a href="#RejectedExecutionHandler" class="headerlink" title="RejectedExecutionHandler"></a>RejectedExecutionHandler</h3><blockquote>
-<p>处理被丢弃的线程和异常的接口</p>
-</blockquote>
-<h3 id="ThreadPoolExecutor"><a href="#ThreadPoolExecutor" class="headerlink" title="ThreadPoolExecutor"></a>ThreadPoolExecutor</h3><p><strong>线程池最核心的类</strong></p>
-<p>理解构造函数的参数<br>corePoolSize<br>maxinumPoolSize<br>keepAliveTime<br>TimeUnit<br>BlockingQueue<br>ThreadFactory<br>RejectedExecutionHandler</p>
-<h3 id="线程池注意问题"><a href="#线程池注意问题" class="headerlink" title="线程池注意问题"></a>线程池注意问题</h3><p>线程池是单例的，不能放在services方法种<br>线程数不能设置过大，会造成线程负载<br>注意死锁问题</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * ClassName:SingleThreadExecutorDemo</div><div class="line"> * Function: TODO  单例线程池</div><div class="line"> * Reason:	 TODO  只有一个线程池在工作（串行执行所有线程）</div><div class="line"> *                 如果这个线程因为异常结束，会有新的线程替代它</div><div class="line"> *                 保证所有任务的执行任务按提交任务顺序执行</div><div class="line"> * @author   dzxla</div><div class="line"> * @version  </div><div class="line"> * @since    Ver 1.1</div><div class="line"> */</div><div class="line">public class SingleThreadExecutorDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//代码实现使用了LinkedBlockingQueue</div><div class="line">		ExecutorService executor = Executors.newSingleThreadExecutor();</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Thread Main End</div><div class="line">into --&gt; 0</div><div class="line">end --&gt; 0</div><div class="line">into --&gt; 1</div><div class="line">end --&gt; 1</div><div class="line">into --&gt; 2</div><div class="line">end --&gt; 2</div><div class="line">into --&gt; 3</div><div class="line">end --&gt; 3</div><div class="line">into --&gt; 4</div><div class="line">end --&gt; 4</div><div class="line">into --&gt; 5</div><div class="line">end --&gt; 5</div><div class="line">into --&gt; 6</div><div class="line">end --&gt; 6</div><div class="line">into --&gt; 7</div><div class="line">end --&gt; 7</div><div class="line">into --&gt; 8</div><div class="line">end --&gt; 8</div><div class="line">into --&gt; 9</div><div class="line">end --&gt; 9</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public class FixedThreadPoolDemo &#123;</div><div class="line"></div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//代码实现使用了LinkedBlockingQueue</div><div class="line">		ExecutorService executor = Executors.newFixedThreadPool(5);</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">into --&gt; 1</div><div class="line">into --&gt; 4</div><div class="line">Thread Main End</div><div class="line">into --&gt; 3</div><div class="line">into --&gt; 0</div><div class="line">into --&gt; 2</div><div class="line">end --&gt; 2</div><div class="line">into --&gt; 5</div><div class="line">end --&gt; 0</div><div class="line">into --&gt; 6</div><div class="line">end --&gt; 3</div><div class="line">into --&gt; 7</div><div class="line">end --&gt; 1</div><div class="line">into --&gt; 8</div><div class="line">end --&gt; 4</div><div class="line">into --&gt; 9</div><div class="line">end --&gt; 5</div><div class="line">end --&gt; 6</div><div class="line">end --&gt; 8</div><div class="line">end --&gt; 7</div><div class="line">end --&gt; 9</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * ClassName:CachedThreadPoolDemo</div><div class="line"> * Function: TODO 可缓存的线程池</div><div class="line"> * Reason:	 TODO 可重用之前的线程</div><div class="line"> * @author   dzxla</div><div class="line"> * @version  </div><div class="line"> * @since    Ver 1.1</div><div class="line"> * @Date	 2016年11月10日		下午3:22:40</div><div class="line"> */</div><div class="line">public class CachedThreadPoolDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//实现了SynchronousQueue队列</div><div class="line">		ExecutorService executor = Executors.newCachedThreadPool();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 20; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-2"><a href="#console-2" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">into --&gt; 0</div><div class="line">into --&gt; 2</div><div class="line">into --&gt; 1</div><div class="line">into --&gt; 3</div><div class="line">into --&gt; 4</div><div class="line">into --&gt; 5</div><div class="line">into --&gt; 6</div><div class="line">into --&gt; 7</div><div class="line">into --&gt; 8</div><div class="line">into --&gt; 9</div><div class="line">into --&gt; 10</div><div class="line">into --&gt; 11</div><div class="line">into --&gt; 12</div><div class="line">into --&gt; 13</div><div class="line">Thread Main End</div><div class="line">into --&gt; 15</div><div class="line">into --&gt; 17</div><div class="line">into --&gt; 16</div><div class="line">into --&gt; 14</div><div class="line">into --&gt; 19</div><div class="line">into --&gt; 18</div><div class="line">end --&gt; 3</div><div class="line">end --&gt; 4</div><div class="line">end --&gt; 5</div><div class="line">end --&gt; 0</div><div class="line">end --&gt; 1</div><div class="line">end --&gt; 2</div><div class="line">end --&gt; 6</div><div class="line">end --&gt; 10</div><div class="line">end --&gt; 9</div><div class="line">end --&gt; 7</div><div class="line">end --&gt; 8</div><div class="line">end --&gt; 11</div><div class="line">end --&gt; 12</div><div class="line">end --&gt; 13</div><div class="line">end --&gt; 19</div><div class="line">end --&gt; 14</div><div class="line">end --&gt; 16</div><div class="line">end --&gt; 17</div><div class="line">end --&gt; 15</div><div class="line">end --&gt; 18</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">public class CustomThreadFactory implements ThreadFactory &#123;</div><div class="line"></div><div class="line">	//原子操作进行计数</div><div class="line">	private static final AtomicInteger poolNum = new AtomicInteger(1);</div><div class="line">	</div><div class="line">	private final ThreadGroup group;</div><div class="line">	private final AtomicInteger threadNum = new AtomicInteger(1);</div><div class="line">	private final String namePrefix;</div><div class="line">	</div><div class="line">	CustomThreadFactory() &#123;</div><div class="line">		SecurityManager sm = System.getSecurityManager();</div><div class="line">		group = (sm != null) ? sm.getThreadGroup() : Thread.currentThread().getThreadGroup();</div><div class="line">		namePrefix = &quot;pool-&quot; + poolNum.getAndIncrement() + &quot;-thread-&quot;;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	@Override</div><div class="line">	public Thread newThread(Runnable r) &#123;</div><div class="line">		//自定义线程名称</div><div class="line">        Thread t = new Thread(group,r,namePrefix + threadNum.getAndIncrement(),0);</div><div class="line">        if(t.isDaemon())&#123;</div><div class="line">			t.setDaemon(false);</div><div class="line">		&#125;</div><div class="line">        if(t.getPriority() != Thread.NORM_PRIORITY)&#123;</div><div class="line">        	t.setPriority(Thread.NORM_PRIORITY);</div><div class="line">        &#125;</div><div class="line">        return t;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		Thread r = new Thread(new Runnable() &#123;</div><div class="line">			</div><div class="line">			@Override</div><div class="line">			public void run() &#123;</div><div class="line">				</div><div class="line">				System.out.println(&quot;自定义线程池&quot;);</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">		</div><div class="line">		CustomThreadFactory factory = new CustomThreadFactory();</div><div class="line">		</div><div class="line">		Thread t = factory.newThread(r);</div><div class="line">		System.out.println(t.getName());</div><div class="line">		t.start();</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-3"><a href="#console-3" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">pool-1-thread-1</div><div class="line">自定义线程池</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——多线程交互：线程阀/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——多线程交互：线程阀/" itemprop="url">线程笔记——多线程交互：线程阀</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:22:32+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p><strong>线程阀是线程与线程之间相互制约和交互的一种机制</strong></p>
-</blockquote>
-<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><ul>
-<li>Queue：保存一组元素，采用FIFO（先进先出）原则</li>
-<li>Deque：保存一组元素，采用先进后出原则（栈结构），双端队列主要用于栈操作</li>
-<li>阻塞队列：支持两个附加操作的队列。队列中元素为空时，获取元素的线程会等待队列变成非空；队列元素满时，存储元素的线程会等待队列变成可用（常用于生产者和消费者场景）。生产者往队列添加元素。消费者取出队列元素。</li>
-</ul>
-<h3 id="阻塞队列4种处理方法"><a href="#阻塞队列4种处理方法" class="headerlink" title="阻塞队列4种处理方法"></a>阻塞队列4种处理方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">method | throwException | return specialValue | block | exit</div><div class="line"></div><div class="line">插入方法 | add(e) | offer(e) | put(e) | offer(e,time,unit)</div><div class="line">移除方法 | remove() | poll() | take() | poll(time,unit)</div><div class="line">检查方法 | element() | peek() |  无   |     无</div></pre></td></tr></table></figure>
-<hr>
-<h3 id="阻塞队列"><a href="#阻塞队列" class="headerlink" title="阻塞队列"></a>阻塞队列</h3><p>数组阻塞队列<br>链表阻塞队列<br>优先级阻塞队列<br>延时队列<br>同步队列<br>链表双向阻塞队列</p>
-<p>链表传输队列<br>同步计数器<br>抽象队列化同步器</p>
-<h3 id="数组阻塞队列（ArrayBlockingQueue）"><a href="#数组阻塞队列（ArrayBlockingQueue）" class="headerlink" title="数组阻塞队列（ArrayBlockingQueue）"></a>数组阻塞队列（ArrayBlockingQueue）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">public class ArrayBlockingQueueDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		//新建一个等待队列</div><div class="line">		final BlockingQueue&lt;String&gt; queue = new ArrayBlockingQueue&lt;&gt;(16);</div><div class="line">		//启动4个线程</div><div class="line">		for (int i = 0; i &lt; 4; i++) &#123;</div><div class="line">			new Thread(new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					while(true)&#123;</div><div class="line">						</div><div class="line">						try &#123;</div><div class="line">							String log = queue.take();</div><div class="line">							parseLong(log);</div><div class="line">						&#125; catch (InterruptedException e) &#123;</div><div class="line">							e.printStackTrace();</div><div class="line">						&#125;</div><div class="line">						</div><div class="line">					&#125;</div><div class="line">					</div><div class="line">				&#125;</div><div class="line">			&#125;).start();;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		//处理16条数据</div><div class="line">		for (int i = 0; i &lt; 16; i++) &#123;</div><div class="line">			String log =  (i + 1) + &quot;----&gt; &quot;;</div><div class="line">			try &#123;</div><div class="line">				queue.put(log);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void parseLong(String log)&#123;</div><div class="line">		System.out.println(log + System.currentTimeMillis());</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="链表阻塞队列（LinkedBlockingQueue）"><a href="#链表阻塞队列（LinkedBlockingQueue）" class="headerlink" title="链表阻塞队列（LinkedBlockingQueue）"></a>链表阻塞队列（LinkedBlockingQueue）</h3><blockquote>
-<p>生产者和消费者采用独立的锁控制数据同步，意味着高并发条件下可以并行操作队列中的数据，以此来提高队列的性能<br>构造LinkedBlockingQueue函数时，需要指定容量大小。否则默认是一个无限大的容量，当生产者&gt;消费者的速度时候，内存可能已经耗尽了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">public class LinckedBlockingQueueDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		//新建一个等待队列</div><div class="line">		final BlockingQueue&lt;String&gt; queue = new LinkedBlockingQueue&lt;String&gt;(16);</div><div class="line">		//产生4个线程</div><div class="line">		for (int i = 0; i &lt; 4; i++) &#123;</div><div class="line">			new Thread(new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					while(true)&#123;</div><div class="line">						</div><div class="line">						try &#123;</div><div class="line">							String log = queue.take();</div><div class="line">							parseLong(log);</div><div class="line">						&#125; catch (InterruptedException e) &#123;</div><div class="line">							e.printStackTrace();</div><div class="line">						&#125;</div><div class="line">						</div><div class="line">					&#125;</div><div class="line">					</div><div class="line">				&#125;</div><div class="line">			&#125;).start();;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		//将数据存入队列中</div><div class="line">		for (int i = 0; i &lt; 16; i++) &#123;</div><div class="line">			String log =  (i + 1) + &quot;----&gt; &quot;;</div><div class="line">			try &#123;</div><div class="line">				queue.put(log);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void parseLong(String log)&#123;</div><div class="line">		System.out.println(log + System.currentTimeMillis());</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-</blockquote>
-<h3 id="优先级阻塞队列（PriorityBlockingQueue）"><a href="#优先级阻塞队列（PriorityBlockingQueue）" class="headerlink" title="优先级阻塞队列（PriorityBlockingQueue）"></a>优先级阻塞队列（PriorityBlockingQueue）</h3><blockquote>
-<p>优先级对象通过传入Compator对象决定<br>PriorityBlockingQueue不会阻塞生产者，而只会在没有可消费的数据时候，阻塞消费者。<br><strong>生产者产生数据的速度绝不能大于消费者接收数据的速度。否则内存容易耗尽</strong><br>线程同步采用公平锁</p>
-<h3 id="延时队列（DelayQueue）"><a href="#延时队列（DelayQueue）" class="headerlink" title="延时队列（DelayQueue）"></a>延时队列（DelayQueue）</h3><p>在新增元素时需要指定多久获取队列当前对象（getDelay(TimeUnit unit)）<br>只有延迟期满了以后，才能获取元素<br>应用场景：缓存设计/定时任务调度</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class Student implements Delayed &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public int compareTo(Delayed delayed) &#123;</div><div class="line">		Student that = (Student) delayed;</div><div class="line">		return submitTime &gt; that.submitTime ? 1 : (submitTime &lt; that.submitTime ? -1 : 0);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@SuppressWarnings(&quot;static-access&quot;)</div><div class="line">	@Override</div><div class="line">	public long getDelay(TimeUnit unit) &#123;</div><div class="line">		</div><div class="line">		return unit.convert(submitTime - System.nanoTime(), unit.NANOSECONDS);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	private String name;</div><div class="line">	private long submitTime; </div><div class="line">	private long workTime; </div><div class="line"></div><div class="line">	public String getName() &#123;</div><div class="line">		return this.name + &quot;交卷时间&quot; + workTime;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public Student(String name, long submitTime) &#123;</div><div class="line">		this.name = name;</div><div class="line">		this.workTime = submitTime;</div><div class="line">		this.submitTime = TimeUnit.NANOSECONDS.convert(submitTime, TimeUnit.MILLISECONDS) + System.nanoTime();</div><div class="line">		System.out.println(this.name + &quot;交卷用时：&quot; + workTime);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		final DelayQueue&lt;Student&gt; dq = new DelayQueue&lt;Student&gt;();</div><div class="line">		for(int i = 0; i &lt; 5;i++)&#123;</div><div class="line">			Student stu = new Student(&quot;学生&quot;+i++,Math.round(Math.random()*10 + i));</div><div class="line">			dq.put(stu);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;peek()&quot;+dq.peek().getName());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="同步队列（SynchronizeQueue）"><a href="#同步队列（SynchronizeQueue）" class="headerlink" title="同步队列（SynchronizeQueue）"></a>同步队列（SynchronizeQueue）</h3><blockquote>
-<p>每个put操作必须等待take操作，否则不能添加元素。负责把生产者的数据直接传递给消费者，但是本身并不存储任何元素（适用传递性场景）<br>比如：在一个线程中的数据传递给另一个线程。它的吞吐量高于上面两个阻塞队列<br>声明同步队列：公平模式（采用公平锁，配合FIFO队列阻塞多余的生产者和消费者）和非公平模式管理多余的生产者和消费者。<br>后一种模式容易获取不到数据。</p>
-<h3 id="链表双向阻塞队列（LinkedBlockingDeque）"><a href="#链表双向阻塞队列（LinkedBlockingDeque）" class="headerlink" title="链表双向阻塞队列（LinkedBlockingDeque）"></a>链表双向阻塞队列（LinkedBlockingDeque）</h3><p>链表构成的双向阻塞队列，可以从队列两端操作元素。在多线程同时入队时减少一半竞争。相比LinkedBlockingQeque多了xxxFirst、xxxLast等方法。add()等同于addLast() remove()等同于removeFirst()</p>
-<h3 id="链表传输队列（LinkedTransferQueue）"><a href="#链表传输队列（LinkedTransferQueue）" class="headerlink" title="链表传输队列（LinkedTransferQueue）"></a>链表传输队列（LinkedTransferQueue）</h3><p>TransferQueue继承BlockingQueue接口<br>transfer采用双重数据结构算法（保留和完成）<br>大致理解：消费者从队列中取一个元素，发现元素为空，则生成一个空元素放入队列。则在该空元素上继续等待，叫保留。生产者意欲向队列中放入元素时，发现前面的数据字段项为空，则将该元素填入空字段中，完成数据传送。<br><strong>transfer提供了线程间直接交换对象的方法</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">transfer(E e) //若当前存在一个等待获取的消费者，则移交之。否则会插入当前元素e到队列尾部，从等待进入阻塞状态，直到消费者取出该线程</div><div class="line">tryTransfer(E e) //若当前存在一个等待获取的消费者(适用poll()或者take()，立刻转移传输对象e,若不存在返回false，不进入队列</div><div class="line">hasWaitingConsumer() //判断是否存在终端消费队列</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public class Producer implements Runnable&#123;</div><div class="line"></div><div class="line">	private final TransferQueue&lt;String&gt; queue;</div><div class="line">	public Producer(TransferQueue&lt;String&gt; queue) &#123;</div><div class="line">		this.queue = queue;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	/**</div><div class="line">	 * produce:产生数据，让消费者接收</div><div class="line">	 * @param  @return    设定文件</div><div class="line">	 * @return String    DOM对象</div><div class="line">	 * @throws </div><div class="line">	 * @since  CodingExample　Ver 1.1</div><div class="line">	 */</div><div class="line">	private String produce()&#123;</div><div class="line">		return &quot;lucky number : &quot; + (new Random().nextInt(100));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		while(true)&#123;</div><div class="line">			if(queue.hasWaitingConsumer())&#123;</div><div class="line">				try &#123;</div><div class="line">					queue.transfer(produce());</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">				try &#123;</div><div class="line">					TimeUnit.SECONDS.sleep(1);//等待生产者等待消费者接收数据</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class Consumer implements Runnable &#123;</div><div class="line"></div><div class="line">	private final TransferQueue&lt;String&gt; queue;</div><div class="line">	public Consumer(TransferQueue&lt;String&gt; queue) &#123;</div><div class="line">		this.queue = queue;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line"></div><div class="line"></div><div class="line">		try &#123;</div><div class="line">			System.out.println(&quot;Consumer 获取元素 --&gt; &quot; + queue.take());</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		TransferQueue&lt;String&gt; queue = new LinkedTransferQueue&lt;String&gt;();</div><div class="line">		</div><div class="line">		//生产者线程</div><div class="line">		Thread pt = new Thread(new Producer(queue));</div><div class="line">		pt.setDaemon(true);//设置为守护线程</div><div class="line">		pt.start();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			Thread ct = new Thread(new Consumer(queue));</div><div class="line">			ct.setDaemon(true);</div><div class="line">			ct.start();</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000);//让消费者休息1s，以便让生产者生产数据</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Consumer 接收数据 --&gt; lucky number : 94</div><div class="line">Consumer 接收数据 --&gt; lucky number : 97</div><div class="line">Consumer 接收数据 --&gt; lucky number : 68</div><div class="line">Consumer 接收数据 --&gt; lucky number : 38</div><div class="line">Consumer 接收数据 --&gt; lucky number : 39</div><div class="line">Consumer 接收数据 --&gt; lucky number : 17</div><div class="line">Consumer 接收数据 --&gt; lucky number : 70</div><div class="line">Consumer 接收数据 --&gt; lucky number : 25</div><div class="line">Consumer 接收数据 --&gt; lucky number : 71</div><div class="line">Consumer 接收数据 --&gt; lucky number : 9</div></pre></td></tr></table></figure>
-<h3 id="同步计数器（ConutDownLatch）"><a href="#同步计数器（ConutDownLatch）" class="headerlink" title="同步计数器（ConutDownLatch）"></a>同步计数器（ConutDownLatch）</h3><blockquote>
-<p>ConutDownLatch(直译：倒计时门闩)：在完成一组正在其他线程执行的操作前，允许一个或多个线程等待。<br>用给定计数初始化ConutDownLatch，由于调用了countdown()方法，计数达到0之前，await()方法会一直阻塞。之后释放所有线程。await之后所有后续调用立即返回。情况只出现一次，计数无法重置。<br><strong>使用场景：在一些应用场景中，需要等待某个条件达到要求后才能做后面的事情；同时当线程完成后，也会触发事件，以便进行后面操作</strong><br>ConutDownLatch最重要的方法countdown()和await()：前者倒数一次，后者等待倒数到0<br>应用场景：①开5个多线程下载，5个线程执行完毕才算成功 ② 当用户多文件上传，可采用多线程上传，多个文件都上传成功后，才算成功。</p>
-</blockquote>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">public class CountDownLatchDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		CountDownLatch latch = new CountDownLatch(3);</div><div class="line">	</div><div class="line">		Worker w1 = new Worker(&quot;Jack&quot;, latch);</div><div class="line">		Worker w2 = new Worker(&quot;Rose&quot;, latch);</div><div class="line">		Worker w3 = new Worker(&quot;Allen&quot;, latch);</div><div class="line">		w1.start();</div><div class="line">		w2.start();</div><div class="line">		w3.start();</div><div class="line">		try &#123;</div><div class="line">			latch.await();</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class Worker extends Thread&#123;</div><div class="line">		private String workerName;</div><div class="line">		private CountDownLatch latch;</div><div class="line">		public Worker(String workerName, CountDownLatch latch) &#123;</div><div class="line">			this.workerName = workerName;</div><div class="line">			this.latch = latch;</div><div class="line">		&#125;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				System.out.println(&quot;Worker:&quot;+workerName+&quot;is beginning.&quot;);</div><div class="line">				Thread.sleep(1000L);</div><div class="line">				System.out.println(&quot;Worker:&quot;+workerName+&quot;is ending.&quot;);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			latch.countDown();//模拟干活</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Worker:Jackis beginning.</div><div class="line">Worker:Allenis beginning.</div><div class="line">Worker:Roseis beginning.</div><div class="line">Worker:Roseis ending.</div><div class="line">Worker:Allenis ending.</div><div class="line">Worker:Jackis ending.</div><div class="line">Main Thread End</div></pre></td></tr></table></figure>
-<h3 id="同步计数器（Semaphore）"><a href="#同步计数器（Semaphore）" class="headerlink" title="同步计数器（Semaphore）"></a>同步计数器（Semaphore）</h3><blockquote>
-<p>Semaphore计数信号量。从概念入手，信号量维护一个许可集合。<br>如有必要，在许可可用前阻塞每一个acquire(),然后才获取该许可，每个release()添加一个许可，从而释放一个正在阻塞的获取者。<br>例如：就像排队进入博物馆一样，先放一批人进去，等这批人离开后，再放一批人进去，以此循环。类似一种排队机制</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Semaphore(int permits) //创建给定的许可数和给定非公平的公平设置的Semaphore数量</div><div class="line">Semaphore(int permits,boolean fair)创建给定的许可数和给定公平的公平设置的Semaphore数量</div><div class="line">acquire() //获取一个许可，提供一个许可之前线程阻塞</div><div class="line">release() //释放一个许可，将其返回给信号量</div></pre></td></tr></table></figure>
-<p><strong>所谓公平性就是先进来的先释放。默认false</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">public class SemaphoreDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		final Semaphore semaphore = new Semaphore(3);//一次只允许3个人访问</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable thread = new Runnable() &#123;</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					System.out.println(&quot;用户&quot;+num+&quot;进入成功&quot;);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(300L);</div><div class="line">						//获取执行许可</div><div class="line">						semaphore.acquire();</div><div class="line">						System.out.println(&quot;用户&quot;+num+&quot;正在进行支付...&quot;);</div><div class="line">						Thread.sleep(1000L);</div><div class="line">						//释放获取下一用户访问</div><div class="line">						semaphore.release();</div><div class="line">						System.out.println(&quot;用户&quot;+num+&quot;支付完成&quot;);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			</div><div class="line">			new Thread(thread).start();</div><div class="line">		&#125;</div><div class="line">		    System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-2"><a href="#console-2" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">用户1进入成功</div><div class="line">用户3进入成功</div><div class="line">用户2进入成功</div><div class="line">用户0进入成功</div><div class="line">Main Thread End</div><div class="line">用户4进入成功</div><div class="line">用户5进入成功</div><div class="line">用户7进入成功</div><div class="line">用户6进入成功</div><div class="line">用户8进入成功</div><div class="line">用户9进入成功</div><div class="line">用户9正在进行支付...</div><div class="line">用户6正在进行支付...</div><div class="line">用户7正在进行支付...</div><div class="line">用户6支付完成</div><div class="line">用户8正在进行支付...</div><div class="line">用户4正在进行支付...</div><div class="line">用户9支付完成</div><div class="line">用户5正在进行支付...</div><div class="line">用户7支付完成</div><div class="line">用户0正在进行支付...</div><div class="line">用户4支付完成</div><div class="line">用户8支付完成</div><div class="line">用户5支付完成</div><div class="line">用户3正在进行支付...</div><div class="line">用户2正在进行支付...</div><div class="line">用户0支付完成</div><div class="line">用户1正在进行支付...</div><div class="line">用户3支付完成</div><div class="line">用户2支付完成</div><div class="line">用户1支付完成</div></pre></td></tr></table></figure>
-<h3 id="同步计数器（CyclicBarrier）"><a href="#同步计数器（CyclicBarrier）" class="headerlink" title="同步计数器（CyclicBarrier）"></a>同步计数器（CyclicBarrier）</h3><blockquote>
-<p>CyclicBarrier(直译：循环栅栏)：允许一组线程互相等待，直到达到一个公共屏障点。然后所有这些线程才同步往后面执行。<br>使用场景：<br>大数据运算需要拆分多步骤的时候。<br>例如：统计全国的业务数据。数据库互相独立（按省分库），统计过程比较慢，数据量比较大，为了提高运算效率。采取并发方式，多个线程计算各省数据，最后汇总统计。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">public class CyclicBarrierDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">	</div><div class="line">		CyclicBarrier cb = new CyclicBarrier(3, new TotalTask());</div><div class="line">		</div><div class="line">		BillTask bt1 = new BillTask(&quot;重庆&quot;, cb);</div><div class="line">		BillTask bt2 = new BillTask(&quot;四川&quot;, cb);</div><div class="line">		BillTask bt3 = new BillTask(&quot;浙江&quot;, cb);</div><div class="line">		bt1.start();</div><div class="line">		bt2.start();</div><div class="line">		bt3.start();</div><div class="line">		</div><div class="line">		System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class TotalTask extends Thread&#123;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			System.out.println(&quot;所有任务执行完毕，就该执行主任务了&quot;);</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class BillTask extends Thread&#123;</div><div class="line">		private String billName;</div><div class="line">		private CyclicBarrier cb;</div><div class="line">		public BillTask(String billName, CyclicBarrier cb) &#123;</div><div class="line">			this.billName = billName;</div><div class="line">			this.cb = cb;</div><div class="line">		&#125;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			System.out.println(&quot;市区：&quot; + billName + &quot;运算开始&quot;);</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000L);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			System.out.println(&quot;市区：&quot; + billName + &quot;运算完成，等待中...&quot;);</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				cb.await();//假设第一次运算不完，第二次依赖第一次运算</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125; catch (BrokenBarrierException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			System.out.println(&quot;全部都结束&quot;+billName+&quot;开启后面的工作&quot;);</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-3"><a href="#console-3" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Main Thread End</div><div class="line">市区：四川运算开始</div><div class="line">市区：浙江运算开始</div><div class="line">市区：重庆运算开始</div><div class="line">市区：四川运算完成，等待中...</div><div class="line">市区：重庆运算完成，等待中...</div><div class="line">市区：浙江运算完成，等待中...</div><div class="line">所有任务执行完毕，就该执行主任务了</div><div class="line">全部都结束重庆开启后面的工作</div><div class="line">全部都结束浙江开启后面的工作</div><div class="line">全部都结束四川开启后面的工作</div></pre></td></tr></table></figure>
-<p>CountDownLatch和CyclicBarrier区别：一个线程等待其他线程完成某件事情的时候才能继续。N个线程互相等待，任何一个线程完成之前，所有线程必须等待。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——线程安全集合类/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——线程安全集合类/" itemprop="url">线程笔记——线程安全集合类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:21:54+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li>HashTable</li>
-<li>ConcurrentHashMap</li>
-<li>CopyOnWrite</li>
-</ol>
-<h3 id="HashTable"><a href="#HashTable" class="headerlink" title="HashTable"></a>HashTable</h3><p>HashTable特点</p>
-<ol>
-<li>和HashMap都是散列表,储存键值对映射</li>
-<li>继承Dictionary、实现Serializable、Clone、Map接口</li>
-<li>初始容量（哈希表创建容量）和加载因子（哈希表中桶的数量），是影响性能的关键因素。默认加载因子0.75</li>
-<li>哈希表的方法都是同步的（线程安全）</li>
-<li>哈希表中集合元素都是无序的</li>
-<li>键值对的值都不能为null</li>
-<li>每个方法体通过synchronized修饰，保证线程安全<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class HashTableDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		Hashtable&lt;String,Integer&gt; ht = new Hashtable&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		Hashtable&lt;String,Integer&gt; htClone = (Hashtable&lt;String, Integer&gt;) ht.clone();</div><div class="line">		System.out.println(&quot;clone&apos;s two:&quot;+htClone.get(&quot;two&quot;));</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h3><ol>
-<li>继承AbstractMap、实现Serializable、Map接口</li>
-<li>性能比哈希表高，允许多个修改操作并发进行，采用锁分离（代码块锁，而不是方法锁）</li>
-<li>内部使用Segment表示哈希表的不同部分（每个段就是一个小的hashtable）。同时也有自己的锁（ReentrantLock）</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		ConcurrentHashMap&lt;String,Integer&gt; ht = new ConcurrentHashMap&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		if(ht.containsKey(&quot;two&quot;))&#123;</div><div class="line">			ht.remove(&quot;two&quot;);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h3><ol>
-<li>set、add、remove使用ReentrantLock中的lock加锁/unlock解锁</li>
-<li>对于读操作大于写操作的特别合适（提供高性能读取，并保证正确率)</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		List&lt;String&gt; list = new CopyOnWriteArrayList&lt;String&gt;();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			list.add(&quot;num&quot;+i);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			System.out.println(list.get(i));</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		Object[] arr = list.toArray();</div><div class="line">		System.out.println(arr.length);</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>add方法源码<br><img src="http://img.blog.csdn.net/20170327112730634?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="CopyOnWriteArraySet"><a href="#CopyOnWriteArraySet" class="headerlink" title="CopyOnWriteArraySet"></a>CopyOnWriteArraySet</h3><ol>
-<li>CopyOnWriteArraySet是在CopyOnWriteArrayList使用了Java的装饰模式。所以CopyOnWriteArrayList的东西都可以在CopyOnWriteArraySet中应用</li>
-</ol>
-<hr>
-<h3 id="CopyOnWrite机制"><a href="#CopyOnWrite机制" class="headerlink" title="CopyOnWrite机制"></a>CopyOnWrite机制</h3><ol>
-<li>CopyOnWrite是写时复制的容器。向容器内添加元素的时候，不是在本身容器添加，而是将容器复制以后。再往里面添加元素。<ul>
-<li>优点：可以并发的读取数据，而不需要加锁（利用读写分离思想）</li>
-</ul>
-</li>
-<li>添加元素需要加锁，否则在多线程情况下会copy出N个复制容器</li>
-</ol>
-<p>根据CopyOnWirteList源码实现CopyOnWriteMap</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class CopyOnWriteMap&lt;K, V&gt; implements Map&lt;K,V&gt;,Cloneable&#123;</div><div class="line">	private volatile Map&lt;K,V&gt; interalMap; </div><div class="line">	</div><div class="line">	public CopyOnWriteMap()&#123;</div><div class="line">		interalMap = new HashMap&lt;K,V&gt;();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V put(K key, V value) &#123;</div><div class="line">	</div><div class="line">	synchronized (this) &#123;</div><div class="line">		Map&lt;K,V&gt; newMap = new HashMap&lt;K,V&gt;(interalMap);</div><div class="line">		V val = newMap.put(key, value);</div><div class="line">		interalMap = newMap;</div><div class="line">		return val;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V get(Object key) &#123;</div><div class="line">	return interalMap.get(key);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="CopyOnWrite应用场景"><a href="#CopyOnWrite应用场景" class="headerlink" title="CopyOnWrite应用场景"></a>CopyOnWrite应用场景</h3><blockquote>
-<p>用于读多写少的并发场景<br>比如白名单/黑名单，商品类别访问和更新等</p>
-</blockquote>
-<h2 id="CopyOnWriteMap注意事项"><a href="#CopyOnWriteMap注意事项" class="headerlink" title="CopyOnWriteMap注意事项"></a>CopyOnWriteMap注意事项</h2><ul>
-<li>减少扩容开销</li>
-<li>批量操作</li>
-</ul>
-<h3 id="CopyOnWrite缺点"><a href="#CopyOnWrite缺点" class="headerlink" title="CopyOnWrite缺点"></a>CopyOnWrite缺点</h3><ul>
-<li>内存占用（因为会涉及占用两个内存空间）</li>
-<li>数据一致性（不能保证实时数据一致）  </li>
-</ul>
-<h3 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h3><ol>
-<li>继承AbstractList，实现List，支持相关CRUD操作</li>
-<li>矢量队列，通过数组保存数据</li>
-<li>实现RandomAccess接口（随机访问），可以通过元素的序号快速获取对象</li>
-<li>实现CLoneable接口</li>
-<li>实现线程安全的方法类似哈希表<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		Vector&lt;String&gt; v = new Vector&lt;String&gt;();</div><div class="line">		v.addElement(&quot;one&quot;);</div><div class="line">		v.addElement(&quot;two&quot;);</div><div class="line">		v.addElement(&quot;three&quot;);</div><div class="line">		v.removeElement(&quot;two&quot;);</div><div class="line">		if(v.contains(&quot;three&quot;))&#123;</div><div class="line">			Iterator&lt;String&gt; iter = v.iterator();</div><div class="line">			while(iter.hasNext())&#123;</div><div class="line">				System.out.println(iter.next());</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1944,7 +1956,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">98</span>
+                <span class="site-state-item-count">107</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1955,7 +1967,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-count">37</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1966,7 +1978,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">84</span>
+                <span class="site-state-item-count">85</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
