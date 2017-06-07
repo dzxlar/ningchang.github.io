@@ -254,6 +254,147 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java链表——LinkedList解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java链表——LinkedList解析/" itemprop="url">Java链表——LinkedList解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:47:34+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>LinkedList类结构</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">LinkedList&lt;E&gt;</div><div class="line">    extends AbstractSequentialList&lt;E&gt;</div><div class="line">    implements List&lt;E&gt;, Deque&lt;E&gt;, Cloneable, java.io.Serializable</div></pre></td></tr></table></figure>
+<p><strong>Node结构</strong><br><strong>双向链表结构（指向前一结点和后一节点的引用）</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Node&lt;E&gt; &#123;</div><div class="line">        E item; </div><div class="line">        Node&lt;E&gt; next; </div><div class="line">        Node&lt;E&gt; prev; </div><div class="line"></div><div class="line">        Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) &#123;</div><div class="line">            this.item = element;</div><div class="line">            this.next = next;</div><div class="line">            this.prev = prev;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>声明变量</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * Pointer to first node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (first.prev == null &amp;&amp; first.item != null)</div><div class="line">    */</div><div class="line">transient Node&lt;E&gt; first;</div><div class="line"></div><div class="line">/**</div><div class="line">    * Pointer to last node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (last.next == null &amp;&amp; last.item != null)</div><div class="line">    */</div><div class="line">   transient Node&lt;E&gt; last;</div></pre></td></tr></table></figure></p>
+<p><strong>链表添加首位</strong><br><em>推导–&gt;（链表添加末尾）</em><br><em>同理。可得到添加addBefore()上一元素，根据条件不同</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**private void addLast(E e)&#123;*/</div><div class="line">private void andFirst(E e) &#123;</div><div class="line">        /**final Node&lt;E&gt; l = last;*/</div><div class="line">        final Node&lt;E&gt; f = first; </div><div class="line">        //assert：last.next == null &amp;&amp; first.item != null;</div><div class="line">        /**final Node&lt;E&gt; newNode = new Node&lt;&gt;(l,e,null);*/</div><div class="line">        //assert：first.prev == null &amp;&amp; first.item != null</div><div class="line">        //init newNode</div><div class="line">        final Node&lt;E&gt; newNode = new Node&lt;&gt;(null, e, f);</div><div class="line">        /**last = newNode*/</div><div class="line">        first = newNode; </div><div class="line">        //如果首位结点为空，则直接添加。否则添加到结点元素的上一结点</div><div class="line">        /** if(l == null) first = newNode else l.next = newNode */</div><div class="line">        if (f == null) </div><div class="line">            last = newNode;</div><div class="line">        else</div><div class="line">            f.prev = newNode;</div><div class="line">        size++; // init size=0</div><div class="line">        modCount++;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>添加上一元素</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private void addBefore(E e,Node&lt;E&gt; target)&#123;</div><div class="line">//assert: node.next = target &amp;&amp; node.prev = target.prev != null</div><div class="line">	Node&lt;E&gt; newNode = (target.prev,e,target);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>删除首元素,并且返回</strong><br><em>推导–&gt;删除末尾元素，并且返回下一个元素</em><br><em>如果需要删除任意一个未知结点Node X,需要判断两种极端情况（最末或者最前，然后往后（往前）推，当前位置清空回收</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">//private E removeLast(Node&lt;E&gt; f)&#123;</div><div class="line">private E removeFirst(Node&lt;E&gt; f) &#123;</div><div class="line">        //assert f == first &amp;&amp; f != null;</div><div class="line">        final E element = f.item; //得到该元素</div><div class="line">        //final Node&lt;E&gt; prev = f.prev;</div><div class="line">        final Node&lt;E&gt; next = f.next; //得到它下一个引用</div><div class="line">        f.item = null; //清空</div><div class="line">        //f.prev = null;</div><div class="line">        f.next = null; // 回收内存（GC）</div><div class="line">        //last = prev;</div><div class="line">        first = next; //将下一个Node移到首位</div><div class="line">        //if(prev == null) first= null; else prev.next = null</div><div class="line">        //如果为空，则代表List只有一个元素，回收</div><div class="line">        //否则，移除该元素</div><div class="line">        if (next == null) </div><div class="line">            last = null;</div><div class="line">        else</div><div class="line">            next.prev = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">E remove(Node&lt;E&gt; x) &#123;</div><div class="line">        // assert x != null;</div><div class="line">        final E element = x.item;</div><div class="line">        final Node&lt;E&gt; next = x.next;</div><div class="line">        final Node&lt;E&gt; prev = x.prev;</div><div class="line">		</div><div class="line">        if (prev == null) &#123;</div><div class="line">            first = next;</div><div class="line">        &#125; else &#123; //填充在后一元素的位置</div><div class="line">            prev.next = next;</div><div class="line">            x.prev = null; //之前的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (next == null) &#123; </div><div class="line">            last = prev;</div><div class="line">        &#125; else &#123; //填充在前一元素的位置</div><div class="line">            next.prev = prev;</div><div class="line">            x.next = null; //之后的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        x.item = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（二）——-GC策略-内存申请、对象衰老/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1744,161 +1885,6 @@ Direct Bytebuffer JNI Compile GC;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/" itemprop="url">ActiveMQ学习笔记（一）—— HelloWorld</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:39:19+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/activemq/" itemprop="url" rel="index">
-                    <span itemprop="name">activemq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="HelloProducer-class"><a href="#HelloProducer-class" class="headerlink" title="HelloProducer.class"></a>HelloProducer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">// 生产者的主要流程  </div><div class="line"></div><div class="line">Connection conn = null;</div><div class="line"></div><div class="line">//1.初始化连接工厂</div><div class="line"></div><div class="line">ConnectionFactory factory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);</div><div class="line"></div><div class="line">// 2.创建Connection  </div><div class="line"></div><div class="line">conn = factory.createConnection();  </div><div class="line"></div><div class="line"> // 3.打开连接</div><div class="line"></div><div class="line">conn.start();</div><div class="line"></div><div class="line">// 4.创建session，是否支持事务</div><div class="line"></div><div class="line">Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);  </div><div class="line"></div><div class="line"> // 5.创建消息目标  </div><div class="line"></div><div class="line">Destination queue = session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line"> //6.创建生产者  </div><div class="line"></div><div class="line">MessageProducer producer = session.createProducer(queue);</div><div class="line"></div><div class="line">//7.配置消息是否持久化  </div><div class="line"></div><div class="line">/*  DeliverMode有2种方式： </div><div class="line"></div><div class="line"> *  </div><div class="line"></div><div class="line">     public interface DeliveryMode &#123; </div><div class="line"></div><div class="line">                static final int NON_PERSISTENT = 1;//不持久化：服务器重启之后，消息销毁 </div><div class="line"></div><div class="line">                static final int PERSISTENT = 2;//持久化：服务器重启之后，该消息仍存在 </div><div class="line"></div><div class="line">      &#125; </div><div class="line"></div><div class="line"> */  </div><div class="line"></div><div class="line">producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);  </div><div class="line"></div><div class="line"> //8.初始化要发送的消息  </div><div class="line"></div><div class="line">TextMessage message = session.createTextMessage(&quot; Hello World ! from activemq&quot;); </div><div class="line"></div><div class="line">//9.发送消息</div><div class="line"></div><div class="line">producer.send(message);</div><div class="line"></div><div class="line">//10.关闭连接</div><div class="line"></div><div class="line">conn.close();</div></pre></td></tr></table></figure>
-<h3 id="HelloCustomer-class"><a href="#HelloCustomer-class" class="headerlink" title="HelloCustomer.class"></a>HelloCustomer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line">HelloConsumer implements TextListener</div><div class="line"></div><div class="line">@Override</div><div class="line"></div><div class="line">public void onMessage(Message message) &#123;</div><div class="line"></div><div class="line">        //如果消息是TextMessage  </div><div class="line"></div><div class="line">        if (message instanceof TextMessage) &#123;  </div><div class="line"></div><div class="line">            //强制转换一下  </div><div class="line"></div><div class="line">            TextMessage txtMsg = (TextMessage) message;  </div><div class="line"></div><div class="line">            try &#123;  </div><div class="line"></div><div class="line">                //输出接收到的消息  </div><div class="line"></div><div class="line">                System.out.println(&quot;我爱罗接收到漩涡鸣人的信息 : &quot; + txtMsg.getText());  </div><div class="line"></div><div class="line">            &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">                e.printStackTrace();  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">        &#125;          </div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">public void receive() &#123;  </div><div class="line"></div><div class="line">        // 消费者的主要流程  </div><div class="line"></div><div class="line">        Connection connection = null;  </div><div class="line"></div><div class="line">        try &#123;  </div><div class="line"></div><div class="line">            // 1.初始化connection工厂  </div><div class="line"></div><div class="line">            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);  </div><div class="line"></div><div class="line">            // 2.创建Connection  </div><div class="line"></div><div class="line">            connection = connectionFactory.createConnection();  </div><div class="line"></div><div class="line">            // 3.打开连接  </div><div class="line"></div><div class="line">            connection.start();  </div><div class="line"></div><div class="line">            // 4.创建session  </div><div class="line"></div><div class="line">            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE); </div><div class="line"></div><div class="line">            // 5.创建消息目标  </div><div class="line"></div><div class="line">            Destination queue= session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line">            //6.创建消费者  </div><div class="line"></div><div class="line">            MessageConsumer consumer = session.createConsumer(queue);          </div><div class="line"></div><div class="line">            //7.配置监听  </div><div class="line"></div><div class="line">            consumer.setMessageListener(this);  </div><div class="line"></div><div class="line">        &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">            e.printStackTrace();  </div><div class="line"></div><div class="line">        &#125;  </div><div class="line"></div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<h3 id="运行测试"><a href="#运行测试" class="headerlink" title="运行测试"></a>运行测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line"></div><div class="line">        new HelloConsumer().receive();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>ActiveMq如果与Spring配置</p>
-<p>  //有对应所需功能api，其余配置只需要在xml文件里面配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private JmsTemplate jmsTemplate;   </div><div class="line"></div><div class="line">public JmsTemplate getJmsTemplate() &#123;  </div><div class="line"></div><div class="line">   return jmsTemplate;  </div><div class="line"></div><div class="line">&#125;  </div><div class="line"></div><div class="line">public void setJmsTemplate(JmsTemplate jmsTemplate) &#123;  </div><div class="line"></div><div class="line">   this.jmsTemplate = jmsTemplate;  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>spring配置内容</p>
-<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714291" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714291</a></p>
-<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714739" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714739</a></p>
-<p>以上转载</p>
-<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12090505" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12090505</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1948,7 +1934,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">110</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1959,7 +1945,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-count">40</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1970,7 +1956,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">87</span>
+                <span class="site-state-item-count">88</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

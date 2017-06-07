@@ -254,6 +254,161 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/" itemprop="url">ActiveMQ学习笔记（一）—— HelloWorld</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:39:19+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/activemq/" itemprop="url" rel="index">
+                    <span itemprop="name">activemq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="HelloProducer-class"><a href="#HelloProducer-class" class="headerlink" title="HelloProducer.class"></a>HelloProducer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">// 生产者的主要流程  </div><div class="line"></div><div class="line">Connection conn = null;</div><div class="line"></div><div class="line">//1.初始化连接工厂</div><div class="line"></div><div class="line">ConnectionFactory factory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);</div><div class="line"></div><div class="line">// 2.创建Connection  </div><div class="line"></div><div class="line">conn = factory.createConnection();  </div><div class="line"></div><div class="line"> // 3.打开连接</div><div class="line"></div><div class="line">conn.start();</div><div class="line"></div><div class="line">// 4.创建session，是否支持事务</div><div class="line"></div><div class="line">Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);  </div><div class="line"></div><div class="line"> // 5.创建消息目标  </div><div class="line"></div><div class="line">Destination queue = session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line"> //6.创建生产者  </div><div class="line"></div><div class="line">MessageProducer producer = session.createProducer(queue);</div><div class="line"></div><div class="line">//7.配置消息是否持久化  </div><div class="line"></div><div class="line">/*  DeliverMode有2种方式： </div><div class="line"></div><div class="line"> *  </div><div class="line"></div><div class="line">     public interface DeliveryMode &#123; </div><div class="line"></div><div class="line">                static final int NON_PERSISTENT = 1;//不持久化：服务器重启之后，消息销毁 </div><div class="line"></div><div class="line">                static final int PERSISTENT = 2;//持久化：服务器重启之后，该消息仍存在 </div><div class="line"></div><div class="line">      &#125; </div><div class="line"></div><div class="line"> */  </div><div class="line"></div><div class="line">producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);  </div><div class="line"></div><div class="line"> //8.初始化要发送的消息  </div><div class="line"></div><div class="line">TextMessage message = session.createTextMessage(&quot; Hello World ! from activemq&quot;); </div><div class="line"></div><div class="line">//9.发送消息</div><div class="line"></div><div class="line">producer.send(message);</div><div class="line"></div><div class="line">//10.关闭连接</div><div class="line"></div><div class="line">conn.close();</div></pre></td></tr></table></figure>
+<h3 id="HelloCustomer-class"><a href="#HelloCustomer-class" class="headerlink" title="HelloCustomer.class"></a>HelloCustomer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line">HelloConsumer implements TextListener</div><div class="line"></div><div class="line">@Override</div><div class="line"></div><div class="line">public void onMessage(Message message) &#123;</div><div class="line"></div><div class="line">        //如果消息是TextMessage  </div><div class="line"></div><div class="line">        if (message instanceof TextMessage) &#123;  </div><div class="line"></div><div class="line">            //强制转换一下  </div><div class="line"></div><div class="line">            TextMessage txtMsg = (TextMessage) message;  </div><div class="line"></div><div class="line">            try &#123;  </div><div class="line"></div><div class="line">                //输出接收到的消息  </div><div class="line"></div><div class="line">                System.out.println(&quot;我爱罗接收到漩涡鸣人的信息 : &quot; + txtMsg.getText());  </div><div class="line"></div><div class="line">            &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">                e.printStackTrace();  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">        &#125;          </div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">public void receive() &#123;  </div><div class="line"></div><div class="line">        // 消费者的主要流程  </div><div class="line"></div><div class="line">        Connection connection = null;  </div><div class="line"></div><div class="line">        try &#123;  </div><div class="line"></div><div class="line">            // 1.初始化connection工厂  </div><div class="line"></div><div class="line">            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);  </div><div class="line"></div><div class="line">            // 2.创建Connection  </div><div class="line"></div><div class="line">            connection = connectionFactory.createConnection();  </div><div class="line"></div><div class="line">            // 3.打开连接  </div><div class="line"></div><div class="line">            connection.start();  </div><div class="line"></div><div class="line">            // 4.创建session  </div><div class="line"></div><div class="line">            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE); </div><div class="line"></div><div class="line">            // 5.创建消息目标  </div><div class="line"></div><div class="line">            Destination queue= session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line">            //6.创建消费者  </div><div class="line"></div><div class="line">            MessageConsumer consumer = session.createConsumer(queue);          </div><div class="line"></div><div class="line">            //7.配置监听  </div><div class="line"></div><div class="line">            consumer.setMessageListener(this);  </div><div class="line"></div><div class="line">        &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">            e.printStackTrace();  </div><div class="line"></div><div class="line">        &#125;  </div><div class="line"></div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<h3 id="运行测试"><a href="#运行测试" class="headerlink" title="运行测试"></a>运行测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line"></div><div class="line">        new HelloConsumer().receive();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ActiveMq如果与Spring配置</p>
+<p>  //有对应所需功能api，其余配置只需要在xml文件里面配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private JmsTemplate jmsTemplate;   </div><div class="line"></div><div class="line">public JmsTemplate getJmsTemplate() &#123;  </div><div class="line"></div><div class="line">   return jmsTemplate;  </div><div class="line"></div><div class="line">&#125;  </div><div class="line"></div><div class="line">public void setJmsTemplate(JmsTemplate jmsTemplate) &#123;  </div><div class="line"></div><div class="line">   this.jmsTemplate = jmsTemplate;  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>spring配置内容</p>
+<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714291" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714291</a></p>
+<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714739" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714739</a></p>
+<p>以上转载</p>
+<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12090505" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12090505</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（六）——-RPC调用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1699,217 +1854,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/多线程记录笔记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/多线程记录笔记/" itemprop="url">多线程记录笔记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:31:38+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>【一】什么是pu核心数？线程数？</p>
-<p>① 宽（32位/64位CPU位宽） ：  更大的cpu一次能处理更大范围的数据运算和支持更大容量的内存<br>② 多核心（单芯片多处理器，简称CMP）：其思想是将大规模并行处理器中的SMP（对称多处理器）集成到同一芯片中，各个处理器并行处理不同的线程<br>③ 多线程（简称SMT）：可复制多个处理器上的结构状态，让同一处理器的多个线程同步执行并共享处理器上的资源</p>
-<p>核心数和线程数之间的关系：<strong>增加核心数是为了增加线程数（核心数:线程数 = 1：1 由于intel引入超线程技术，核心数:线程数=1：2） </strong></p>
-<p>【二】cpu时间片轮转机制？</p>
-<p>时间片轮转调度（又称RR调度）：每个进程分配一个时间段（时间片，即该进程允许运行时间）</p>
-<p>【三】进程和线程的区别</p>
-<p> 进程：程序运行资源分配最小单位<br> 线程：cpu调度的最小单位，必须依赖进程而存在</p>
-<p>【四】并行运行？</p>
-<p> 程序同时所开启的运行的线程数    &lt;= cpu数量   * cpu线程数量</p>
-<p> 【五】并发运行？</p>
-<p>  程序同时所开启的运行的线程数    &gt; cpu数量   * cpu线程数量</p>
-<p>【六】吞吐量？</p>
-<p><strong>指对网络、设备、端口、虚电路或其他设施，单位时间内成功传送的数据量</strong></p>
-<p>① 网络吞吐量：在某个时刻，网络中亮哥节点之间，提供给网络应用的剩余带宽（在帧没有丢失的情况下，设备能够接收的最大速率），帮助寻找网络路径中的瓶颈</p>
-<p>② 系统吞吐量：系统在单位时间内所处理的信息量（每个时间段通过处理的进程量衡量）</p>
-<p>【七】多并发的优势</p>
-<p>   ①充分利用CPU资源<br>   ②增加用户响应时间<br>   ③让代码模块化、简单化（e.g：异步处理机制）</p>
-<p>  【八】线程生命周期<br>    <strong>new  –&gt; runnable –&gt; running –&gt; block –&gt; dead</strong></p>
-<p>  【九】守护线程？<br>    在后台运行的线程<br>    <strong>setDaemon(true)</strong><br>    e.g:JVM垃圾回收、内存管理、连接池、监控、超时、状态等都属于守护线程</p>
-<p>   【十】线程组</p>
-<p>   方便管理一些具有<strong>相同属性以及特性</strong>的线程</p>
-<p>   【十一】ThreadLocal线程副本</p>
-<p>   1.通常为static 2.可添加多个key值 3.线程安全 4.remove()，用完变量以后，请移除，不然会造成内存泄露</p>
-<p>   【十二】内存模型和多线程</p>
-<p>①线程读取数据优先级：寄存器 —&gt; 高速缓存 —&gt;  内存<br>②JLS（java统一规范）定义一个统一的内存模型JMM（规定了jvm有主内存（堆内存）和工作内存）<br>③多线程不能通过数据传递通讯，只能通过共享变量</p>
-<p>   【十三】什么是线程不安全？<br>线程操作一个<strong>数据结构出现修改和串行的情况，没有保证数据的一致性</strong></p>
-<p>   【十四】实现线程安全的3种方式<br>    1.多实例（非单例）<br>    2.java.util.concurrent下的类库<br>    3.锁机制synchronied，lock</p>
-<p>   【十五】线程同步synchronized（又称隐式锁）<br>    修饰一个方法或者代码块，<strong>保证在同一时刻最多只有一个线程执行</strong><br>方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public synchronized xxMethod()</div></pre></td></tr></table></figure>
-<p>代码块</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">synchronized(Object)&#123;&#125;</div></pre></td></tr></table></figure>
-<p>【十六】显式锁<br>  Lock对应API<br>getLock() 获取锁<br>lockInterruptibly() 如果当前线程未被中断，则获取锁，如果锁可用，则获取锁，并立即返回如果锁不可用，则禁用当前线程，并且将线程处于休眠状态<br>tryLock() 在调用时锁为空闲状态获得锁<br>unLock()  释放锁<br>new Condition()<br>ReentrantLock是Lock实现类，互斥的同步器</p>
-<p>【十七】ReadWriteLock 和   ReadTrantReadWriteLock</p>
-<p>Lock的子接口，用来实现读写两个锁并存、互斥操作机制<br>ReadTrantReadWriteLock是ReadWriteLock的实现类</p>
-<p>【十八】 .读写锁机制</p>
-<p>①读-读不互斥<br>②读-写互斥<br>③写-写互斥</p>
-<p>【十九】显示锁StampedLock<br>悲观锁：假定会发生并发冲突，屏蔽一切违反数据完整性的操作<br>乐观锁：假定不会发生并发冲突，只在提交操作时检查数据完整性</p>
-<p>【二十】线程安全的集合类<br>  HashTable、ConcurrentHashMap、CopyOnWriteArrayList<br>  CopyOnWriteArraySet、（后续会单出列出原理）<br><strong>HashTable</strong><br>性质：散列表<br>存储内容：键值对<br>继承：Dictionary<br>实现：Serializable、Map、Cloneable<br>影响性能因素：初始能量和加载因子<br>是否同步：是<br>是否顺序：否<br>如何实现线程安全：公开的方法都用synchronized修饰<br><strong>ConcurrentHashMap</strong><br>继承：AbstractHashMap<br>实现：Map、Serializable<br>效率：比Hashtable高<br>如何实现线程安全：锁分离技术（代码块锁），而非方法锁）<br>支持多个写入并发操作<br><strong>CopyOnWriteArrayList</strong><br>如何实现线程安全<br>1.set()、and()、remove()使用lock()加锁 unlock解锁<br>2.Array.copyOf() 拷贝副本<br>3，读操作不进行加锁、写操作进行加锁<br>使用情况：读操作明显大于写操作（高性能的并发读取）<br><strong>CopyOnWriteArraySet</strong><br>在CopyOnWriteArrayList的基础上实现Java的装饰模式<br>存储介质使用CopyOnWriteArrayList来存储数据</p>
-<p> 【二十一】CopyOnWrite机制<br>写时复制的容器<br>读写分离的思想：<strong>往容器中添加数据的时候，不是直接添加而是将容器复制，进而写入复制容器，因此不需要加锁</strong><br>用于<strong>读多写少</strong>的场景<br>缺点：①占用内存大 ② 数据一致性问题</p>
-<p> 【二十一】<strong>Stringbuffer是线程安全的</strong><br>                   <strong>Stringbuilder是非线程安全的</strong></p>
-<p> 【二十二】代码执行效率排序<br>   无锁、无同步安全的代码 &gt; 方法块锁 &gt; 类锁和方法锁</p>
-<p>  【二十三】多线程通过什么交互？<br>    <strong>线程阀</strong></p>
-<p>   【二十四】理解queue、deque、blockingQueue概念（后续研究)<br>     queue&lt;单向队列&gt;<br>        ①性质：线性表<br>        ②作用：用于保存一组元素（存取元素时必须遵循先进先出（FIFO）的原则）<br>        ③规范：只允许在表的前端进行删除操作（队头），表的后端进行插入操作（队尾）<br>        ④扩展： 队列中没有元素为空队列</p>
-<p>   deque&lt;双端队列&gt;<br>      ①两端都可以进出的队列<br>      ②当约束从队列一端进入队时，就形成了另外一种存取模式，先进后出（栈结构）<br>      ③作用：双端队列主要用于栈操作，让栈操作具有可追溯性（e.g:Windows窗体路径前进、后退栈）</p>
-<p>  BlockingQueue（阻塞队列）<br>  ①支持两个附加操作的队列（当队列为空时，获取元素的线程会等待元素变为非空;队列满时，存储元素的线程会等待队列可用）<br>  ②用途:常用于生产者和消费者的场景（生产者是往队列添加元素的线程，消费者是从队列拿取元素的线程，相当于生产者的存放容器）</p>
-<p>【二十五】ArrayBlockingQueue数组阻塞队列<br>        概念：由数组支持有界阻塞队列<br>        存取方式：FIFO<br>        类型：有界缓冲区（一旦固定容量，则不要再增加）<br>        适用：队等待的生产者线程和消费者线程进行排序的可选公平策略<br>        缺点：公平性会降低吞吐量<br>        优点：减少可变性和不平衡性</p>
-<p>【二十六】LinkedBlockingQueue链表阻塞队列<br>性质：链表<br>当生产者往队列放入一个数据时，队列会从生产者中获取数据，并缓存到队列内部，而生产者立即返回，只有当队列缓存区达到最大值缓存容量（可通过构造函数指定）时，才会阻塞队列<br>直到消费者从队列中消费一份数据才会生产者线程才被唤醒，反之，亦是。<br>之所以能高效处理并发数据是因为生产者和消费者端采用独立的锁来控制数据同步<br>并且意味着高并发情况下生产者和消费者可以并行的操作队列中数据</p>
-<p>【二十七】优先级阻塞队列PriorityBlockingQueue<br>支持优先级排序的无序阻塞队列（通过构造函数传下来的Compator对象决定）<br>不会阻塞数据生产者，而只会在没有可消费的数据阻塞消费者<br>注意：生产者的生产速度 &lt; 消费者接收数据的速度（否则会耗尽堆内存空间）<br>内部同步控制线程的锁：公平锁</p>
-<p>【二十八】延时队列DelayQueue<br>支持延时获取元素的使用优先级的实现无界阻塞队列<br>必须实现Delayed和Comparable接口（getDelay() 和 compareTo())<br>应用：缓存设计（保存缓存元素的有效期）和定时任务调度（保存当天将会执行的时间和任务）</p>
-<p>【二十九】同步队列SynchronousQueue<br>不存储元素的阻塞队列<br>每一个put操作必须等待take操作，否则不能继续添加元素<br>负责把生产者数据直接传递给消费者线程，队列本身不存储任何数据<br>吞吐量高于其他阻塞队列<br>声明同步队列有两种方式：公平模式（采用FIFO)和非公平模式(采用LIFO)</p>
-<p>【三十】链表双向阻塞队列LinkedTransferDueue<br>由链表组成的双向阻塞队列（可以从队列两端移除/插入元素）</p>
-<p>【三十一】链表传输队列LinkedTreansferQueue<br>链表构成的无界传输队列<br>继承BlockingQueue的一个实现类<br>transfer算法采用双重数据结构（之所以叫双重，是通过两个步骤完成：保留与完成）<br>e.g：消费者从队列中取一个元素，如果为空，则会补上空元素放入队列，消费者在这个线程上等待，这叫保留<br>直到生产者意欲向队列中放入一个元素，发现最前面的元素为Null，就把当前元素填充进前面元素中，完成了传送</p>
-<p>【三十二】同步计数器CountDownLatch<br>在完成一组正在其他线程执行的操作之前，允许一个或多个线程一直等待。用给定的计数初始化<br>由于调用了countDown()方法，所以在当前计数为0之前，await会一直阻塞，之后会释放所有等待线程<br>使用场景：在一些应用场景，需要等到某个条件达到要求后才能做后面的操作，同时当线程完成后也会触发事件，以便进行后面操作<br>countDown() 倒数一次<br>await() 等待倒数到0<br>应用场景1：开5个多线程去下载，5个都执行完了，才算下载成功<br>应用场景2：采用多文件上传，多线程上传，当多个文件上传成功才是真的成功</p>
-<p>【三十三】抽象队列化同步器AbstractQueuedSynchronizer<br>基于FIFO队列<br>利用int表示状态<br>使用方法是继承<br>子类通过同步器并需要实现它的方法管理状态<br>提供两种机制：排他模式和共享模式<br>可实现自定义锁</p>
-<p>【三十四】同步计数器Semaphore<br>排队执行</p>
-<p>【三十五】同步计数器CyclicBarrier<br>同步辅助类（循环栅栏）<br>多个线程像多个循环，循环到点后，才往后执行<br>实际应用场景：统计全国业务数据（其中各省数据库独立，统计量大）<br>为了提高并发效率，采取多个线程计算各省数据，每个省下面用多线程，在汇总数据</p>
-<p>【三十五】什么是线程池？<br>目的：减少对象创建和销毁的时间<br>Java线程池实现Java高并发、Java多线程、可管理的统一调度器<br><strong>Executors是线程的工厂类（工具类）：方便快速的创建线程池</strong></p>
-<p>【三十六】创建线程池常见的3种方法：<br>newSingleThreadExecutor 创建单线程的线程池<br>newFixedThreadPool 创建固定大小的线程池<br>newCachedThreadPool 创建可缓存线程池</p>
-<p>【三十七】线程池的优点<br>1.降低资源消耗（重复利用已创建线程）<br>2.提高响应速度<br>3.提高线程的可管理性<br>4.防止服务器过载，形成内存溢出</p>
-<p>【三十八】线程池工作机制<br>线程等待池 BlockingQueue<br>任务处理池PoolWorker，即正在工作的线程列表HashSet<br>核心池大小（corePoolSize） 线程池的稳定峰值，达到这个值之后的线程数大小不会释放的<br>最大处理线程池数（maxinumPoolSize） 线程池的线程数超过corePoolSize,小于maxPoolSize，会动态创建回收线程池内的资源</p>
-<p>【三十九】自定义线程池和ExecutorService<br>自定义线程池需要用到ThreadFactory</p>
-<p>Executor ： 执行线程池的工具</p>
-<p>ExecutorService ： 线程池的真正接口（继承了Executor）</p>
-<p>AbstractExecutorService：实现ExecutorService接口</p>
-<p>ThreadPoolExecutor：ExecutorService默认实现 </p>
-<p>ScheduleExecutorService：解决那些需要重复执行的问题</p>
-<p>ScheduleThreadPoolExecutor：解决周期性调度问题的真正实现</p>
-<p>Executors 工厂类（创建更多线程）</p>
-<p>【四十】RejectedExecutionHandler<br>处理被丢弃的线程和异常的接口</p>
-<p>【四十一】 ThreadPoolExecutor</p>
-<p>线程池最核心的类</p>
-<p>理解构造函数的参数<br>    corePoolSize<br>    maxinumPoolSize<br>    keepAliveTime<br>    TimeUnit<br>    BlockingQueue<br>    ThreadFactory<br>    RejectedExecutionHandler</p>
-<p>【四十二】线程池注意问题<br>线程池是单例的，不能放在services方法种<br>线程数不能设置过大，会造成线程负载<br>注意死锁问题</p>
-<p>【四十三】JDK7的Fork/Join<br>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
-<p>【四十四】Future任务机制和FutureTask<br>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
-<p>【四十五】Future相关<br>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
-<p>【四十六】Future原理<br>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
-<p>【四十七】计算最大并发量<br>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1959,7 +1903,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">110</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1970,7 +1914,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-count">40</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1981,7 +1925,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">87</span>
+                <span class="site-state-item-count">88</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
