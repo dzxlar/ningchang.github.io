@@ -93,17 +93,17 @@
 
 
 
-<meta name="description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存  Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)  方法栈&amp;amp;本地方法栈: &amp;gt;线程创建时产生,方法执行时生成栈帧 方法区 &amp;gt;存储类的元数据信息 常量等 堆  java">
+<meta name="description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存 Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)  方法栈&amp;amp;本地方法栈: 线程创建时产生,方法执行时生成栈帧  方法区 存储类的元数据信息 常量等  堆 java代码中所有的ne">
 <meta name="keywords" content="jvm调优">
 <meta property="og:type" content="article">
 <meta property="og:title" content="jvm调优笔记（一）—— 基础概念">
 <meta property="og:url" content="http://yoursite.com/2017/06/05/jvm调优笔记（一）——-基础概念/index.html">
 <meta property="og:site_name" content="dzxblog">
-<meta property="og:description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存  Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)  方法栈&amp;amp;本地方法栈: &amp;gt;线程创建时产生,方法执行时生成栈帧 方法区 &amp;gt;存储类的元数据信息 常量等 堆  java">
-<meta property="og:updated_time" content="2017-06-05T03:47:04.159Z">
+<meta property="og:description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存 Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)  方法栈&amp;amp;本地方法栈: 线程创建时产生,方法执行时生成栈帧  方法区 存储类的元数据信息 常量等  堆 java代码中所有的ne">
+<meta property="og:updated_time" content="2017-06-07T05:50:02.055Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jvm调优笔记（一）—— 基础概念">
-<meta name="twitter:description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存  Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)  方法栈&amp;amp;本地方法栈: &amp;gt;线程创建时产生,方法执行时生成栈帧 方法区 &amp;gt;存储类的元数据信息 常量等 堆  java">
+<meta name="twitter:description" content="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存 Java 虚拟机具有一个堆，堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)  方法栈&amp;amp;本地方法栈: 线程创建时产生,方法执行时生成栈帧  方法区 存储类的元数据信息 常量等  堆 java代码中所有的ne">
 
 
 
@@ -343,25 +343,23 @@
       
 
       
-        <p>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存</p>
-<blockquote>
+        <h2 id="java内存组成介绍：堆-Heap-和非堆-Non-heap-内存"><a href="#java内存组成介绍：堆-Heap-和非堆-Non-heap-内存" class="headerlink" title="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存"></a>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存</h2><blockquote>
 <p>Java 虚拟机具有一个堆，<strong>堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。</strong>”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)</p>
 </blockquote>
-<p>方法栈&amp;本地方法栈:</p>
-<pre><code>&gt;线程创建时产生,方法执行时生成栈帧
-</code></pre><p>方法区</p>
-<pre><code>&gt;存储类的元数据信息 常量等
-</code></pre><p>堆</p>
-<blockquote>
+<h2 id="方法栈-amp-本地方法栈"><a href="#方法栈-amp-本地方法栈" class="headerlink" title="方法栈&amp;本地方法栈:"></a>方法栈&amp;本地方法栈:</h2><blockquote>
+<p>线程创建时产生,方法执行时生成栈帧</p>
+</blockquote>
+<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><blockquote>
+<p>存储类的元数据信息 常量等</p>
+</blockquote>
+<h2 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h2><blockquote>
 <p>java代码中所有的new操作</p>
 </blockquote>
 <pre><code>native Memory(C heap)
 Direct Bytebuffer JNI Compile GC;
-</code></pre><p>堆内存分配</p>
-<p><strong>JVM初始分配的内存由-Xms指定</strong>，默认是物理内存的1/64；<strong>JVM最大分配的内存由-Xmx指定</strong>，默认是物理内存的1/4。<strong><em>默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制</em></strong>。因此服务器一般设置-Xms、-Xmx相等以避免在每次GC 后调整堆的大小。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。</p>
-<p>  非堆内存分配<br>      JVM使用<strong>-XX:PermSize</strong>设置非堆内存初始值，默认是物理内存的1/64；由 <strong>-XX:MaxPermSize</strong>设置最大非堆内存的大小，默认是物理内存的1/4。</p>
-<p>JVM内存限制(最大值)</p>
-<blockquote>
+</code></pre><h2 id="堆内存分配"><a href="#堆内存分配" class="headerlink" title="堆内存分配"></a>堆内存分配</h2><p><strong>JVM初始分配的内存由-Xms指定</strong>，默认是物理内存的1/64；<strong>JVM最大分配的内存由-Xmx指定</strong>，默认是物理内存的1/4。<strong><em>默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制</em></strong>。因此服务器一般设置-Xms、-Xmx相等以避免在每次GC 后调整堆的大小。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。</p>
+<h2 id="非堆内存分配"><a href="#非堆内存分配" class="headerlink" title="非堆内存分配"></a>非堆内存分配</h2><p>JVM使用<strong>-XX:PermSize</strong>设置非堆内存初始值，默认是物理内存的1/64；由 <strong>-XX:MaxPermSize</strong>设置最大非堆内存的大小，默认是物理内存的1/4。</p>
+<h2 id="JVM内存限制-最大值"><a href="#JVM内存限制-最大值" class="headerlink" title="JVM内存限制(最大值)"></a>JVM内存限制(最大值)</h2><blockquote>
 <p>JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处理器虽然 可控内存空间有4GB,但是具体的操作系统会给一个限制，这个限制一般是2GB-3GB（一般来说Windows系统下为1.5G-2G，Linux系统 下为2G-3G），而64bit以上的处理器就不会有限制了。</p>
 </blockquote>
 
@@ -465,8 +463,17 @@ Direct Bytebuffer JNI Compile GC;
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
@@ -481,7 +488,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">110</span>
+                <span class="site-state-item-count">113</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -492,7 +499,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-count">41</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -503,7 +510,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">88</span>
+                <span class="site-state-item-count">90</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
@@ -528,6 +535,22 @@ Direct Bytebuffer JNI Compile GC;
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#java内存组成介绍：堆-Heap-和非堆-Non-heap-内存"><span class="nav-number">1.</span> <span class="nav-text">java内存组成介绍：堆(Heap)和非堆(Non-heap)内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法栈-amp-本地方法栈"><span class="nav-number">2.</span> <span class="nav-text">方法栈&本地方法栈:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法区"><span class="nav-number">3.</span> <span class="nav-text">方法区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆"><span class="nav-number">4.</span> <span class="nav-text">堆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆内存分配"><span class="nav-number">5.</span> <span class="nav-text">堆内存分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非堆内存分配"><span class="nav-number">6.</span> <span class="nav-text">非堆内存分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM内存限制-最大值"><span class="nav-number">7.</span> <span class="nav-text">JVM内存限制(最大值)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
