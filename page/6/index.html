@@ -254,6 +254,177 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（六）——-RPC调用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（六）——-RPC调用/" itemprop="url">RabbitMq学习笔记（六）—— RPC调用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:38:52+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="RpcClient-class"><a href="#RpcClient-class" class="headerlink" title="RpcClient.class"></a>RpcClient.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"> //生成Rpc队列</div><div class="line"></div><div class="line">            channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);  </div><div class="line"></div><div class="line">            channel.basicQos(1);  </div><div class="line"></div><div class="line">            //创建Rpc队列消费者</div><div class="line"></div><div class="line">            QueueingConsumer consumer = new QueueingConsumer(channel);  </div><div class="line"></div><div class="line">            channel.basicConsume(RPC_QUEUE_NAME, false, consumer);  </div><div class="line"></div><div class="line">            System.out.println(&quot;RPCServer [x] Awaiting RPC requests&quot;);  </div><div class="line"></div><div class="line">            while (true) &#123;  </div><div class="line"></div><div class="line">                String response = &quot;&quot;;      //返回RpcClient回调结果</div><div class="line"></div><div class="line">                //获取队列中消息，如果没有则会一直阻塞</div><div class="line"></div><div class="line">                QueueingConsumer.Delivery delivery = consumer.nextDelivery();    </div><div class="line"></div><div class="line">                BasicProperties props = delivery.getProperties();  </div><div class="line"></div><div class="line">                //开启Rpc</div><div class="line"></div><div class="line">                BasicProperties replyProps = new BasicProperties.Builder().correlationId(props.getCorrelationId()).build();  </div><div class="line"></div><div class="line">               try &#123;  </div><div class="line"></div><div class="line">                    //获取消息</div><div class="line"></div><div class="line">                    String message = new String(delivery.getBody(), &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                    int n = Integer.parseInt(message);  </div><div class="line"></div><div class="line">                    System.out.println(&quot;RPCServer [.] fib(&quot; + message + &quot;)&quot;);  </div><div class="line"></div><div class="line">                    response = &quot;&quot; + fib(n);  </div><div class="line"></div><div class="line">                &#125; catch (Exception e) &#123;  </div><div class="line"></div><div class="line">                    System.out.println(&quot; [.] &quot; + e.toString());  </div><div class="line"></div><div class="line">                    response = &quot;&quot;;  </div><div class="line"></div><div class="line">                &#125; finally &#123;  </div><div class="line"></div><div class="line">                    //完成</div><div class="line"></div><div class="line">                    channel.basicPublish(&quot;&quot;, props.getReplyTo(), replyProps, response.getBytes(&quot;UTF-8&quot;));  </div><div class="line"></div><div class="line">                    //传输失败，回退</div><div class="line"></div><div class="line">                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="RpcClient-class-1"><a href="#RpcClient-class-1" class="headerlink" title="RpcClient.class"></a>RpcClient.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">private Connection connection;  </div><div class="line"></div><div class="line">    private Channel channel;  </div><div class="line"></div><div class="line">    private String requestQueueName = &quot;rpc_queue&quot;;  </div><div class="line"></div><div class="line">    private String replyQueueName;  </div><div class="line"></div><div class="line">    private QueueingConsumer consumer;  </div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    public RpcClient() throws KeyManagementException, NoSuchAlgorithmException, URISyntaxException, IOException, TimeoutException&#123;</div><div class="line"></div><div class="line">         ConnectionFactory factory = new ConnectionFactory();  </div><div class="line"></div><div class="line">         factory.setUri(&quot;amqp://admin:admin@172.16.41.31:5672&quot;);  </div><div class="line"></div><div class="line">         connection = factory.newConnection();  </div><div class="line"></div><div class="line">         channel = connection.createChannel();  </div><div class="line"></div><div class="line">         replyQueueName = channel.queueDeclare().getQueue();  </div><div class="line"></div><div class="line">         consumer = new QueueingConsumer(channel);  </div><div class="line"></div><div class="line">         channel.basicConsume(replyQueueName, true, consumer);  </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    //计算结果，返回给RpcServer</div><div class="line"></div><div class="line">    public String call(String message) throws Exception &#123;  </div><div class="line"></div><div class="line">    String response = null;  </div><div class="line"></div><div class="line">        String corrId = UUID.randomUUID().toString();  </div><div class="line"></div><div class="line">        BasicProperties props = new BasicProperties.Builder().correlationId(corrId).replyTo(replyQueueName).build();  </div><div class="line"></div><div class="line">        channel.basicPublish(&quot;&quot;, requestQueueName, props, message.getBytes(&quot;UTF-8&quot;));  </div><div class="line"></div><div class="line">        while (true) &#123;  </div><div class="line"></div><div class="line">            QueueingConsumer.Delivery delivery = consumer.nextDelivery();  </div><div class="line"></div><div class="line">            if (delivery.getProperties().getCorrelationId().equals(corrId)) &#123;  </div><div class="line"></div><div class="line">                response = new String(delivery.getBody(), &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                break;  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">        &#125;  </div><div class="line"></div><div class="line">        return response;  </div><div class="line"></div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    public void close() throws Exception &#123;  </div><div class="line"></div><div class="line">        connection.close();  </div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h3 id="远程方法调用的注意事项"><a href="#远程方法调用的注意事项" class="headerlink" title="远程方法调用的注意事项"></a>远程方法调用的注意事项</h3><pre><code>RPC在软件开发中非常常见，也经常被批评。当一个程序员对代码不熟悉的时候，跟踪RPC的性能问题是出在本地还是远程服务器就非常麻烦，对于RPC的使用，有几点需要特别说明：
+</code></pre><p>使用远程调用时的本地函数最好独立出来</p>
+<p>保证代码组件之间的依赖关系清晰明了，并用日志记录不同的执行过程和时间</p>
+<p>发生客户端运行缓慢或者假死时，先确认RPC服务器是否还活着！</p>
+<p>尽量使用异步队列来处理RPC请求，尽量不要用同步阻塞的方式运行RPC请求</p>
+<h2 id="消息属性"><a href="#消息属性" class="headerlink" title="消息属性"></a>消息属性</h2><p>传输一条消息，AMQP协议预定义了14个属性，下面几个是使用比较频繁的几个属性：</p>
+<p>deliveryMode：配置一个消息是否持久化。（2表示持久化）这个在第二章中有说明。</p>
+<p>contentType ：用来描述编码的MIME类型。与html的MIME类型类似，例如，经常使用JSON编码是将此属性设置为一个很好的做法：application/json。</p>
+<p>replyTo ： 回调队列的名称。</p>
+<p>correlationId：RPC响应请求的相关编号。</p>
+<p>关联编号  Correlation Id</p>
+<blockquote>
+<p>如果一个客户端有很多的计算任务，按照上面的代码，我们会为每个任务创建一个请求，然后等待返回的结果，这种方法貌似很耗时，如果把所有的任务都放到同一个连接中，那么我们又没法分辨出返回的结果是那个任务的？为了解决这个问题，RabbitMQ提供了一个correlationid属性来解决这个问题。RabbitMQ为每个请求提供唯一的编号，然后在返回队列里如果看到了这个编号，就知道我们的任务处理完成了，如果收到的编号不认识，就可以安全的忽略。</p>
+</blockquote>
+<p>你可能会疑问，如果忽略了，那么想知道这个返回结果的客户端是不是就收不到这个结果了？这个基本上不会出现，但是，理论上也可能发生，例如一个RPC服务器，在发送确认消息前挂了，你收到的消息可能就是不完整的。这种情况，RabbitMQ会重新发送任务处理请求。这也是为什么客户端必须处理这些重复请求以及RPC启用幂次模式。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>RPC工作方式</p>
+<p>当客户端启动时，会创建一个匿名的回调队列</p>
+<p>在RPC请求中，定义了两个属性：replyTo，表示回调队列的名称； correlationId，表示请求任务的唯一编号，用来区分不同请求的返回结果。</p>
+<p>将请求发送到rpc_queue队列中</p>
+<p>RPC服务器等待rpc_queue队列的请求，如果有消息，就处理，它将计算结果发送到请求中的回调队列里。</p>
+<p>客户端监听回调队列中的消息，如果有返回消息，它根据回调消息中的correlationid进行匹配计算结果。</p>
+<p>以上转载</p>
+<p><a href="http://blog.csdn.net/chwshuang/article/details/50518570" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50518570</a></p>
+<p>参考RabbitMQ中文文档</p>
+<p><a href="http://rabbitmq.mr-ping.com/tutorials_with_python/[5]Topics.html" target="_blank" rel="external">http://rabbitmq.mr-ping.com/tutorials_with_python/[5]Topics.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（五）——-Topic/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1739,163 +1910,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Object方法和排序/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Object方法和排序/" itemprop="url">【Java8】Guava——Object方法和排序</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:30:59+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Guava/" itemprop="url" rel="index">
-                    <span itemprop="name">Guava</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Objects"><a href="#Objects" class="headerlink" title="Objects"></a>Objects</h2><h3 id="Equal"><a href="#Equal" class="headerlink" title="Equal"></a>Equal</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String str = &quot;test&quot;;</div><div class="line">Objects.equal(str,null) //return false</div><div class="line">Objects.equal(null,str) //return false</div><div class="line">Objects.equal(str,&quot;test&quot;) //return true</div><div class="line">Objects.equal(null,null) //return true</div></pre></td></tr></table></figure>
-<h3 id="HashCode"><a href="#HashCode" class="headerlink" title="HashCode"></a>HashCode</h3><blockquote>
-<p>对传入的字段序列计算出合理的、顺序敏感的散列值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Objects.hashCode(field1,field2,field3...)</div></pre></td></tr></table></figure></p>
-</blockquote>
-<h3 id="toString-NaN"><a href="#toString-NaN" class="headerlink" title="toString"></a>toString</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//return ClassName&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(this).add(&quot;x&quot;, 1).toString();</div><div class="line">//return MyClass&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(&quot;MyClass&quot;).add(&quot;x&quot;, 1).toString();</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="Guava排序器——“流畅风格比较器”"><a href="#Guava排序器——“流畅风格比较器”" class="headerlink" title="Guava排序器——“流畅风格比较器”"></a>Guava排序器——“流畅风格比较器”</h2><blockquote>
-<p>从实现上说，Ordering实例就是一个特殊的Comparator实例。Ordering把很多基于Comparator的静态方法（如Collections.max）包装为自己的实例方法（非静态方法），并且提供了链式调用方法，来定制和增强现有的比较器</p>
-</blockquote>
-<h3 id="创建排序器"><a href="#创建排序器" class="headerlink" title="创建排序器"></a>创建排序器</h3><p><strong>官方排序</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">natural() //对可排序类型做自然排序，如数字按大小，日期按先后排序</div><div class="line">usingToString() //按对象的字符串形式做字典排序</div><div class="line">from(Comparator) //把给定的Comparator转化为排序器</div></pre></td></tr></table></figure></p>
-<p><strong>自定义排序</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//直接继承Ordering</div><div class="line">Ordering&lt;String&gt; strLenthSort = new Ordering&lt;String&gt;() &#123;</div><div class="line">  public int compare(String left, String right) &#123;</div><div class="line">    return Ints.compare(left.length(), right.length());</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p><strong>链式调用方法</strong></p>
-<blockquote>
-<p>通过链式调用，可以由给定的排序器衍生出其它排序器</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">reverse() //获取语义相反的排序器</div><div class="line">nullsFirst() //使用当前排序器，但额外把null值排到最前面</div><div class="line">nullsLast()  //使用当前排序器，但额外把null值排到最后面</div><div class="line">compound(Comparator) //合成另一个比较器，以处理当前排序器中的相等情况</div><div class="line">lexicographical() //基于处理类型T的排序器，返回该类型的可迭代对象Iterable&lt;T&gt;的排序器</div><div class="line">onResultOf(Function) //对集合中元素调用Function，再按返回值用当前排序器排序</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">//需要下面这个类的排序器</div><div class="line">class MyObject&#123;</div><div class="line">    @Nullable String sorted;</div><div class="line">    int notSortedBy;</div><div class="line">&#125;</div><div class="line">//考虑到排序器应该能处理sortedBy为null的情况</div><div class="line">Ordering&lt;MyObject&gt; ordering =</div><div class="line">Ordering</div><div class="line">		.natural() //自然排序</div><div class="line">		.nullsFirst() //空值优先</div><div class="line">		.onResultOf(</div><div class="line">			new Function&lt;MyObject, String&gt;() &#123;</div><div class="line">			  public String apply(MyObject foo) &#123;</div><div class="line">			    return foo.sorted; </div><div class="line">			  &#125;</div><div class="line">		&#125;);</div></pre></td></tr></table></figure>
-<p>注：链式调用产生的排序器时，应该从后往前读。</p>
-<blockquote>
-<p>排序器首先调用apply方法获取sorted值，并把sorted为null的元素都放到最前面，然后把剩下的元素按sorted进行自然排序。<strong>之所以要从后往前读，是因为每次链式调用都是用后面的方法包装了前面的排序器</strong></p>
-</blockquote>
-<p><em>注：用compound方法包装排序器时，就不应遵循从后往前读的原则。为了避免理解上的混乱，请不要把compound写在一长串链式调用的中间，你可以另起一行，在链中最先或最后调用compound。</em></p>
-<h3 id="运用排序器"><a href="#运用排序器" class="headerlink" title="运用排序器"></a>运用排序器</h3><p>Guava的排序器实现有若干操纵集合或元素值的API</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">greatestOf(Iterable iterable, int k) //获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable) //判断可迭代对象是否已按排序器排序:允许有排序值相等的元素。</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">greatestOf(Iterable iterable, int k)//获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable)	//判断可迭代对象是否已按排序器排序：允许有排序值相等的元素</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">min(E, E) //返回两个参数中最小的那个。如果相等，则返回第一个参数</div><div class="line">min(E, E, E, E...)//返回多个参数中最小的那个。如果有超过一个参数都最小，则返回第一个最小的参数</div><div class="line">min(Iterable) //返回迭代器中最小的元素。如果可迭代对象中没有元素，则抛出NoSuchElementException</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1945,7 +1959,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">109</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1956,7 +1970,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-count">39</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1967,7 +1981,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">86</span>
+                <span class="site-state-item-count">87</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

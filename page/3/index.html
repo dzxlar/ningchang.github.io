@@ -254,6 +254,206 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术/" itemprop="url">## 《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:03:31+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术"><a href="#《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术"></a>《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术</h2><blockquote>
+<p><strong>系统隔离</strong>是为了在系统发生故障时，能限定传播范围和影响范围，即发生故障时不会产生滚雪球效应，从而保证只能故障服务不可用，其他服务仍然可用</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>资源隔离</strong>是通过隔离减少资源竞争，保证服务间的相互不影响和可用性</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>其他常见隔离手段：线程隔离、进程隔离、集群隔离、机房隔离、读写隔离、快慢隔离、动静隔离、爬虫隔离、环境隔离（测试、预发布/灰度、正式环境）、AB测试（版本测试）、缓存隔离、压测隔离（真实/压测数据）、查询隔离（简单/批量/复杂查询条件分别路由到不同集群）</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>常用解决手段：负载均衡路由、自动/手动切换分组、降级等保障程序可用性</p>
+</blockquote>
+<hr>
+<h2 id="线程隔离"><a href="#线程隔离" class="headerlink" title="线程隔离"></a>线程隔离</h2><blockquote>
+<p>主要指线程池分离，在实际使用中，会将不同的请求分类，交给不同线程池处理。当一种业务的请求处理发生故障时，不会扩散到其他线程池，从而保障服务可用</p>
+</blockquote>
+<hr>
+<h2 id="进程隔离"><a href="#进程隔离" class="headerlink" title="进程隔离"></a>进程隔离</h2><blockquote>
+<p>通过系统拆分多个子系统来实现物理隔离，通过进程隔离使得某一个子系统出现问题而不会影响其他子系统</p>
+</blockquote>
+<hr>
+<h2 id="集群隔离"><a href="#集群隔离" class="headerlink" title="集群隔离"></a>集群隔离</h2><blockquote>
+<p>通过部署多个服务形成服务集群，从而提升系统容量。随着调用方增多，当某个服务影响其他服务的稳定性，应考虑为某个服务提供单个的服务集群（服务分组）</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;jsf:provider id=&quot;myService&quot; interface=&quot;com.test.MyService&quot; alias=&quot;$&#123;服务分组名&#125;&quot; ref=&quot;myServiceImpl&quot;/&gt;</div></pre></td></tr></table></figure>
+<h2 id="机房隔离"><a href="#机房隔离" class="headerlink" title="机房隔离"></a>机房隔离</h2><blockquote>
+<p>对系统可用性要求，会进行多机房部署，每个机房都有服务器组。本机房的服务只调用本机服务，不进行跨机房调用，其中一个机房出现问题时，可以通过DNS负载均衡将请求切换到另外一个机房，或许考虑服务能自动重试其他机房服务。一种方法是根据ip自动分组，还有一种方法在分组名中加上机房名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;jsf:provider id=&quot;myService&quot; interface=&quot;com.test.MyService&quot; alias=&quot;$&#123;服务分组名&#125;-$&#123;机房名&#125;&quot; ref=&quot;myServiceImpl&quot;/&gt;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<hr>
+<h2 id="读写隔离"><a href="#读写隔离" class="headerlink" title="读写隔离"></a>读写隔离</h2><blockquote>
+<p>通过主从模式将读和写集群分离，读服务只从redis集群获取数据，当主Redis集群出错时，从Redis集群仍然可用。而当从Redis出现问题时，可以进行其他集群重试</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">--先读取从</div><div class="line">status , resp = slave_get(key)</div><div class="line">if status == STATUS_OK then</div><div class="line">   return status ,value</div><div class="line">end</div><div class="line">--失败之后，在读取主</div><div class="line">status , resp = master_get(key)</div></pre></td></tr></table></figure>
+<p>–</p>
+<h2 id="动静隔离"><a href="#动静隔离" class="headerlink" title="动静隔离"></a>动静隔离</h2><blockquote>
+<p>如果用户访问结算页，JS/CSS等静态资源出现在系统中，很可能由于访问量太大，导致带宽满，从而出现不可用。一般静态资源放在CDN上</p>
+</blockquote>
+<hr>
+<h2 id="爬虫隔离"><a href="#爬虫隔离" class="headerlink" title="爬虫隔离"></a>爬虫隔离</h2><blockquote>
+<p>在实际业务中，爬虫比例远高于正常流量。而爬虫访问量太大可能导致服务不可用。一种通过限流解决。另一种通过负载均衡层面将爬虫路由到单独集群，从而保证正常服务可用，爬虫流量尽量可用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Nginx.conf</div><div class="line">set $flag = 0;</div><div class="line">if($http_user_agent ~* &quot;splider&quot;)&#123;</div><div class="line">    set $flag &quot;1&quot;;</div><div class="line">&#125;</div><div class="line">if($flag = &quot;0&quot;)&#123;</div><div class="line">    //代理到正常集群</div><div class="line">&#125;</div><div class="line">if($flag = &quot;1&quot;)&#123;</div><div class="line">    //代理到爬虫集群</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="热点隔离"><a href="#热点隔离" class="headerlink" title="热点隔离"></a>热点隔离</h2><blockquote>
+<p>秒杀、抢购就属于热点例子。做成独立系统或服务隔离从而保证热点服务出问题，不会影响主服务。还有一些热点可能由于价格或者突发事件，对于读热点，可以采取多级缓存搞定（缓存+队列进行削峰）</p>
+</blockquote>
+<hr>
+<h2 id="资源隔离"><a href="#资源隔离" class="headerlink" title="资源隔离"></a>资源隔离</h2><blockquote>
+<p>磁盘、CPU、网络等外界存在竞争关系的因素</p>
+</blockquote>
+<hr>
+<h2 id="Hystrix隔离"><a href="#Hystrix隔离" class="headerlink" title="Hystrix隔离"></a>Hystrix隔离</h2><p><a href="http://www.infoq.com/cn/news/2013/01/netflix-hystrix-fault-tolerance" target="_blank" rel="external">Hystrix-应对复杂分布式系统中的延时和故障容错</a></p>
+<hr>
+<h2 id="基于Servlet3的请求隔离"><a href="#基于Servlet3的请求隔离" class="headerlink" title="基于Servlet3的请求隔离"></a>基于Servlet3的请求隔离</h2><p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet30/" target="_blank" rel="external">servlet3新特性</a></p>
+<blockquote>
+<p>Tomcat7以上支持Servlet3异步化，在此之前，所有请求都是同步的。</p>
+</blockquote>
+<p>异步化优点</p>
+<ul>
+<li>基于NIO能处理更高的并发连接数</li>
+<li>请求解析和业务处理线程池分离</li>
+<li>根据业务重要性进行业务分级、并分级线程池</li>
+<li>对业务线程池进行监控、降级、运维等处理</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1990,176 +2190,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——建造者模式（Builder-Pattern）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——建造者模式（Builder-Pattern）/" itemprop="url">【设计模式】创建型模式——建造者模式（Builder Pattern）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:26:33+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="建造者模式定义"><a href="#建造者模式定义" class="headerlink" title="建造者模式定义"></a>建造者模式定义</h3><blockquote>
-<p><strong>将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示。</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p>例如： 王者荣耀内的英雄角色。他们有多个组成部分（技能、着装、五官等）构成一个复杂的角色对象。但每个角色的组成部分又有差异，但创建步骤都大同小异。最后将各组成部分装配成一个完整的人物。</p>
-</blockquote>
-<hr>
-<h3 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h3><ul>
-<li>在建造者模式中， 客户端不必知道产品内部组成的细节，将产品本身与产品的创建过程解耦，使得相同的创建过程可以创建不同的产品对象。</li>
-<li>每一个具体建造者都相对独立，而与其他的具体建造者无关，因此可以很方便地替换具体建造者或增加新的具体建造者， 用户使用不同的具体建造者即可得到不同的产品对象 。</li>
-<li>可以更加精细地控制产品的创建过程 。将复杂产品的创建步骤分解在不同的方法中，使得创建过程更加清晰，也更方便使用程序来控制创建过程。</li>
-<li>增加新的具体建造者无须修改原有类库的代码，指挥者类针对抽象建造者类编程，系统扩展方便，符合“开闭原则”。</li>
-</ul>
-<h3 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h3><ul>
-<li>建造者模式所创建的产品一般具有较多的共同点，其组成部分相似，如果产品之间的差异性很大，则不适合使用建造者模式，因此其使用范围受到一定的限制。</li>
-<li>如果产品的内部变化复杂，可能会导致需要定义很多具体建造者类来实现这种变化，导致系统变得很庞大。</li>
-</ul>
-<h3 id="模式应用"><a href="#模式应用" class="headerlink" title="模式应用"></a>模式应用</h3><ul>
-<li>需要生成的产品对象有复杂的内部结构，这些产品对象通常包含多个成员属性。</li>
-<li>需要生成的产品对象的属性相互依赖，需要指定其生成顺序。</li>
-<li>对象的创建过程独立于创建该对象的类。在建造者模式中引入了指挥者类，将创建过程封装在指挥者类中，而不在建造者类中。</li>
-<li>隔离复杂对象的创建和使用，并使得相同的创建过程可以创建不同的产品。</li>
-</ul>
-<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170331113755091?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class Product  &#123;</div><div class="line">       private  String partA; //定义部件，部件可以是任意类型，包括值类型和引用类型</div><div class="line">       private  String partB;</div><div class="line">       private  String partC;</div><div class="line">       //partA的Getter方法和Setter方法省略</div><div class="line">       //partB的Getter方法和Setter方法省略</div><div class="line">       //partC的Getter方法和Setter方法省略</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">abstract class Builder &#123;</div><div class="line">     //创建产品对象</div><div class="line">       protected  Product product=new Product();</div><div class="line">      </div><div class="line">       public  abstract void buildPartA();</div><div class="line">       public  abstract void buildPartB();</div><div class="line">       public  abstract void buildPartC();</div><div class="line">      </div><div class="line">     //返回产品对象</div><div class="line">       public  Product getResult() &#123;</div><div class="line">              return  product;</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">class Director &#123;</div><div class="line">       private  Builder builder;</div><div class="line">      </div><div class="line">       public  Director(Builder builder) &#123;</div><div class="line">              this.builder=builder;</div><div class="line">       &#125;</div><div class="line">      </div><div class="line">       public  void setBuilder(Builder builder) &#123;</div><div class="line">              this.builder=builer;</div><div class="line">       &#125;</div><div class="line">      </div><div class="line">     //产品构建与组装方法</div><div class="line">       public Product construct() &#123;</div><div class="line">              builder.buildPartA();</div><div class="line">              builder.buildPartB();</div><div class="line">              builder.buildPartC();</div><div class="line">              return builder.getResult();</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">	//可通过配置文件实现</div><div class="line">	Builder  builder = new ConcreteBuilder(); </div><div class="line">	Director director = new  Director(builder);</div><div class="line">	Product product = director.construct();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="建造者和抽象工厂比较"><a href="#建造者和抽象工厂比较" class="headerlink" title="建造者和抽象工厂比较"></a>建造者和抽象工厂比较</h3><ul>
-<li>与抽象工厂模式相比， 建造者模式返回一个组装好的完整产品 ，而 抽象工厂模式返回一系列相关的产品，这些产品位于不同的产品等级结构，构成了一个产品族。</li>
-<li>在抽象工厂模式中，客户端实例化工厂类，然后调用工厂方法获取所需产品对象，而在建造者模式中，客户端可以不直接调用建造者的相关方法，而是通过指挥者类来指导如何生成对象，包括对象的组装过程和建造步骤，它侧重于一步步构造一个复杂对象，返回一个完整的对象。</li>
-<li>如果将抽象工厂模式看成 汽车配件生产工厂 ，生产一个产品族的产品，那么建造者模式就是一个 汽车组装工厂 ，通过对部件的组装可以返回一辆完整的汽车。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2209,7 +2239,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">109</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2220,7 +2250,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-count">39</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2231,7 +2261,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">86</span>
+                <span class="site-state-item-count">87</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
