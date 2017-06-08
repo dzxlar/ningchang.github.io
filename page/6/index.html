@@ -254,6 +254,186 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Redis/" itemprop="url">【Linux】Centos6.8安装Redis</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:36+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1.下载源码并编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd /tmp &amp;&amp; wget http://download.redis.io/redis-stable.tar.gz#tar zxvf  redis-stable.tar.gz &amp;&amp; cd redis-stable &amp;&amp; make</div></pre></td></tr></table></figure>
+<p>2.为了能在任何路径下都能执行redis相关命令，我们需要copy以下两个文件到/usr/local/bin目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp src/redis-server /usr/local/bin/#cp src/redis-cli /usr/local/bin/</div></pre></td></tr></table></figure>
+<p>3.创建文件夹分别保存Redis的配置文件和数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /etc/redis#mkdir /var/redis</div></pre></td></tr></table></figure>
+<p>4.将Redis初始化文件copy进/etc/init.d，并重命名为redis_6379</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp utils/redis_init_script /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
+<p>5.查看文件redis_6379的内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
+<p>6.copy配置文件模板到上图中指定的路径并重命名为6379.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp redis.conf /etc/redis/6379.conf</div></pre></td></tr></table></figure>
+<p>7.在第3步新建的/var/redis路径下新建目录6379作为当前Redis实例的工作目录和数据存放目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /var/redis/6379</div></pre></td></tr></table></figure>
+<p>8.编辑配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/redis/6379.confport 6379#Redis默认监听端口daemonize yes   #是否作为守护进程运行，默认为nopidfile /var/run/redis_6379.pid   #如以后台进程运行，则需指定一个pid文件位置loglevel notice   #日志记录等级，有4个可选值，debug，verbose（默认值），notice，warninglogfile /var/log/redis_6379.log   #指定日志输出文件名，可设为/dev/null屏蔽日志dir /var/redis/6379#本地数据库存放路径和工作目录(非常重要！！！)bind 127.0.0.1#绑定主机IP，默认值为127.0.0.1</div></pre></td></tr></table></figure>
+<p>9.添加开机自启动。开机启动要配置在 rc.local 中，而 /etc/profile 文件，要有用户登录了，才会被执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo &quot;/etc/init.d/redis_6379 start &amp;&quot; &gt;&gt; /etc/rc.local</div></pre></td></tr></table></figure>
+<p>10.启动Redis并测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# /etc/init.d/redis_6379 start</div></pre></td></tr></table></figure>
+<p>Starting Redis server…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# redis-cli</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set test jinbitou.net</div></pre></td></tr></table></figure>
+<p>OK</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; get test</div></pre></td></tr></table></figure>
+<p>“jinbitou.net”</p>
+<p>127.0.0.1:6379&gt;</p>
+<p>11.检测是否开启远程连接<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps -ef | grep redis</div></pre></td></tr></table></figure></p>
+<p>12.配置密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; config set requirepass admin #密码为admin</div></pre></td></tr></table></figure>
+<p>13.如果java无法访问远程redis</p>
+<p>关闭虚拟机防火墙  <code>service iptables stop</code></p>
+<p>以上转载</p>
+<p><a href="http://jinbitou.net/2016/10/28/2110.html" target="_blank" rel="external">http://jinbitou.net/2016/10/28/2110.html</a></p>
+<p>相关资料</p>
+<p><a href="http://www.tianshouzhi.com/api/tutorials/redis/189" target="_blank" rel="external">http://www.tianshouzhi.com/api/tutorials/redis/189</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Nginx/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1700,175 +1880,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（二）——-工作队列（WorkQueue）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（二）——-工作队列（WorkQueue）/" itemprop="url">RabbitMq学习笔记（二）—— 工作队列（WorkQueue）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:36:23+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>WorkQueue：有序的处理消息（etc：流水线作业）</p>
-</blockquote>
-<h3 id="消费者消费数据"><a href="#消费者消费数据" class="headerlink" title="消费者消费数据"></a>消费者消费数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">boolean durable = true;//持久化，保证数据不丢失</div><div class="line"></div><div class="line">channel.queueDeclare(&quot;queue_task&quot;, durable, false, false, null); </div><div class="line"></div><div class="line">        //避免负载不均衡，保证一个消费者处理一个消息</div><div class="line">		int prefetchCount = 1;</div><div class="line">		channel.basicQos(prefetchCount);</div><div class="line"></div><div class="line">        //消费者</div><div class="line">        Consumer consumer = new DefaultConsumer(channel)&#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties,byte[] body)   throws IOException &#123;</div><div class="line">        String message = new String(body, &quot;UTF-8&quot;);</div><div class="line">        System.out.println(&quot;Worker 接收 &apos;&quot; + message + &quot;&apos;&quot;);</div><div class="line">        try &#123;</div><div class="line"></div><div class="line">             doWork(message);</div><div class="line"></div><div class="line">        &#125; finally &#123;</div><div class="line"></div><div class="line">            System.out.println(&quot;Worker 处理完成&quot;);</div><div class="line"></div><div class="line">            //消息处理完成确认</div><div class="line"></div><div class="line">            //如果发生异常，未处理完的消息，将会重新放回队列</div><div class="line">			channel.basicAck(envelope.getDeliveryTag(), false);</div><div class="line"></div><div class="line">                &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        &#125;;</div><div class="line"></div><div class="line">        //消息消费完成确认</div><div class="line">        channel.basicConsume(&quot;queue_task&quot;, false, consumer);</div></pre></td></tr></table></figure>
-<blockquote>
-<p>主要场景是消费者需要根据消息中的内容进行业务逻辑处理，这种消息可以看成是一个任务指令，处理起来比较耗时，通过多个消费者来处理这些消息，来提高数据的吞吐能力</p>
-</blockquote>
-<h3 id="消息确认"><a href="#消息确认" class="headerlink" title="消息确认"></a>消息确认</h3><blockquote>
-<p>为了确保消息或者任务不会丢失，RabbitMQ支持消息确认–ACK。ACK机制是消费者端从RabbitMQ收到消息并处理完成后，反馈给RabbitMQ，RabbitMQ收到反馈后才将此消息从队列中删除。如果一个消费者在处理消息时挂掉（网络不稳定、服务器异常、网站故障等原因导致频道、连接关闭或者TCP连接丢失等），那么他就不会有ACK反馈，RabbitMQ会认为这个消息没有正常消费，会将此消息重新放入队列中。如果有其他消费者同时在线，RabbitMQ会立即将这个消息推送给这个在线的消费者。这种机制保证了在消费者服务器故障的时候，能不丢失任何消息和任务。 </p>
-</blockquote>
-<p><strong>消息的ACK确认机制默认是打开的。</strong></p>
-<h3 id="忘记确认"><a href="#忘记确认" class="headerlink" title="忘记确认"></a>忘记确认</h3><blockquote>
-<p>忘记通过basicAck返回确认信息是常见的错误。这个错误非常严重，将导致消费者客户端退出或者关闭后，消息会被退回RabbitMQ服务器，这会使RabbitMQ服务器内存爆满，而且RabbitMQ也不会主动删除这些被退回的消息。 </p>
-</blockquote>
-<p><strong>注：使用rabbitmqctl messages_unacknowledged命令打印上面信息</strong></p>
-<h3 id="消息持久化"><a href="#消息持久化" class="headerlink" title="消息持久化"></a>消息持久化</h3><blockquote>
-<p>标记为持久化后的消息也不能完全保证不会丢失。虽然已经告诉RabbitMQ消息要保存到磁盘上，但是理论上，RabbitMQ已经接收到生产者的消息，但是还没有来得及保存到磁盘上，服务器就挂了（比如机房断电），那么重启后，RabbitMQ中的这条未及时保存的消息就会丢失。因为RabbitMQ不做实时立即的磁盘同步（fsync）。这种情况下，对于持久化要求不是特别高的简单任务队列来说，还是可以满足的。如果需要更强大的保证，那么你可以考虑使用生产者确认反馈机制。</p>
-</blockquote>
-<h3 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h3><blockquote>
-<p>默认情况下，RabbitMQ将队列消息随机分配给每个消费者，这时可能出现消息调度不均衡的问题。例如有两台消费者服务器，一个服务器可能非常繁忙，消息不断，另外一个却很悠闲，没有什么负载。RabbitMQ不会主动介入这些情况，还是会随机调度消息到每台服务器。 </p>
-</blockquote>
-<p><strong>int prefetchCount = 1;channel.basicQos(prefetchCount);</strong></p>
-<p>为了解决这个问题，我们可以使用【prefetchcount = 1】这个设置。这个设置告诉RabbitMQ，不要一次将多个消息发送给一个消费者。这样做的好处是只有当消费者处理完成当前消息并反馈后，才会收到另外一条消息或任务。这样就避免了负载不均衡的事情了。</p>
-<p>以上转载<br><a href="http://blog.csdn.net/chwshuang/article/details/50512057" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50512057</a></p>
-<p>RabbitMq在线API文档<br><a href="http://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/" target="_blank" rel="external">http://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1918,7 +1929,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">114</span>
+                <span class="site-state-item-count">115</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1929,7 +1940,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">41</span>
+                <span class="site-state-item-count">42</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1940,7 +1951,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">90</span>
+                <span class="site-state-item-count">91</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
