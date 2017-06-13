@@ -254,6 +254,152 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【扩展】RxJava与SpringMVC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【扩展】RxJava与SpringMVC/" itemprop="url">【扩展】RxJava与SpringMVC</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:22:09+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/扩展/" itemprop="url" rel="index">
+                    <span itemprop="name">扩展</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="RxJava"><a href="#RxJava" class="headerlink" title="RxJava"></a>RxJava</h3><blockquote>
+<p>a library for composing asynchronous and event-based programs by using observable sequences.</p>
+<p>是一个使用可观察数据流进行异步编程的编程接口，ReactiveX结合了观察者模式、迭代器模式和函数式编程的精华。与异步数据流交互的编程范式</p>
+</blockquote>
+<hr>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/single&quot;)</div><div class="line">public Single&lt;String&gt; single() &#123;</div><div class="line">    return Single.just(&quot;single value&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/singleWithResponse&quot;)</div><div class="line">public ResponseEntity&lt;Single&lt;String&gt;&gt; singleWithResponse() &#123;</div><div class="line">    return new ResponseEntity&lt;&gt;(Single.just(&quot;single value&quot;), HttpStatus.NOT_FOUND);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/throw&quot;)</div><div class="line">public Single&lt;Object&gt; error() &#123;</div><div class="line">    return Single.error(new RuntimeException(&quot;Unexpected&quot;));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/single&quot;)</div><div class="line">public Single&lt;String&gt; single() &#123;</div><div class="line">    return Observable.just(&quot;single value&quot;).toSingle();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/multiple&quot;)</div><div class="line">public Single&lt;List&lt;String&gt;&gt; multiple() &#123;</div><div class="line">    return Observable.just(&quot;multiple&quot;, &quot;values&quot;).toList().toSingle();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/responseWithObservable&quot;)</div><div class="line">public ResponseEntity&lt;Single&lt;String&gt;&gt; responseWithObservable() &#123;</div><div class="line"></div><div class="line">    Observable&lt;String&gt; observable = Observable.just(&quot;single value&quot;);</div><div class="line">    HttpHeaders headers = new HttpHeaders();</div><div class="line">    headers.setContentType(APPLICATION_JSON_UTF8);</div><div class="line">    return new ResponseEntity&lt;&gt;(observable.toSingle(), headers, HttpStatus.CREATED);</div><div class="line">&#125;</div><div class="line"></div><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/timeout&quot;)</div><div class="line">public Observable&lt;String&gt; timeout() &#123;</div><div class="line">    return Observable.timer(1, TimeUnit.MINUTES).map(new Func1&lt;Long, String&gt;() &#123;</div><div class="line">        @Override</div><div class="line">        public String call(Long aLong) &#123;</div><div class="line">            return &quot;single value&quot;;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/sse&quot;)</div><div class="line">public SseEmitter single() &#123;</div><div class="line">    return RxResponse.sse(Observable.just(&quot;single value&quot;));</div><div class="line">&#125;</div><div class="line"></div><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/messages&quot;)</div><div class="line">public SseEmitter messages() &#123;</div><div class="line">    return RxResponse.sse(Observable.just(&quot;message 1&quot;, &quot;message 2&quot;, &quot;message 3&quot;));</div><div class="line">&#125;</div><div class="line"></div><div class="line">@RequestMapping(method = RequestMethod.GET, value = &quot;/events&quot;)</div><div class="line">public SseEmitter event() &#123;</div><div class="line">    return RxResponse.sse(APPLICATION_JSON_UTF8, Observable.just(</div><div class="line">            new EventDto(&quot;Spring io&quot;, getDate(2016, 5, 19)),</div><div class="line">            new EventDto(&quot;SpringOnePlatform&quot;, getDate(2016, 8, 1))</div><div class="line">    ));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java核心】泛型简单记录/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1814,7 +1960,7 @@ show warnings
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">115</span>
+                <span class="site-state-item-count">116</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1825,7 +1971,7 @@ show warnings
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1836,7 +1982,7 @@ show warnings
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">91</span>
+                <span class="site-state-item-count">92</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

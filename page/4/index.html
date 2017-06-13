@@ -254,6 +254,161 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/" itemprop="url">【设计模式】行为型模式——命令模式（Command Pattern）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:37:15+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><blockquote>
+<p><strong>将一个请求封装为一个对象，从而让我们可用不同的请求对客户进行参数化；对请求排队或者记录请求日志，以及支持可撤销的操作。命令模式是一种对象行为型模式，其别名为动作(Action)模式或事务(Transaction)模式。</strong></p>
+</blockquote>
+<p> <strong>命令模式可以将请求发送者和接收者完全解耦，发送者与接收者之间没有直接引用关系，发送请求的对象只需要知道如何发送请求，而不必知道如何完成请求。</strong></p>
+<h2 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h2><p>(1) 降低系统的耦合度。由于请求者与接收者之间不存在直接引用，因此请求者与接收者之间实现完全解耦，相同的请求者可以对应不同的接收者，同样，相同的接收者也可以供不同的请求者使用，两者之间具有良好的独立性。<br>       (2) 新的命令可以很容易地加入到系统中。由于增加新的具体命令类不会影响到其他类，因此增加新的具体命令类很容易，无须修改原有系统源代码，甚至客户类代码，满足“开闭原则”的要求。<br>       (3) 可以比较容易地设计一个命令队列或宏命令（组合命令）。<br>       (4) 为请求的撤销(Undo)和恢复(Redo)操作提供了一种设计和实现方案。</p>
+<h2 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h2><p> <strong>使用命令模式可能会导致某些系统有过多的具体命令类。</strong>因为针对每一个对请求接收者的调用操作都需要设计一个具体命令类，因此在某些系统中可能需要提供大量的具体命令类，这将影响命令模式的使用。</p>
+<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p> (1) 系统需要将请求调用者和请求接收者解耦，使得调用者和接收者不直接交互。请求调用者无须知道接收者的存在，也无须知道接收者是谁，接收者也无须关心何时被调用。<br>       (2) 系统需要在不同的时间指定请求、将请求排队和执行请求。一个命令对象和请求的初始调用者可以有不同的生命期，换言之，最初的请求发出者可能已经不在了，而命令对象本身仍然是活动的，可以通过该命令对象去调用请求接收者，而无须关心请求调用者的存在性，可以通过请求日志文件等机制来具体实现。<br>       (3) 系统需要支持命令的撤销(Undo)操作和恢复(Redo)操作。<br>       (4) 系统需要将一组操作组合在一起形成宏命令。</p>
+<h2 id="模式应用"><a href="#模式应用" class="headerlink" title="模式应用"></a>模式应用</h2><blockquote>
+<p><strong>Hystrix</strong></p>
+</blockquote>
+<h2 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h2><p><img src="http://img.blog.csdn.net/20170418143436113?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<blockquote>
+<p><strong>命令模式的本质是对请求进行封装，一个请求对应于一个命令，将发出命令的责任和执行命令的责任分割开。</strong>每一个命令都是一个操作：请求的一方发出请求要求执行一个操作；接收的一方收到请求，并执行相应的操作。命令模式允许请求的一方和接收的一方独立开来，使得请求的一方不必知道接收请求的一方的接口，更不必知道请求如何被接收、操作是否被执行、何时被执行，以及是怎么被执行的。<br>       <strong>命令模式的关键在于引入了抽象命令类，请求发送者针对抽象命令类编程，只有实现了抽象命令类的具体命令才与请求接收者相关联。</strong></p>
+</blockquote>
+<h2 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">abstract class Command &#123;  </div><div class="line">    public abstract void execute();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Invoker &#123;  </div><div class="line">    private Command command;  </div><div class="line">      </div><div class="line">    //构造注入  </div><div class="line">    public Invoker(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //设值注入  </div><div class="line">    public void setCommand(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //业务方法，用于调用命令类的execute()方法  </div><div class="line">    public void call() &#123;  </div><div class="line">        command.execute();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">class ConcreteCommand extends Command &#123;  </div><div class="line">    private Receiver receiver; //维持一个对请求接收者对象的引用  </div><div class="line">  </div><div class="line">    public void execute() &#123;  </div><div class="line">        receiver.action(); //调用请求接收者的业务处理方法action()  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class Receiver &#123;  </div><div class="line">    public void action() &#123;  </div><div class="line">        //具体操作  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>每一个具体命令类对应一个请求的处理者（接收者），通过向请求发送者注入不同的具体命令对象可以使得相同的发送者对应不同的接收者，从而实现“将一个请求封装为一个对象，用不同的请求对客户进行参数化”</strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为性模式——模板方法模式-Template-Method-Pattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1435,6 +1590,173 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/" itemprop="url">【设计模式】结构性模式—— 代理模式（Proxy Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="代理模式定义"><a href="#代理模式定义" class="headerlink" title="代理模式定义"></a>代理模式定义</h3><blockquote>
+<p><strong>给某一个对象提供一个代理，并由代理对象控制对原对象的引用。它是一种对象结构型模式</strong></p>
+</blockquote>
+<h3 id="代理模式的优点"><a href="#代理模式的优点" class="headerlink" title="代理模式的优点"></a>代理模式的优点</h3><ul>
+<li>代理模式能够协调调用者和被调用者，在一定程度上降低了系统的耦合度。</li>
+<li>远程代理使得客户端可以访问在远程机器上的对象，远程机器 可能具有更好的计算性能与处理速度，可以快速响应并处理客户端请求。</li>
+<li>虚拟代理通过使用一个小对象来代表一个大对象，可以减少系 统资源的消耗，对系统进行优化并提高运行速度。</li>
+<li>保护代理可以控制对真实对象的使用权限。</li>
+</ul>
+<h3 id="代理模式缺点"><a href="#代理模式缺点" class="headerlink" title="代理模式缺点"></a>代理模式缺点</h3><ul>
+<li>由于在客户端和真实主题之间增加了代理对象，因此 有些类型的代理模式可能会造成请求的处理速度变慢。</li>
+<li>实现代理模式需要额外的工作，有些代理模式的实现 非常复杂。</li>
+</ul>
+<h3 id="代理模式结构"><a href="#代理模式结构" class="headerlink" title="代理模式结构"></a>代理模式结构</h3><p><img src="http://img.blog.csdn.net/20170331105829488?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class Subject  </div><div class="line">&#123;  </div><div class="line">    public abstract void doRequest();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class RealSubject extend Subject  </div><div class="line">&#123;  </div><div class="line">	@Override</div><div class="line">    public void doRequest()  </div><div class="line">    &#123;  </div><div class="line">        //业务方法具体实现代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Proxy extend Subject  </div><div class="line">&#123;  </div><div class="line">    private RealSubject realSubject = new RealSubject(); //维持一个对真实主题对象的引用  </div><div class="line">  </div><div class="line">    public void beforeRequest()   </div><div class="line">    &#123;  </div><div class="line">        …...  </div><div class="line">    &#125;  </div><div class="line">    @Override</div><div class="line">    public void doRequest()   </div><div class="line">    &#123;  </div><div class="line">        beforeRequest();  </div><div class="line">        realSubject.doRequest(); //调用真实主题对象的方法  </div><div class="line">        afterRequest();  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    public void afterRequest()   </div><div class="line">    &#123;  </div><div class="line">        ……  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p>代理类型</p>
+<ul>
+<li>远程(Remote)代理：为一个位于不同的地址空间的对象提供一个本地 的代理对象，这个不同的地址空间可以是在同一台主机中，也可是在 另一台主机中，远程代理又叫做大使(Ambassador)。</li>
+<li>虚拟(Virtual)代理：如果需要创建一个资源消耗较大的对象，先创建一个消耗相对较小的对象来表示，真实对象只在需要时才会被真正创建。</li>
+<li>Copy-on-Write代理：它是虚拟代理的一种，把复制（克隆）操作延迟 到只有在客户端真正需要时才执行。一般来说，对象的深克隆是一个 开销较大的操作，Copy-on-Write代理可以让这个操作延迟，只有对象被用到的时候才被克隆。</li>
+<li>保护(Protect or Access)代理：控制对一个对象的访问，可以给不同的用户提供不同级别的使用权限。</li>
+<li>缓冲(Cache)代理：为某一个目标操作的结果提供临时的存储空间，以便多个客户端可以共享这些结果。</li>
+<li>防火墙(Firewall)代理：保护目标不让恶意用户接近。<br>同步化(Synchronization)代理：使几个用户能够同时使用一个对象而没有冲突。</li>
+<li>智能引用(Smart Reference)代理：当一个对象被引用时，提供一些额外的操作，如将此对象被调用的次数记录下来等。</li>
+</ul>
+<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ul>
+<li>动态代理是一种较为高级的代理模式，它的典型应用就是Spring AOP。</li>
+<li>在传统的代理模式中，客户端通过Proxy调用RealSubject类的doRequest()方法，同时还在代理类中封装了其他方法(如beforeRequest()和afterRequest())，可以处理一些其他问题。</li>
+<li>如果按照这种方法使用代理模式，那么真实主题角色必须是事先已经存在的，并将其作为代理对象的内部成员属性。如果一个真实主题角色必须对应一个代理主题角色，这将导致系统中的类个数急剧增加，因此需要想办法减少系统中类的个数，此外，如何在事先不知道真实主题角色的情况下使用代理主题角色，这都是动态代理需要解决的问题。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1667,377 +1989,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/" itemprop="url">【设计模式】结构性模式—— 代理模式（Proxy Pattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="代理模式定义"><a href="#代理模式定义" class="headerlink" title="代理模式定义"></a>代理模式定义</h3><blockquote>
-<p><strong>给某一个对象提供一个代理，并由代理对象控制对原对象的引用。它是一种对象结构型模式</strong></p>
-</blockquote>
-<h3 id="代理模式的优点"><a href="#代理模式的优点" class="headerlink" title="代理模式的优点"></a>代理模式的优点</h3><ul>
-<li>代理模式能够协调调用者和被调用者，在一定程度上降低了系统的耦合度。</li>
-<li>远程代理使得客户端可以访问在远程机器上的对象，远程机器 可能具有更好的计算性能与处理速度，可以快速响应并处理客户端请求。</li>
-<li>虚拟代理通过使用一个小对象来代表一个大对象，可以减少系 统资源的消耗，对系统进行优化并提高运行速度。</li>
-<li>保护代理可以控制对真实对象的使用权限。</li>
-</ul>
-<h3 id="代理模式缺点"><a href="#代理模式缺点" class="headerlink" title="代理模式缺点"></a>代理模式缺点</h3><ul>
-<li>由于在客户端和真实主题之间增加了代理对象，因此 有些类型的代理模式可能会造成请求的处理速度变慢。</li>
-<li>实现代理模式需要额外的工作，有些代理模式的实现 非常复杂。</li>
-</ul>
-<h3 id="代理模式结构"><a href="#代理模式结构" class="headerlink" title="代理模式结构"></a>代理模式结构</h3><p><img src="http://img.blog.csdn.net/20170331105829488?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class Subject  </div><div class="line">&#123;  </div><div class="line">    public abstract void doRequest();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class RealSubject extend Subject  </div><div class="line">&#123;  </div><div class="line">	@Override</div><div class="line">    public void doRequest()  </div><div class="line">    &#123;  </div><div class="line">        //业务方法具体实现代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Proxy extend Subject  </div><div class="line">&#123;  </div><div class="line">    private RealSubject realSubject = new RealSubject(); //维持一个对真实主题对象的引用  </div><div class="line">  </div><div class="line">    public void beforeRequest()   </div><div class="line">    &#123;  </div><div class="line">        …...  </div><div class="line">    &#125;  </div><div class="line">    @Override</div><div class="line">    public void doRequest()   </div><div class="line">    &#123;  </div><div class="line">        beforeRequest();  </div><div class="line">        realSubject.doRequest(); //调用真实主题对象的方法  </div><div class="line">        afterRequest();  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    public void afterRequest()   </div><div class="line">    &#123;  </div><div class="line">        ……  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p>代理类型</p>
-<ul>
-<li>远程(Remote)代理：为一个位于不同的地址空间的对象提供一个本地 的代理对象，这个不同的地址空间可以是在同一台主机中，也可是在 另一台主机中，远程代理又叫做大使(Ambassador)。</li>
-<li>虚拟(Virtual)代理：如果需要创建一个资源消耗较大的对象，先创建一个消耗相对较小的对象来表示，真实对象只在需要时才会被真正创建。</li>
-<li>Copy-on-Write代理：它是虚拟代理的一种，把复制（克隆）操作延迟 到只有在客户端真正需要时才执行。一般来说，对象的深克隆是一个 开销较大的操作，Copy-on-Write代理可以让这个操作延迟，只有对象被用到的时候才被克隆。</li>
-<li>保护(Protect or Access)代理：控制对一个对象的访问，可以给不同的用户提供不同级别的使用权限。</li>
-<li>缓冲(Cache)代理：为某一个目标操作的结果提供临时的存储空间，以便多个客户端可以共享这些结果。</li>
-<li>防火墙(Firewall)代理：保护目标不让恶意用户接近。<br>同步化(Synchronization)代理：使几个用户能够同时使用一个对象而没有冲突。</li>
-<li>智能引用(Smart Reference)代理：当一个对象被引用时，提供一些额外的操作，如将此对象被调用的次数记录下来等。</li>
-</ul>
-<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ul>
-<li>动态代理是一种较为高级的代理模式，它的典型应用就是Spring AOP。</li>
-<li>在传统的代理模式中，客户端通过Proxy调用RealSubject类的doRequest()方法，同时还在代理类中封装了其他方法(如beforeRequest()和afterRequest())，可以处理一些其他问题。</li>
-<li>如果按照这种方法使用代理模式，那么真实主题角色必须是事先已经存在的，并将其作为代理对象的内部成员属性。如果一个真实主题角色必须对应一个代理主题角色，这将导致系统中的类个数急剧增加，因此需要想办法减少系统中类的个数，此外，如何在事先不知道真实主题角色的情况下使用代理主题角色，这都是动态代理需要解决的问题。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——-观察者模式（Observer）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】行为型模式——-观察者模式（Observer）/" itemprop="url">【设计模式】行为型模式—— 观察者模式（Observer）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:13+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="观察者模式定义"><a href="#观察者模式定义" class="headerlink" title="观察者模式定义"></a>观察者模式定义</h3><blockquote>
-<p><strong>定义对象间的一种一对多依赖关系，使得每当一个对象状态发生改变时，其相关依赖对象皆得到通知并被自动更新</strong>。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>观察者模式又叫做发布-订阅（Publish/Subscribe）模式、模型-视图（Model/View）模式、源-监听器（Source/Listener）模式或从属者（Dependents）模式。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>举个例子：完农药开黑的时候。5人一队，推塔游戏。当其中防御塔或者水晶有一方遭受其他攻击的时候。会发出一个遭受攻击的指令通知所有队友。进而队友前往支援。</p>
-<p>总结如下：水晶遭受攻击（观察目标） –&gt; 通知队友（观察者） –&gt; 队友响应</p>
-</blockquote>
-<hr>
-<h3 id="模式动机"><a href="#模式动机" class="headerlink" title="模式动机"></a>模式动机</h3><blockquote>
-<p>一个观察目标可以对应多个观察者，而且这些观察者之间没有相互联系，可以根据需要增加和删除观察者，使得系统更易于扩展，这就是观察者模式的模式动机</p>
-</blockquote>
-<h3 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h3><ul>
-<li>观察者模式可以实<strong>现表示层和数据逻辑层的分离</strong>，并定义了稳定的消息更新传递机制，抽象了更新接口，使得可以有各种各样不同的表示层作为具体观察者角色。</li>
-<li>观察者模式在<strong>观察目标和观察者之间建立一个抽象的耦合</strong>。</li>
-<li>观察者模式<strong>支持广播通信</strong>。</li>
-<li>观察者模式<strong>符合“开闭原则”的要求</strong>。</li>
-</ul>
-<h3 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h3><ul>
-<li>如果一个观察目标对象有<strong>很多直接和间接的观察者的话，将所有的观察者都通知到会花费很多时间</strong>。</li>
-<li>如果在<strong>观察者和观察目标之间有循环依赖</strong>的话，观察目标会触发它们之间进行循环调用，可能导致系统崩溃。</li>
-<li>观察者模式<strong>没有相应的机制让观察者知道所观察的目标对象是怎么发生变化的，而仅仅只是知道观察目标发生了变化</strong>。</li>
-</ul>
-<h3 id="具体应用"><a href="#具体应用" class="headerlink" title="具体应用"></a>具体应用</h3><ul>
-<li>一个抽象模型有两个方面，其中一个方面依赖于另一个方面。将这些方面封装在独立的对象中使它们可以各自独立地改变和复用。</li>
-<li>一个对象的改变将导致其他一个或多个对象也发生改变，而不知道具体有多少对象将发生改变，可以降低对象之间的耦合度。</li>
-<li>一个对象必须通知其他对象，而并不知道这些对象是谁。</li>
-<li>需要在系统中创建一个触发链，A对象的行为将影响B对象，B对象的行为将影响C对象……，可以使用观察者模式创建一种链式触发机制。</li>
-</ul>
-<h3 id="实际场景"><a href="#实际场景" class="headerlink" title="实际场景"></a>实际场景</h3><p>如某电子商务网站可以在执行发送操作后给用户多个发送商品打折信息，某团队战斗游戏中某队友牺牲将给所有成员提示等等，凡是涉及到一对一或者一对多的对象交互场景都可以使用观察者模式</p>
-<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170330105651030?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h4 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h4><p><img src="http://img.blog.csdn.net/20170330111712540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* 抽象观察目标</div><div class="line">*/</div><div class="line">abstract class Subject &#123;  </div><div class="line">    //定义一个观察者集合用于存储所有观察者对象  </div><div class="line">    protected List&lt;Observer&gt; observers = Lists.newArrayList();</div><div class="line">    //注册方法，用于向观察者集合中增加一个观察者  </div><div class="line">    public void attach(Observer observer) &#123;  </div><div class="line">	    observers.add(observer);  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">    //注销方法，用于在观察者集合中删除一个观察者  </div><div class="line">    public void detach(Observer observer) &#123;  </div><div class="line">	    observers.remove(observer);  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">    //声明抽象通知方法  </div><div class="line">    public abstract void notify();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">class ConcreteSubject extends Subject &#123;  </div><div class="line">    //实现通知方法  </div><div class="line">    public void notify() &#123;  </div><div class="line">        //遍历观察者集合，调用每一个观察者的响应方法  </div><div class="line">        observers.foreach(observer -&gt; observer.update());</div><div class="line">    &#125;     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">interface Observer &#123;  </div><div class="line">    //声明响应方法  </div><div class="line">    public void update();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class ConcreteObserver implements Observer &#123;  </div><div class="line">    //实现响应方法  </div><div class="line">    public void update() &#123;  </div><div class="line">        //具体响应代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p><strong>在有些更加复杂的情况下，具体观察者类ConcreteObserver的update()方法在执行时需要使用到具体目标类ConcreteSubject中的状态（属性）</strong></p>
-<p>如果ConcreteObserver的update()方法不需要使用到ConcreteSubject中的状态属性，则可以对观察者模式的标准结构进行简化，在具体观察者ConcreteObserver和具体目标ConcreteSubject之间无须维持对象引用</p>
-</blockquote>
-<p><strong>如果在具体层具有关联关系，系统的扩展性将受到一定的影响，增加新的具体目标类有时候需要修改原有观察者的代码，在一定程度上违反了“开闭原则”，但是如果原有观察者类无须关联新增的具体目标，则系统扩展性不受影响。</strong></p>
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><h4 id="jdk对观察者模式支持"><a href="#jdk对观察者模式支持" class="headerlink" title="jdk对观察者模式支持"></a>jdk对观察者模式支持</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">java.util.Observable</div></pre></td></tr></table></figure>
-<p><img src="http://img.blog.csdn.net/20170330113456344?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<ol>
-<li>changed 改变状态标志 相当于 state</li>
-<li>clearChanged() 将状态变为false</li>
-<li>hasChanged() 检测状态是否改变</li>
-<li>countObservers() 用于返回队列中观察者的数量。</li>
-</ol>
-<p><img src="http://img.blog.csdn.net/20170330113534407?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>  当观察目标的状态发生变化时，该方法将会被调用，在Observer的子类中将实现update()方法，即具体观察者可以根据需要具有不同的更新行为。当调用观察目标类Observable的notifyObservers()方法时，将执行观察者类中的update()方法</p>
-<h3 id="观察者模式和Java事件处理"><a href="#观察者模式和Java事件处理" class="headerlink" title="观察者模式和Java事件处理"></a>观察者模式和Java事件处理</h3><blockquote>
-<p>在JDK 1.1及以后的各个版本中，<strong>事件处理模型采用基于观察者模式的委派事件模型(DEM)</strong>，即<strong>一个Java组件所引发的事件并不由引发事件的对象自己来负责处理，而是委派给独立的事件处理对象负责。</strong></p>
-</blockquote>
-<p>在DEM模型中，目标角色（如界面组件）负责发布事件，而观察者角色（事件处理者）可以向目标订阅它所感兴趣的事件。当一个具体目标产生一个事件时，它将通知所有订阅者。</p>
-<blockquote>
-<p>事件的发布者称为<strong>事件源(Event Source)</strong>，而订阅者称为<strong>事件监听器(Event Listener)。</strong>在这个过程中还可以通过<strong>事件对象(Event Object)</strong>来传递与事件相关的信息</p>
-</blockquote>
-<p><strong>事件源对象、事件监听对象（事件处理对象）和事件对象构成了Java事件处理模型的三要素</strong></p>
-<p><strong>在Java事件处理中，通常使用的是一对一的观察者模式，而不是一对多的观察者模式</strong></p>
-<p>###MVC模式</p>
-<blockquote>
-<p>它包含三个角色：模型(Model)，视图(View)和控制器(Controller)。观察者模式可以用来实现MVC模式，<strong>观察者模式中的观察目标就是MVC模式中的模型(Model)，而观察者就是MVC中的视图(View)</strong>，控制器(Controller)充当两者之间的中介者(Mediator)。当模型层的数据发生改变时，视图层将自动改变其显示内容</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2087,7 +2038,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">115</span>
+                <span class="site-state-item-count">116</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2098,7 +2049,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2109,7 +2060,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">91</span>
+                <span class="site-state-item-count">92</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

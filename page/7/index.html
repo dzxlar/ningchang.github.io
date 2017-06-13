@@ -254,6 +254,173 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（三）——-交换器（Pub-Topic）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（三）——-交换器（Pub-Topic）/" itemprop="url">RabbitMq学习笔记（三）—— 交换器（Pub/Topic）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:37:25+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//声明交换器（fanout：分发）rabbitmqctl list_exchanges 查看交换器规则</div><div class="line"></div><div class="line">channel.exchangeDeclare(&quot;logs&quot;, &quot;fanout&quot;);</div><div class="line"></div><div class="line">//创建临时队列</div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line">String message = &quot;this is message in the fanout&apos;exchange &quot;;</div><div class="line"></div><div class="line">//发送消息到交换器中</div><div class="line"></div><div class="line">channel.basicPublish( &quot;logs&quot;, &quot;&quot;, null, message.getBytes());</div><div class="line"></div><div class="line">//交换器绑定队列</div><div class="line"></div><div class="line">channel.queueBind(queueName, &quot;logs&quot;, &quot;&quot;);</div></pre></td></tr></table></figure>
+<blockquote>
+<p>RabbitMQ中消息传递模型的核心思想是：生产者不直接发送消息到队列。实际的运行环境中，生产者是不知道消息会发送到那个队列上，她只会将消息发送到一个交换器，交换器也像一个生产线，她一边接收生产者发来的消息，另外一边则根据交换规则，将消息放到队列中。</p>
+</blockquote>
+<h3 id="交换器的规则有："><a href="#交换器的规则有：" class="headerlink" title="交换器的规则有："></a>交换器的规则有：</h3><ol>
+<li><p>direct （直连）</p>
+</li>
+<li><p>topic （主题）</p>
+</li>
+<li><p>headers （标题）</p>
+</li>
+<li><p>fanout （分发）</p>
+</li>
+</ol>
+<h3 id="匿名交换器"><a href="#匿名交换器" class="headerlink" title="匿名交换器"></a>匿名交换器</h3><blockquote>
+<p>在之前的教程中，我们知道，发送消息到队列时根本没有使用交换器，但是消息也能发送到队列。这是因为RabbitMQ选择了一个空“”字符串的默认交换器。</p>
+</blockquote>
+<p>第一个参数就是交换器的名称。如果输入“”空字符串，表示使用默认的匿名交换器。<br>第二个参数是【routingKey】路由线索<br>匿名交换器规则：<br>发送到routingKey名称对应的队列。</p>
+<h3 id="临时队列"><a href="#临时队列" class="headerlink" title="临时队列"></a>临时队列</h3><p>如果要在生产者和消费者之间创建一个新的队列，又不想使用原来的队列，临时队列就是为这个场景而生的：</p>
+<p>首先，每当我们连接到RabbitMQ，我们需要一个新的空队列，我们可以用一个随机名称来创建，或者说让服务器选择一个随机队列名称给我们。</p>
+<p>一旦我们断开消费者，队列应该立即被删除。</p>
+<p>以上转载</p>
+<p><a href="http://blog.csdn.net/chwshuang/article/details/50512057" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50512057</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（二）——-工作队列（WorkQueue）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1736,170 +1903,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java】异常小记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java】异常小记/" itemprop="url">【Java】异常小记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:26:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li>Throwable</li>
-</ol>
-<ul>
-<li>是Java中所有错误或异常的超类。</li>
-<li>它的两个子类是Error和Exception。</li>
-</ul>
-<ol>
-<li><p>Error 是 Throwable 的子类，用于指示合理的应用程序不应该试图捕获的严重问题</p>
-</li>
-<li><p>Exception 类及其子类是 Throwable 的一种形式，它指出了合理的应用程序想要捕获的条件</p>
-</li>
-<li><p>RuntimeException 是那些可能在 Java 虚拟机正常运行期间抛出的异常的超类。可能在执行方法期间抛出但未被捕获的RuntimeException 的任何子类都无需在 throws 子句中进行声明。</p>
-</li>
-<li><p><strong>在子类中一个重写的方法可能只抛出父类中声明过的异常或者异常的子类</strong></p>
-</li>
-<li><p>Exception和Error的区别<br> Exception</p>
-<pre><code>1．可以是可被控制(checked) 或不可控制的(unchecked) 
-2．表示一个由程序员自身导致的错误 
-3．在应用程序级被处理
-</code></pre><p> Error（应用层面少用，了解即可）</p>
-<pre><code>1．总是不可控制的(unchecked) 
-2．用于表示系统错误或低层资源的错误 
-3．如何可能的话，应该在系统级被捕捉
-</code></pre></li>
-</ol>
-<p>7.Java中的两类异常情况</p>
-<pre><code>1. Checked exception: 这类异常都是Exception的子类 。异常的向上抛出机制进行处理，假如子类可能产生A异常，那么在父类中也必须throws A异常。**可能导致的问题：代码效率低，耦合度过高**
- 2. Unchecked exception: 这类异常都是RuntimeException的子类，虽然RuntimeException同样也是Exception的子类，但是它们是非凡的，它们不能通过client code来试图解决，所以称为Unchecked exception
-</code></pre><p>异常类关系图<br><img src="http://img.blog.csdn.net/20170321111500322?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="异常类关系图"></p>
-<p><a href="https://my.oschina.net/hanzhankang/blog/195529" target="_blank" rel="external">异常参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1949,7 +1952,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">115</span>
+                <span class="site-state-item-count">116</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1960,7 +1963,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1971,7 +1974,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">91</span>
+                <span class="site-state-item-count">92</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
