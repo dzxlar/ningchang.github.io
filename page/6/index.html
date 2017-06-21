@@ -254,6 +254,155 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java序列化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java序列化/" itemprop="url">Java序列化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:51+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>什么是序列化</p>
+<blockquote>
+<p>序列化 (Serialization)是指将对象的状态信息转换为可以存储或传输的形式的过程。</p>
+</blockquote>
+<p>在序列化期间，<strong>对象将其当前状态写入到临时或持久性存储区。以后，可以通过从存储区中读取或反序列化对象的状态，重新创建该对象</strong>。</p>
+<p>简而言之</p>
+<p>序列化<br><strong>将数据结构或对象转换成二进制串的过程</strong></p>
+<p>反序列化<br><strong>将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程</strong></p>
+<p>具体例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public static void main(String args[]) throws Exception &#123;</div><div class="line"></div><div class="line">    String obj = “hello world!”;</div><div class="line"></div><div class="line">    // 将序列化对象写入文件object.txt中</div><div class="line"></div><div class="line">    FileOutputStream fos = new FileOutputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectOutputStream os = new ObjectOutputStream(fos);</div><div class="line"></div><div class="line">    os.writeObject(obj);</div><div class="line"></div><div class="line">    os.close();</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // 从文件object.txt中读取数据</div><div class="line">    FileInputStream fis = new FileInputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectInputStream ois = new ObjectInputStream(fis);</div><div class="line"></div><div class="line">    // 通过反序列化恢复对象obj</div><div class="line"></div><div class="line">    String obj2 = (String)ois.readObject();</div><div class="line"></div><div class="line">    ois.close();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>反序列化漏洞原理</p>
+<blockquote>
+<p>反序列化漏洞的本质就是反序列化机制打破了数据和对象的边界，导致攻击者注入的恶意序列化数据在反序列化过程中被还原成对象，控制了对象就可能在目标系统上面执行攻击代码。Java序列化应用于RMI JMX JMS 技术中。</p>
+</blockquote>
+<p>以上转载</p>
+<p><a href="http://techshow.ctrip.com/archives/1414.html" target="_blank" rel="external">http://techshow.ctrip.com/archives/1414.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java反射/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1779,158 +1928,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/" itemprop="url">RabbitMq学习笔记（四）—— 消息路由（Routing）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:37:53+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">//声明直连交换器</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;direct&quot;);  </div><div class="line"></div><div class="line">// 获取匿名队列名称  </div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">根据路由关键字进行多重绑定 </div><div class="line"></div><div class="line">for(String severity :routingKeys)&#123;  </div><div class="line"></div><div class="line">        channel.queueBind(queueName, EXCHANGE_NAME, severity);  </div><div class="line"></div><div class="line">&#125; </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//消费数据</div><div class="line"></div><div class="line">Consumer consumer = new DefaultConsumer(channel) &#123;  </div><div class="line"></div><div class="line">            @Override  </div><div class="line"></div><div class="line">            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException &#123;  </div><div class="line"></div><div class="line">                String message = new String(body, &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                System.out.println(&quot; [x] Received &apos;&quot; + envelope.getRoutingKey() + &quot;&apos;:&apos;&quot; + message + &quot;&apos;&quot;);  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">  &#125;;  </div><div class="line"></div><div class="line">        channel.basicConsume(queueName, true, consumer);</div></pre></td></tr></table></figure>
-<h4 id="直连类型交换器"><a href="#直连类型交换器" class="headerlink" title="直连类型交换器"></a>直连类型交换器</h4><blockquote>
-<p>上一章的例子是通过分发【fanout】类型的交换器【logs】广播日志信息，现在我们将日志分debug、info、warn、error这几种基本的级别，实际在生产环境中，避免磁盘空间浪费，应用只会将error级别的日志打印出来。而分发【fanout】类型的交换器会将所有基本的日志都发送出来，如果我们想只接收某一级别的日志信息，就需要使用直连【direct】类型的交换器了, 下面的图中，队列1通过ERROR这个routingkey绑定到E交换器，队列2通过WARN和INFO绑定到E交换器，E交换器的类型是直连【direct】的，如果生产者【P】发出ERROR的日志，只会有队列1会收到，如果生产者【P】发出INFO和WARN的日志，只有队列2会收到，如果生产者【P】发出DEBUG级别的日志，队列1和队列2都会忽略它。</p>
-</blockquote>
-<h4 id="多重绑定"><a href="#多重绑定" class="headerlink" title="多重绑定"></a>多重绑定</h4><blockquote>
-<p>我们允许多个队列以相同的路由关键字绑定到同一个交换器中，可以看到，交换器虽然是直连类型，但是绑定后的效果却跟分发类型的交换器类似，相同的是队列1和队列2都会收到同一条来自交换器的消息。</p>
-</blockquote>
-<p>他们的区别：分发模式下，队列1、队列2会收到所有级别（除ERROR级别以外）的消息，而直连模式下，他们仅仅只会收到ERROR关键字类型的消息。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1980,7 +1977,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">116</span>
+                <span class="site-state-item-count">117</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1991,7 +1988,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-count">43</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2002,7 +1999,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">92</span>
+                <span class="site-state-item-count">93</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
