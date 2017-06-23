@@ -254,6 +254,163 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Object方法和排序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Object方法和排序/" itemprop="url">【Java8】Guava——Object方法和排序</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:30:59+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Guava/" itemprop="url" rel="index">
+                    <span itemprop="name">Guava</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Objects"><a href="#Objects" class="headerlink" title="Objects"></a>Objects</h2><h3 id="Equal"><a href="#Equal" class="headerlink" title="Equal"></a>Equal</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String str = &quot;test&quot;;</div><div class="line">Objects.equal(str,null) //return false</div><div class="line">Objects.equal(null,str) //return false</div><div class="line">Objects.equal(str,&quot;test&quot;) //return true</div><div class="line">Objects.equal(null,null) //return true</div></pre></td></tr></table></figure>
+<h3 id="HashCode"><a href="#HashCode" class="headerlink" title="HashCode"></a>HashCode</h3><blockquote>
+<p>对传入的字段序列计算出合理的、顺序敏感的散列值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Objects.hashCode(field1,field2,field3...)</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="toString-NaN"><a href="#toString-NaN" class="headerlink" title="toString"></a>toString</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//return ClassName&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(this).add(&quot;x&quot;, 1).toString();</div><div class="line">//return MyClass&#123;x=1&#125;</div><div class="line">Objects.toStringHelper(&quot;MyClass&quot;).add(&quot;x&quot;, 1).toString();</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="Guava排序器——“流畅风格比较器”"><a href="#Guava排序器——“流畅风格比较器”" class="headerlink" title="Guava排序器——“流畅风格比较器”"></a>Guava排序器——“流畅风格比较器”</h2><blockquote>
+<p>从实现上说，Ordering实例就是一个特殊的Comparator实例。Ordering把很多基于Comparator的静态方法（如Collections.max）包装为自己的实例方法（非静态方法），并且提供了链式调用方法，来定制和增强现有的比较器</p>
+</blockquote>
+<h3 id="创建排序器"><a href="#创建排序器" class="headerlink" title="创建排序器"></a>创建排序器</h3><p><strong>官方排序</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">natural() //对可排序类型做自然排序，如数字按大小，日期按先后排序</div><div class="line">usingToString() //按对象的字符串形式做字典排序</div><div class="line">from(Comparator) //把给定的Comparator转化为排序器</div></pre></td></tr></table></figure></p>
+<p><strong>自定义排序</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//直接继承Ordering</div><div class="line">Ordering&lt;String&gt; strLenthSort = new Ordering&lt;String&gt;() &#123;</div><div class="line">  public int compare(String left, String right) &#123;</div><div class="line">    return Ints.compare(left.length(), right.length());</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p><strong>链式调用方法</strong></p>
+<blockquote>
+<p>通过链式调用，可以由给定的排序器衍生出其它排序器</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">reverse() //获取语义相反的排序器</div><div class="line">nullsFirst() //使用当前排序器，但额外把null值排到最前面</div><div class="line">nullsLast()  //使用当前排序器，但额外把null值排到最后面</div><div class="line">compound(Comparator) //合成另一个比较器，以处理当前排序器中的相等情况</div><div class="line">lexicographical() //基于处理类型T的排序器，返回该类型的可迭代对象Iterable&lt;T&gt;的排序器</div><div class="line">onResultOf(Function) //对集合中元素调用Function，再按返回值用当前排序器排序</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">//需要下面这个类的排序器</div><div class="line">class MyObject&#123;</div><div class="line">    @Nullable String sorted;</div><div class="line">    int notSortedBy;</div><div class="line">&#125;</div><div class="line">//考虑到排序器应该能处理sortedBy为null的情况</div><div class="line">Ordering&lt;MyObject&gt; ordering =</div><div class="line">Ordering</div><div class="line">		.natural() //自然排序</div><div class="line">		.nullsFirst() //空值优先</div><div class="line">		.onResultOf(</div><div class="line">			new Function&lt;MyObject, String&gt;() &#123;</div><div class="line">			  public String apply(MyObject foo) &#123;</div><div class="line">			    return foo.sorted; </div><div class="line">			  &#125;</div><div class="line">		&#125;);</div></pre></td></tr></table></figure>
+<p>注：链式调用产生的排序器时，应该从后往前读。</p>
+<blockquote>
+<p>排序器首先调用apply方法获取sorted值，并把sorted为null的元素都放到最前面，然后把剩下的元素按sorted进行自然排序。<strong>之所以要从后往前读，是因为每次链式调用都是用后面的方法包装了前面的排序器</strong></p>
+</blockquote>
+<p><em>注：用compound方法包装排序器时，就不应遵循从后往前读的原则。为了避免理解上的混乱，请不要把compound写在一长串链式调用的中间，你可以另起一行，在链中最先或最后调用compound。</em></p>
+<h3 id="运用排序器"><a href="#运用排序器" class="headerlink" title="运用排序器"></a>运用排序器</h3><p>Guava的排序器实现有若干操纵集合或元素值的API</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">greatestOf(Iterable iterable, int k) //获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable) //判断可迭代对象是否已按排序器排序:允许有排序值相等的元素。</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">greatestOf(Iterable iterable, int k)//获取可迭代对象中最大的k个元素</div><div class="line">isOrdered(Iterable)	//判断可迭代对象是否已按排序器排序：允许有排序值相等的元素</div><div class="line">sortedCopy(Iterable)//判断可迭代对象是否已严格按排序器排序：不允许排序值相等的元素</div><div class="line">min(E, E) //返回两个参数中最小的那个。如果相等，则返回第一个参数</div><div class="line">min(E, E, E, E...)//返回多个参数中最小的那个。如果有超过一个参数都最小，则返回第一个最小的参数</div><div class="line">min(Iterable) //返回迭代器中最小的元素。如果可迭代对象中没有元素，则抛出NoSuchElementException</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Optional/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1698,203 +1855,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——线程安全集合类/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——线程安全集合类/" itemprop="url">线程笔记——线程安全集合类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:21:54+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li>HashTable</li>
-<li>ConcurrentHashMap</li>
-<li>CopyOnWrite</li>
-</ol>
-<h3 id="HashTable"><a href="#HashTable" class="headerlink" title="HashTable"></a>HashTable</h3><p>HashTable特点</p>
-<ol>
-<li>和HashMap都是散列表,储存键值对映射</li>
-<li>继承Dictionary、实现Serializable、Clone、Map接口</li>
-<li>初始容量（哈希表创建容量）和加载因子（哈希表中桶的数量），是影响性能的关键因素。默认加载因子0.75</li>
-<li>哈希表的方法都是同步的（线程安全）</li>
-<li>哈希表中集合元素都是无序的</li>
-<li>键值对的值都不能为null</li>
-<li>每个方法体通过synchronized修饰，保证线程安全<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class HashTableDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		Hashtable&lt;String,Integer&gt; ht = new Hashtable&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		Hashtable&lt;String,Integer&gt; htClone = (Hashtable&lt;String, Integer&gt;) ht.clone();</div><div class="line">		System.out.println(&quot;clone&apos;s two:&quot;+htClone.get(&quot;two&quot;));</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h3><ol>
-<li>继承AbstractMap、实现Serializable、Map接口</li>
-<li>性能比哈希表高，允许多个修改操作并发进行，采用锁分离（代码块锁，而不是方法锁）</li>
-<li>内部使用Segment表示哈希表的不同部分（每个段就是一个小的hashtable）。同时也有自己的锁（ReentrantLock）</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		ConcurrentHashMap&lt;String,Integer&gt; ht = new ConcurrentHashMap&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		if(ht.containsKey(&quot;two&quot;))&#123;</div><div class="line">			ht.remove(&quot;two&quot;);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h3><ol>
-<li>set、add、remove使用ReentrantLock中的lock加锁/unlock解锁</li>
-<li>对于读操作大于写操作的特别合适（提供高性能读取，并保证正确率)</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		List&lt;String&gt; list = new CopyOnWriteArrayList&lt;String&gt;();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			list.add(&quot;num&quot;+i);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			System.out.println(list.get(i));</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		Object[] arr = list.toArray();</div><div class="line">		System.out.println(arr.length);</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>add方法源码<br><img src="http://img.blog.csdn.net/20170327112730634?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="CopyOnWriteArraySet"><a href="#CopyOnWriteArraySet" class="headerlink" title="CopyOnWriteArraySet"></a>CopyOnWriteArraySet</h3><ol>
-<li>CopyOnWriteArraySet是在CopyOnWriteArrayList使用了Java的装饰模式。所以CopyOnWriteArrayList的东西都可以在CopyOnWriteArraySet中应用</li>
-</ol>
-<hr>
-<h3 id="CopyOnWrite机制"><a href="#CopyOnWrite机制" class="headerlink" title="CopyOnWrite机制"></a>CopyOnWrite机制</h3><ol>
-<li>CopyOnWrite是写时复制的容器。向容器内添加元素的时候，不是在本身容器添加，而是将容器复制以后。再往里面添加元素。<ul>
-<li>优点：可以并发的读取数据，而不需要加锁（利用读写分离思想）</li>
-</ul>
-</li>
-<li>添加元素需要加锁，否则在多线程情况下会copy出N个复制容器</li>
-</ol>
-<p>根据CopyOnWirteList源码实现CopyOnWriteMap</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class CopyOnWriteMap&lt;K, V&gt; implements Map&lt;K,V&gt;,Cloneable&#123;</div><div class="line">	private volatile Map&lt;K,V&gt; interalMap; </div><div class="line">	</div><div class="line">	public CopyOnWriteMap()&#123;</div><div class="line">		interalMap = new HashMap&lt;K,V&gt;();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V put(K key, V value) &#123;</div><div class="line">	</div><div class="line">	synchronized (this) &#123;</div><div class="line">		Map&lt;K,V&gt; newMap = new HashMap&lt;K,V&gt;(interalMap);</div><div class="line">		V val = newMap.put(key, value);</div><div class="line">		interalMap = newMap;</div><div class="line">		return val;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V get(Object key) &#123;</div><div class="line">	return interalMap.get(key);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="CopyOnWrite应用场景"><a href="#CopyOnWrite应用场景" class="headerlink" title="CopyOnWrite应用场景"></a>CopyOnWrite应用场景</h3><blockquote>
-<p>用于读多写少的并发场景<br>比如白名单/黑名单，商品类别访问和更新等</p>
-</blockquote>
-<h2 id="CopyOnWriteMap注意事项"><a href="#CopyOnWriteMap注意事项" class="headerlink" title="CopyOnWriteMap注意事项"></a>CopyOnWriteMap注意事项</h2><ul>
-<li>减少扩容开销</li>
-<li>批量操作</li>
-</ul>
-<h3 id="CopyOnWrite缺点"><a href="#CopyOnWrite缺点" class="headerlink" title="CopyOnWrite缺点"></a>CopyOnWrite缺点</h3><ul>
-<li>内存占用（因为会涉及占用两个内存空间）</li>
-<li>数据一致性（不能保证实时数据一致）  </li>
-</ul>
-<h3 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h3><ol>
-<li>继承AbstractList，实现List，支持相关CRUD操作</li>
-<li>矢量队列，通过数组保存数据</li>
-<li>实现RandomAccess接口（随机访问），可以通过元素的序号快速获取对象</li>
-<li>实现CLoneable接口</li>
-<li>实现线程安全的方法类似哈希表<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		Vector&lt;String&gt; v = new Vector&lt;String&gt;();</div><div class="line">		v.addElement(&quot;one&quot;);</div><div class="line">		v.addElement(&quot;two&quot;);</div><div class="line">		v.addElement(&quot;three&quot;);</div><div class="line">		v.removeElement(&quot;two&quot;);</div><div class="line">		if(v.contains(&quot;three&quot;))&#123;</div><div class="line">			Iterator&lt;String&gt; iter = v.iterator();</div><div class="line">			while(iter.hasNext())&#123;</div><div class="line">				System.out.println(iter.next());</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1944,7 +1904,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">118</span>
+                <span class="site-state-item-count">119</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1955,7 +1915,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1966,7 +1926,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">94</span>
+                <span class="site-state-item-count">95</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

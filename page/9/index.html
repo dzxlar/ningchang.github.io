@@ -254,6 +254,203 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——线程安全集合类/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——线程安全集合类/" itemprop="url">线程笔记——线程安全集合类</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:21:54+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ol>
+<li>HashTable</li>
+<li>ConcurrentHashMap</li>
+<li>CopyOnWrite</li>
+</ol>
+<h3 id="HashTable"><a href="#HashTable" class="headerlink" title="HashTable"></a>HashTable</h3><p>HashTable特点</p>
+<ol>
+<li>和HashMap都是散列表,储存键值对映射</li>
+<li>继承Dictionary、实现Serializable、Clone、Map接口</li>
+<li>初始容量（哈希表创建容量）和加载因子（哈希表中桶的数量），是影响性能的关键因素。默认加载因子0.75</li>
+<li>哈希表的方法都是同步的（线程安全）</li>
+<li>哈希表中集合元素都是无序的</li>
+<li>键值对的值都不能为null</li>
+<li>每个方法体通过synchronized修饰，保证线程安全<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class HashTableDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		Hashtable&lt;String,Integer&gt; ht = new Hashtable&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		Hashtable&lt;String,Integer&gt; htClone = (Hashtable&lt;String, Integer&gt;) ht.clone();</div><div class="line">		System.out.println(&quot;clone&apos;s two:&quot;+htClone.get(&quot;two&quot;));</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h3><ol>
+<li>继承AbstractMap、实现Serializable、Map接口</li>
+<li>性能比哈希表高，允许多个修改操作并发进行，采用锁分离（代码块锁，而不是方法锁）</li>
+<li>内部使用Segment表示哈希表的不同部分（每个段就是一个小的hashtable）。同时也有自己的锁（ReentrantLock）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		ConcurrentHashMap&lt;String,Integer&gt; ht = new ConcurrentHashMap&lt;String,Integer&gt;();</div><div class="line">		ht.put(&quot;one&quot;, 1);</div><div class="line">		ht.put(&quot;two&quot;, 2);</div><div class="line">		ht.put(&quot;three&quot;, 3);</div><div class="line">		</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">		</div><div class="line">		if(ht.containsKey(&quot;two&quot;))&#123;</div><div class="line">			ht.remove(&quot;two&quot;);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;two:&quot;+ht.get(&quot;two&quot;));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h3><ol>
+<li>set、add、remove使用ReentrantLock中的lock加锁/unlock解锁</li>
+<li>对于读操作大于写操作的特别合适（提供高性能读取，并保证正确率)</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		List&lt;String&gt; list = new CopyOnWriteArrayList&lt;String&gt;();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			list.add(&quot;num&quot;+i);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			System.out.println(list.get(i));</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		Object[] arr = list.toArray();</div><div class="line">		System.out.println(arr.length);</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>add方法源码<br><img src="http://img.blog.csdn.net/20170327112730634?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="CopyOnWriteArraySet"><a href="#CopyOnWriteArraySet" class="headerlink" title="CopyOnWriteArraySet"></a>CopyOnWriteArraySet</h3><ol>
+<li>CopyOnWriteArraySet是在CopyOnWriteArrayList使用了Java的装饰模式。所以CopyOnWriteArrayList的东西都可以在CopyOnWriteArraySet中应用</li>
+</ol>
+<hr>
+<h3 id="CopyOnWrite机制"><a href="#CopyOnWrite机制" class="headerlink" title="CopyOnWrite机制"></a>CopyOnWrite机制</h3><ol>
+<li>CopyOnWrite是写时复制的容器。向容器内添加元素的时候，不是在本身容器添加，而是将容器复制以后。再往里面添加元素。<ul>
+<li>优点：可以并发的读取数据，而不需要加锁（利用读写分离思想）</li>
+</ul>
+</li>
+<li>添加元素需要加锁，否则在多线程情况下会copy出N个复制容器</li>
+</ol>
+<p>根据CopyOnWirteList源码实现CopyOnWriteMap</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class CopyOnWriteMap&lt;K, V&gt; implements Map&lt;K,V&gt;,Cloneable&#123;</div><div class="line">	private volatile Map&lt;K,V&gt; interalMap; </div><div class="line">	</div><div class="line">	public CopyOnWriteMap()&#123;</div><div class="line">		interalMap = new HashMap&lt;K,V&gt;();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V put(K key, V value) &#123;</div><div class="line">	</div><div class="line">	synchronized (this) &#123;</div><div class="line">		Map&lt;K,V&gt; newMap = new HashMap&lt;K,V&gt;(interalMap);</div><div class="line">		V val = newMap.put(key, value);</div><div class="line">		interalMap = newMap;</div><div class="line">		return val;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public V get(Object key) &#123;</div><div class="line">	return interalMap.get(key);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="CopyOnWrite应用场景"><a href="#CopyOnWrite应用场景" class="headerlink" title="CopyOnWrite应用场景"></a>CopyOnWrite应用场景</h3><blockquote>
+<p>用于读多写少的并发场景<br>比如白名单/黑名单，商品类别访问和更新等</p>
+</blockquote>
+<h2 id="CopyOnWriteMap注意事项"><a href="#CopyOnWriteMap注意事项" class="headerlink" title="CopyOnWriteMap注意事项"></a>CopyOnWriteMap注意事项</h2><ul>
+<li>减少扩容开销</li>
+<li>批量操作</li>
+</ul>
+<h3 id="CopyOnWrite缺点"><a href="#CopyOnWrite缺点" class="headerlink" title="CopyOnWrite缺点"></a>CopyOnWrite缺点</h3><ul>
+<li>内存占用（因为会涉及占用两个内存空间）</li>
+<li>数据一致性（不能保证实时数据一致）  </li>
+</ul>
+<h3 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h3><ol>
+<li>继承AbstractList，实现List，支持相关CRUD操作</li>
+<li>矢量队列，通过数组保存数据</li>
+<li>实现RandomAccess接口（随机访问），可以通过元素的序号快速获取对象</li>
+<li>实现CLoneable接口</li>
+<li>实现线程安全的方法类似哈希表<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		Vector&lt;String&gt; v = new Vector&lt;String&gt;();</div><div class="line">		v.addElement(&quot;one&quot;);</div><div class="line">		v.addElement(&quot;two&quot;);</div><div class="line">		v.addElement(&quot;three&quot;);</div><div class="line">		v.removeElement(&quot;two&quot;);</div><div class="line">		if(v.contains(&quot;three&quot;))&#123;</div><div class="line">			Iterator&lt;String&gt; iter = v.iterator();</div><div class="line">			while(iter.hasNext())&#123;</div><div class="line">				System.out.println(iter.next());</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——线程安全的单例模式的写法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1765,153 +1962,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】foreach/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】foreach/" itemprop="url">【Java8】foreach</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:06:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="map-foreach"><a href="#map-foreach" class="headerlink" title="map foreach"></a>map foreach</h3><p>以前的方式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">for (Map.Entry&lt;String, String&gt; map : paramsMap.entrySet()) &#123;</div><div class="line">params.add(new BasicNameValuePair(map.getKey(), map.getValue()));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>java8</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">paramsMap.forEach((key,value) -&gt; params.add(new BasicNameValuePair(key,value)));</div></pre></td></tr></table></figure>
-<h3 id="List-foreach"><a href="#List-foreach" class="headerlink" title="List foreach"></a>List foreach</h3><p>以前方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">for (String item:arrayList)&#123;</div><div class="line">    System.out.println(item);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>java8</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">list.forEach(item-&gt;System.out.println(item));</div><div class="line"></div><div class="line">list.forEach(System.out::println);</div><div class="line"></div><div class="line">list.forEach(item-&gt;&#123;</div><div class="line">    if(&quot;zhangshan&quot;.equals(item))&#123;</div><div class="line">        System.out.println(item);</div><div class="line">    &#125;</div><div class="line">&#125;);</div><div class="line"></div><div class="line">list.stream()</div><div class="line">        .filter(s-&gt; s.contains(&quot;li&quot;)||s.contains(&quot;si&quot;))</div><div class="line">        .forEach(System.out::println);</div><div class="line"></div><div class="line">list.stream()</div><div class="line">        .filter(s-&gt;s.contains(&quot;E&quot;))</div><div class="line">        .findFirst().ifPresent(s -&gt; System.out.println(s));</div></pre></td></tr></table></figure>
-<hr>
-<p>【例1】select d.name from dish d where d.price &gt; 20<br> java8之前的写法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">List&lt;DishInfo&gt; dishes = new ArrayList&lt;DishInfo&gt;();</div><div class="line">for(DishInfo dish : dishes)&#123;</div><div class="line">	if(dish.getPrice() &gt; 20)&#123;</div><div class="line">		dishes.add(dish);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><strong>java8</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">List&lt;DishInfo&gt; dishes = Lists.newArrayList(</div><div class="line">new DishInfo(&quot;chiken&quot;, (float) 10.0,DishInfo.Type.OTHER),</div><div class="line">new DishInfo(&quot;beef&quot;,(float) 25.0,DishInfo.Type.BEAF)</div><div class="line">);</div><div class="line">		</div><div class="line">List&lt;String&gt; dishNames = </div><div class="line">             dishes.stream()</div><div class="line">           //dishes.parallelStream() //并行处理</div><div class="line">				   .filter(dish -&gt; dish.getPrice() &gt; 20)			                      </div><div class="line">                   .sorted(comparing(DishInfo::getType))</div><div class="line">                   .map(DishInfo::getName)	</div><div class="line">                   .limit(3)			                        </div><div class="line">				   .collect(toList());</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//.count()</div><div class="line">//.distinct()</div><div class="line">//.skip(2)</div><div class="line">//.map(String::length)</div><div class="line">//.flatMap()</div><div class="line">//.reduce()</div><div class="line">Stream.iterate()</div><div class="line">Stream.generate(Math::random).limit(6).forEach(System.out::println);</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; title = Arrays.asList(&quot;java&quot;,&quot;python&quot;,&quot;javascript&quot;);</div><div class="line">	    Stream&lt;String&gt; streamTitle = title.stream();</div><div class="line">	    streamTitle.forEach(System.out::println);</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1961,7 +2011,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">118</span>
+                <span class="site-state-item-count">119</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1972,7 +2022,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1983,7 +2033,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">94</span>
+                <span class="site-state-item-count">95</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
