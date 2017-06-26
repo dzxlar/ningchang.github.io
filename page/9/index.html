@@ -254,6 +254,191 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——多线程交互：线程阀/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——多线程交互：线程阀/" itemprop="url">线程笔记——多线程交互：线程阀</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:22:32+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p><strong>线程阀是线程与线程之间相互制约和交互的一种机制</strong></p>
+</blockquote>
+<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><ul>
+<li>Queue：保存一组元素，采用FIFO（先进先出）原则</li>
+<li>Deque：保存一组元素，采用先进后出原则（栈结构），双端队列主要用于栈操作</li>
+<li>阻塞队列：支持两个附加操作的队列。队列中元素为空时，获取元素的线程会等待队列变成非空；队列元素满时，存储元素的线程会等待队列变成可用（常用于生产者和消费者场景）。生产者往队列添加元素。消费者取出队列元素。</li>
+</ul>
+<h3 id="阻塞队列4种处理方法"><a href="#阻塞队列4种处理方法" class="headerlink" title="阻塞队列4种处理方法"></a>阻塞队列4种处理方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">method | throwException | return specialValue | block | exit</div><div class="line"></div><div class="line">插入方法 | add(e) | offer(e) | put(e) | offer(e,time,unit)</div><div class="line">移除方法 | remove() | poll() | take() | poll(time,unit)</div><div class="line">检查方法 | element() | peek() |  无   |     无</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="阻塞队列"><a href="#阻塞队列" class="headerlink" title="阻塞队列"></a>阻塞队列</h3><p>数组阻塞队列<br>链表阻塞队列<br>优先级阻塞队列<br>延时队列<br>同步队列<br>链表双向阻塞队列</p>
+<p>链表传输队列<br>同步计数器<br>抽象队列化同步器</p>
+<h3 id="数组阻塞队列（ArrayBlockingQueue）"><a href="#数组阻塞队列（ArrayBlockingQueue）" class="headerlink" title="数组阻塞队列（ArrayBlockingQueue）"></a>数组阻塞队列（ArrayBlockingQueue）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">public class ArrayBlockingQueueDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		//新建一个等待队列</div><div class="line">		final BlockingQueue&lt;String&gt; queue = new ArrayBlockingQueue&lt;&gt;(16);</div><div class="line">		//启动4个线程</div><div class="line">		for (int i = 0; i &lt; 4; i++) &#123;</div><div class="line">			new Thread(new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					while(true)&#123;</div><div class="line">						</div><div class="line">						try &#123;</div><div class="line">							String log = queue.take();</div><div class="line">							parseLong(log);</div><div class="line">						&#125; catch (InterruptedException e) &#123;</div><div class="line">							e.printStackTrace();</div><div class="line">						&#125;</div><div class="line">						</div><div class="line">					&#125;</div><div class="line">					</div><div class="line">				&#125;</div><div class="line">			&#125;).start();;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		//处理16条数据</div><div class="line">		for (int i = 0; i &lt; 16; i++) &#123;</div><div class="line">			String log =  (i + 1) + &quot;----&gt; &quot;;</div><div class="line">			try &#123;</div><div class="line">				queue.put(log);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void parseLong(String log)&#123;</div><div class="line">		System.out.println(log + System.currentTimeMillis());</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="链表阻塞队列（LinkedBlockingQueue）"><a href="#链表阻塞队列（LinkedBlockingQueue）" class="headerlink" title="链表阻塞队列（LinkedBlockingQueue）"></a>链表阻塞队列（LinkedBlockingQueue）</h3><blockquote>
+<p>生产者和消费者采用独立的锁控制数据同步，意味着高并发条件下可以并行操作队列中的数据，以此来提高队列的性能<br>构造LinkedBlockingQueue函数时，需要指定容量大小。否则默认是一个无限大的容量，当生产者&gt;消费者的速度时候，内存可能已经耗尽了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">public class LinckedBlockingQueueDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		//新建一个等待队列</div><div class="line">		final BlockingQueue&lt;String&gt; queue = new LinkedBlockingQueue&lt;String&gt;(16);</div><div class="line">		//产生4个线程</div><div class="line">		for (int i = 0; i &lt; 4; i++) &#123;</div><div class="line">			new Thread(new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					while(true)&#123;</div><div class="line">						</div><div class="line">						try &#123;</div><div class="line">							String log = queue.take();</div><div class="line">							parseLong(log);</div><div class="line">						&#125; catch (InterruptedException e) &#123;</div><div class="line">							e.printStackTrace();</div><div class="line">						&#125;</div><div class="line">						</div><div class="line">					&#125;</div><div class="line">					</div><div class="line">				&#125;</div><div class="line">			&#125;).start();;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		//将数据存入队列中</div><div class="line">		for (int i = 0; i &lt; 16; i++) &#123;</div><div class="line">			String log =  (i + 1) + &quot;----&gt; &quot;;</div><div class="line">			try &#123;</div><div class="line">				queue.put(log);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void parseLong(String log)&#123;</div><div class="line">		System.out.println(log + System.currentTimeMillis());</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="优先级阻塞队列（PriorityBlockingQueue）"><a href="#优先级阻塞队列（PriorityBlockingQueue）" class="headerlink" title="优先级阻塞队列（PriorityBlockingQueue）"></a>优先级阻塞队列（PriorityBlockingQueue）</h3><blockquote>
+<p>优先级对象通过传入Compator对象决定<br>PriorityBlockingQueue不会阻塞生产者，而只会在没有可消费的数据时候，阻塞消费者。<br><strong>生产者产生数据的速度绝不能大于消费者接收数据的速度。否则内存容易耗尽</strong><br>线程同步采用公平锁</p>
+<h3 id="延时队列（DelayQueue）"><a href="#延时队列（DelayQueue）" class="headerlink" title="延时队列（DelayQueue）"></a>延时队列（DelayQueue）</h3><p>在新增元素时需要指定多久获取队列当前对象（getDelay(TimeUnit unit)）<br>只有延迟期满了以后，才能获取元素<br>应用场景：缓存设计/定时任务调度</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class Student implements Delayed &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public int compareTo(Delayed delayed) &#123;</div><div class="line">		Student that = (Student) delayed;</div><div class="line">		return submitTime &gt; that.submitTime ? 1 : (submitTime &lt; that.submitTime ? -1 : 0);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@SuppressWarnings(&quot;static-access&quot;)</div><div class="line">	@Override</div><div class="line">	public long getDelay(TimeUnit unit) &#123;</div><div class="line">		</div><div class="line">		return unit.convert(submitTime - System.nanoTime(), unit.NANOSECONDS);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	private String name;</div><div class="line">	private long submitTime; </div><div class="line">	private long workTime; </div><div class="line"></div><div class="line">	public String getName() &#123;</div><div class="line">		return this.name + &quot;交卷时间&quot; + workTime;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public Student(String name, long submitTime) &#123;</div><div class="line">		this.name = name;</div><div class="line">		this.workTime = submitTime;</div><div class="line">		this.submitTime = TimeUnit.NANOSECONDS.convert(submitTime, TimeUnit.MILLISECONDS) + System.nanoTime();</div><div class="line">		System.out.println(this.name + &quot;交卷用时：&quot; + workTime);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		final DelayQueue&lt;Student&gt; dq = new DelayQueue&lt;Student&gt;();</div><div class="line">		for(int i = 0; i &lt; 5;i++)&#123;</div><div class="line">			Student stu = new Student(&quot;学生&quot;+i++,Math.round(Math.random()*10 + i));</div><div class="line">			dq.put(stu);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;peek()&quot;+dq.peek().getName());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="同步队列（SynchronizeQueue）"><a href="#同步队列（SynchronizeQueue）" class="headerlink" title="同步队列（SynchronizeQueue）"></a>同步队列（SynchronizeQueue）</h3><blockquote>
+<p>每个put操作必须等待take操作，否则不能添加元素。负责把生产者的数据直接传递给消费者，但是本身并不存储任何元素（适用传递性场景）<br>比如：在一个线程中的数据传递给另一个线程。它的吞吐量高于上面两个阻塞队列<br>声明同步队列：公平模式（采用公平锁，配合FIFO队列阻塞多余的生产者和消费者）和非公平模式管理多余的生产者和消费者。<br>后一种模式容易获取不到数据。</p>
+<h3 id="链表双向阻塞队列（LinkedBlockingDeque）"><a href="#链表双向阻塞队列（LinkedBlockingDeque）" class="headerlink" title="链表双向阻塞队列（LinkedBlockingDeque）"></a>链表双向阻塞队列（LinkedBlockingDeque）</h3><p>链表构成的双向阻塞队列，可以从队列两端操作元素。在多线程同时入队时减少一半竞争。相比LinkedBlockingQeque多了xxxFirst、xxxLast等方法。add()等同于addLast() remove()等同于removeFirst()</p>
+<h3 id="链表传输队列（LinkedTransferQueue）"><a href="#链表传输队列（LinkedTransferQueue）" class="headerlink" title="链表传输队列（LinkedTransferQueue）"></a>链表传输队列（LinkedTransferQueue）</h3><p>TransferQueue继承BlockingQueue接口<br>transfer采用双重数据结构算法（保留和完成）<br>大致理解：消费者从队列中取一个元素，发现元素为空，则生成一个空元素放入队列。则在该空元素上继续等待，叫保留。生产者意欲向队列中放入元素时，发现前面的数据字段项为空，则将该元素填入空字段中，完成数据传送。<br><strong>transfer提供了线程间直接交换对象的方法</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">transfer(E e) //若当前存在一个等待获取的消费者，则移交之。否则会插入当前元素e到队列尾部，从等待进入阻塞状态，直到消费者取出该线程</div><div class="line">tryTransfer(E e) //若当前存在一个等待获取的消费者(适用poll()或者take()，立刻转移传输对象e,若不存在返回false，不进入队列</div><div class="line">hasWaitingConsumer() //判断是否存在终端消费队列</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public class Producer implements Runnable&#123;</div><div class="line"></div><div class="line">	private final TransferQueue&lt;String&gt; queue;</div><div class="line">	public Producer(TransferQueue&lt;String&gt; queue) &#123;</div><div class="line">		this.queue = queue;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	/**</div><div class="line">	 * produce:产生数据，让消费者接收</div><div class="line">	 * @param  @return    设定文件</div><div class="line">	 * @return String    DOM对象</div><div class="line">	 * @throws </div><div class="line">	 * @since  CodingExample　Ver 1.1</div><div class="line">	 */</div><div class="line">	private String produce()&#123;</div><div class="line">		return &quot;lucky number : &quot; + (new Random().nextInt(100));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		while(true)&#123;</div><div class="line">			if(queue.hasWaitingConsumer())&#123;</div><div class="line">				try &#123;</div><div class="line">					queue.transfer(produce());</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">				try &#123;</div><div class="line">					TimeUnit.SECONDS.sleep(1);//等待生产者等待消费者接收数据</div><div class="line">				&#125; catch (InterruptedException e) &#123;</div><div class="line">					e.printStackTrace();</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class Consumer implements Runnable &#123;</div><div class="line"></div><div class="line">	private final TransferQueue&lt;String&gt; queue;</div><div class="line">	public Consumer(TransferQueue&lt;String&gt; queue) &#123;</div><div class="line">		this.queue = queue;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line"></div><div class="line"></div><div class="line">		try &#123;</div><div class="line">			System.out.println(&quot;Consumer 获取元素 --&gt; &quot; + queue.take());</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		TransferQueue&lt;String&gt; queue = new LinkedTransferQueue&lt;String&gt;();</div><div class="line">		</div><div class="line">		//生产者线程</div><div class="line">		Thread pt = new Thread(new Producer(queue));</div><div class="line">		pt.setDaemon(true);//设置为守护线程</div><div class="line">		pt.start();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			Thread ct = new Thread(new Consumer(queue));</div><div class="line">			ct.setDaemon(true);</div><div class="line">			ct.start();</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000);//让消费者休息1s，以便让生产者生产数据</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Consumer 接收数据 --&gt; lucky number : 94</div><div class="line">Consumer 接收数据 --&gt; lucky number : 97</div><div class="line">Consumer 接收数据 --&gt; lucky number : 68</div><div class="line">Consumer 接收数据 --&gt; lucky number : 38</div><div class="line">Consumer 接收数据 --&gt; lucky number : 39</div><div class="line">Consumer 接收数据 --&gt; lucky number : 17</div><div class="line">Consumer 接收数据 --&gt; lucky number : 70</div><div class="line">Consumer 接收数据 --&gt; lucky number : 25</div><div class="line">Consumer 接收数据 --&gt; lucky number : 71</div><div class="line">Consumer 接收数据 --&gt; lucky number : 9</div></pre></td></tr></table></figure>
+<h3 id="同步计数器（ConutDownLatch）"><a href="#同步计数器（ConutDownLatch）" class="headerlink" title="同步计数器（ConutDownLatch）"></a>同步计数器（ConutDownLatch）</h3><blockquote>
+<p>ConutDownLatch(直译：倒计时门闩)：在完成一组正在其他线程执行的操作前，允许一个或多个线程等待。<br>用给定计数初始化ConutDownLatch，由于调用了countdown()方法，计数达到0之前，await()方法会一直阻塞。之后释放所有线程。await之后所有后续调用立即返回。情况只出现一次，计数无法重置。<br><strong>使用场景：在一些应用场景中，需要等待某个条件达到要求后才能做后面的事情；同时当线程完成后，也会触发事件，以便进行后面操作</strong><br>ConutDownLatch最重要的方法countdown()和await()：前者倒数一次，后者等待倒数到0<br>应用场景：①开5个多线程下载，5个线程执行完毕才算成功 ② 当用户多文件上传，可采用多线程上传，多个文件都上传成功后，才算成功。</p>
+</blockquote>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">public class CountDownLatchDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		CountDownLatch latch = new CountDownLatch(3);</div><div class="line">	</div><div class="line">		Worker w1 = new Worker(&quot;Jack&quot;, latch);</div><div class="line">		Worker w2 = new Worker(&quot;Rose&quot;, latch);</div><div class="line">		Worker w3 = new Worker(&quot;Allen&quot;, latch);</div><div class="line">		w1.start();</div><div class="line">		w2.start();</div><div class="line">		w3.start();</div><div class="line">		try &#123;</div><div class="line">			latch.await();</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class Worker extends Thread&#123;</div><div class="line">		private String workerName;</div><div class="line">		private CountDownLatch latch;</div><div class="line">		public Worker(String workerName, CountDownLatch latch) &#123;</div><div class="line">			this.workerName = workerName;</div><div class="line">			this.latch = latch;</div><div class="line">		&#125;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				System.out.println(&quot;Worker:&quot;+workerName+&quot;is beginning.&quot;);</div><div class="line">				Thread.sleep(1000L);</div><div class="line">				System.out.println(&quot;Worker:&quot;+workerName+&quot;is ending.&quot;);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			latch.countDown();//模拟干活</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Worker:Jackis beginning.</div><div class="line">Worker:Allenis beginning.</div><div class="line">Worker:Roseis beginning.</div><div class="line">Worker:Roseis ending.</div><div class="line">Worker:Allenis ending.</div><div class="line">Worker:Jackis ending.</div><div class="line">Main Thread End</div></pre></td></tr></table></figure>
+<h3 id="同步计数器（Semaphore）"><a href="#同步计数器（Semaphore）" class="headerlink" title="同步计数器（Semaphore）"></a>同步计数器（Semaphore）</h3><blockquote>
+<p>Semaphore计数信号量。从概念入手，信号量维护一个许可集合。<br>如有必要，在许可可用前阻塞每一个acquire(),然后才获取该许可，每个release()添加一个许可，从而释放一个正在阻塞的获取者。<br>例如：就像排队进入博物馆一样，先放一批人进去，等这批人离开后，再放一批人进去，以此循环。类似一种排队机制</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Semaphore(int permits) //创建给定的许可数和给定非公平的公平设置的Semaphore数量</div><div class="line">Semaphore(int permits,boolean fair)创建给定的许可数和给定公平的公平设置的Semaphore数量</div><div class="line">acquire() //获取一个许可，提供一个许可之前线程阻塞</div><div class="line">release() //释放一个许可，将其返回给信号量</div></pre></td></tr></table></figure>
+<p><strong>所谓公平性就是先进来的先释放。默认false</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">public class SemaphoreDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		final Semaphore semaphore = new Semaphore(3);//一次只允许3个人访问</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable thread = new Runnable() &#123;</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					System.out.println(&quot;用户&quot;+num+&quot;进入成功&quot;);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(300L);</div><div class="line">						//获取执行许可</div><div class="line">						semaphore.acquire();</div><div class="line">						System.out.println(&quot;用户&quot;+num+&quot;正在进行支付...&quot;);</div><div class="line">						Thread.sleep(1000L);</div><div class="line">						//释放获取下一用户访问</div><div class="line">						semaphore.release();</div><div class="line">						System.out.println(&quot;用户&quot;+num+&quot;支付完成&quot;);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			</div><div class="line">			new Thread(thread).start();</div><div class="line">		&#125;</div><div class="line">		    System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-2"><a href="#console-2" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">用户1进入成功</div><div class="line">用户3进入成功</div><div class="line">用户2进入成功</div><div class="line">用户0进入成功</div><div class="line">Main Thread End</div><div class="line">用户4进入成功</div><div class="line">用户5进入成功</div><div class="line">用户7进入成功</div><div class="line">用户6进入成功</div><div class="line">用户8进入成功</div><div class="line">用户9进入成功</div><div class="line">用户9正在进行支付...</div><div class="line">用户6正在进行支付...</div><div class="line">用户7正在进行支付...</div><div class="line">用户6支付完成</div><div class="line">用户8正在进行支付...</div><div class="line">用户4正在进行支付...</div><div class="line">用户9支付完成</div><div class="line">用户5正在进行支付...</div><div class="line">用户7支付完成</div><div class="line">用户0正在进行支付...</div><div class="line">用户4支付完成</div><div class="line">用户8支付完成</div><div class="line">用户5支付完成</div><div class="line">用户3正在进行支付...</div><div class="line">用户2正在进行支付...</div><div class="line">用户0支付完成</div><div class="line">用户1正在进行支付...</div><div class="line">用户3支付完成</div><div class="line">用户2支付完成</div><div class="line">用户1支付完成</div></pre></td></tr></table></figure>
+<h3 id="同步计数器（CyclicBarrier）"><a href="#同步计数器（CyclicBarrier）" class="headerlink" title="同步计数器（CyclicBarrier）"></a>同步计数器（CyclicBarrier）</h3><blockquote>
+<p>CyclicBarrier(直译：循环栅栏)：允许一组线程互相等待，直到达到一个公共屏障点。然后所有这些线程才同步往后面执行。<br>使用场景：<br>大数据运算需要拆分多步骤的时候。<br>例如：统计全国的业务数据。数据库互相独立（按省分库），统计过程比较慢，数据量比较大，为了提高运算效率。采取并发方式，多个线程计算各省数据，最后汇总统计。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">public class CyclicBarrierDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">	</div><div class="line">		CyclicBarrier cb = new CyclicBarrier(3, new TotalTask());</div><div class="line">		</div><div class="line">		BillTask bt1 = new BillTask(&quot;重庆&quot;, cb);</div><div class="line">		BillTask bt2 = new BillTask(&quot;四川&quot;, cb);</div><div class="line">		BillTask bt3 = new BillTask(&quot;浙江&quot;, cb);</div><div class="line">		bt1.start();</div><div class="line">		bt2.start();</div><div class="line">		bt3.start();</div><div class="line">		</div><div class="line">		System.out.println(&quot;Main Thread End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class TotalTask extends Thread&#123;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			System.out.println(&quot;所有任务执行完毕，就该执行主任务了&quot;);</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	static class BillTask extends Thread&#123;</div><div class="line">		private String billName;</div><div class="line">		private CyclicBarrier cb;</div><div class="line">		public BillTask(String billName, CyclicBarrier cb) &#123;</div><div class="line">			this.billName = billName;</div><div class="line">			this.cb = cb;</div><div class="line">		&#125;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			</div><div class="line">			System.out.println(&quot;市区：&quot; + billName + &quot;运算开始&quot;);</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000L);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			System.out.println(&quot;市区：&quot; + billName + &quot;运算完成，等待中...&quot;);</div><div class="line">			</div><div class="line">			try &#123;</div><div class="line">				cb.await();//假设第一次运算不完，第二次依赖第一次运算</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125; catch (BrokenBarrierException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			System.out.println(&quot;全部都结束&quot;+billName+&quot;开启后面的工作&quot;);</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-3"><a href="#console-3" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Main Thread End</div><div class="line">市区：四川运算开始</div><div class="line">市区：浙江运算开始</div><div class="line">市区：重庆运算开始</div><div class="line">市区：四川运算完成，等待中...</div><div class="line">市区：重庆运算完成，等待中...</div><div class="line">市区：浙江运算完成，等待中...</div><div class="line">所有任务执行完毕，就该执行主任务了</div><div class="line">全部都结束重庆开启后面的工作</div><div class="line">全部都结束浙江开启后面的工作</div><div class="line">全部都结束四川开启后面的工作</div></pre></td></tr></table></figure>
+<p>CountDownLatch和CyclicBarrier区别：一个线程等待其他线程完成某件事情的时候才能继续。N个线程互相等待，任何一个线程完成之前，所有线程必须等待。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——线程安全集合类/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1780,188 +1965,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】lambda表达式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】lambda表达式/" itemprop="url">【Java8】lambda表达式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:09:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ul>
-<li><p>学习内容</p>
-<ul>
-<li>行为参数化</li>
-<li>lambda表达式</li>
-<li>方法引用</li>
-</ul>
-</li>
-<li><p>行为参数化</p>
-<ul>
-<li>让函数仅保留模板代码，而把筛选条件抽离出来当做参数传递进来</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;Apple&gt; filterApples = filterApplesByAppleFilter(apples,(Apple apple) -&gt; Color.RED.equals(apple.getColor()) &amp;&amp; apple.getWeight() &gt;= 100);</div></pre></td></tr></table></figure>
-<ul>
-<li>lambda表达式定义</li>
-</ul>
-<blockquote>
-<p>lambda表达式定义为一种 简洁、可传递的匿名函数，首先我们需要明确<strong>lambda表达式本质上是一个函数，虽然它不属于某个特定的类，但具备参数列表、函数主体、返回类型，以及能够抛出异常；其次它是匿名的，lambda表达式没有具体的函数名称</strong>；lambda表达式可以像参数一样进行传递，从而极大的简化代码的编写</p>
-</blockquote>
-<ul>
-<li>lambda表达式格式<ul>
-<li>格式一： 参数列表 -&gt; 表达式</li>
-<li>格式二： 参数列表 -&gt; {表达式集合}</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p><strong>lambda表达式隐含了return关键字</strong>，所以在单个的表达式中，我们无需显式的写return关键字，但是<strong>当表达式是一个语句集合的时候，则需要显式添加return，并用花括号{ }将多个表达式包围起来</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//返回给定字符串的长度，隐含return语句</div><div class="line">(String s) -&gt; s.length() </div><div class="line"></div><div class="line">// 始终返回42的无参方法</div><div class="line">() -&gt; 42 </div><div class="line"></div><div class="line">// 包含多行表达式，则用花括号括起来</div><div class="line">(int x, int y) -&gt; &#123;</div><div class="line">    int z = x * y;</div><div class="line">    return x + z;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><p>依托于函数式接口使用lambda表达式</p>
-<ul>
-<li>自定义函数式接口<ul>
-<li>函数式接口定义为只具备 一个抽象方法的接口</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>方法引用</p>
-</li>
-</ul>
-<p>静态方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line">(args) -&gt; ClassName.staticMethod(args) / ClassName::staticMethod</div></pre></td></tr></table></figure>
-<p> 参数的实例方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(args) -&gt; args.instanceMethod() / ClassName::instanceMethod //ClassName是args的类型</div></pre></td></tr></table></figure>
-<p>外部的实例方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(args) -&gt; ext.instanceMethod(args) / ext::instanceMethod(args)</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2011,7 +2014,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">119</span>
+                <span class="site-state-item-count">120</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2033,7 +2036,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">95</span>
+                <span class="site-state-item-count">96</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
