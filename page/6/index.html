@@ -254,6 +254,177 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/链表结构小记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/链表结构小记/" itemprop="url">链表结构小记</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:48:15+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="链表的概念"><a href="#链表的概念" class="headerlink" title="链表的概念"></a>链表的概念</h2><blockquote>
+<p>链表是一种递归的数据结构，它或者为空（null），或者是指向一个结点（node）的引用，该节点还有一个元素和一个指向另一条链表的引用。   </p>
+</blockquote>
+<p>  在Java中LinkedList就是一个典型的(单向)链表结构（它的一个实例域保存了指向链表中第一个结点的引用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">  </div><div class="line">class LinkedList&lt;Item&gt;&#123;</div><div class="line"></div><div class="line">     private Node first; //当前节点</div><div class="line"></div><div class="line">     private class  Node&#123;</div><div class="line"></div><div class="line">           Item data; </div><div class="line"></div><div class="line">           Node next; //下一节点</div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">             · · · · · ·</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="单向链表"><a href="#单向链表" class="headerlink" title="单向链表"></a>单向链表</h2><blockquote>
+<p>node包含指向后一个节点的引用</p>
+</blockquote>
+<h2 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h2><blockquote>
+<p>每个node不仅包含指向下后一个结点的引用，还包含着指向前一个结点的引用。</p>
+</blockquote>
+<h4 id="链表的优点"><a href="#链表的优点" class="headerlink" title="链表的优点"></a>链表的优点</h4><ol>
+<li>链表支持<strong><em>插入和删除</em></strong>这两种操作，并且删除/插入链表头部/尾部结点的时间复杂度通常都是常数级别 [  O(1)  ]</li>
+<li>可以动态改变大小。</li>
+</ol>
+<h4 id="链表的缺点"><a href="#链表的缺点" class="headerlink" title="链表的缺点"></a>链表的缺点</h4><ol>
+<li>不支持高效的random access（随机访问）。</li>
+</ol>
+<blockquote>
+<p>由于其链式存储的特性，链表不具备良好的空间局部性，也就是说，链表是一种缓存不友好的数据结构。</p>
+</blockquote>
+<h2 id="链表的实现"><a href="#链表的实现" class="headerlink" title="链表的实现"></a>链表的实现</h2><h4 id="单向链表-1"><a href="#单向链表-1" class="headerlink" title="单向链表"></a>单向链表</h4><p><strong>插入节点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public void insert(Item item) &#123;</div><div class="line"></div><div class="line">    Node oldFirst = first; </div><div class="line"></div><div class="line">    first = new Node(); </div><div class="line"></div><div class="line">    first.item = item; </div><div class="line"></div><div class="line">    first.next = oldFirst; </div><div class="line"></div><div class="line">    itemCount++; </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>删除节点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public Item delete() &#123;</div><div class="line"></div><div class="line">    if (first != null) &#123;</div><div class="line"></div><div class="line">        Item item = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        return item;</div><div class="line"></div><div class="line">    &#125; else &#123;</div><div class="line"></div><div class="line">        throw new NullPointerException(&quot;There&apos;s no Node in the linked list.&quot;);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="双向链表-1"><a href="#双向链表-1" class="headerlink" title="双向链表"></a>双向链表</h2><p>双向链表相比与单链表的优势在于它同时<strong><em>支持高效的正向及反向遍历</em></strong>，<strong><em>并且可以方便的在链表尾部删除结点</em></strong></p>
+<p>Java实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div></pre></td><td class="code"><pre><div class="line">public class DoubleLinkedList&lt;Item&gt; &#123;</div><div class="line"></div><div class="line">    private Node first; </div><div class="line"></div><div class="line">    private Node last;</div><div class="line"></div><div class="line">    private int itemCount;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    private class Node &#123;</div><div class="line"></div><div class="line">        Node prev; </div><div class="line"></div><div class="line">        Node next; </div><div class="line"></div><div class="line">        Item item;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    public void addFirst(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldFirst = first;</div><div class="line"></div><div class="line">        first = new Node();</div><div class="line"></div><div class="line">        first.item = item;</div><div class="line"></div><div class="line">        first.next = oldFirst;</div><div class="line"></div><div class="line">        if (oldFirst != null) &#123;</div><div class="line"></div><div class="line">            oldFirst.prev = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            last = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addLast(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldLast = last;</div><div class="line"></div><div class="line">        last = new Node();</div><div class="line"></div><div class="line">        last.item = item;</div><div class="line"></div><div class="line">        last.prev = oldLast;</div><div class="line"></div><div class="line">        if (oldLast != null) &#123;</div><div class="line"></div><div class="line">            oldLast.next = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            first = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delFirst() &#123;</div><div class="line"></div><div class="line">        if (first == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        if (first != null) &#123;</div><div class="line"></div><div class="line">            first.prev = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            last = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delLast() &#123;</div><div class="line"></div><div class="line">        if (last == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = last.item;</div><div class="line"></div><div class="line">        last = last.prev;</div><div class="line"></div><div class="line">        if (last != null) &#123;</div><div class="line"></div><div class="line">            last.next = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            first = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addBefore(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        //从头开始遍历寻找目标节点</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            //继续向后寻找目标节点</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //现在target为指向目标结点的引用</div><div class="line"></div><div class="line">        if (target.prev == null) &#123;</div><div class="line"></div><div class="line">            //此时相当于在表头插入结点</div><div class="line"></div><div class="line">            addFirst(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldPrev = target.prev;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.prev = newNode;</div><div class="line"></div><div class="line">            newNode.next = target;</div><div class="line"></div><div class="line">            newNode.prev = oldPrev;</div><div class="line"></div><div class="line">            oldPrev.next = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addAfter(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target.next == null) &#123;</div><div class="line"></div><div class="line">            addLast(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldNext = target.next;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.next = newNode;</div><div class="line"></div><div class="line">            newNode.prev = target;</div><div class="line"></div><div class="line">            newNode.next= oldNext;</div><div class="line"></div><div class="line">            oldNext.prev = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注：实现链表使用的是pointer wrapper方式，这种方式的特点是prev/next指针包含在结点中，而数据由结点中的另一个指针（即item）所引用。采取这种方式，在获取结点数据时，我们需要进行double-dereferencing，而且这种方式实现的链表不是一种[局部化结构]，这意味着我们<strong>拿到链表的一个结点数据后，无法直接进行insert/delete操作</strong>。</p>
+<h4 id="常见面试题"><a href="#常见面试题" class="headerlink" title="常见面试题"></a>常见面试题</h4><ol>
+<li>输入一个链表，输出该链表中倒数第k个结点。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public class Solution &#123;</div><div class="line"></div><div class="line">    public ListNode FindKthToTail(ListNode head,int k) &#123;</div><div class="line"></div><div class="line">        //先求得链表的尺寸，赋值给size</div><div class="line"></div><div class="line">        int size = 0;</div><div class="line"></div><div class="line">        ListNode current = head;</div><div class="line"></div><div class="line">        while (current != null) &#123;</div><div class="line"></div><div class="line">            size++;</div><div class="line"></div><div class="line">            current = current.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //获取next实例域size-k次，即可得到倒数第k个结点（从1开始计数）</div><div class="line"></div><div class="line">        for (int i = 0; i &lt; size - k; i++) &#123;</div><div class="line"></div><div class="line">            head = head.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return head;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>2.反转链表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public ListNode ReverseList(ListNode head) &#123;</div><div class="line"></div><div class="line">    if (head == null) &#123;</div><div class="line"></div><div class="line">        return null;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ListNode current = head;</div><div class="line"></div><div class="line">    //原head的next node为null</div><div class="line"></div><div class="line">    ListNode prevNode = null;</div><div class="line"></div><div class="line">    ListNode newHead = null;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    while (current != null) &#123;</div><div class="line"></div><div class="line">        ListNode nextNode = current.next;</div><div class="line"></div><div class="line">        current.next = prevNode;</div><div class="line"></div><div class="line">        if (nextNode == null) &#123;</div><div class="line"></div><div class="line">            newHead = current;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        prevNode = current;</div><div class="line"></div><div class="line">        current = nextNode;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return newHead;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://blog.csdn.net/qq_20597479/article/details/59492181" target="_blank" rel="external">LinkedList源码解析</a></p>
+<p>以上转载</p>
+<p><a href="http://www.cnblogs.com/absfree/p/5463372.html" target="_blank" rel="external">http://www.cnblogs.com/absfree/p/5463372.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java链表——LinkedList解析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1693,198 +1864,11 @@ Direct Bytebuffer JNI Compile GC;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装RabbitMQ/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装RabbitMQ/" itemprop="url">【Linux】Centos6.8安装RabbitMQ</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:03+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>####【步骤一】 安装依赖包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">yum -y install ncurses-devel</div><div class="line"></div><div class="line">yum list | grep ssl     yum install openssl-devel</div><div class="line"></div><div class="line">yum list | grep ODBC  yum install unixODBC-devel</div><div class="line"></div><div class="line">yum install gcc-c++   </div><div class="line"></div><div class="line">yum install perl （自己补充的，不然会报错）</div><div class="line"></div><div class="line">yum install libxslt yum install  rsync yum install  zip</div><div class="line"></div><div class="line">yum -y install xmlto  </div><div class="line"></div><div class="line">yum install gcc glibc-devel make ncurses-devel openssl-devel autoconf</div></pre></td></tr></table></figure>
-<p>####【步骤二】下载erlang</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget   http://www.erlang.org/download/otp_src_19.0.tar.gz</div></pre></td></tr></table></figure>
-<h4 id="【步骤三】解压erlang"><a href="#【步骤三】解压erlang" class="headerlink" title="【步骤三】解压erlang"></a>【步骤三】解压erlang</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">tar zvxf otp_src_19.0.tar.gz  -C /usr/local </div><div class="line"></div><div class="line">mv /user/otp_src_19.0.tar.gz /usr/local/otp (重命名）</div><div class="line"></div><div class="line">cd otp</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/erlang --without-javac  --with-opengl</div><div class="line">--enable-debug --enable-unicode</div><div class="line"></div><div class="line">make &amp;&amp; make install (编译erlang）</div><div class="line"></div><div class="line">vi /etc/profile (设置环境变量）</div><div class="line"></div><div class="line">PATH=$PATH:/usr/local/erlang/bin</div><div class="line">        export PATH</div><div class="line"></div><div class="line">cd /usr/local/erlang/bin</div></pre></td></tr></table></figure>
-<h4 id="【步骤四】测试erl是否安装成功"><a href="#【步骤四】测试erl是否安装成功" class="headerlink" title="【步骤四】测试erl是否安装成功"></a>【步骤四】测试erl是否安装成功</h4><p>8.1 erl</p>
-<p>退出erl命令行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">halt().</div></pre></td></tr></table></figure>
-<h4 id="【步骤五】安装python"><a href="#【步骤五】安装python" class="headerlink" title="【步骤五】安装python"></a>【步骤五】安装python</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz</div><div class="line"></div><div class="line">mv Python-2.7.6.tgz python</div><div class="line"></div><div class="line">cd python</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/python27</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
-<p>检测是否安装成功</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python -v</div></pre></td></tr></table></figure>
-<hr>
-<ol>
-<li>wget 工具安装</li>
-</ol>
-<p><a href="http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm" target="_blank" rel="external">http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -ivh wget-1.12-8.el6.x86_64.rpm</div></pre></td></tr></table></figure>
-<ol>
-<li>xz工具安装<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">yum install xz</div><div class="line"></div><div class="line">xz -d xxx.tar.xz</div><div class="line"></div><div class="line">tar -xf xxx.tar -C /usr/local</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>#安装rabbitmq</p>
-<p>1.下载</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget  http://www.rabbitmq.com/releases/rabbitmq-server/v3.1.5/rabbitmq-server-unix-3.1.5.tar.gz</div></pre></td></tr></table></figure>
-<p>2.解压</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar xvf rabbitmq-server-unix-3.1.5.tar.gz</div><div class="line"></div><div class="line">mv rabbitmq-server-unix-3.1.5.tar.gz /usr/local/rabbitmq-server</div></pre></td></tr></table></figure>
-<p>#sbin命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">rabbitmqctl add_user admin admin 新增用户</div><div class="line"></div><div class="line">rabbitmqctl set_user_tags admin administrator 设置为管理员</div><div class="line"></div><div class="line">rabbitmqctl set_permissions -p &quot;/&quot; admin &quot;.*&quot; &quot;.*&quot; &quot;.*&quot; 设置权限</div><div class="line"></div><div class="line">rabbitmq-plugins enable rabbitmq_management  配置web插件</div></pre></td></tr></table></figure>
-<p>#远程访问rabbitmq</p>
-<p><strong>iptables -F 关闭防火墙，开放端口</strong></p>
-<p><a href="http://172.16.41.31:15672" target="_blank" rel="external">http://172.16.41.31:15672</a></p>
-<p>#Java访问rabbitmq</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">vi /etc/rabbitmq/rabbitmq.config 中添加</div><div class="line"></div><div class="line">[</div><div class="line"> &#123;rabbit,</div><div class="line"></div><div class="line">  [</div><div class="line">      &#123;tcp_listeners, [5672]&#125;,</div><div class="line">      &#123;loopback_users, [&quot;admin&quot;]&#125;</div><div class="line">  ]&#125;</div><div class="line">].</div></pre></td></tr></table></figure>
-<p>端口</p>
-<p>4369 (epmd)</p>
-<p>5672, 5671 (AMQP 0-9-1 and 1.0 without and with TLS)</p>
-<ol>
-<li>This port used by Erlang distribution for inter-node and CLI tools communication and is allocated from a dynamic range (limited to a single port by default, computed as AMQP port + 20000)</li>
-</ol>
-<p>15672 (if management plugin is enabled)</p>
-<p>61613, 61614 (if STOMP is enabled)</p>
-<p>1883, 8883 (if MQTT is enabled)</p>
-<p>   修改虚拟机ip</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/network-scripts/ifcfg-eth0</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1929,7 +1913,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">120</span>
+                <span class="site-state-item-count">121</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
