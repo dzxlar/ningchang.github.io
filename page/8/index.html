@@ -254,6 +254,151 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/zookeeper学习笔记（三）-——-分布式锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/zookeeper学习笔记（三）-——-分布式锁/" itemprop="url">zookeeper学习笔记（三） —— 分布式锁</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:32:55+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">Zookeeper</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h2><ol>
+<li>ZooKeeper <strong>调用create()方法来创建一个路径格式为“ <em>locknode</em>/lock- ”的节点</strong>，此节点类型为 sequence （连续）和 ephemeral（临时）。也就是说，创建的节点为临时节点，并且所有的节点连续编号，即“ lock-i ”的格式</li>
+<li>在创建的锁节点上<strong>调用 getChildren （）方法，来获取锁目录下的最小编号节点</strong>，并且不设置 watch </li>
+<li>步骤 2 中获取的节点恰好是步骤 1 中客户端创建的节点，那么此客户端获得此种类型的锁，然后退出操作</li>
+<li>客户端在锁目录上<strong>调用 exists （）方法，并且设置 watch 来监视锁目录下比自己小一个的连续临时节点的状态</strong></li>
+<li>果监视节点状态发生变化，则跳转到第 2 步，继续进行后续的操作，直到退出锁竞争</li>
+</ol>
+<h2 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h2><blockquote>
+<p>客户端只需要将加锁操作步骤中创建的临时节点删除即可</p>
+</blockquote>
+<h2 id="羊群效应"><a href="#羊群效应" class="headerlink" title="羊群效应"></a>羊群效应</h2><p>“羊群效应”就是指大量客户端收到同一事件的通知，但实际只有很少一部分需要处理这一事件。<br>设想当有成百上千客户端，都在尝试获得锁，<strong>每个客户端都会在锁上设置观察，来捕捉节点的变化。每次锁被释放或另一个进程申请获取锁时，观察都会被触发并且每个客户端都会收到一个通知，但只有一个客户端会成功获得锁</strong>。这时就会造成大量的峰值流量，给zookeeper服务器造成压力。</p>
+<p>为了避免羊群效应，我们需要优化通知事件，将没必要的观察通知去掉，如删除等，只有在前一个顺序号的子节点消失时才需要通知下一个客户端。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/zookeeper学习笔记（五）——具体应用：秒杀思路/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1713,170 +1858,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-Fork-Join/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——-Fork-Join/" itemprop="url">线程笔记—— Fork/Join</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:24:00+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="JDK7的Fork-Join"><a href="#JDK7的Fork-Join" class="headerlink" title="JDK7的Fork/Join"></a>JDK7的Fork/Join</h3><p>思想：化繁为简、分而治之、递归的分解和合并，直到任务小到可以接收的程度<br>目的：并行执行任务的框架</p>
-<h3 id="Future任务机制和FutureTask"><a href="#Future任务机制和FutureTask" class="headerlink" title="Future任务机制和FutureTask"></a>Future任务机制和FutureTask</h3><p>Future就是对具体的Runnable和Callable的执行结果进行取消、查询是否完成、获取结果<br>1.判断任务是否完成<br>2.是否中断任务<br>3.能够获取任务执行结果<br>FutureTask是Future的实现类<br>FutureTask实现RunnableFuture接口（继承Runnable和Future）<br>应用场景：需要统计各种类型报表记录结果（拆分成多个小线程进行模块运算，然后将结果合并作为大报表呈现结果）</p>
-<h3 id="Future相关"><a href="#Future相关" class="headerlink" title="Future相关"></a>Future相关</h3><p>RecursiveAction 用于没有返回结果的任务<br>RecursiveTask 用于返回结果的任务<br>execute() 异步执行任务<br>invoke() 指定指定的任务，等待完成，返回结果<br>submit() 异步执行指定的任务，并立即返回Future对象</p>
-<h3 id="Future原理"><a href="#Future原理" class="headerlink" title="Future原理"></a>Future原理</h3><p>特殊的线程池框架（分叉/结合）<br>ForkJoinPool利用了工作窃取类算法，使得空闲线程能够主动分担从别的线程分解的主任务</p>
-<h3 id="计算最大并发量"><a href="#计算最大并发量" class="headerlink" title="计算最大并发量"></a>计算最大并发量</h3><p>根据请求大小和CPU运行机制和执行时间<br>（响应大小/内存大小、宽带/请求大小对应）<br>单台IO运行时间、CPU切换时间、程序执行时间、有没有数据库处理的等待<br>通过日志监控，查看用户访问哪些请求、请求哪些参数（找另一个和服务器一样的配置机器做压力测试）</p>
-<h3 id="Fork-Join优缺点"><a href="#Fork-Join优缺点" class="headerlink" title="Fork/Join优缺点"></a>Fork/Join优缺点</h3><ul>
-<li>优点 <ol>
-<li>充分实现并发程序任务拆分</li>
-<li>简化编程</li>
-<li>着重划分任务和组合中间结果</li>
-</ol>
-</li>
-<li>缺点 <ol>
-<li>拆分对象不宜过多，容易造成内存溢出</li>
-</ol>
-</li>
-</ul>
-<h3 id="Fork-Join应用场景"><a href="#Fork-Join应用场景" class="headerlink" title="Fork/Join应用场景"></a>Fork/Join应用场景</h3><blockquote>
-<p><strong>树形数据结构处理和遍历</strong></p>
-</blockquote>
-<h3 id="api"><a href="#api" class="headerlink" title="api"></a>api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">fork() //异步执行任务</div><div class="line">join() //计算完成后返回结果</div><div class="line">RecursiveTask //用于无返回结果的任务</div><div class="line">RecursiveAction //用于有返回结果的任务</div><div class="line">ForkJoinPool //实现Executor接口</div><div class="line">//三个调度子方法</div><div class="line">execute() //异步执行</div><div class="line">invoke() //等待完成，返回结果</div><div class="line">submit() //异步执行execute任务，并立即返回Future对象</div></pre></td></tr></table></figure>
-<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class FutureTaskDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		</div><div class="line">		SonTask sonTask = new SonTask(&quot;线程2&quot;);</div><div class="line">		FutureTask&lt;String&gt; task1 = new FutureTask&lt;&gt;(sonTask);</div><div class="line">		new Thread(task1).start();</div><div class="line">		System.out.println(task1.get()); //获取结果</div><div class="line">		</div><div class="line">		FutureTask&lt;Integer&gt; task2 = new FutureTask&lt;Integer&gt;(new MySun(),2);</div><div class="line">		new Thread(task2).start();</div><div class="line">		System.out.println(&quot;result_&quot;+task2.get());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class SonTask implements Callable&lt;String&gt; &#123;</div><div class="line"></div><div class="line">	private String name = &quot;&quot;;</div><div class="line">	</div><div class="line">	SonTask(String name) &#123;</div><div class="line">		this.name = name;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public String call() throws Exception &#123;</div><div class="line">		Thread.sleep(1000L);</div><div class="line">		System.out.println(name + &quot;计算完成&quot;);</div><div class="line">		return &quot;result_1&quot;;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class MySun implements Runnable &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void run() &#123;</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(500L);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;线程2处理完成&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">result_1</div><div class="line">result_2</div></pre></td></tr></table></figure>
-<h3 id="Fork-Join"><a href="#Fork-Join" class="headerlink" title="Fork/Join"></a>Fork/Join</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class CountTask extends RecursiveTask&lt;Integer&gt;&#123;</div><div class="line"></div><div class="line">	private static final long serialVersionUID = 2148758397044775857L;</div><div class="line"></div><div class="line">	private static int splitSize = 2; </div><div class="line">	private int start , end; </div><div class="line">	</div><div class="line">	</div><div class="line">	public CountTask(int start, int end) &#123;</div><div class="line">		this.start = start;</div><div class="line">		this.end = end;</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected Integer compute() &#123;</div><div class="line">		int sum = 0;</div><div class="line">		//如果任务不需要拆分就开始计算</div><div class="line">		boolean isSplit =  (end - start) &lt;= splitSize;</div><div class="line">		if(isSplit)&#123;</div><div class="line">			for (int i = start; i &lt;= end; i++) &#123;</div><div class="line">				sum += i;</div><div class="line">			&#125;</div><div class="line">		&#125;else&#123; //拆分成2个子任务</div><div class="line">			int middle = (start + end) / 2;</div><div class="line">			CountTask oneTask = new CountTask(start, middle);</div><div class="line">			CountTask twoTask = new CountTask(middle+1, end);</div><div class="line">			oneTask.fork();//开始执行</div><div class="line">			twoTask.fork();</div><div class="line">			</div><div class="line">			//获得第一个子任务结果</div><div class="line">			int oneResult = oneTask.join();</div><div class="line">			int twoResult = twoTask.join();</div><div class="line">			</div><div class="line">			sum = oneResult + twoResult;</div><div class="line">		&#125;</div><div class="line">		return sum;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public class FockJoinDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</div><div class="line">		ForkJoinPool pool = new ForkJoinPool();</div><div class="line">		CountTask count1 = new CountTask(1, 5);</div><div class="line">		</div><div class="line">		Future&lt;Integer&gt; res1 = pool.submit(count1);</div><div class="line">		System.out.println(&quot;1-5结果: &quot;+res1.get());</div><div class="line">		</div><div class="line">		CountTask count2 = new CountTask(1, 100);</div><div class="line">		Future&lt;Integer&gt; res2 = pool.submit(count2);</div><div class="line">		System.out.println(&quot;1-100结果：&quot;+res2.get());</div><div class="line">		</div><div class="line">		System.out.println(&quot;=============Fock/Join监控===============&quot;);</div><div class="line">		</div><div class="line">		System.out.println(pool.getActiveThreadCount());</div><div class="line">		System.out.println(pool.getQueuedTaskCount());</div><div class="line">		System.out.println(pool.getQueuedSubmissionCount());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">1-5结果: 15</div><div class="line">1-100结果：5050</div><div class="line">=============Fock/Join监控===============</div><div class="line">1</div><div class="line">0</div><div class="line">0</div></pre></td></tr></table></figure>
-<p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp11137.html" target="_blank" rel="external">IBM_Fork/Join分析</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1926,7 +1907,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">121</span>
+                <span class="site-state-item-count">122</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1937,7 +1918,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-count">45</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1948,7 +1929,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">96</span>
+                <span class="site-state-item-count">97</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

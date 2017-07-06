@@ -254,6 +254,160 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记（三）——-聚合/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记（三）——-聚合/" itemprop="url">ElasticSearch学习笔记（三）—— 聚合</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:27:08+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>最后，我们还有一个需求需要完成：允许管理者在职员目录中进行一些分析。 Elasticsearch有一个功能叫做聚合(aggregations)，它允许你在数据上生成复杂的分析统计。它很像SQL中的GROUP BY但是功能更强大</p>
+<p>举个例子，让我们找到所有职员中最大的共同点是什么</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">  &quot;aggs&quot;: &#123;</div><div class="line">    &quot;all_interests&quot;: &#123; </div><div class="line">	  //类似以GroupBy interests</div><div class="line">      &quot;terms&quot;: &#123; &quot;field&quot;: &quot;interests&quot; &#125; </div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123; ... &#125;,</div><div class="line">   &quot;aggregations&quot;: &#123;</div><div class="line">      &quot;all_interests&quot;: &#123;</div><div class="line">         &quot;buckets&quot;: [</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;music&quot;,</div><div class="line">               &quot;doc_count&quot;: 2</div><div class="line">            &#125;,</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;forestry&quot;,</div><div class="line">               &quot;doc_count&quot;: 1</div><div class="line">            &#125;,</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;sports&quot;,</div><div class="line">               &quot;doc_count&quot;: 1</div><div class="line">            &#125;</div><div class="line">         ]</div><div class="line">      &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以看到两个职员对音乐有兴趣，一个喜欢林学，一个喜欢运动。这些数据并没有被预先计算好，它们是实时的从匹配查询语句的文档中动态计算生成的</p>
+<p>如果我们想知道所有姓”Smith”的人最大的共同点（兴趣爱好）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;match&quot;: &#123;</div><div class="line">      &quot;last_name&quot;: &quot;smith&quot;</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  &quot;aggs&quot;: &#123;</div><div class="line">    &quot;all_interests&quot;: &#123;</div><div class="line">      &quot;terms&quot;: &#123;</div><div class="line">        &quot;field&quot;: &quot;interests&quot;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>all_interests聚合已经变成只包含和查询语句相匹配的文档了</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line"> &quot;all_interests&quot;: &#123;</div><div class="line">    &quot;buckets&quot;: [</div><div class="line">       &#123;</div><div class="line">          &quot;key&quot;: &quot;music&quot;,</div><div class="line">          &quot;doc_count&quot;: 2</div><div class="line">       &#125;,</div><div class="line">       &#123;</div><div class="line">          &quot;key&quot;: &quot;sports&quot;,</div><div class="line">          &quot;doc_count&quot;: 1</div><div class="line">       &#125;</div><div class="line">    ]</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>聚合也允许分级汇总。例如，让我们统计每种兴趣下职员的平均年龄</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;aggs&quot; : &#123;</div><div class="line">        &quot;all_interests&quot; : &#123;</div><div class="line">            &quot;terms&quot; : &#123; &quot;field&quot; : &quot;interests&quot; &#125;,</div><div class="line">            &quot;aggs&quot; : &#123;</div><div class="line">                &quot;avg_age&quot; : &#123;</div><div class="line">                    &quot;avg&quot; : &#123; &quot;field&quot; : &quot;age&quot; &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">  &quot;all_interests&quot;: &#123;</div><div class="line">     &quot;buckets&quot;: [</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;music&quot;,</div><div class="line">           &quot;doc_count&quot;: 2,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 28.5</div><div class="line">           &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;forestry&quot;,</div><div class="line">           &quot;doc_count&quot;: 1,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 35</div><div class="line">           &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;sports&quot;,</div><div class="line">           &quot;doc_count&quot;: 1,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 25</div><div class="line">           &#125;</div><div class="line">        &#125;</div><div class="line">     ]</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>该聚合结果比之前的聚合结果要更加丰富。我们依然得到了兴趣以及数量（指具有该兴趣的员工人数）的列表，但是现在每个兴趣额外拥有avg_age字段来显示具有该兴趣员工的平均年龄</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Elasticsearch致力于隐藏分布式系统的复杂性。以下这些操作都是在底层自动完成的：</p>
+<ul>
+<li>将你的文档分区到不同的容器或者分片(shards)中，它们可以存在于一个或多个节点中。</li>
+<li>将分片均匀的分配到各个节点，对索引和搜索做负载均衡。</li>
+<li>冗余每一个分片，防止硬件故障造成的数据丢失。</li>
+<li>将集群中任意一个节点上的请求路由到相应数据所在的节点。</li>
+<li>无论是增加节点，还是移除节点，分片都可以做到无缝的扩展和迁移。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-二-——-搜索/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1713,370 +1867,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:04:54+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存"><a href="#《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存"></a>《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存</h2><blockquote>
-<p>使用缓存目的让访问速度更快。处理经常读取的数据、频繁查询的数据、热点数据、I/O瓶颈数据、计算昂贵的数据等</p>
-<p><strong>符合5分钟法则和局部性原理的数据都可以用来缓存</strong></p>
-</blockquote>
-<hr>
-<h2 id="缓存命中率"><a href="#缓存命中率" class="headerlink" title="缓存命中率"></a>缓存命中率</h2><blockquote>
-<p><strong>缓存命中率是从缓存中读取数据的次数与总读取次数比率</strong>.命中率越高越好</p>
-</blockquote>
-<p>缓存命中率 = 从缓存中读取次数/总读取次数</p>
-<hr>
-<h2 id="缓存回收策略"><a href="#缓存回收策略" class="headerlink" title="缓存回收策略"></a>缓存回收策略</h2><p>1.基于空间</p>
-<blockquote>
-<p>缓存设置了存储空间</p>
-</blockquote>
-<p>2.基于容量</p>
-<blockquote>
-<p>缓存设置了最大大小</p>
-</blockquote>
-<p>3.基于时间</p>
-<ul>
-<li>TTL(存活期) 缓存数据从创建开始到到期的一个时间段</li>
-<li>TTI（空闲期） 缓存数据多久不被访问到后移除缓存的时间</li>
-</ul>
-<hr>
-<h3 id="基于Java对象引用"><a href="#基于Java对象引用" class="headerlink" title="基于Java对象引用"></a>基于Java对象引用</h3><ul>
-<li><p>软引用</p>
-<blockquote>
-<p>如果对象是软引用，那么当JVM堆内存不足时候，垃圾回收器回收对象。软引用适合做缓存</p>
-</blockquote>
-</li>
-<li><p>弱引用</p>
-<blockquote>
-<p>当垃圾回收对象时，发现弱引用，则将它回收</p>
-</blockquote>
-</li>
-</ul>
-<p><strong>注意：只有在没有其他强引用对象引用弱引用/软引用对象垃圾回收才能回收。即如果有一个对象引用了弱引用/软引用，那么垃圾回收不会回收该软引用/弱引用对象</strong></p>
-<hr>
-<h3 id="Java缓存类型"><a href="#Java缓存类型" class="headerlink" title="Java缓存类型"></a>Java缓存类型</h3><ul>
-<li><p>堆缓存</p>
-<ul>
-<li>通过Java堆缓存对象</li>
-<li>优点 <ol>
-<li>没有序列化/反序列化，速度快</li>
-</ol>
-</li>
-<li>缺点<ol>
-<li>数据量过大的情况，GC暂停时间变长</li>
-<li>存储容量受堆空间影响</li>
-</ol>
-</li>
-<li>适用场景<ul>
-<li>堆缓存用于存储较热数据</li>
-</ul>
-</li>
-<li>GuavaCache、Ehcache3.x、MapDB等实现</li>
-</ul>
-</li>
-<li><p>堆外缓存</p>
-<ul>
-<li>存储在堆外缓存</li>
-<li>优点<ol>
-<li>减少GC暂停时间，支持更大缓存空间</li>
-</ol>
-</li>
-<li>缺点<ol>
-<li>读取数据需要序列化/反序列化，速度较慢</li>
-</ol>
-</li>
-<li>Ehcache3.下、MapDB等实现</li>
-</ul>
-</li>
-<li><p>磁盘缓存</p>
-<ul>
-<li>存储在磁盘的数据，JVM重启时数据仍然存在</li>
-<li>堆缓存/堆外缓存数据丢失</li>
-<li>Ehcache3.下、MapDB等实现</li>
-</ul>
-</li>
-<li><p>分布式缓存</p>
-<ul>
-<li>多JVM实例会存在两个问题<ol>
-<li>单机容量问题</li>
-<li>数据一致性问题<ul>
-<li>可设置缓存时间定时更新数据</li>
-</ul>
-</li>
-<li>缓存不命中时，需要回源到DB加载数据，DB访问量 增加<ul>
-<li>通过一致性哈希分片算法解决</li>
-</ul>
-</li>
-<li>可以使用Java进程间分布式缓存或者Redis分布式缓存</li>
-</ol>
-</li>
-</ul>
-</li>
-<li><p>单机模式</p>
-<blockquote>
-<p>存储最热的数据到堆缓存，相对热的数据到堆外缓存，不热的数据到磁盘缓存</p>
-</blockquote>
-</li>
-<li><p>集群时</p>
-<blockquote>
-<p>存储最热的数据到堆缓存，相对热的数据到堆外缓存，全量数据到分布式缓存</p>
-</blockquote>
-</li>
-</ul>
-<hr>
-<p><strong>堆缓存  -&gt; 堆外缓存 -&gt; 磁盘缓存 -&gt; 分布式缓存<br>L1 -&gt; L2 -&gt;3级缓存架构</strong></p>
-<hr>
-<h1 id="堆内缓存"><a href="#堆内缓存" class="headerlink" title="堆内缓存"></a>堆内缓存</h1><h3 id="GuavaCache"><a href="#GuavaCache" class="headerlink" title="GuavaCache"></a>GuavaCache</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Cache&lt;String,String&gt; guavaCache = </div><div class="line">     CacheBuilder.newBuilder()</div><div class="line">                 .concurrencyLevel(4)</div><div class="line">                 .expireAfterWrite(10,TimeUnit.SECONDS)</div><div class="line">                 .maximumSize(10000)</div><div class="line">                 .build();</div></pre></td></tr></table></figure>
-<p><a href="http://www.cnblogs.com/-OYK/archive/2012/12/05/2803317.html" target="_blank" rel="external">LRU算法</a></p>
-<ul>
-<li>maximumSize:缓存容量，超出之后，按照LRU进行缓存回收</li>
-<li>expireAfterWrite：设置TTL。定期回收缓存数据</li>
-<li>weakKeys/weakValues：设置弱引用缓存</li>
-<li>softValues：设置软引用缓存</li>
-<li>invalidate：主动失效某些缓存数据<ul>
-<li>什么时候触发失效?<strong>GuavaCache不会再缓存数据失效时立即触发回收操作，而在put时主动进行一次缓存清理</strong></li>
-</ul>
-</li>
-<li>concurrencyLevel：缓存级别<ul>
-<li>Cache重写了ConcurrentHashMap，concurrencyLevel设置Segment数量，concurrencyLevel越大并发能力越强</li>
-<li>recordStats:启动记录统计消息，比如命中率</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="Ehcache3-x实现"><a href="#Ehcache3-x实现" class="headerlink" title="Ehcache3.x实现"></a>Ehcache3.x实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);</div><div class="line"></div><div class="line">CacheConfigurationBuilder&lt;String,String&gt; cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder(</div><div class="line">    String.class,</div><div class="line">    String.class,</div><div class="line">    ResourcePoolsBuilder.newResourcePoolsBuilder()</div><div class="line">                        .heap(100,EntryUnit.ENTRIES)</div><div class="line">)</div><div class="line">.withDispatcherConcurrency(4)</div><div class="line">.withExpiry(Expirations.timeToLiveExpiration(Duration.of(10,TimeUnit.SECONDS)));</div><div class="line"></div><div class="line">Cache&lt;String,String&gt; ehcache = cacheManager.createCache(&quot;ehcache&quot;,cacheConfig);</div></pre></td></tr></table></figure>
-<h3 id="回收缓存策略"><a href="#回收缓存策略" class="headerlink" title="回收缓存策略"></a>回收缓存策略</h3><ul>
-<li>基于空间<ul>
-<li>heap(100,EntryUnit.ENTRIES) 设置缓存内存空间，超过此空间LRU回收</li>
-</ul>
-</li>
-</ul>
-<p>= 基于时间</p>
-<ul>
-<li>withExpiry(Expirations.timeToLiveExpiration(Duration.of(10,TimeUnit.SECONDS))) 设置TTL</li>
-<li>.withExpiry(Expirations.timeToIdleExpiration(Duration.of(10,TimeUnit.SECONDS))) 设置TTL、TTI</li>
-</ul>
-<ul>
-<li><p>缓存主动失效</p>
-<ul>
-<li>remove()/removeAll()<ul>
-<li>类似GuavaCache失效机制</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>并发级别</p>
-<ul>
-<li>withDispatcherConcurrency(4)用来设置事件分发时的并发级别</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="MapDB"><a href="#MapDB" class="headerlink" title="MapDB"></a>MapDB</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">HTreeMap mapDBCache = </div><div class="line">        DBMarker.heapDB()</div><div class="line">                .concurrencyScale(16)</div><div class="line">                .make()</div><div class="line">                .hashMap(&quot;mapDBCache&quot;)</div><div class="line">                .expireMaxSize(10000)</div><div class="line">                .expireAfterCreate(10,TimeUnit.SECONDS)</div><div class="line">                .expireAfterUpdate(10,TimeUnit.SECONDS)</div><div class="line">                .expireAfterGet(10,TimeUnit.SECONDS)</div><div class="line">                .create();</div></pre></td></tr></table></figure>
-<h3 id="回收策略"><a href="#回收策略" class="headerlink" title="回收策略"></a>回收策略</h3><ul>
-<li><p>基于容量</p>
-<ul>
-<li>expireMaxSize 缓存容量</li>
-</ul>
-</li>
-<li><p>基于时间</p>
-<ul>
-<li>expireAfterCreate/expireAfterUpdate 设置TTL</li>
-<li>expireAfterGet 设置TTI</li>
-</ul>
-</li>
-</ul>
-<h3 id="失效机制"><a href="#失效机制" class="headerlink" title="失效机制"></a>失效机制</h3><ul>
-<li>remove()/clear() 主动失效某些缓存数据<ul>
-<li>类似GuavaCache失效机制，不过，需要配置线程池定期执行缓存失效</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">.expireExecutor(scheduledExecutorService)</div><div class="line">.expireExecutorPeriod(3000)</div></pre></td></tr></table></figure>
-<h3 id="并发级别"><a href="#并发级别" class="headerlink" title="并发级别"></a>并发级别</h3><ul>
-<li>concurrencyScale() 类似GuavaCache的配置</li>
-</ul>
-<hr>
-<h3 id="堆内缓存-1"><a href="#堆内缓存-1" class="headerlink" title="堆内缓存"></a>堆内缓存</h3><h3 id="磁盘缓存"><a href="#磁盘缓存" class="headerlink" title="磁盘缓存"></a>磁盘缓存</h3><h3 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h3><hr>
-<h1 id="应用级缓存具体实例"><a href="#应用级缓存具体实例" class="headerlink" title="应用级缓存具体实例"></a>应用级缓存具体实例</h1><h3 id="多级缓存API封装"><a href="#多级缓存API封装" class="headerlink" title="多级缓存API封装"></a>多级缓存API封装</h3><blockquote>
-<p>对业务数据的一些基本信息进行适当的本地缓存，提升性能。对于多实例，还会使用分布式缓存，所以会对适当api进行封装</p>
-</blockquote>
-<h3 id="本地缓存初始化"><a href="#本地缓存初始化" class="headerlink" title="本地缓存初始化"></a>本地缓存初始化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public class LocalCacheInitService extends BaseService &#123;</div><div class="line">    </div><div class="line">    @Override</div><div class="line">    public void afterPropertiesSet() throws Exception&#123;</div><div class="line">        Cache&lt;String,Object&gt; categoryCache =</div><div class="line">             CacheBuilder.newBuilder()</div><div class="line">                         .softValues()</div><div class="line">                         .maximumSize(10000)</div><div class="line">                         .expireAfterWrite(Switches.CATEGORY.getExpiresInSeconds)</div><div class="line">                         .build();</div><div class="line">        </div><div class="line">        addCache(CacheKeys.CATEGORY_KEY,categoryCache)</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    public void addCache(String key,Cache&lt;?,?&gt; cache)&#123;</div><div class="line">        localCacheService.addCache(key,value);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>注意：本地缓存时间使用分布式缓存过期时间的一半，防止本地缓存数据缓存时间太长，导致多实例间的数据不一致</strong></p>
-<h3 id="写缓存API"><a href="#写缓存API" class="headerlink" title="写缓存API"></a>写缓存API</h3><h3 id="读缓存API"><a href="#读缓存API" class="headerlink" title="读缓存API"></a>读缓存API</h3><h3 id="NullCache"><a href="#NullCache" class="headerlink" title="NullCache"></a>NullCache</h3><hr>
-<h1 id="缓存模式"><a href="#缓存模式" class="headerlink" title="缓存模式"></a>缓存模式</h1><ul>
-<li>Cache-Aside<blockquote>
-<p>由业务代码直接维护缓存</p>
-</blockquote>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">value = myCache.getIfPresent(key);</div><div class="line">if(value == null)&#123;</div><div class="line">    //读场景</div><div class="line">    value = loadFromSoR(key);</div><div class="line">    //写场景</div><div class="line">    //value = writeToSoR(key);</div><div class="line">    //myCache.invalidate(key);</div><div class="line">    //放入缓存</div><div class="line">    myCache.put(value,key);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>适用于AOP模式</li>
-<li><p>Cache-Aside存在并发更新</p>
-<ol>
-<li>用户维度，加上缓存过期时间解决</li>
-<li>商品基础数据，考虑canal订阅binlog，进行增量更新分布式缓存，但是缓存会存在延迟，本地缓存可根据不一致容忍度设置合理过期时间</li>
-<li>读服务场景，可考虑一致性哈希，或者设置比较短的过期时间</li>
-</ol>
-</li>
-<li><p>Cache-As-SoR</p>
-<ul>
-<li>Read-Through<blockquote>
-<p>首先调用Cache，如果Cache不命中，由Cache回源到SoR</p>
-<ul>
-<li>通过配置CacheLoader组件回源到SoR加载源 数据</li>
-</ul>
-</blockquote>
-</li>
-<li>Write-Through</li>
-<li>Write-Behind</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>Cache看成SoR，然后Cache委托SoR进行真实读写.业务中只看到Cache操作</p>
-</blockquote>
-<ul>
-<li>Copy Pattern</li>
-</ul>
-<hr>
-<h3 id="名词"><a href="#名词" class="headerlink" title="名词"></a>名词</h3><ul>
-<li>SoR：记录系统（数据源）</li>
-<li>Cache：缓存，是SoR的快照</li>
-<li>回源：回到数据源获取数据</li>
-</ul>
-<p><a href="http://jinnianshilongnian.iteye.com/blog/2283670" target="_blank" rel="external">多级缓存</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2126,7 +1916,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">121</span>
+                <span class="site-state-item-count">122</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2137,7 +1927,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-count">45</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2148,7 +1938,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">96</span>
+                <span class="site-state-item-count">97</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
