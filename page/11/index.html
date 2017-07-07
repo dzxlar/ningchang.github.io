@@ -254,6 +254,175 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/docker真实应用场景/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/docker真实应用场景/" itemprop="url">docker真实应用场景</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:44:29+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>简化配置、代码流水线管理、提高开发效率、隔离应用、整合服务器、调试能力、多租户环境、快速部署分别是docker的8个使用场景</p>
+</blockquote>
+<p><img src="http://dockerone.com/uploads/article/20150106/802e00800b6dca3038b072bffdd56e15.png" alt="这里写图片描述"></p>
+<h3 id="Docker特性"><a href="#Docker特性" class="headerlink" title="Docker特性"></a>Docker特性</h3><ul>
+<li>Docker提供了轻量级的虚拟化 </li>
+<li>在同一台机器上创建更多数量的容器</li>
+<li>容器的启动与停止都能在几秒中内完成</li>
+</ul>
+<hr>
+<h3 id="1-简化配置"><a href="#1-简化配置" class="headerlink" title="1. 简化配置"></a>1. 简化配置</h3><blockquote>
+<p>这是Docker公司宣传的Docker的主要使用场景。虚拟机的最大好处是能在你的硬件设施上运行各种配置不一样的平台（软件、系统），<strong>Docker在降低额外开销的情况下提供了同样的功能。它能让你将运行环境和配置放在代码中然后部署</strong>，同一个Docker的配置可以在不同的环境中使用，这样就降低了硬件要求和应用环境之间耦合度。</p>
+</blockquote>
+<h3 id="2-代码流水线（Code-Pipeline）管理"><a href="#2-代码流水线（Code-Pipeline）管理" class="headerlink" title="2. 代码流水线（Code Pipeline）管理"></a>2. 代码流水线（Code Pipeline）管理</h3><blockquote>
+<p>前一个场景对于管理代码的流水线起到了很大的帮助。代码从开发者的机器到最终在生产环境上的部署，需要经过很多的中间环境。而每一个中间环境都有自己微小的差别，<strong>Docker给应用提供了一个从开发到上线均一致的环境，让代码的流水线变得简单不少。</strong></p>
+</blockquote>
+<h3 id="3-提高开发效率"><a href="#3-提高开发效率" class="headerlink" title="3. 提高开发效率"></a>3. 提高开发效率</h3><blockquote>
+<p>不同的开发环境中，我们都想把两件事做好。<strong>一是我们想让开发环境尽量贴近生产环境，二是我们想快速搭建开发环境。</strong><br>理想状态中，要达到第一个目标，我们需要将每一个服务都跑在独立的虚拟机中以便监控生产环境中服务的运行状态。然而，我们却不想每次都需要网络连接，每次重新编译的时候远程连接上去特别麻烦。这就是Docker做的特别好的地方，开发环境的机器通常内存比较小，之前使用虚拟的时候，我们经常需要为开发环境的机器加内存，而现在Docker可以轻易的让几十个服务在Docker中跑起来。</p>
+</blockquote>
+<h3 id="4-隔离应用"><a href="#4-隔离应用" class="headerlink" title="4. 隔离应用"></a>4. 隔离应用</h3><blockquote>
+<p><strong>有很多种原因会让你选择在一个机器上运行不同的应用</strong>，比如之前提到的提高开发效率的场景等。<br>我们经常需要考虑两点，一是因为要降低成本而进行服务器整合，二是将一个整体式的应用拆分成松耦合的单个服务（译者注：微服务架构）。</p>
+</blockquote>
+<h3 id="5-整合服务器"><a href="#5-整合服务器" class="headerlink" title="5. 整合服务器"></a>5. 整合服务器</h3><blockquote>
+<p>正如通过虚拟机来整合多个应用，<strong>Docker隔离应用的能力使得Docker可以整合多个服务器以降低成本。由于没有多个操作系统的内存占用，以及能在多个实例之间共享没有使用的内存</strong>，Docker可以比虚拟机提供更好的服务器整合解决方案。</p>
+</blockquote>
+<h3 id="6-调试能力"><a href="#6-调试能力" class="headerlink" title="6. 调试能力"></a>6. 调试能力</h3><blockquote>
+<p>Docker提供了很多的工具，这些工具不一定只是针对容器，但是却适用于容器。它们提供了很多的功能，包括可以为容器设置检查点、设置版本和查看两个容器之间的差别，这些特性可以帮助调试Bug。</p>
+</blockquote>
+<h3 id="7-多租户环境"><a href="#7-多租户环境" class="headerlink" title="7. 多租户环境"></a>7. 多租户环境</h3><blockquote>
+<p>另外一个Docker有意思的使用场景是在多租户的应用中，它可以避免关键应用的重写。我们一个特别的关于这个场景的例子是为IoT（译者注：物联网）的应用开发一个快速、易用的多租户环境。这种多租户的基本代码非常复杂，很难处理，重新规划这样一个应用不但消耗时间，也浪费金钱。<br>使用Docker，可以为每一个租户的应用层的多个实例创建隔离的环境，这不仅简单而且成本低廉，当然这一切得益于Docker环境的启动速度和其高效的diff命令。</p>
+</blockquote>
+<h3 id="8-快速部署"><a href="#8-快速部署" class="headerlink" title="8. 快速部署"></a>8. 快速部署</h3><blockquote>
+<p>在虚拟机之前，引入新的硬件资源需要消耗几天的时间。虚拟化技术（Virtualization）将这个时间缩短到了分钟级别。而Docker通过为进程仅仅创建一个容器而无需启动一个操作系统，再次将这个过程缩短到了秒级。</p>
+</blockquote>
+<hr>
+<p><a href="http://dockone.io/article/126" target="_blank" rel="external">译文转载</a><br><a href="http://blog.flux7.com/blogs/docker/8-ways-to-use-docker-in-the-real-world" target="_blank" rel="external">原文出处</a><br><a href="http://dockone.io/" target="_blank" rel="external">docker论坛</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】new-date-api/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1656,166 +1825,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】Guava——Joiner/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Java8】Guava——Joiner/" itemprop="url">【Java8】Guava——Joiner</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:33:12+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Guava/" itemprop="url" rel="index">
-                    <span itemprop="name">Guava</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Joiner"><a href="#Joiner" class="headerlink" title="Joiner"></a>Joiner</h2><blockquote>
-<p>字符串拼接对象</p>
-</blockquote>
-<p><img src="http://img.blog.csdn.net/20170410153303919?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<hr>
-<h2 id="on"><a href="#on" class="headerlink" title="on"></a>on</h2><h3 id="基本实例"><a href="#基本实例" class="headerlink" title="基本实例"></a>基本实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Joiner.on(&quot; &quot;).join(&quot;四川省&quot;,&quot;成都市&quot;,&quot;金牛区&quot;).toString()</div></pre></td></tr></table></figure>
-<ul>
-<li>on 以空格为分隔符 </li>
-<li>join内是拼接的对象:迭代器对象、数组、可变参数等</li>
-</ul>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">四川省 成都市 金牛区</div></pre></td></tr></table></figure>
-<h3 id="特殊处理"><a href="#特殊处理" class="headerlink" title="特殊处理"></a>特殊处理</h3><h4 id="动态拼接"><a href="#动态拼接" class="headerlink" title="动态拼接"></a>动态拼接</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">StringBuffer result = new StringBuffer(&quot;result: &quot;);</div><div class="line">		Joiner.on(&quot; &quot;).appendTo(result,7,8);</div></pre></td></tr></table></figure>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">result: 7 8</div></pre></td></tr></table></figure>
-<h4 id="忽略空值"><a href="#忽略空值" class="headerlink" title="忽略空值"></a>忽略空值</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//直接忽略Null</div><div class="line">Joiner.on(&quot; &quot;).skipNulls().join(&quot;四川省&quot;,&quot;成都市&quot;,&quot;金牛区&quot;,null).toString()</div><div class="line">//找出Null，并用其他值代替</div><div class="line">Joiner.on(&quot; &quot;).useForNull(&quot;未填写&quot;).join(&quot;四川省&quot;,&quot;成都市&quot;,&quot;金牛区&quot;,null).toString()</div></pre></td></tr></table></figure>
-<hr>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">四川省 成都市 金牛区 </div><div class="line">四川省 成都市 金牛区 未填写</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="Joiner-MapJoiner"><a href="#Joiner-MapJoiner" class="headerlink" title="Joiner.MapJoiner"></a>Joiner.MapJoiner</h2><blockquote>
-<p>MapJoiner 是 Joiner 的内部静态类，用于帮助将 Map 对象拼接成字符串。</p>
-</blockquote>
-<h3 id="基本实例-1"><a href="#基本实例-1" class="headerlink" title="基本实例"></a>基本实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Joiner.on(&quot; &quot;).withKeyValueSeparator(&quot;=&quot;).join(ImmutableMap.of(&quot;收件人&quot;,&quot;Nimo&quot;,&quot;联系方式&quot;,&quot;123&quot;,&quot;收件地址&quot;,&quot;浙江省杭州市滨江区XXXX&quot;));</div></pre></td></tr></table></figure>
-<p>result</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">收件人=Nimo 联系方式=123 收件地址=浙江省杭州市滨江区XXXX</div></pre></td></tr></table></figure>
-<p><a href="https://blog.jamespan.me/2015/02/08/guava-basic-utilities-1" target="_blank" rel="external">Joiner具体参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1865,7 +1874,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">122</span>
+                <span class="site-state-item-count">123</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
