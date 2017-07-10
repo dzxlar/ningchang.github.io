@@ -254,6 +254,219 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/10/PHP学习笔记-一-——-入门环境搭建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/10/PHP学习笔记-一-——-入门环境搭建/" itemprop="url">PHP学习笔记(一) —— 入门环境搭建</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-10T10:52:31+08:00">
+                2017-07-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/php/" itemprop="url" rel="index">
+                    <span itemprop="name">php</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>题外话:由于公司DMS管理系统是第三方php写的，现在需要进行二次开发。所以了解了一下一些基本php搭建环境、基本框架语法等知识点</p>
+</blockquote>
+<h1 id="搭建准备环境"><a href="#搭建准备环境" class="headerlink" title="搭建准备环境"></a>搭建准备环境</h1><blockquote>
+<p>独立安装各模块顺序按照Apache—&gt;PHP—&gt;MySQL进行。集成安装环境则不用</p>
+</blockquote>
+<ul>
+<li><a href="http://httpd.apache.org/docs/current/platform/windows.html#down" target="_blank" rel="external">Apache</a></li>
+<li><a href="https://www.mysql.com/" target="_blank" rel="external">MySQL</a></li>
+<li><a href="http://windows.php.net/download#php-5.6" target="_blank" rel="external">PHP</a></li>
+<li><a href="http://www.wampserver.com/" target="_blank" rel="external">集成安装环境-wampsever</a></li>
+</ul>
+<h1 id="安装Httpd"><a href="#安装Httpd" class="headerlink" title="安装Httpd"></a>安装Httpd</h1><ol>
+<li>下载ApacheHaus并且解压</li>
+<li>管理员身份运行命令行进入 ${ApachePath}/bin</li>
+<li>运行httpd -k install安装</li>
+</ol>
+<p>安装过程报错问题</p>
+<ol>
+<li><p>项目路径失效。解决方案：打开conf/httpd.conf，修改</p>
+<pre><code>Define SRVROOT &quot;G:\php\httpd\Apache24&quot;
+ServerRoot &quot;${SRVROOT}&quot;
+</code></pre><ol>
+<li>80端口和443端口冲突。解决方案：打开conf/extra/httpd-ssl或者…/httpd-ahssl文件将Listen端口号更改为其他。这里改为8180和442</li>
+</ol>
+<h2 id="卸载Httpd"><a href="#卸载Httpd" class="headerlink" title="卸载Httpd"></a>卸载Httpd</h2><pre><code>httpd -k uninstall
+</code></pre><h2 id="重新安装。运行不报错"><a href="#重新安装。运行不报错" class="headerlink" title="重新安装。运行不报错"></a>重新安装。运行不报错</h2><pre><code>httpd -k install
+</code></pre><h2 id="启动Apache"><a href="#启动Apache" class="headerlink" title="启动Apache"></a>启动Apache</h2><pre><code>httpd -k start
+</code></pre><h2 id="访问http-localhost-8180"><a href="#访问http-localhost-8180" class="headerlink" title="访问http://localhost:8180"></a>访问<a href="http://localhost:8180" target="_blank" rel="external">http://localhost:8180</a></h2><h2 id="向apcache添加php依赖-httpd-conf"><a href="#向apcache添加php依赖-httpd-conf" class="headerlink" title="向apcache添加php依赖(httpd.conf)"></a>向apcache添加php依赖(httpd.conf)</h2><pre><code> # 如下为PHP环境添加模块
+LoadModule php5_module &quot;G:/php/php56/php5apache2_4.dll&quot;
+PHPIniDir &quot;G:/php/php56/php.ini&quot; # php.ini-production重命名
+
+# 添加PHP支持
+AddType application/x-httpd-php .php
+</code></pre>   <ifmodule dir_module=""><br>        DirectoryIndex index.html index.htm index.php<br>    </ifmodule>
+
+</li>
+</ol>
+<h2 id="修改php-ini"><a href="#修改php-ini" class="headerlink" title="修改php.ini"></a>修改php.ini</h2><pre><code>doc_root = G:\php\httpd\Apache24\htdocs
+</code></pre><h2 id="全局搜索"><a href="#全局搜索" class="headerlink" title="全局搜索"></a>全局搜索</h2><pre><code>; extension_dir = &quot;./&quot;
+</code></pre><h2 id="添加"><a href="#添加" class="headerlink" title="添加"></a>添加</h2><pre><code>extension_dir = &quot;G:\php\php56\ext&quot;
+</code></pre><h2 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h2><pre><code>;extension=php_bz2.dll
+extension=php_curl.dll
+;extension=php_fileinfo.dll
+extension=php_gd2.dll
+;extension=php_gettext.dll
+;extension=php_gmp.dll
+;extension=php_intl.dll
+extension=php_imap.dll
+;extension=php_interbase.dll
+;extension=php_ldap.dll
+extension=php_mbstring.dll
+;extension=php_exif.dll      ; Must be after mbstring as it depends on it
+extension=php_mysql.dll
+extension=php_mysqli.dll
+;extension=php_oci8_12c.dll  ; Use with Oracle Database 12c Instant Client
+;extension=php_openssl.dll
+;extension=php_pdo_firebird.dll
+extension=php_pdo_mysql.dll
+;extension=php_pdo_oci.dll
+;extension=php_pdo_odbc.dll
+;extension=php_pdo_pgsql.dll
+;extension=php_pdo_sqlite.dll
+;extension=php_pgsql.dll
+;extension=php_shmop.dll
+
+; The MIBS data available in the PHP distribution must be installed. 
+; See http://www.php.net/manual/en/snmp.installation.php 
+extension=php_snmp.dll
+
+extension=php_soap.dll
+extension=php_sockets.dll
+;extension=php_sqlite3.dll
+;extension=php_sybase_ct.dll
+;extension=php_tidy.dll
+;extension=php_xmlrpc.dll
+;extension=php_xsl.dll
+</code></pre><h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>${apachePath}/htdocs 新建phpinfo.php，添加内容</p>
+<pre><code>&lt;?php phpinfo();?&gt;
+</code></pre><h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a href="https://segmentfault.com/a/1190000003409708" target="_blank" rel="external">https://segmentfault.com/a/1190000003409708</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/07/hive学习笔记-一-——-基础入门/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2158,183 +2371,6 @@ public Map&lt;String, Object&gt; consumerConfigs() {
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/08/【消息队列】Kafka学习笔记-三-——Java/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/08/【消息队列】Kafka学习笔记-三-——Java/" itemprop="url">【消息队列】Kafka学习笔记(三)——Java</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-08T13:41:23+08:00">
-                2017-06-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="引入pom-xml文件"><a href="#引入pom-xml文件" class="headerlink" title="引入pom.xml文件"></a>引入pom.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;!-- start kafka --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;0.10.2.1&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;!-- kafka end --&gt;</div></pre></td></tr></table></figure>
-<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="ProducerAPI"><a href="#ProducerAPI" class="headerlink" title="ProducerAPI"></a>ProducerAPI</h3><h4 id="ProducerRecord-lt-K-V-gt"><a href="#ProducerRecord-lt-K-V-gt" class="headerlink" title="ProducerRecord&lt; K,V &gt;"></a>ProducerRecord&lt; K,V &gt;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public ProducerRecord(String topic, Integer partition, Long timestamp, K key, V value) &#123;</div><div class="line">        if (topic == null)</div><div class="line">            throw new IllegalArgumentException(&quot;Topic cannot be null.&quot;);</div><div class="line">        if (timestamp != null &amp;&amp; timestamp &lt; 0)</div><div class="line">            throw new IllegalArgumentException(</div><div class="line">                    String.format(&quot;Invalid timestamp: %d. Timestamp should always be non-negative or null.&quot;, timestamp));</div><div class="line">        if (partition != null &amp;&amp; partition &lt; 0)</div><div class="line">            throw new IllegalArgumentException(</div><div class="line">                    String.format(&quot;Invalid partition: %d. Partition number should always be non-negative or null.&quot;, partition));</div><div class="line">        this.topic = topic; </div><div class="line">        this.partition = partition; </div><div class="line">        this.key = key;  </div><div class="line">        this.value = value; </div><div class="line">        this.timestamp = timestamp; </div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p><strong>注意：key是可选的。在没有指定key发送到哪个partition的情况下，producer会计算key的hash值，从而确定这条消息发送到哪个分区。如果partition和key都没有指定，那么producer将会使用round-robin的方式发送消息到分区</strong></p>
-<ul>
-<li>topic参数用于指定消息发送到哪个Topic，必填。</li>
-<li>partition指的是消息发送哪个分区，可以为null </li>
-<li>如果partition指定，那么key将不会起作用。value就是消息的实际内容</li>
-</ul>
-<h4 id="RecordMetadata-lt-K-V-gt"><a href="#RecordMetadata-lt-K-V-gt" class="headerlink" title="RecordMetadata&lt; K,V &gt;"></a>RecordMetadata&lt; K,V &gt;</h4><blockquote>
-<p>表示消息发送后，服务端接收到消息的确认信息。包括这个消息发送到了那个topic下的那个partition，偏移量offset是多少等</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">private RecordMetadata(TopicPartition topicPartition, long offset, long timestamp, long</div><div class="line">        checksum, int serializedKeySize, int serializedValueSize) &#123;</div><div class="line">        super();</div><div class="line">        this.offset = offset;</div><div class="line">        this.timestamp = timestamp;</div><div class="line">        this.checksum = checksum;</div><div class="line">        this.serializedKeySize = serializedKeySize;</div><div class="line">        this.serializedValueSize = serializedValueSize;</div><div class="line">        this.topicPartition = topicPartition; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="Producer-lt-K-V-gt"><a href="#Producer-lt-K-V-gt" class="headerlink" title="Producer&lt; K,V &gt;"></a>Producer&lt; K,V &gt;</h4><blockquote>
-<p>表示消息的发送者。K、V的含义与ProducerRecord&lt; K,V &gt;相同</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public interface Producer&lt;K, V&gt; extends Closeable &#123;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *异步发送一条信息，返回Future对象，其中包含了服务端的响应信息RecordMetadata</div><div class="line">     */</div><div class="line">    public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record);</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 发送一条消息，当服务端确认后，执行指定的回调函数</div><div class="line">     */</div><div class="line">    public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record, Callback callback);</div><div class="line">    </div><div class="line">    /**</div><div class="line">     * 如果producer有很多消息要发送，那么producer可能会产生消息堆积，调用这个方法会发送所有堆积的消息，在这个</div><div class="line">     *方法执行完成之前，线程一直会阻塞</div><div class="line">     */</div><div class="line">    public void flush();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取一个Topic下的所有分区信息，因为分区的数量可能会改变，因此不应该缓存这个分区信息的内容</div><div class="line">     */</div><div class="line">    public List&lt;PartitionInfo&gt; partitionsFor(String topic);</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 监控相关</div><div class="line">     */</div><div class="line">    public Map&lt;MetricName, ? extends Metric&gt; metrics();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 关闭，等待所有消息发送完</div><div class="line">     */</div><div class="line">    public void close();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 指定时间内要关闭完成，如果没有完成，强制关闭，不管有没有消息还没发送</div><div class="line">     */</div><div class="line">    public void close(long timeout, TimeUnit unit);</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="PartitionInfo"><a href="#PartitionInfo" class="headerlink" title="PartitionInfo"></a>PartitionInfo</h4><blockquote>
-<p> 表示一个Topic下面的分区信息</p>
-</blockquote>
-<p><strong>注意： 如果自己实现kafka的监控程序。需要分区这些元数据</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public PartitionInfo(String topic, int partition, Node leader, Node[] replicas, Node[] inSyncReplicas) &#123;</div><div class="line">        this.topic = topic;</div><div class="line">        this.partition = partition;</div><div class="line">        this.leader = leader;</div><div class="line">        this.replicas = replicas;</div><div class="line">        this.inSyncReplicas = inSyncReplicas;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="Serializer类与Deserializer"><a href="#Serializer类与Deserializer" class="headerlink" title="Serializer类与Deserializer"></a>Serializer类与Deserializer</h4><p>序列化实现类</p>
-<ul>
-<li>ByteArraySerializer</li>
-<li>ByteBufferSerializer</li>
-<li>BytesSerializer</li>
-<li>DoubleSerializer</li>
-<li>IntegerSerializer</li>
-<li>LongSerializer</li>
-<li>StringSerializer</li>
-</ul>
-<p><strong>注意：kafka最终都是将消息中的内容变成二进制数据进行存储。需要转换为二进制数组。每种类型转换方式都不一样</strong></p>
-<p>核心方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public byte[] serialize(String topic, T data);</div></pre></td></tr></table></figure>
-<p>StringSerializer的实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">   public void configure(Map&lt;String, ?&gt; configs, boolean isKey) &#123;</div><div class="line">         String propertyName = isKey ? &quot;key.serializer.encoding&quot; : &quot;value.serializer.encoding&quot;;</div><div class="line">         Object encodingValue = configs.get(propertyName);</div><div class="line">         if (encodingValue == null)</div><div class="line">             encodingValue = configs.get(&quot;serializer.encoding&quot;);</div><div class="line">         if (encodingValue != null &amp;&amp; encodingValue instanceof String)</div><div class="line">             encoding = (String) encodingValue;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
-<p>注意：对于每一种Serializer都有一个Deserializer，通常我们是在Producer端指定Serializer，在Consumer端指定Deserializer，相信这个非常容易理解，唯一要注意的是，二者必须是要对应的，否则可能会出现反序列化失败的情况</p>
-<h4 id="生产者代码实例"><a href="#生产者代码实例" class="headerlink" title="生产者代码实例"></a>生产者代码实例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">Properties props = new Properties();</div><div class="line">       props.put(&quot;bootstrap.servers&quot;, &quot;115.28.65.149:2181&quot;);</div><div class="line">       props.put(&quot;acks&quot;, &quot;all&quot;);</div><div class="line">       props.put(&quot;retries&quot;, 0);</div><div class="line">       props.put(&quot;batch.size&quot;, 16384);</div><div class="line">       props.put(&quot;linger.ms&quot;, 1);</div><div class="line">       props.put(&quot;buffer.memory&quot;, 33554432);</div><div class="line">       props.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</div><div class="line">       props.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</div><div class="line">  </div><div class="line">       Producer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);</div><div class="line">       for(int i = 0; i &lt; 100; i++)</div><div class="line">           producer.send(new ProducerRecord&lt;String, String&gt;(&quot;test&quot;, Integer.toString(i), Integer.toString(i)));</div><div class="line"> </div><div class="line">       producer.close();</div></pre></td></tr></table></figure>
-<p><strong>注意： Kafka客户端在初始化的情况下用来连接kafka集群的，而且必须指定，不过也不需要列出集群中所有的broker地址，这个参数只是在启动的时候用一下，获取到连接之后，会自动获取到集群中所有broker的信息</strong></p>
-<hr>
-<h3 id="CosumerAPI"><a href="#CosumerAPI" class="headerlink" title="CosumerAPI"></a>CosumerAPI</h3><h4 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div></pre></td><td class="code"><pre><div class="line">public class KafkaConsumer&lt;K, V&gt; implements Consumer&lt;K, V&gt;  &#123;</div><div class="line">   </div><div class="line">    /**</div><div class="line">     * 获取当前分配到这个consumer的分区信息。如果是通过调用assign(List&lt;TopicPartition&gt; partitions)方式进行订阅，</div><div class="line">     *那么将返回相同的分区信息。</div><div class="line">     *如果调用的是subscribe(List&lt;String&gt; topics,..)方式订阅消息，</div><div class="line">     *那么将会返回当前topic自动分配给这个consumer的分区信息(可能为空)</div><div class="line">     */</div><div class="line">    public Set&lt;TopicPartition&gt; assignment()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 返回当前consumer订阅的Topic(一个Consumer可以订阅多个Topic)</div><div class="line">     */</div><div class="line">    public Set&lt;String&gt; subscription()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *内部调用了subscribe(List&lt;String&gt; topics, ConsumerRebalanceListener callback)</div><div class="line">     */</div><div class="line">    public void subscribe(List&lt;String&gt; topics);</div><div class="line">     /**</div><div class="line">     * 传入要订阅的Topic(可以有多个)，动态分配partition。</div><div class="line">     *注意Topic的订阅是不能累加的，也就是说，如果当前已经订阅了其他的topic，那么调用此方法会替换原来订阅的topic。</div><div class="line">     *这也意味着：assign(List&lt;TopicPartition&gt; partitions)和本方法是不能联合使用的。</div><div class="line">     *如果传入的参数为空，那么相当于unsubscribe()的作用</div><div class="line">     *作为group管理的一部分，将会持续跟踪属于同一个group的consumers，并且在以下事件触发时，引发rebalence操作：</div><div class="line">     * 1、任何一个topic下的分区数量发生变化</div><div class="line">     * 2、Topic创建或者删除</div><div class="line">     * 3、consumer group中的某个consumer instance死掉</div><div class="line">     * 4、一个新的consumer加入当前consumer group(通过join)</div><div class="line">     */</div><div class="line">    public void subscribe(List&lt;String&gt; topics, ConsumerRebalanceListener callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 手工指定订阅的Topic和partition信息</div><div class="line">     */</div><div class="line">    public void assign(List&lt;TopicPartition&gt; partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">    * 支持使用正则表达式的方式订阅Topic</div><div class="line">    */</div><div class="line">    public void subscribe(Pattern pattern, ConsumerRebalanceListener callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 取消订阅(assgin方式和subscribe的订阅都会被取消)</div><div class="line">     */</div><div class="line">    public void unsubscribe()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 从topic中主动拉取消息，如果没有订阅任何topic就调用这个方法，会报错。</div><div class="line">     *从poll名字既可以看出拉取的方式是基于轮询，轮询topic中的每个分区查看有没有最新消息。</div><div class="line">     *在每一次轮询时，consumer都会使用上一次的消费的offset作为本次轮询的start offset。</div><div class="line">     *上一次消费offset可以通过seek(TopicPartition partition, long offset)方法手工设定，或者自动设置</div><div class="line">     */</div><div class="line">    public ConsumerRecords&lt;K, V&gt; poll(long timeout)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *内部调用了commitSync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets)</div><div class="line">     */</div><div class="line">    public void commitSync()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 同步提交上一次poll时，当前consumer订阅的所有topic的所有partition的消费偏移量(offset)信息</div><div class="line">     * 这个消费偏移量信息是存储在kafka集群上的。当consumer每次rebalence或者启动的时候，都会使用到这个偏移量</div><div class="line">     * 例如：lastProcessedMessageOffset + 1.</div><div class="line">     */</div><div class="line">    public void commitSync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 内部调用了commitAsync(OffsetCommitCallback callback)</div><div class="line">     */</div><div class="line">    public void commitAsync()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *异步提交上一次poll时，当前consumer订阅的所有topic的所有partition的消费偏移量(offset)信息</div><div class="line">     */</div><div class="line">    public void commitAsync(OffsetCommitCallback callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 异步提交指定的topic的某些partition的消费偏移量(offset)信息</div><div class="line">     */</div><div class="line">    public void commitAsync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets, OffsetCommitCallback callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 手工指定消费进度，在下一次poll时，将会使用指定的进度进行消费，慎用。</div><div class="line">     */</div><div class="line">    public void seek(TopicPartition partition, long offset)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 从指定分区的开头进行消费，</div><div class="line">     *这个方法不会立即执行，要等到下一次poll(long)或者position(TopicPartition)方法执行时，才会调用。</div><div class="line">     */</div><div class="line">    public void seekToBeginning(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 设置指定分区所有消息已经消费完</div><div class="line">     *这个方法不会立即执行，要等到下一次poll(long)或者position(TopicPartition)方法执行时，才会调用。</div><div class="line">     */</div><div class="line">    public void seekToEnd(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取指定分区中下一次开始消费的偏移量</div><div class="line">     */</div><div class="line">    public long position(TopicPartition partition)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取指定分区最后一次提交的消费进度(不论这个offset是否由当前进程提交)</div><div class="line">     *如果传入的参数代表的分区没有分配给当前consumer，或者consumer没有缓存当前分区的消费进度信息，这个方法可能会阻塞进行远程调用</div><div class="line">     */</div><div class="line">    public OffsetAndMetadata committed(TopicPartition partition)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取由当前Consumer持有的metrics信息</div><div class="line">     */</div><div class="line">    public Map&lt;MetricName, ? extends Metric&gt; metrics()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取一个Topic的所有分区信息，如果本地没有缓存的话，需要进行远程调用</div><div class="line">     */</div><div class="line">    public List&lt;PartitionInfo&gt; partitionsFor(String topic)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取当前用户有权限查看的所有的topic的所有分区信息</div><div class="line">     */</div><div class="line">    public Map&lt;String, List&lt;PartitionInfo&gt;&gt; listTopics()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 暂停对某些分区消息的订阅，当再下一次poll时，不会消费这些分区的消息，直到调用 resume(TopicPartition)后，重新进行消费</div><div class="line">     * 这个方法不会触发rebalence</div><div class="line">     */</div><div class="line">    public void pause(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 恢复对某个partiton消息的订阅，如果这个partition之前没有被pause，这个方法不会执行任何操作</div><div class="line">     */</div><div class="line">    public void resume(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 关闭consumer，等待一些操作完成。例如如果auto-commit是支持的，将会提交当前消费的offset</div><div class="line">     */</div><div class="line">    public void close()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 唤醒操作，如果一个consumer的poll需要消耗很长时间，可以使用这个方法进行终止。</div><div class="line">     */</div><div class="line">    public void wakeup()&#123;..&#125;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="ConsumerRecords与ConsumerRecord"><a href="#ConsumerRecords与ConsumerRecord" class="headerlink" title="ConsumerRecords与ConsumerRecord"></a>ConsumerRecords与ConsumerRecord</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public final class ConsumerRecord&lt;K, V&gt; &#123;</div><div class="line">    private final String topic;</div><div class="line">    private final int partition;</div><div class="line">    private final long offset;</div><div class="line">    private final K key;</div><div class="line">    private final V value;</div><div class="line">     ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public class ConsumerRecords&lt;K, V&gt; implements Iterable&lt;ConsumerRecord&lt;K, V&gt;&gt; &#123;</div><div class="line">    private final Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; records;</div><div class="line">     ...</div><div class="line">     &#125;</div></pre></td></tr></table></figure>
-<h4 id="消费者代码示例"><a href="#消费者代码示例" class="headerlink" title="消费者代码示例"></a>消费者代码示例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">Properties props = new Properties();</div><div class="line">        props.put(&quot;bootstrap.servers&quot;, &quot;115.28.65.149:9092&quot;);</div><div class="line">        props.put(&quot;group.id&quot;, &quot;testConsumer&quot;);</div><div class="line">        props.put(&quot;enable.auto.commit&quot;, &quot;true&quot;);</div><div class="line">        props.put(&quot;auto.commit.interval.ms&quot;, &quot;1000&quot;);</div><div class="line">        props.put(&quot;session.timeout.ms&quot;, &quot;30000&quot;);</div><div class="line">        props.put(&quot;key.deserializer&quot;,</div><div class="line">                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);</div><div class="line">        props.put(&quot;value.deserializer&quot;,</div><div class="line">                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);</div><div class="line">        KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);</div><div class="line">        consumer.subscribe(Arrays.asList(&quot;test&quot;));</div><div class="line">        Runtime.getRuntime().addShutdownHook(new Thread()&#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line">                consumer.close();</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">        &#125;);</div><div class="line">        while (true) &#123;</div><div class="line">            ConsumerRecords&lt;String, String&gt; records = consumer.poll(100);</div><div class="line">            for (ConsumerRecord&lt;String, String&gt; record : records)</div><div class="line">                System.out.printf(&quot;offset = %d, key = %s, value = %s&quot;,</div><div class="line">                        record.offset(), record.key(), record.value());</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2384,7 +2420,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">123</span>
+                <span class="site-state-item-count">124</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2395,7 +2431,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">45</span>
+                <span class="site-state-item-count">46</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2406,7 +2442,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">97</span>
+                <span class="site-state-item-count">98</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
