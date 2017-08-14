@@ -254,6 +254,168 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——显式锁StampedLock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——显式锁StampedLock/" itemprop="url">线程笔记——显式锁StampedLock</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:19:06+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>首先了解悲观锁和乐观锁概念</p>
+<blockquote>
+<p>悲观锁：假设会发生并发冲突，屏蔽一切可能违反数据完整性的操作<br>读取悲观锁：在读取之前先判断以下，数据有无修改。<br>乐观锁：假设不会发生并发冲突，只在提交操作前检查是否违反数据完整性的操作<br>读取乐观锁：在读取之前不需要判断数据是否被修改，只需读取自己的数据</p>
+</blockquote>
+<h3 id="StampedLock"><a href="#StampedLock" class="headerlink" title="StampedLock"></a>StampedLock</h3><blockquote>
+<p>StampedLock是基于能力的锁，很好的实现悲观锁和乐观锁的逻辑。<br>使用三种模式控制读-写访问<br>StampedLock的状态包含版本和模式，获取锁方法根据锁状态返回一个表示控制表示的标识（stamp）<br>“try”版本的方法返回特殊值”0”表示获取失败<br>锁释放需要一个标识作为参数。如果不符合锁状态则失败</p>
+</blockquote>
+<p>3种模式</p>
+<ol>
+<li><p>写</p>
+<blockquote>
+<p>writeLock可能阻塞等待独占访问,返回一个标志，用在unlockWrite释放锁。也提供无时间或者带时间版本的tryWriteLock方法<br>当锁以写模式持有时，没有读锁可获取。所有乐观性读确认失败</p>
+</blockquote>
+</li>
+<li><p>读</p>
+<blockquote>
+<p>readLock阻塞等待非独占访问,用在unlockRead释放锁。也提供无时间或者带时间版本的tryWriteLock方法</p>
+</blockquote>
+</li>
+<li><p>乐观读</p>
+<blockquote>
+<p>只有在锁没有以写模式持有时，tryOptimisticRcad()返回一个非0标识。<br>如果锁自给定标识没有写模式持有，validate()返回true（可认为极弱版本的读锁，可在任意时间被写入打破）<br>在短的只读代码使用乐观模式可以减少竞争，提高吞吐。</p>
+</blockquote>
+<h3 id="StampedLock-1"><a href="#StampedLock-1" class="headerlink" title="StampedLock"></a>StampedLock</h3><p><strong>利用Lock机制+Stamp标记状态。实现锁与锁之间乐观和悲观</strong></p>
+</li>
+</ol>
+<p>Java Doc Example</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line">public class StampedLockDemo &#123;</div><div class="line">   </div><div class="line">	private double x;</div><div class="line">	private double y;</div><div class="line">	</div><div class="line">	final StampedLock lock = new StampedLock();</div><div class="line">	</div><div class="line">	//一个简单的写模式例子</div><div class="line">	public void move(double deltaX, double deltaY)&#123;</div><div class="line">		//标志</div><div class="line">		long stamp = lock.writeLock();</div><div class="line">		</div><div class="line">		try &#123;</div><div class="line">			x += deltaX;</div><div class="line">			y += deltaY;</div><div class="line">		&#125; finally&#123;</div><div class="line">			lock.unlockWrite(stamp);</div><div class="line">		&#125;</div><div class="line">		System.out.println(&quot;写入...x = &quot; + x + &quot; &quot; + &quot;y = &quot; + y);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	//乐观读锁</div><div class="line">	public double distanceFromOrigin()&#123;</div><div class="line">		long stamp = lock.tryOptimisticRead();</div><div class="line">		double currentX = x;</div><div class="line">		double currentY = y;</div><div class="line">		System.out.println(&quot;读取...x = &quot; + x + &quot; &quot; + &quot;y = &quot; + y);</div><div class="line">		//检查是否有写锁发生</div><div class="line">		if(!lock.validate(stamp))&#123;</div><div class="line">			stamp = lock.readLock();</div><div class="line">			try &#123;</div><div class="line">				currentX = x;</div><div class="line">				currentY = y;</div><div class="line">			&#125; finally&#123;</div><div class="line">				lock.unlockRead(stamp);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		return Math.sqrt(currentX * currentX + currentY * currentY);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	//悲观锁</div><div class="line">	public void moveIfAtOrigin(double newX, double newY)&#123;</div><div class="line">		long readStamp = lock.readLock();</div><div class="line">		try&#123;</div><div class="line">			//检查状态是否符合</div><div class="line">			while(x == 10.0 &amp;&amp; y == 10.0)&#123;</div><div class="line">				//将读锁转为写锁</div><div class="line">				long writeStamp = lock.tryConvertToWriteLock(readStamp);</div><div class="line">				//确认写锁是否成功</div><div class="line">				if(writeStamp != 0L)&#123;</div><div class="line">					readStamp = writeStamp;//成功则替换</div><div class="line">					x = newX;</div><div class="line">					y = newY;</div><div class="line">					break;</div><div class="line">				&#125;else&#123;</div><div class="line">					lock.unlockRead(readStamp);</div><div class="line">					readStamp = lock.writeLock();</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			System.out.println(&quot;读锁变为写锁后：x = &quot;+x + &quot; y = &quot; + y);</div><div class="line">		&#125;finally&#123;</div><div class="line">			lock.unlock(readStamp);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		StampedLockDemo demo = new StampedLockDemo();</div><div class="line">		demo.move(10,10);</div><div class="line">		System.out.println(demo.distanceFromOrigin());</div><div class="line">		demo.moveIfAtOrigin(100,200);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">写入...x = 10.0 y = 10.0</div><div class="line">读取...x = 10.0 y = 10.0</div><div class="line">14.142135623730951</div><div class="line">读锁变为写锁后：x = 100.0 y = 200.0</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——显式锁Lock和ReentrantLock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1849,167 +2011,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Zookeeper学习笔记（四）——-主从模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Zookeeper学习笔记（四）——-主从模式/" itemprop="url">Zookeeper学习笔记（四）—— 主从模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:02:01+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">Zookeeper</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="zookeeper编程"><a href="#zookeeper编程" class="headerlink" title="zookeeper编程"></a>zookeeper编程</h3><ul>
-<li>zookeeper有一个java绑定和一个c绑定</li>
-<li>c绑定的两种形式：单线程和多线程</li>
-<li>两种形式的区别在于<strong>如何循环消息以获取更多消息</strong></li>
-</ul>
-<h3 id="主从复制的Zookeeper"><a href="#主从复制的Zookeeper" class="headerlink" title="主从复制的Zookeeper"></a>主从复制的Zookeeper</h3><p>在评估、开发和测试环境中。使用zookeeper独立模式</p>
-<p>在生产模式中。应用主从复制模式。</p>
-<blockquote>
-<p>相同应用中服务器主从复制组叫做 quorum , 并且在主从复制模式中，在quorum中的所有服务器有相同的配置文件副本</p>
-</blockquote>
-<p>注意：<strong>如果使用zk的主从模式，至少3台服务器。并且建议基数服务器。</strong><br>原因：1. 如果只有两台服务器，其中的一个故障的时候，没有足够的机器形成多数quorum。</p>
-<ol>
-<li>在本质上两台服务比单台服务更不稳定，因为有两个单点。</li>
-</ol>
-<p>配置文件修改</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">dataDir=/var/lib/zookeeper</div><div class="line">clientPort=2181</div><div class="line">initLimit=5 </div><div class="line">syncLimit=2</div><div class="line">server.1=zoo1:2888:3888</div><div class="line">server.2=zoo2:2888:3888</div><div class="line">server.3=zoo3:2888:3888</div></pre></td></tr></table></figure>
-<ul>
-<li>initLimit: 限定quorum中的Zookeeper服务器连接到Leader的超时时间。（eg.initLimit的超时时间是5个标记号，2000毫秒一个标记，就是10秒） </li>
-<li>server.x: 列出了构成Zookeeper服务的服务器(eg.通过查找data目录中的myid文件知道是哪个服务。这个myid个文件包含了服务编号，用ASCII)</li>
-<li>端口号2888和3888：服务器节点使用前面的端口连接到其他节点。便于同事之间的通信（eg.对更新的顺序取得统一的意见）<blockquote>
-<p>一个Zookeeper的服务器用这个端口连接follower到leader。当一个新的leader产生时，follower使用这个端口打开一个TCP连接，连接到leader。因为默认的leader选举也使用TCP。我们现在需要另一个端口用来leader选举。这是在服务器条目的第二个端口</p>
-</blockquote>
-</li>
-</ul>
-<hr>
-<p>注意：在一台机器上测试多台服务器，在服务器配置文件为每个server.x指定servername为localhost,和独有的quorum &amp; leader选举端口（也就是 2888:3888, 2889:3889, 2890:3890在上面的示例中）。当然分开dataDir和不同的clientPort也是非常重要的</p>
-<hr>
-<p>优化：获取更新的低延迟，有一个专门的事务日志目录非常重要。默认情况下，事务日志作为一个数据快照和myid文件放入同一个目录。datalogDir参数指示一个不同的目录用于事务日志</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2059,7 +2060,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">125</span>
+                <span class="site-state-item-count">126</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2070,7 +2071,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-count">48</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2081,7 +2082,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">98</span>
+                <span class="site-state-item-count">99</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
