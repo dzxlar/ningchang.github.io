@@ -254,6 +254,165 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/17/hashCode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/17/hashCode/" itemprop="url">hashCode()</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-17T16:19:33+08:00">
+                2017-08-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/源码/" itemprop="url" rel="index">
+                    <span itemprop="name">源码</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><pre><code>/**
+ *  计算公式
+ * s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
+ */
+ public int hashCode() {
+     int h = hash;
+     if (h == 0 &amp;&amp; value.length &gt; 0) {
+         char val[] = value;
+         for (int i = 0; i &lt; value.length; i++) {
+             h = 31 * h + val[i];
+         }
+         hash = h;
+     }
+     return h;
+ }
+</code></pre><h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><blockquote>
+<p>根据一定的规则将与对象相关的信息（比如对象的存储地址，对象的字段等）映射成一个数值，这个数值称作为散列值</p>
+</blockquote>
+<p><strong>注意:虽然不能根据hashcode值判断两个对象是否相等，但是可以直接根据hashcode值判断两个对象不等，如果两个对象的hashcode值不等，则必定是两个不同的对象。如果要判断两个对象是否真正相等，必须通过equals方法</strong></p>
+<ul>
+<li>如果equals()相等，hashCode()一定相等</li>
+<li>如果equals()不等，hashCode()一定不等</li>
+<li>如果hashCode()不等，equals()一定不等</li>
+<li>如果hashCode()相等，equals()不一定相等</li>
+</ul>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://my.oschina.net/u/3624220/blog/1512125" target="_blank" rel="external">hashCode和equals</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/17/Https学习笔记-一/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2112,169 +2271,6 @@ threadPool.shutdown();
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/23/【多线程】线程中的原子操作基本概念/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/23/【多线程】线程中的原子操作基本概念/" itemprop="url">【多线程】线程中的原子操作基本概念</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-23T10:18:44+08:00">
-                2017-06-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/Atomic/" itemprop="url" rel="index">
-                    <span itemprop="name">Atomic</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>当一个请求在多线程环境下涉及到更新变量并且是原子性增长的，在线程非安全情况下可能会获得不同的值（例如：用户的点赞 A用户（A线程）点赞+1，B用户（B线程）点赞+1，最终得到的结果可能是2，不是3)</p>
-<p>为了保证程序在多线程环境下计数正确。Java引入atomic包（包内的原子操作类为更新一个变量提供一种高效、简单、线程安全的方式）</p>
-<p>因为变量类型有很多种所以在Atomic包内提供了13种原子操作类;属于4种类型的原子更新方式。分别是<strong>原子更新基本类型、原子更新数组、原子更新引用、原子更新属性(字段)</strong></p>
-<p><strong>Atomic包里的类基本都是使用Unsafe实现的包装类</strong></p>
-<h2 id="原子更新基本类"><a href="#原子更新基本类" class="headerlink" title="原子更新基本类"></a>原子更新基本类</h2><ul>
-<li>AtomicInteger:原子更新整型</li>
-<li>AtomicBoolean:原子更新布尔类型</li>
-<li>AtomicLong:原子更新长整型</li>
-</ul>
-<h2 id="原子更新数组"><a href="#原子更新数组" class="headerlink" title="原子更新数组"></a>原子更新数组</h2><ul>
-<li>AtomicIntegerArray 原子更新整型数组的元素</li>
-<li>AtomicLongArray 原子更新长整型数组的元素</li>
-<li>AtomicReferenceArray 原子更新引用类型数组的元素</li>
-</ul>
-<h2 id="原子更新引用类型"><a href="#原子更新引用类型" class="headerlink" title="原子更新引用类型"></a>原子更新引用类型</h2><ul>
-<li>AtomicReference 更新引用类型</li>
-<li>AtomicReferenceFieldUpdater 更新引用类型的字段</li>
-<li>AtomicMarkableReference 更新带有标记位的引用类型</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2324,7 +2320,7 @@ threadPool.shutdown();
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">128</span>
+                <span class="site-state-item-count">129</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2335,7 +2331,7 @@ threadPool.shutdown();
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2346,7 +2342,7 @@ threadPool.shutdown();
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">101</span>
+                <span class="site-state-item-count">102</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
