@@ -254,6 +254,585 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:02:52+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理"><a href="#《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理"></a>《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理</h2><blockquote>
+<p>单实例不能支撑用户请求的时候，就需要进行扩容</p>
+</blockquote>
+<p>如果用户访问 <a href="https://www.tmall.com" target="_blank" rel="external">https://www.tmall.com</a> 的方式访问请求，浏览器首先会查询DNS服务器所对应IP，然后通过IP访问对应服务器</p>
+<h4 id="方式"><a href="#方式" class="headerlink" title="方式"></a>方式</h4><p>www.tmall.com 域名映射多个IP，但是如果某台服务器重启或出现故障，DNS存在一定缓存时间，故障后切换时间长，且没有对后端服务进行心跳检测和失败重试的机制</p>
+<ul>
+<li>外网DNS通过GSLB(全局负载均衡)进行流量调度<ul>
+<li>查看公网ip<ul>
+<li>站长工具 - DNS查询 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>内网DNS通过简单的轮询负载均衡<ul>
+<li>HaProxy 和 Nginx</li>
+</ul>
+</li>
+</ul>
+<h3 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h3><p>Nginx通常用于七层负载，限制一定的吞吐量，为了提升吞吐量会在DNS和Nginx中引入接入层(LVS、F5做4层负载均衡)</p>
+<p><strong>首先通过DNS解析LVS/F5，然后LVS/F5转发给Nginx，再由Nginx转发给后端RealServer</strong></p>
+<p>业务开发人员只需关心Nginx层面，LVS/F5会由运维人员维护</p>
+<p>Nginx1.9.0以后开始支持TCP(ngx_stream_upstream_module)四层负载均衡</p>
+<h4 id="概念理解"><a href="#概念理解" class="headerlink" title="概念理解"></a>概念理解</h4><p>二层负载均衡<br>通过改写报文的目标MAC地址为上游服务器MAC地址</p>
+<ol>
+<li>源Ip地址和目标Ip地址不变</li>
+<li>负载均衡服务器和真实服务器共享一个VIP</li>
+</ol>
+<p>四层负载均衡</p>
+<ol>
+<li>根据端口将报文转发到上游服务器(不同的Ip的地址 + 端口)</li>
+</ol>
+<p>七层负载均衡</p>
+<ol>
+<li>根据端口号和应用层协议的主机名、URL、转发报文到上游服务器</li>
+</ol>
+<h2 id="负载均衡核心"><a href="#负载均衡核心" class="headerlink" title="负载均衡核心"></a>负载均衡核心</h2><ol>
+<li>上游服务器(upstream server)配置</li>
+<li>负载均衡算法</li>
+<li>失败重试机制</li>
+<li>服务器心跳检查</li>
+</ol>
+<hr>
+<h3 id="upstream-配置上游服务器（真实业务服务器）"><a href="#upstream-配置上游服务器（真实业务服务器）" class="headerlink" title="upstream 配置上游服务器（真实业务服务器）"></a>upstream 配置上游服务器（真实业务服务器）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>IP地址和端口</li>
+<li>权重：默认为1.权重越高分配给这台服务器的请求越多(如上每3次请求就有1次转发给8080，另外2次转发给8070)</li>
+</ul>
+<h3 id="proxy-pass-处理用户请求"><a href="#proxy-pass-处理用户请求" class="headerlink" title="proxy_pass 处理用户请求"></a>proxy_pass 处理用户请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    proxy_pass http://realServer;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>当访问Nginx时，会将请求反向代理到realServer配置的upstream server中</li>
+</ul>
+<hr>
+<h2 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h2><ul>
+<li>round-robin：轮询(默认)</li>
+<li>ip_hash：根据客户IP进行均衡负载（即相同的ip分配给同一个upstream server</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    ip_hash;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>hash 算法：根据请求uri进行负载均衡，可以使用Nginx变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    hash $uri;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>hash key[consistant]:对某一个key进行哈希或者使用一致性hash算法进行负载均衡</p>
+<ul>
+<li>使用hash算法存在的问题<ul>
+<li>当添加/删除一台服务器时，将导致很多key被重新负载均衡到不同服务器：所以建议使用一致性hash算法，只有少数key被重新负载均衡到不同服务器中</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>根据动态consistent_key指定<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    hash $consistent_key consistent;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>location指定一致性hash，会优先考虑请求参数cat，若没有，则根据请求uri进行负载<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    set $consistent_key $arg_cat;</div><div class="line">    if($consistent_key = &quot;&quot;)&#123;</div><div class="line">        set $consistent_key $request_uri;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="失败重试"><a href="#失败重试" class="headerlink" title="失败重试"></a>失败重试</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 max_fails=2 fail_timeout=10s weight=1;</div><div class="line">    server 172.16.42.81:8070 max_fails=2 fail_timeout=10s weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>当fail_timeout时间内失败了max_fails次，则认为该服务器不可用，然后摘掉该服务器，fail_timeouth后再次将服务器加入到存活服务器列表<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    proxy_connect_timeout 5s;</div><div class="line">    proxy_read_timeout 5s;</div><div class="line">    proxy_send_timeout 5s;</div><div class="line">    </div><div class="line">    proxy_next_upstream error timeout;</div><div class="line">    proxy_next_upstream_timeout 10s;</div><div class="line">    proxy_next_upstream_tries 2;</div><div class="line">    </div><div class="line">    proxy_pass http://realServer;</div><div class="line">    </div><div class="line">    add_header upstream_addr $upstream_addr;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h2 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h2><blockquote>
+<p>Nginx默认采用惰性策略，Nginx上夜班提供health_check进行主动健康检查; 也可以集成nginx_upstream_check_module模块进行健康检查</p>
+</blockquote>
+<h3 id="nginx-upstream-check-module"><a href="#nginx-upstream-check-module" class="headerlink" title="nginx_upstream_check_module"></a>nginx_upstream_check_module</h3><h4 id="TCP心跳检查"><a href="#TCP心跳检查" class="headerlink" title="TCP心跳检查"></a>TCP心跳检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">    check interval=3000 rise=1 fail=3 timeout=2000 type=tcp;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>interval 每个3s检测一次</li>
+<li>fail 失败多少次之后，目标不存活</li>
+<li>rise 成功多少次后，目标存活，并可以处理请求</li>
+<li>timeout 请求超时时间配置</li>
+</ul>
+<h4 id="Http心跳检查"><a href="#Http心跳检查" class="headerlink" title="Http心跳检查"></a>Http心跳检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">    check interval=3000 rise=1 fail=3 timeout=2000 type=http;</div><div class="line">    check_http_send &quot;HEAD /status HTTP/1.0\r\n\r\n&quot;;</div><div class="line">    check_http_expect_alive http_2xx http_3xx;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>check_http_send 检查时发出的http请求内容</li>
+<li>check_http_expect_alive 当上游服务器返回匹配的响应码，则认为上游服务器存活</li>
+</ul>
+<p>注意：间隔时间不能太短，否则可能因为心跳检查包太多造成上游服务器挂掉，同事设置合理超时时间</p>
+<p>安装健康检查模块需要先打nginx_upstream_check_module补丁，不然该模块不工作</p>
+<hr>
+<h2 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h2><h3 id="域名上游服务器"><a href="#域名上游服务器" class="headerlink" title="域名上游服务器"></a>域名上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server c0.3.cn;</div><div class="line">    server c1.3.cn;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Nginx社区版：在Nginx解析配置文件时将域名解析成IP地址并记到upstream上，当这两个域名对应ip发生变化时，不会更新，Nginx商业版支持动态更新</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">proxy_pass http://c0.3.cn</div></pre></td></tr></table></figure>
+<p>支持动态更新</p>
+<h3 id="备份上游服务器"><a href="#备份上游服务器" class="headerlink" title="备份上游服务器"></a>备份上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 backup;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="不可用上游服务器"><a href="#不可用上游服务器" class="headerlink" title="不可用上游服务器"></a>不可用上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 down;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="长连接"><a href="#长连接" class="headerlink" title="长连接"></a>长连接</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 backup;</div><div class="line">    keepalive 100;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>keepalive 每个Worker进程与上游服务器可缓存的空闲连接最大数量，当超过这个数量时，最近最少使用的链接被关闭</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    ## 支持keep-alive</div><div class="line">    proxy_http_version 1.1;</div><div class="line">    ## 支持http/1.0</div><div class="line">    proxy_set_header Connection &quot;Connection:Keep-Alive&quot;;</div><div class="line">    proxy_pass http://realServer;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>总长连接数 = 空闲连接池 + 释放连接池</p>
+<p>具体环境</p>
+<ul>
+<li>空闲连接池太小，连接不够用，需要不断建立连接</li>
+<li>空闲连接池太多，空闲连接太多，还未使用就超时</li>
+</ul>
+<p><strong>注意：尽量只对小报文开启长连接</strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:01:30+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则"><a href="#《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则"></a>《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则</h2><ul>
+<li>设计系统参考<strong>墨菲定律</strong><ol>
+<li>凡是可能出错的事必定会出错</li>
+<li>任何事情都没有表面看起来那么简单</li>
+<li>所有事情都比预想更长</li>
+<li>如果担心某种情况发生，这个事情可能发生</li>
+</ol>
+</li>
+<li>系统划分参考<strong>康威定律</strong><ol>
+<li><a href="https://yq.aliyun.com/articles/8611" target="_blank" rel="external">微服务基础-康威定律</a></li>
+<li>系统架构是公司组织架构的反映</li>
+<li>应该按照业务闭环对系统/组织架构划分，实现闭环/高内聚/低耦合</li>
+<li>如果沟通出现问题，应该考虑进行系统和组织架构调整</li>
+<li>在合适的时机进行系统拆分</li>
+</ol>
+</li>
+<li>合理利用资源参考<strong>二八定律(帕雷托法则)</strong><ol>
+<li>80%的结果取决于20%的原因</li>
+</ol>
+</li>
+</ul>
+<h3 id="高并发原则"><a href="#高并发原则" class="headerlink" title="高并发原则"></a>高并发原则</h3><ul>
+<li><strong>无状态</strong><blockquote>
+<ol>
+<li>应用是无状态的，比较容易进行水平扩展</li>
+<li>实际生产环境: 应用无状态;配置文件有状态;</li>
+<li>比如: 不同机房读取不同数据源，通过配置文件或者配置中心指定</li>
+</ol>
+</blockquote>
+</li>
+<li><strong>拆分</strong><blockquote>
+<p>根据业务环境考虑采取”单一系统”还是”按功能拆封模块”<br>拆分情况</p>
+<ul>
+<li>系统维度：系统功能/模块拆分<ul>
+<li>商品系统、购物车、结算、订单系统等</li>
+</ul>
+</li>
+<li>功能维度：功能再拆分<ul>
+<li>优惠券系统拆分:创建券、领券、用券系统</li>
+</ul>
+</li>
+<li>读写维度：根据读写比例特征进行拆分<ul>
+<li>读服务，可考虑缓存</li>
+<li>写服务，可考虑分库分表</li>
+<li>聚合读取，可考虑异构拆分系统</li>
+</ul>
+</li>
+<li>AOP维度：根据访问特征，进行AOP拆分<ul>
+<li>商品详情页分为CDN和页面渲染系统</li>
+</ul>
+</li>
+<li>模块维度：基础和代码维护特征进行拆分<ul>
+<li>Service、Dao、Web三层结构</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>服务化</strong></p>
+<blockquote>
+<p>总结: 进程内调用 -&gt; 单机远程调用 -&gt;<br>集群手动注册 -&gt; 自动注册和发现 -&gt;<br>服务分组/隔离/路由 -&gt; 服务治理(限流/白名单)</p>
+</blockquote>
+</li>
+<li><p><strong>消息队列</strong></p>
+<blockquote>
+<ul>
+<li>处理不需要同步调用的服务或者订阅一些系统关心<br>的变化从而达到服务解耦(一对多消费)、异步处理<br>、流量削峰/缓冲等</li>
+<li>比如:订单系统、定期送系统、订单风控系统等</li>
+<li>如果订阅者太多，那么订阅单个消息队列会成为瓶颈。考虑对消息队列进行镜像复制</li>
+<li>注意事项：处理生产消息失败、消息重复接收等问题<ul>
+<li>数据重复接收<ul>
+<li>大流量缓冲:牺牲强一致性、保证最终一致性<ul>
+<li>比如: 扣减库存: Redis扣减 -&gt; 记录日志<br>-&gt; 同步Worker -&gt; 库存DB</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>同步Worker设计时，须考虑并发处理和重复处理<br>比如使用扫描处理(部分表) 还是 集群处理(Map-Reduce).考虑是否对订单列表增加字段:处理人、处理状态、处理时间、失败次数等<ul>
+<li>数据校对<ul>
+<li>通过消息异步机制，可能存在数据丢失情况<br>通过数据校对保证数据一致和完整性（比如.<br>通过Worker定期扫描原始表，对业务数据进行校对</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>数据异构</strong></p>
+</li>
+<li><p><strong>数据闭环</strong></p>
+<blockquote>
+<p>例如商品详情页. 由于数据来源过多，影响服务器稳定,最好的办法是将数据进行异构存储,形成数据闭环</p>
+<ol>
+<li>数据异构<ul>
+<li>通过MQ接收数据变更、然后原子化存储到合适引擎，如Redis或者KV存储</li>
+</ul>
+</li>
+<li>数据聚合<ul>
+<li>&lt;可选&gt; 数据从多个数据源拿出，然后前端进行聚合</li>
+</ul>
+</li>
+<li>前端展示<ul>
+<li>通过一次或者少量次数拿到所需数据</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<p><strong>总结：数据异构和数据闭环是同一个概念，目的实现数据的自我控制，当其他系统出问题时不影响自己系统。或者自己出问题不影响其他系统。一般通过消息队列进行数据分发</strong></p>
+<ul>
+<li><p>缓存银弹</p>
+<ul>
+<li>客户端缓存<ul>
+<li>浏览器缓存/客户端应用缓存<ul>
+<li>设置Expires/Cache-Control进行控制</li>
+<li>针对实时性不高的数据</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>客户端网络<ul>
+<li>代理服务器开启缓存<ul>
+<li>APP缓存静态资源文件</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>广域网<ul>
+<li>代理服务器/镜像服务器/p2p</li>
+</ul>
+</li>
+<li><p>源站及源站网络</p>
+<ul>
+<li>接入层缓存/应用层缓存/分布式缓存/静态化、伪静态化/服务器操作系统提供的缓存<ul>
+<li>接入式缓存：Nginx搭建接入层:URL重写、一致性hash、proxy_cache、proxy_cache_lock、shared_dict(Nginx+Lua)</li>
+<li>应用层缓存：使用Tomcat:使用堆内缓存和堆外缓存。local redis cache（多机使用主从机制同步数据)</li>
+<li>分布式缓存：常见分片规则一致性hash</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>并发化</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="高可用原则"><a href="#高可用原则" class="headerlink" title="高可用原则"></a>高可用原则</h2><ul>
+<li>降级<ul>
+<li>对于一个高可用服务，很重要的设计是降级开关。<ol>
+<li>开关集中化管理</li>
+<li>可降级的多级读服务</li>
+<li>开关前置化</li>
+<li>业务降级</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>限流<ul>
+<li>限流的目的：防止恶意请求流量、恶意攻击或者防止流量超出峰值<ol>
+<li>恶意请求流量只到cache</li>
+<li>对于穿透到后端应用的流量，通过Nginx的limit模块进行处理</li>
+<li>对于恶意Ip通过Nginx deny屏蔽</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>切流量</p>
+<ul>
+<li><p>比如：多机房某个机房挂了、某个服务器挂了、某个机架挂了都需要切流量。</p>
+<ol>
+<li>DNS：切换机房入口</li>
+<li>HttpDNS：主要APP环境下，客户端分配流量入口，绕过运营商LocalDNS实现精准流量调度</li>
+<li>LVS：切换故障Nginx接入层</li>
+<li>Nginx：切换故障应用层</li>
+</ol>
+</li>
+<li><p>可回滚<br>通过版本号实现追溯回滚。比如：数据回滚、事务回滚、部署版本回滚、静态资源回滚等</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="业务设计原则"><a href="#业务设计原则" class="headerlink" title="业务设计原则"></a>业务设计原则</h2><ul>
+<li>防重设计<blockquote>
+<p>考虑防重key或者防重表</p>
+</blockquote>
+</li>
+<li>幂等设计</li>
+<li>流程可定义</li>
+<li>状态与状态机</li>
+<li>后台操作系统可反馈</li>
+<li>后台系统审批化</li>
+<li>文档和注释</li>
+<li>备份</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1581,414 +2160,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/" itemprop="url">【设计模式】创建型模式—— 工厂模式(Factory Pattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li>简单工厂</li>
-<li>工厂方法</li>
-<li>抽象工厂</li>
-</ol>
-<h3 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h3><blockquote>
-<p><strong>根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。在简单工厂模式中用于创建实例的方法是静态方法，因此简单工厂模式又被称为静态工厂方法(StaticFactoryMethod)模式，属于类创建型模式</strong></p>
-</blockquote>
-<h3 id="简单工厂模式优点"><a href="#简单工厂模式优点" class="headerlink" title="简单工厂模式优点"></a>简单工厂模式优点</h3><ul>
-<li>工厂类含有必要的判断逻辑，可以决定在什么时候创建哪一个产品类的实例，客户端可以免除直接创建产品对象的责任，而仅仅“消费”产品；简单工厂模式通过这种做法实现了对责任的分割，它提供了专门的工厂类用于创建对象。</li>
-<li>客户端无须知道所创建的具体产品类的类名，只需要知道具体产品类所对应的参数即可，对于一些复杂的类名，通过简单工厂模式可以减少使用者的记忆量。</li>
-<li>通过引入配置文件，可以在不修改任何客户端代码的情况下更换和增加新的具体产品类，在一定程度上提高了系统的灵活性。</li>
-</ul>
-<h3 id="简单工厂模式缺点"><a href="#简单工厂模式缺点" class="headerlink" title="简单工厂模式缺点"></a>简单工厂模式缺点</h3><ul>
-<li>由于工厂类集中了所有产品创建逻辑，一旦不能正常工作，整个系统都要受到影响。</li>
-<li>使用简单工厂模式将会增加系统中类的个数，在一定程序上增加了系统的复杂度和理解难度。</li>
-<li>系统扩展困难，一旦添加新产品就不得不修改工厂逻辑，在产品类型较多时，有可能造成工厂逻辑过于复杂，不利于系统的扩展和维护。</li>
-<li>简单工厂模式由于使用了静态工厂方法，造成工厂角色无法形成基于继承的等级结构。</li>
-</ul>
-<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ol>
-<li>工厂类负责创建的对象比较少，由于创建的对象较少，不会造成工厂方法中的业务逻辑太过复杂。</li>
-<li>客户端只知道传入工厂类的参数，对于如何创建对象并不关心。</li>
-</ol>
-<h3 id="简单工厂结构"><a href="#简单工厂结构" class="headerlink" title="简单工厂结构"></a>简单工厂结构</h3><p><img src="http://img.blog.csdn.net/20170330163156608?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<ul>
-<li>Factory（工厂角色）：工厂角色即工厂类，它是简单工厂模式的核心，负责实现创建所有产品实例的内部逻辑；工厂类可以被外界直接调用，创建所需的产品对象</li>
-<li>Product（抽象产品角色）：它是工厂类所创建的所有对象的父类，封装了各种产品对象的公有方法</li>
-<li>ConcreteProduct（具体产品角色）：它是简单工厂模式的创建目标，所有被创建的对象都充当这个角色的某个具体类的实例</li>
-</ul>
-<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">abstract class Product &#123;  </div><div class="line">    //所有产品类的公共业务方法  </div><div class="line">    public void methodSame() &#123;  </div><div class="line">        //公共方法的实现  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    //声明抽象业务方法  </div><div class="line">    public abstract void methodDiff();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class ConcreteProduct extends Product &#123;  </div><div class="line">    //实现业务方法  </div><div class="line">    public void methodDiff() &#123;  </div><div class="line">        //业务方法的实现  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class StaticFactory &#123;  </div><div class="line">    //静态工厂方法  </div><div class="line">    public static Product createFactory(String type) &#123;  </div><div class="line">        Product product = null;  </div><div class="line">        if (type.equalsIgnoreCase(&quot;A&quot;)) &#123;  </div><div class="line">            product = new ConcreteProductA();  </div><div class="line">            //初始化设置product  </div><div class="line">        &#125;  </div><div class="line">        else if (type.equalsIgnoreCase(&quot;B&quot;)) &#123;  </div><div class="line">            product = new ConcreteProductB();  </div><div class="line">            //初始化设置product  </div><div class="line">        &#125;  </div><div class="line">        return product;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class Client &#123;  </div><div class="line">    public static void main(String args[]) &#123;  </div><div class="line">        Product product;   </div><div class="line">        product = StaticFactory.createFactory(&quot;A&quot;); //通过工厂类创建产品对象  </div><div class="line">        product.methodSame();  </div><div class="line">        product.methodDiff();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>总结：当系统中需要引入新产品时，由于静态工厂方法通过所传入参数的不同来创建不同的产品，这必定要修改工厂类的源代码，将违背“开闭原则”，如何实现增加新产品而不影响已有代码？工厂方法模式应运而生</p>
-</blockquote>
-<hr>
-<h3 id="工厂方法模式定义"><a href="#工厂方法模式定义" class="headerlink" title="工厂方法模式定义"></a>工厂方法模式定义</h3><blockquote>
-<p><strong>定义一个用于创建对象的接口，让子类决定将哪一个类实例化。工厂方法模式让一个类的实例化延迟到其子类</strong>。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>工厂方法模式又简称为工厂模式(Factory Pattern)，又可称作虚拟构造器模式(Virtual Constructor Pattern)或多态工厂模式(Polymorphic Factory Pattern)。工厂方法模式是一种类创建型模式。</p>
-</blockquote>
-<h3 id="工厂方法优点"><a href="#工厂方法优点" class="headerlink" title="工厂方法优点"></a>工厂方法优点</h3><ul>
-<li>在工厂方法模式中，工厂方法用来创建客户所需要的产品，同时还向客户隐藏了哪种具体产品类将被实例化这一细节，用户只需要关心所需产品对应的工厂，无须关心创建细节，甚至无须知道具体产品类的类名。</li>
-<li>基于工厂角色和产品角色的多态性设计是工厂方法模式的关键。它能够使工厂可以自主确定创建何种产品对象，而如何创建这个对象的细节则完全封装在具体工厂内部。工厂方法模式之所以又被称为多态工厂模式，是因为所有的具体工厂类都具有同一抽象父类。</li>
-<li>使用工厂方法模式的另一个优点是在系统中加入新产品时，无须修改抽象工厂和抽象产品提供的接口，无须修改客户端，也无须修改其他的具体工厂和具体产品，而只要添加一个具体工厂和具体产品就可以了。这样，系统的可扩展性也就变得非常好，完全符合“开闭原则”。</li>
-</ul>
-<h3 id="工厂方法缺点"><a href="#工厂方法缺点" class="headerlink" title="工厂方法缺点"></a>工厂方法缺点</h3><ul>
-<li>在添加新产品时，需要编写新的具体产品类，而且还要提供与之对应的具体工厂类，系统中类的个数将成对增加，在一定程度上增加了系统的复杂度，有更多的类需要编译和运行，会给系统带来一些额外的开销。</li>
-<li>由于考虑到系统的可扩展性，需要引入抽象层，在客户端代码中均使用抽象层进行定义，增加了系统的抽象性和理解难度，且在实现时可能需要用到DOM、反射等技术，增加了系统的实现难度。</li>
-</ul>
-<h3 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
-<li>一个类不知道它所需要的对象的类：在工厂方法模式中，客户端不需要知道具体产品类的类名，只需要知道所对应的工厂即可，具体的产品对象由具体工厂类创建；客户端需要知道创建具体产品的工厂类。</li>
-<li>一个类通过其子类来指定创建哪个对象：在工厂方法模式中，对于抽象工厂类只需要提供一个创建产品的接口，而由其子类来确定具体要创建的对象，利用面向对象的多态性和里氏代换原则，在程序运行时，子类对象将覆盖父类对象，从而使得系统更容易扩展。</li>
-<li>将创建对象的任务委托给多个工厂子类中的某一个，客户端在使用时可以无须关心是哪一个工厂子类创建产品子类，需要时再动态指定，可将具体工厂类的类名存储在配置文件或数据库中。</li>
-</ul>
-<h3 id="工厂方法结构"><a href="#工厂方法结构" class="headerlink" title="工厂方法结构"></a>工厂方法结构</h3><p><img src="http://img.blog.csdn.net/20170330170347737?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<ol>
-<li><p>工厂方法的重载</p>
-<blockquote>
-<p>在抽象工厂中定义多个重载的工厂方法，在具体工厂中实现了这些工厂方法，这些方法可以包含不同的业务逻辑，以满足对不同产品对象的需求</p>
-</blockquote>
-</li>
-<li><p>工厂方法的隐藏</p>
-<blockquote>
-<p>客户端无须调用工厂方法创建产品，直接通过工厂即可使用所创建的对象中的业务方法</p>
-</blockquote>
-</li>
-</ol>
-<blockquote>
-<p> <strong>工厂方法模式是简单工厂模式的延伸，它继承了简单工厂模式的优点，同时还弥补了简单工厂模式的不足。工厂方法模式是使用频率最高的设计模式之一，是很多开源框架和API类库的核心模式</strong></p>
-</blockquote>
-<h3 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">interface Factory &#123;  </div><div class="line">    public Product factoryMethod();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactory implements Factory &#123;  </div><div class="line">    public Product factoryMethod() &#123;  </div><div class="line">        return new ConcreteProduct();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Factory factory;  </div><div class="line">factory = new ConcreteFactory(); //可通过配置文件实现  </div><div class="line">Product product;  </div><div class="line">product = factory.factoryMethod();</div></pre></td></tr></table></figure>
-<ul>
-<li>可以通过配置文件来存储具体工厂类ConcreteFactory的类名，更换新的具体工厂时无须修改源代码，系统扩展更为方便</li>
-<li>在实际使用时，具体工厂类在实现工厂方法时除了创建具体产品对象之外，还可以负责产品对象的初始化工作以及一些资源和环境配置工作，例如连接数据库、创建文件</li>
-</ul>
-<blockquote>
-<p>总结：  工厂方法模式通过引入工厂等级结构，解决了简单工厂模式中工厂类职责太重的问题，但由于工厂方法模式中的每个工厂只生产一类产品，可能会导致系统中存在大量的工厂类，势必会增加系统的开销。此时，我们可以考虑将一些相关的产品组成一个“产品族”，由同一个工厂来统一生产</p>
-</blockquote>
-<hr>
-<h3 id="抽象工厂模式定义"><a href="#抽象工厂模式定义" class="headerlink" title="抽象工厂模式定义"></a>抽象工厂模式定义</h3><blockquote>
-<p><strong>提供一个创建一系列相关或相互依赖对象的接口，而无须指定它们具体的类。抽象工厂模式又称为Kit模式，属于对象创建型模式</strong></p>
-</blockquote>
-<h2 id="抽象工厂模式优点"><a href="#抽象工厂模式优点" class="headerlink" title="抽象工厂模式优点"></a>抽象工厂模式优点</h2><ul>
-<li>抽象工厂模式隔离了具体类的生成，使得客户并不需要知道什么被创建。由于这种隔离，更换一个具体工厂就变得相对容易。所有的具体工厂都实现了抽象工厂中定义的那些公共接口，因此只需改变具体工厂的实例，就可以在某种程度上改变整个软件系统的行为</li>
-<li>当一个产品族中的多个对象被设计成一起工作时，它能够保证客户端始终只使用同一个产品族中的对象。这对一些需要根据当前环境来决定其行为的软件系统来说，是一种非常实用的设计模式。</li>
-<li>增加新的具体工厂和产品族很方便，无须修改已有系统，符合“开闭原则”。<h2 id="抽象工厂模式缺点"><a href="#抽象工厂模式缺点" class="headerlink" title="抽象工厂模式缺点"></a>抽象工厂模式缺点</h2></li>
-<li>在添加新的产品对象时，难以扩展抽象工厂来生产新种类的产品，这是因为在抽象工厂角色中规定了所有可能被创建的产品集合，要支持新种类的产品就意味着要对该接口进行扩展，而这将涉及到对抽象工厂角色及其所有子类的修改，显然会带来较大的不便。</li>
-<li>开闭原则的倾斜性（增加新的工厂和产品族容易，增加新的产品等级结构麻烦）。<h2 id="适用场景-2"><a href="#适用场景-2" class="headerlink" title="适用场景"></a>适用场景</h2></li>
-<li>一个系统不应当依赖于产品类实例如何被创建、组合和表达的细节，这对于所有类型的工厂模式都是重要的。</li>
-<li>系统中有多于一个的产品族，而每次只使用其中某一产品族。</li>
-<li>属于同一个产品族的产品将在一起使用，这一约束必须在系统的设计中体现出来。</li>
-<li>系统提供一个产品类的库，所有的产品以同样的接口出现，从而使客户端不依赖于具体实现。<h2 id="抽象模式结构"><a href="#抽象模式结构" class="headerlink" title="抽象模式结构"></a>抽象模式结构</h2><img src="http://img.blog.csdn.net/20170330174255240?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></li>
-</ul>
-<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class AbstractFactory &#123;  </div><div class="line">public abstract AbstractProductA createProductA(); //工厂方法一  </div><div class="line">public abstract AbstractProductB createProductB(); //工厂方法二  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryA extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductA1 createProductA1() &#123;  </div><div class="line">    return new ProductA1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductA2 createProductA2() &#123;  </div><div class="line">    return new ProductA2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryB extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductB1 createProductB1() &#123;  </div><div class="line">    return new ProductB1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductB2 createProductB2() &#123;  </div><div class="line">    return new ProductB2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/" itemprop="url">【设计模式】结构性模式—— 代理模式（Proxy Pattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="代理模式定义"><a href="#代理模式定义" class="headerlink" title="代理模式定义"></a>代理模式定义</h3><blockquote>
-<p><strong>给某一个对象提供一个代理，并由代理对象控制对原对象的引用。它是一种对象结构型模式</strong></p>
-</blockquote>
-<h3 id="代理模式的优点"><a href="#代理模式的优点" class="headerlink" title="代理模式的优点"></a>代理模式的优点</h3><ul>
-<li>代理模式能够协调调用者和被调用者，在一定程度上降低了系统的耦合度。</li>
-<li>远程代理使得客户端可以访问在远程机器上的对象，远程机器 可能具有更好的计算性能与处理速度，可以快速响应并处理客户端请求。</li>
-<li>虚拟代理通过使用一个小对象来代表一个大对象，可以减少系 统资源的消耗，对系统进行优化并提高运行速度。</li>
-<li>保护代理可以控制对真实对象的使用权限。</li>
-</ul>
-<h3 id="代理模式缺点"><a href="#代理模式缺点" class="headerlink" title="代理模式缺点"></a>代理模式缺点</h3><ul>
-<li>由于在客户端和真实主题之间增加了代理对象，因此 有些类型的代理模式可能会造成请求的处理速度变慢。</li>
-<li>实现代理模式需要额外的工作，有些代理模式的实现 非常复杂。</li>
-</ul>
-<h3 id="代理模式结构"><a href="#代理模式结构" class="headerlink" title="代理模式结构"></a>代理模式结构</h3><p><img src="http://img.blog.csdn.net/20170331105829488?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class Subject  </div><div class="line">&#123;  </div><div class="line">    public abstract void doRequest();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class RealSubject extend Subject  </div><div class="line">&#123;  </div><div class="line">	@Override</div><div class="line">    public void doRequest()  </div><div class="line">    &#123;  </div><div class="line">        //业务方法具体实现代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Proxy extend Subject  </div><div class="line">&#123;  </div><div class="line">    private RealSubject realSubject = new RealSubject(); //维持一个对真实主题对象的引用  </div><div class="line">  </div><div class="line">    public void beforeRequest()   </div><div class="line">    &#123;  </div><div class="line">        …...  </div><div class="line">    &#125;  </div><div class="line">    @Override</div><div class="line">    public void doRequest()   </div><div class="line">    &#123;  </div><div class="line">        beforeRequest();  </div><div class="line">        realSubject.doRequest(); //调用真实主题对象的方法  </div><div class="line">        afterRequest();  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    public void afterRequest()   </div><div class="line">    &#123;  </div><div class="line">        ……  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p>代理类型</p>
-<ul>
-<li>远程(Remote)代理：为一个位于不同的地址空间的对象提供一个本地 的代理对象，这个不同的地址空间可以是在同一台主机中，也可是在 另一台主机中，远程代理又叫做大使(Ambassador)。</li>
-<li>虚拟(Virtual)代理：如果需要创建一个资源消耗较大的对象，先创建一个消耗相对较小的对象来表示，真实对象只在需要时才会被真正创建。</li>
-<li>Copy-on-Write代理：它是虚拟代理的一种，把复制（克隆）操作延迟 到只有在客户端真正需要时才执行。一般来说，对象的深克隆是一个 开销较大的操作，Copy-on-Write代理可以让这个操作延迟，只有对象被用到的时候才被克隆。</li>
-<li>保护(Protect or Access)代理：控制对一个对象的访问，可以给不同的用户提供不同级别的使用权限。</li>
-<li>缓冲(Cache)代理：为某一个目标操作的结果提供临时的存储空间，以便多个客户端可以共享这些结果。</li>
-<li>防火墙(Firewall)代理：保护目标不让恶意用户接近。<br>同步化(Synchronization)代理：使几个用户能够同时使用一个对象而没有冲突。</li>
-<li>智能引用(Smart Reference)代理：当一个对象被引用时，提供一些额外的操作，如将此对象被调用的次数记录下来等。</li>
-</ul>
-<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ul>
-<li>动态代理是一种较为高级的代理模式，它的典型应用就是Spring AOP。</li>
-<li>在传统的代理模式中，客户端通过Proxy调用RealSubject类的doRequest()方法，同时还在代理类中封装了其他方法(如beforeRequest()和afterRequest())，可以处理一些其他问题。</li>
-<li>如果按照这种方法使用代理模式，那么真实主题角色必须是事先已经存在的，并将其作为代理对象的内部成员属性。如果一个真实主题角色必须对应一个代理主题角色，这将导致系统中的类个数急剧增加，因此需要想办法减少系统中类的个数，此外，如何在事先不知道真实主题角色的情况下使用代理主题角色，这都是动态代理需要解决的问题。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2038,7 +2209,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">126</span>
+                <span class="site-state-item-count">128</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2049,7 +2220,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">49</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2060,7 +2231,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">99</span>
+                <span class="site-state-item-count">101</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
