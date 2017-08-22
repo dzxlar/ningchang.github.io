@@ -254,6 +254,193 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-一-——-入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-一-——-入门/" itemprop="url">ElasticSearch学习笔记(一) —— 入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:21:09+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="ElasticSearch是什么"><a href="#ElasticSearch是什么" class="headerlink" title="ElasticSearch是什么"></a>ElasticSearch是什么</h2><blockquote>
+<p>Elasticsearch是一个基于Apache Lucene(TM)的开源搜索引擎。无论在开源还是专有领域，Lucene可以被认为是迄今为止最先进、性能最好的、功能最全的搜索引擎库。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Elasticsearch也使用Java开发并使用Lucene作为其核心来实现所有索引和搜索的功能，但是它的目的是通过简单的RESTful API来隐藏Lucene的复杂性，从而让全文搜索变得简单</p>
+</blockquote>
+<ul>
+<li>分布式的实时文件存储，每个字段都被索引并可被搜索</li>
+<li>分布式的实时分析搜索引擎</li>
+<li>可以扩展到上百台服务器，处理PB级结构化或非结构化数据</li>
+</ul>
+<p>上手Elasticsearch非常容易。它提供了许多合理的缺省值，并对初学者隐藏了复杂的搜索引擎理论。它开箱即用（安装即可使用），只需很少的学习既可在生产环境中使用</p>
+<hr>
+<h3 id="与Elasticsearch交互"><a href="#与Elasticsearch交互" class="headerlink" title="与Elasticsearch交互"></a>与Elasticsearch交互</h3><p>如何与Elasticsearch交互取决于你是否使用Java</p>
+<p><strong>Java API</strong></p>
+<p>Elasticsearch为Java用户提供了两种内置客户端：</p>
+<h4 id="节点客户端-node-client"><a href="#节点客户端-node-client" class="headerlink" title="节点客户端(node client)"></a>节点客户端(node client)</h4><p>节点客户端以<strong>无数据节点(none data node)身份加入集群</strong>，换言之，它自己不存储任何数据，但是它知道数据在集群中的具体位置，并且<strong>能够直接转发请求到对应的节点上</strong>。</p>
+<h4 id="传输客户端-Transport-client"><a href="#传输客户端-Transport-client" class="headerlink" title="传输客户端(Transport client)"></a>传输客户端(Transport client)</h4><p>这个更轻量的传输客户端能够发送请求到远程集群。它自己不加入集群，只是简单<strong>转发请求给集群中的节点</strong>。</p>
+<p><strong>两个Java客户端都通过9300端口与集群交互，使用Elasticsearch传输协议(Elasticsearch Transport Protocol)</strong></p>
+<p><strong>集群中的节点之间也通过9300端口进行通信。如果此端口未开放，你的节点将不能组成集群</strong></p>
+<blockquote>
+<p>TIP<br>Java客户端所在的Elasticsearch版本必须与集群中其他节点一致，否则，它们可能互相无法识别。</p>
+</blockquote>
+<h3 id="基于HTTP协议，以JSON为数据交互格式的RESTful-API"><a href="#基于HTTP协议，以JSON为数据交互格式的RESTful-API" class="headerlink" title="基于HTTP协议，以JSON为数据交互格式的RESTful API"></a>基于HTTP协议，以JSON为数据交互格式的RESTful API</h3><p><strong>其他所有程序语言都可以使用RESTful API，通过9200端口的与Elasticsearch进行通信</strong>，你可以使用你喜欢的WEB客户端，事实上，如你所见，你甚至可以通过curl命令与Elasticsearch通信</p>
+<p>请求格式和普通的Http请求相同<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -X&lt;VERB&gt; &apos;&lt;PROTOCOL&gt;://&lt;HOST&gt;:&lt;PORT&gt;/&lt;PATH&gt;?&lt;QUERY_STRING&gt;&apos; -d &apos;&lt;BODY&gt;&apos;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>VERB HTTP方法：GET, POST, PUT, HEAD, DELETE</li>
+<li>PROTOCOL http或者https协议（只有在Elasticsearch前面有https代理的时候可用）</li>
+<li>HOST Elasticsearch集群中的任何一个节点的主机名，如果是在本地的节点，那么就叫localhost</li>
+<li>PORT Elasticsearch HTTP服务所在的端口，默认为9200</li>
+<li>PATH API路径（例如_count将返回集群中文档的数量），PATH可以包含多个组件，例如_cluster/stats或者_nodes/stats/jvm</li>
+<li>QUERY_STRING 一些可选的查询请求参数，例如?pretty参数将使请求返回更加美观易读的JSON数据</li>
+<li>BODY 一个JSON格式的请求主体（如果请求需要的话）</li>
+</ul>
+<p>e.g 为了计算集群中的文档数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">curl -XGET &apos;http://localhost:9200/_count?pretty&apos; -d &apos;</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Elasticsearch返回一个类似200 OK的HTTP状态码和JSON格式的响应主体（除了HEAD请求）。上面的请求会得到如下的JSON格式的响应主体</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;count&quot; : 0,</div><div class="line">    &quot;_shards&quot; : &#123;</div><div class="line">        &quot;total&quot; : 5,</div><div class="line">        &quot;successful&quot; : 5,</div><div class="line">        &quot;failed&quot; : 0</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们看不到HTTP头是因为我们没有让curl显示它们，如果要显示，使用curl命令后跟-i参数:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XGET &apos;localhost:9200/&apos;</div></pre></td></tr></table></figure>
+<p>对于本书的其余部分，我们将简写curl请求中重复的部分，例如主机名和端口，还有curl命令本身。<br>一个完整的请求形如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">curl -XGET &apos;localhost:9200/_count?pretty&apos; -d &apos;</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;&apos;</div></pre></td></tr></table></figure>
+<p>将简写成这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">GET /_count</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>事实上，在Sense控制台中也使用了与上面相同的格式</p>
+<hr>
+<h3 id="面向文档"><a href="#面向文档" class="headerlink" title="面向文档"></a>面向文档</h3><blockquote>
+<p>Elasticsearch是面向文档(document oriented)的，这意味着它可以<strong>存储整个对象或文档(document)</strong>。然而<strong>它不仅仅是存储，还会索引(index)每个文档的内容使之可以被搜索</strong>。<em>在Elasticsearch中，你可以对文档（而非成行成列的数据）进行索引、搜索、排序、过滤。这种理解数据的方式与以往完全不同，这也是Elasticsearch能够执行复杂的全文搜索的原因之一</em></p>
+</blockquote>
+<h3 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h3><blockquote>
+<p>ELasticsearch使用Javascript对象符号(JavaScript Object Notation)，也就是JSON，作为文档序列化格式<br>使用JSON格式来表示一个用户对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;email&quot;:      &quot;john@smith.com&quot;,</div><div class="line">    &quot;first_name&quot;: &quot;John&quot;,</div><div class="line">    &quot;last_name&quot;:  &quot;Smith&quot;,</div><div class="line">    &quot;info&quot;: &#123;</div><div class="line">        &quot;bio&quot;:         &quot;Eco-warrior and defender of the weak&quot;,</div><div class="line">        &quot;age&quot;:         25,</div><div class="line">        &quot;interests&quot;: [ &quot;dolphins&quot;, &quot;whales&quot; ]</div><div class="line">    &#125;,</div><div class="line">    &quot;join_date&quot;: &quot;2014/05/01&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p><a href="https://es.xiaoleilu.com/010_Intro/15_API.html" target="_blank" rel="external">官方文档</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1935,293 +2122,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（四）-——-限流/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（四）-——-限流/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （四） —— 限流</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:03:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（四）-——-限流"><a href="#《亿级流量网站架构核心技术》学习笔记-（四）-——-限流" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （四） —— 限流"></a>《亿级流量网站架构核心技术》学习笔记 （四） —— 限流</h2><blockquote>
-<p><strong>限流的目的是通过对并发访问/请求进行限速或者一个时间窗口内的请求进行限速来保护系统</strong>,一旦达到限制速率可拒绝服务、排队或者等待、降级</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>限流标准可以通过压测数据找出每个系统的处理峰值，通过设置峰值，防止系统过载时，通过拒绝处理过载请求保障系统可用。另外通过吞吐量、响应时间、可用率动态调整峰值</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>常见限流手段：限制总并发数(etc.数据库连接池、连接池)、限制瞬时并发数(etc.Nginx的limit_conn)、限制时间窗口内的平均速率（etc.Nginx的limit_req）、限制远程接口调用速率、限制MQ消费速率、网络连接数、网络流量、CPU或者内存负载等</p>
-</blockquote>
-<hr>
-<h2 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a>限流算法</h2><ul>
-<li>令牌桶</li>
-<li>漏桶</li>
-<li>计数器(粗暴限流实现)</li>
-</ul>
-<h3 id="令牌桶"><a href="#令牌桶" class="headerlink" title="令牌桶"></a>令牌桶</h3><blockquote>
-<p>存放固定容量令牌的桶，按照固定速率往里面加令牌</p>
-</blockquote>
-<p>令牌桶描述如下</p>
-<ol>
-<li>假设限制2r/s，则按照500ms固定速率往桶中添加令牌</li>
-<li>桶中最多存放b个令牌，当桶满时，新添加的令牌丢弃或者拒绝</li>
-<li>当一个n个字节大小的数据包到达，将从桶中删除n个令牌，接着数据包被发送到网络</li>
-<li>如果桶中令牌没有n个，则不会被删除，且该数据包会被限流（要么丢弃、要么在缓冲区等待）</li>
-</ol>
-<hr>
-<h3 id="漏桶"><a href="#漏桶" class="headerlink" title="漏桶"></a>漏桶</h3><blockquote>
-<p><strong>漏桶作为计量工具时，可以用于流量整形和流量控制</strong></p>
-</blockquote>
-<p>漏桶描述如下<br>1.一个固定流量的漏桶，按照常量速率流出水滴<br>2.如果桶是空的，则不流出水滴<br>3.可以以任意速率流入水滴到漏桶<br>4.如果流入水滴超出了桶的容量，则流入的水滴溢出（丢弃），而漏桶是不变的</p>
-<hr>
-<h3 id="两种令牌算法的对比"><a href="#两种令牌算法的对比" class="headerlink" title="两种令牌算法的对比"></a>两种令牌算法的对比</h3><ul>
-<li>令牌桶通过固定速率往桶中添加令牌，请求是否被处理需要看桶中令牌是否足够，当令牌减为0时，拒绝新请求</li>
-<li>漏桶通过按照常量固定速率，流入请求速率任意，当流入的请求数累积到漏桶容量时，则新流入的请求被拒绝</li>
-<li>令牌桶限制的是平均速率(允许突发请求)，并允许一定程度的突发流量</li>
-<li>漏桶限制的是常量流出速率，从而平滑突发流入速率</li>
-<li>令牌桶允许一定程度的突发，而漏桶的目的是平滑流入速率</li>
-<li>两个算法实现可以一样，但是方向相反，对于相同参数得到的限流效果是一样的</li>
-</ul>
-<hr>
-<blockquote>
-<p><strong>通过计数器来进行限流，主要用于限制总并发数，</strong>比如线程池大小、数据库连接池大小、秒杀并发数都是计数器用法。只要全局总请求数或者一定时间段的总请求数达到设定阙值，则进行限流</p>
-</blockquote>
-<hr>
-<h2 id="应用级限流"><a href="#应用级限流" class="headerlink" title="应用级限流"></a>应用级限流</h2><h3 id="限流总并发-连接-请求数"><a href="#限流总并发-连接-请求数" class="headerlink" title="限流总并发/连接/请求数"></a>限流总并发/连接/请求数</h3><blockquote>
-<p>对于一个应用系统，总有一个TPS/QPS阙值(极限并发/请求数)</p>
-</blockquote>
-<p>Tomcat的Connector参数</p>
-<ul>
-<li>acceptCount：tomcat线程忙于响应，新来连接进入队列排队，超出队列大小，拒绝连接</li>
-<li>maxConnections：瞬时最大连接数，超出会排队等待</li>
-<li>maxThreads: Thread能启动用来处理请求的最大线程数，如果请求数远远大于线程数，程序会引起响应变慢甚至僵死    </li>
-</ul>
-<hr>
-<h3 id="限流总资源数"><a href="#限流总资源数" class="headerlink" title="限流总资源数"></a>限流总资源数</h3><blockquote>
-<p>如果有的资源是稀缺资源。可以通过池化技术限制总资源数，如连接池数，线程池等</p>
-</blockquote>
-<h3 id="限流某个接口的总并发-请求数"><a href="#限流某个接口的总并发-请求数" class="headerlink" title="限流某个接口的总并发/请求数"></a>限流某个接口的总并发/请求数</h3><blockquote>
-<p>接口可能会有突发访问情况，但又担心访问量太大而崩溃，如抢购，这时候需要限制总并发/请求数了，属于细粒度控制. 通过适用AtomicLong(原子操作)和Semaphore(同步计数器)、以及Hystrix在信号量模式下也适用Semaphore限制接口并发数</p>
-</blockquote>
-<p><strong>适用于可降级业务或者需要过载访问的服务进行限流</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">try&#123;</div><div class="line">    if(atomic.incrementAndGet() &gt; 限流数)&#123;</div><div class="line">        //拒绝请求</div><div class="line">    &#125;</div><div class="line">&#125; finally &#123;</div><div class="line">    atomic.decrementAndGet()</div><div class="line">&#125;</div><div class="line">//处理请求</div></pre></td></tr></table></figure></p>
-<h3 id="限流某个接口的时间窗请求数"><a href="#限流某个接口的时间窗请求数" class="headerlink" title="限流某个接口的时间窗请求数"></a>限流某个接口的时间窗请求数</h3><blockquote>
-<p>即一个时间窗内的请求数，如想限制某个接口服务每秒/每分钟/每日的调用量。比如商品详情页服务会调用基础商品服务调用，但是更新量比较大可能将基础服务打挂。对每秒/每分钟进行限速</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">LoadCache&lt;Long,AtomicLong&gt; counter = </div><div class="line">    CacheBuilder.newBuilder()</div><div class="line">                .expireAfterWrite(2,TimeUnit.SECONDS)</div><div class="line">                .build(new CacheLoader&lt;Long,AtomicLong&gt;()&#123;</div><div class="line">                    @Override</div><div class="line">                    public AtomicLong load(Long seconds) throws Exception&#123;</div><div class="line">                        return new AtomicLong(0);</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">long limit = 1000;</div><div class="line">while(true)&#123;</div><div class="line">    long currentSeconds = System.currentTimeMillis() / 1000;</div><div class="line">    if(conuter.get(currentSeconds).incrementAndGet() &gt; limit)&#123;</div><div class="line">        System.out.println(&quot;限流:&quot;+currentSenconds);</div><div class="line">        continue;</div><div class="line">    &#125;</div><div class="line">    //业务处理</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><strong>使用Guava的Cache存储计数器，过期时间设置2s（保证能记录1s内计数）。然后获取当前时间戳，取秒数作为key进行计数统计和限流</strong></li>
-</ul>
-<p><a href="http://ifeve.com/google-guava-cachesexplained/" target="_blank" rel="external">Guava-Cache</a></p>
-<hr>
-<h3 id="平滑限流某个接口的请求数"><a href="#平滑限流某个接口的请求数" class="headerlink" title="平滑限流某个接口的请求数"></a>平滑限流某个接口的请求数</h3><blockquote>
-<p>在一些场景，需要对突发请求进行整形，整形为平均速率请求处理；可以使用令牌桶和漏桶实现。Guava提供了令牌桶的实现</p>
-</blockquote>
-<p><a href="http://ifeve.com/guava-ratelimiter/" target="_blank" rel="external">Guava RateLimiter</a><br>提供的令牌桶算法可用于平滑突发限流和平滑预热限流</p>
-<ul>
-<li><p>表示桶容量为5且每秒新增5个令牌(即每隔200ms增加一个令牌)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">RateLimiter limiter = RateLimiter.create(5);</div></pre></td></tr></table></figure>
-</li>
-<li><p>表示消费一个令牌（获取许可）。如果桶中有足够的令牌，则成功（0），如果没有令牌暂停一段时间</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">limiter.acquire();</div></pre></td></tr></table></figure>
-<p><strong>总结：该限流针对单应用限流，如果将应用部署在多台机器，不能进行全局限流。需要用分布式和接入层限流解决这个问题</strong></p>
-<hr>
-<h3 id="分布式限流"><a href="#分布式限流" class="headerlink" title="分布式限流"></a>分布式限流</h3><blockquote>
-<p><strong>分布式限流的关键是将限流服务做成原子化</strong> 解决方案Redis+Lua或者Nginx+Lua技术实现高并发和高性能</p>
-</blockquote>
-<p>Lua语言支持漏桶和令牌桶算法</p>
-<p><a href="http://coolshell.cn/articles/10739.html" target="_blank" rel="external">Lua简明教程</a></p>
-<p><a href="https://wizardforcel.gitbooks.io/lua-doc/content/" target="_blank" rel="external">Lua参考手册</a></p>
-<hr>
-<h3 id="接入层限流"><a href="#接入层限流" class="headerlink" title="接入层限流"></a>接入层限流</h3><blockquote>
-<p>接入层通常指请求流量的入口，该层目的：负载均衡、非法请求过滤、请求聚合、缓存、降级、限流、A/B测试、服务质量监控等</p>
-</blockquote>
-<h4 id="Nginx接入层"><a href="#Nginx接入层" class="headerlink" title="Nginx接入层"></a>Nginx接入层</h4><blockquote>
-<p>连接数限流模块ngx_http_limit_conn_module</p>
-<p>漏桶算法实现的请求限流模块ngx_http_limit_req_module</p>
-<p>OpenRestry提供的Lua限流模块lua-resty-limit-traffic</p>
-</blockquote>
-<p>limit_conn 用来对某个key对应的总的网络连接数进行限流。可以按照维度（ip、域名）等进行限流</p>
-<p>limit_req 用来对某个key对应的请求的平均速率进行限流（平滑模式和允许突发模式）</p>
-<h3 id="ngx-http-limit-conn-module"><a href="#ngx-http-limit-conn-module" class="headerlink" title="ngx_http_limit_conn_module"></a>ngx_http_limit_conn_module</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    limit_conn_zone $binary_remote_addr zone=addr:10m;</div><div class="line">    limit_conn_log_level error;</div><div class="line">    limit_conn_status 503;</div><div class="line">    </div><div class="line">    server &#123;</div><div class="line">        </div><div class="line">        location /limit &#123;</div><div class="line">            limit_conn addr 1;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>limit_conn 主要执行过程</p>
-<ul>
-<li>请求进入后判断limit_conn_zone中相应key连接数是否超过了配置的最大连接数</li>
-<li>如果超过了配置的最大大小，则被限流，返回limit_conn_status状态码，否则，相应key连接数+1，并注册请求处理完成的回调函数</li>
-<li>进行请求处理</li>
-<li>在结束请求阶段会调用注册的回调函数对相应key连接数-1</li>
-</ul>
-<p><strong>limit_conn可以根据限制某个key的总并发/请求数，key根据需要变化</strong></p>
-<h4 id="根据ip限制并发连接数"><a href="#根据ip限制并发连接数" class="headerlink" title="根据ip限制并发连接数"></a>根据ip限制并发连接数</h4><ol>
-<li>定义ip维度的限流区域</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">limit_conn_zone $binary_remote_addr zone=perip:10m;</div></pre></td></tr></table></figure>
-<ol>
-<li>添加限流逻辑</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">location /limit &#123;</div><div class="line">        limit_conn perip 2;</div><div class="line">        echo &quot;123&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ol>
-<li>AB测试工具进行测试</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ab -n 5 -c 5 http://localhost/limit</div></pre></td></tr></table></figure>
-<h4 id="根据域名限制并发连接数配置"><a href="#根据域名限制并发连接数配置" class="headerlink" title="根据域名限制并发连接数配置"></a>根据域名限制并发连接数配置</h4><ol>
-<li>定义ip维度的限流区域</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">limit_conn_zone $binary_remote_addr zone=perserver:10m;</div></pre></td></tr></table></figure>
-<ol>
-<li>添加限流逻辑</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">location /limit &#123;</div><div class="line">        limit_conn perserver 2;</div><div class="line">        echo &quot;123&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h3 id="ngx-http-limit-req-module"><a href="#ngx-http-limit-req-module" class="headerlink" title="ngx_http_limit_req_module"></a>ngx_http_limit_req_module</h3><blockquote>
-<p>limit_req通过漏桶算法实现，用于对指定key的请求进行限流 (etc.按照维度限制请求速率)</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    limit_conn_zone $binary_remote_addr zone=one:10m rate=1r/s;</div><div class="line">    limit_conn_log_level error;</div><div class="line">    limit_conn_status 503;</div><div class="line">    </div><div class="line">    server &#123;</div><div class="line">        </div><div class="line">        location /limit &#123;</div><div class="line">            limit_req zone = one burst=5 nodelay;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>limit_req主要执行过程</p>
-<p>1.请求进入后首先判断最后一次请求时间相对与当前时间是否需要限流</p>
-<p>2.如果没有配置桶容量(burst)，则桶容量为0，按照固定速率处理请求，如果请求被限流，返回相应错误码</p>
-<p>如果配置桶容量(burst&gt;0)及延迟模式(不配置nodelay),<br>桶满了，则新请求被限流；如果未满，按照固定平均速率处理</p>
-<p>如果配置桶容量(burst&gt;0)及非延迟模式(配置Nodelay),则不会按照固定速率，而是允许突发处理请求；桶满了则限流，直接返回相应错误码</p>
-<p>3.如果没有被限流，则正常处理请求</p>
-<p>4.Nginx会在相应时机选择一些(3个节点)限流key进行过期处理，内存回收</p>
-<hr>
-<h2 id="节流"><a href="#节流" class="headerlink" title="节流"></a>节流</h2><blockquote>
-<p>允许在特定时间窗口内对重复的相同事件最多一次处理</p>
-</blockquote>
-<h3 id="throttleFirst-throttleLast"><a href="#throttleFirst-throttleLast" class="headerlink" title="throttleFirst / throttleLast"></a>throttleFirst / throttleLast</h3><blockquote>
-<p>在特定时间窗口内对重复的多个相同事件只处理第一个或最后一个</p>
-</blockquote>
-<h3 id="throttleWithTimeout"><a href="#throttleWithTimeout" class="headerlink" title="throttleWithTimeout"></a>throttleWithTimeout</h3><blockquote>
-<p>也叫去抖(debounce),限制两个连续事件的先后执行时间不得小于某个时间窗口</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2271,7 +2171,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">129</span>
+                <span class="site-state-item-count">130</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
