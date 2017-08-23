@@ -254,6 +254,193 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装RabbitMQ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装RabbitMQ/" itemprop="url">【Linux】Centos6.8安装RabbitMQ</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:03+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/" itemprop="url" rel="index">
+                    <span itemprop="name">centos</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos/rabbitmq/" itemprop="url" rel="index">
+                    <span itemprop="name">rabbitmq</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>####【步骤一】 安装依赖包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">yum -y install ncurses-devel</div><div class="line"></div><div class="line">yum list | grep ssl     yum install openssl-devel</div><div class="line"></div><div class="line">yum list | grep ODBC  yum install unixODBC-devel</div><div class="line"></div><div class="line">yum install gcc-c++   </div><div class="line"></div><div class="line">yum install perl （自己补充的，不然会报错）</div><div class="line"></div><div class="line">yum install libxslt yum install  rsync yum install  zip</div><div class="line"></div><div class="line">yum -y install xmlto  </div><div class="line"></div><div class="line">yum install gcc glibc-devel make ncurses-devel openssl-devel autoconf</div></pre></td></tr></table></figure>
+<p>####【步骤二】下载erlang</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget   http://www.erlang.org/download/otp_src_19.0.tar.gz</div></pre></td></tr></table></figure>
+<h4 id="【步骤三】解压erlang"><a href="#【步骤三】解压erlang" class="headerlink" title="【步骤三】解压erlang"></a>【步骤三】解压erlang</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">tar zvxf otp_src_19.0.tar.gz  -C /usr/local </div><div class="line"></div><div class="line">mv /user/otp_src_19.0.tar.gz /usr/local/otp (重命名）</div><div class="line"></div><div class="line">cd otp</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/erlang --without-javac  --with-opengl</div><div class="line">--enable-debug --enable-unicode</div><div class="line"></div><div class="line">make &amp;&amp; make install (编译erlang）</div><div class="line"></div><div class="line">vi /etc/profile (设置环境变量）</div><div class="line"></div><div class="line">PATH=$PATH:/usr/local/erlang/bin</div><div class="line">        export PATH</div><div class="line"></div><div class="line">cd /usr/local/erlang/bin</div></pre></td></tr></table></figure>
+<h4 id="【步骤四】测试erl是否安装成功"><a href="#【步骤四】测试erl是否安装成功" class="headerlink" title="【步骤四】测试erl是否安装成功"></a>【步骤四】测试erl是否安装成功</h4><p>8.1 erl</p>
+<p>退出erl命令行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">halt().</div></pre></td></tr></table></figure>
+<h4 id="【步骤五】安装python"><a href="#【步骤五】安装python" class="headerlink" title="【步骤五】安装python"></a>【步骤五】安装python</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz</div><div class="line"></div><div class="line">mv Python-2.7.6.tgz python</div><div class="line"></div><div class="line">cd python</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/python27</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
+<p>检测是否安装成功</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python -v</div></pre></td></tr></table></figure>
+<hr>
+<ol>
+<li>wget 工具安装</li>
+</ol>
+<p><a href="http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm" target="_blank" rel="external">http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -ivh wget-1.12-8.el6.x86_64.rpm</div></pre></td></tr></table></figure>
+<ol>
+<li>xz工具安装<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">yum install xz</div><div class="line"></div><div class="line">xz -d xxx.tar.xz</div><div class="line"></div><div class="line">tar -xf xxx.tar -C /usr/local</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>#安装rabbitmq</p>
+<p>1.下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget  http://www.rabbitmq.com/releases/rabbitmq-server/v3.1.5/rabbitmq-server-unix-3.1.5.tar.gz</div></pre></td></tr></table></figure>
+<p>2.解压</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar xvf rabbitmq-server-unix-3.1.5.tar.gz</div><div class="line"></div><div class="line">mv rabbitmq-server-unix-3.1.5.tar.gz /usr/local/rabbitmq-server</div></pre></td></tr></table></figure>
+<p>#sbin命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">rabbitmqctl add_user admin admin 新增用户</div><div class="line"></div><div class="line">rabbitmqctl set_user_tags admin administrator 设置为管理员</div><div class="line"></div><div class="line">rabbitmqctl set_permissions -p &quot;/&quot; admin &quot;.*&quot; &quot;.*&quot; &quot;.*&quot; 设置权限</div><div class="line"></div><div class="line">rabbitmq-plugins enable rabbitmq_management  配置web插件</div></pre></td></tr></table></figure>
+<p>#远程访问rabbitmq</p>
+<p><strong>iptables -F 关闭防火墙，开放端口</strong></p>
+<p><a href="http://172.16.41.31:15672" target="_blank" rel="external">http://172.16.41.31:15672</a></p>
+<p>#Java访问rabbitmq</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">vi /etc/rabbitmq/rabbitmq.config 中添加</div><div class="line"></div><div class="line">[</div><div class="line"> &#123;rabbit,</div><div class="line"></div><div class="line">  [</div><div class="line">      &#123;tcp_listeners, [5672]&#125;,</div><div class="line">      &#123;loopback_users, [&quot;admin&quot;]&#125;</div><div class="line">  ]&#125;</div><div class="line">].</div></pre></td></tr></table></figure>
+<p>端口</p>
+<p>4369 (epmd)</p>
+<p>5672, 5671 (AMQP 0-9-1 and 1.0 without and with TLS)</p>
+<ol>
+<li>This port used by Erlang distribution for inter-node and CLI tools communication and is allocated from a dynamic range (limited to a single port by default, computed as AMQP port + 20000)</li>
+</ol>
+<p>15672 (if management plugin is enabled)</p>
+<p>61613, 61614 (if STOMP is enabled)</p>
+<p>1883, 8883 (if MQTT is enabled)</p>
+<p>   修改虚拟机ip</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/network-scripts/ifcfg-eth0</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1704,161 +1891,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/zookeeper学习笔记（五）——具体应用：秒杀思路/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/zookeeper学习笔记（五）——具体应用：秒杀思路/" itemprop="url">zookeeper学习笔记（五）——具体应用：秒杀思路</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:32:14+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">Zookeeper</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="秒杀一般有几个场景"><a href="#秒杀一般有几个场景" class="headerlink" title="秒杀一般有几个场景"></a>秒杀一般有几个场景</h3><pre><code>1.电商秒杀商品 2.抢红包 3.抢票
-</code></pre><h3 id="假设一个场景如下"><a href="#假设一个场景如下" class="headerlink" title="假设一个场景如下"></a>假设一个场景如下</h3><pre><code>某电商公司搞活动,一折秒杀,推出几种秒杀的商品,每种商品1000个,预计100w人抢购 要求: 不能超卖.绝对不可以卖多了. 数据库要扣减库存,并且记录订单明细
-</code></pre><h3 id="难点分析"><a href="#难点分析" class="headerlink" title="难点分析"></a>难点分析</h3><p>1.不能<strong>阻塞</strong>. 海量的请求就像血栓一样,遍走周身,一旦遇到瓶颈,就会堵塞整个血管. 所以一定要让海量的用户请求,尽快结束.</p>
-<p>2.数据库单行更新 大量的 update 库存表 set 剩余数量=剩余数量-1 where 商品ID=? 这种单行更新,有<strong>行锁</strong>,会阻塞其他事务,占用宝贵的数据库处理能力.</p>
-<h3 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h3><p>1.<strong>Web服务器集群层,卸载流量</strong> 海量的用户秒杀请求,本质上是一个排序,先到先得. 但是如此之多的请求,完全响应,难度又很大. 所以在Web服务器集群,可以考虑卸载流量. 比如每十个请求,随机抛弃九个,只放行一个请求到后续处理环节. 把秒杀的排序模式,变为随机抽奖的模式.</p>
-<p>2.<strong>Web服务器集群层,缩小锁范围. 每次秒杀活动开始之前.先计算活动推出的商品数量,然后分配一个限额到每个Web服务器</strong>. 比如一个活动推出秒杀商品 电视,手机,衣服各1000件,那么每台服务器的限额就是125件. 将这个限额写入ZooKeeper,Web服务器监听到限额的变化,就会重新初始化各自的商品剩余数量.</p>
-<h3 id="模拟实例"><a href="#模拟实例" class="headerlink" title="模拟实例"></a>模拟实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">private static ConcurrentHashMap&lt;String,Integer&gt; map=new ConcurrentHashMap&lt;String, Integer&gt;();    </div><div class="line">    private void zooKeeperHandle()&#123;</div><div class="line">        //将ZooKeeper的变化,初始化到Web服务器全局容器</div><div class="line">        map.put(&quot;电视机&quot;, 125);</div><div class="line">        map.put(&quot;手机&quot;, 125);</div><div class="line">        map.put(&quot;衣服&quot;, 125);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>假设用户请求秒杀电视机,它只是锁了该Web服务器电视机的数量。(该Web服务器手机和衣服还可以继续并发处理,当然其他的Web服务器也在同时处理电视机的秒杀请求) 这样缩小了锁定的范围,增加了系统处理的吞吐量.</p>
-<p>如果这个剩余数量大于零,则将用户ID放入电视机购买队列,<br>然后告知用户秒杀成功如果这个剩余数量等于零,则告知用户秒杀失败.<br>即便别的Web服务器还有电视机的剩余配额.</p>
-<p>3.ZooKeeper层,ZooKeeper变更库存信息 假设活动期间,需要修改库存信息。 两种可能, 第一种,该商品已经卖了500件,电商不想继续卖了. 第二种,从仓库中又找到了一些积压库存..</p>
-<blockquote>
-<p>两种情况,都直接修改ZooKeeper中相应商品的配额.<br>Web服务器会监听变化,并重新初始化全局容器.</p>
-</blockquote>
-<p>4.消息队列层,多消费者处理<br>    消费者主要是从队列获取购买请求,发送至数据库<br>    扣减数据库库存<br>    写订单明细记录</p>
-<p>5.数据库层,使用存储过程代替JDBC调用 由于使用了多消费者处理同一队列,增加吞吐量,避免队列堆积过大. 但是多消费者,必然导致数据库出现单行更新问题(不推荐）</p>
-<p>单行更新问题就是多个线程,并发修改同一条记录,导致事务相互阻塞.浪费了数据库宝贵的处理能力.</p>
-<p>以上转载<br><a href="http://m.blog.itpub.net/29254281/viewspace-1800617/" target="_blank" rel="external">http://m.blog.itpub.net/29254281/viewspace-1800617/</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1903,7 +1940,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">130</span>
+                <span class="site-state-item-count">131</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1925,7 +1962,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">102</span>
+                <span class="site-state-item-count">103</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

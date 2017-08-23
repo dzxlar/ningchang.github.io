@@ -254,6 +254,160 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-线程池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——-线程池/" itemprop="url">线程笔记—— 线程池</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:23:29+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="什么是线程池？"><a href="#什么是线程池？" class="headerlink" title="什么是线程池？"></a>什么是线程池？</h3><p>目的：减少对象创建和销毁的时间<br>Java线程池实现Java高并发、Java多线程、可管理的统一调度器<br>Executors是线程的工厂类（工具类）：方便快速的创建线程池</p>
+<h3 id="创建线程池常见的3种方法"><a href="#创建线程池常见的3种方法" class="headerlink" title="创建线程池常见的3种方法"></a>创建线程池常见的3种方法</h3><p>newSingleThreadExecutor 创建单线程的线程池<br>newFixedThreadPool 创建固定大小的线程池<br>newCachedThreadPool 创建可缓存线程池</p>
+<h3 id="线程池的优点"><a href="#线程池的优点" class="headerlink" title="线程池的优点"></a>线程池的优点</h3><p>1.降低资源消耗（重复利用已创建线程）<br>2.提高响应速度<br>3.提高线程的可管理性<br>4.防止服务器过载，形成内存溢出</p>
+<h3 id="线程池工作机制"><a href="#线程池工作机制" class="headerlink" title="线程池工作机制"></a>线程池工作机制</h3><p>线程等待池 BlockingQueue<br>任务处理池PoolWorker，即正在工作的线程列表HashSet<br>核心池大小（corePoolSize） 线程池的稳定峰值，达到这个值之后的线程数大小不会释放的<br>最大处理线程池数（maxinumPoolSize） 线程池的线程数超过corePoolSize,小于maxPoolSize，会动态创建回收线程池内的资源</p>
+<h3 id="自定义线程池和ExecutorService"><a href="#自定义线程池和ExecutorService" class="headerlink" title="自定义线程池和ExecutorService"></a>自定义线程池和ExecutorService</h3><blockquote>
+<p>自定义线程池需要用到ThreadFactory<br>Executor ： 执行线程池的工具<br>ExecutorService ： 线程池的真正接口（继承了Executor）<br>AbstractExecutorService：实现ExecutorService接口<br>ThreadPoolExecutor：ExecutorService默认实现<br>ScheduleExecutorService：解决那些需要重复执行的问题<br>ScheduleThreadPoolExecutor：解决周期性调度问题的真正实现<br>Executors 工厂类（创建更多线程）</p>
+</blockquote>
+<h3 id="RejectedExecutionHandler"><a href="#RejectedExecutionHandler" class="headerlink" title="RejectedExecutionHandler"></a>RejectedExecutionHandler</h3><blockquote>
+<p>处理被丢弃的线程和异常的接口</p>
+</blockquote>
+<h3 id="ThreadPoolExecutor"><a href="#ThreadPoolExecutor" class="headerlink" title="ThreadPoolExecutor"></a>ThreadPoolExecutor</h3><p><strong>线程池最核心的类</strong></p>
+<p>理解构造函数的参数<br>corePoolSize<br>maxinumPoolSize<br>keepAliveTime<br>TimeUnit<br>BlockingQueue<br>ThreadFactory<br>RejectedExecutionHandler</p>
+<h3 id="线程池注意问题"><a href="#线程池注意问题" class="headerlink" title="线程池注意问题"></a>线程池注意问题</h3><p>线程池是单例的，不能放在services方法种<br>线程数不能设置过大，会造成线程负载<br>注意死锁问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * ClassName:SingleThreadExecutorDemo</div><div class="line"> * Function: TODO  单例线程池</div><div class="line"> * Reason:	 TODO  只有一个线程池在工作（串行执行所有线程）</div><div class="line"> *                 如果这个线程因为异常结束，会有新的线程替代它</div><div class="line"> *                 保证所有任务的执行任务按提交任务顺序执行</div><div class="line"> * @author   dzxla</div><div class="line"> * @version  </div><div class="line"> * @since    Ver 1.1</div><div class="line"> */</div><div class="line">public class SingleThreadExecutorDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//代码实现使用了LinkedBlockingQueue</div><div class="line">		ExecutorService executor = Executors.newSingleThreadExecutor();</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Thread Main End</div><div class="line">into --&gt; 0</div><div class="line">end --&gt; 0</div><div class="line">into --&gt; 1</div><div class="line">end --&gt; 1</div><div class="line">into --&gt; 2</div><div class="line">end --&gt; 2</div><div class="line">into --&gt; 3</div><div class="line">end --&gt; 3</div><div class="line">into --&gt; 4</div><div class="line">end --&gt; 4</div><div class="line">into --&gt; 5</div><div class="line">end --&gt; 5</div><div class="line">into --&gt; 6</div><div class="line">end --&gt; 6</div><div class="line">into --&gt; 7</div><div class="line">end --&gt; 7</div><div class="line">into --&gt; 8</div><div class="line">end --&gt; 8</div><div class="line">into --&gt; 9</div><div class="line">end --&gt; 9</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public class FixedThreadPoolDemo &#123;</div><div class="line"></div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//代码实现使用了LinkedBlockingQueue</div><div class="line">		ExecutorService executor = Executors.newFixedThreadPool(5);</div><div class="line">		for (int i = 0; i &lt; 10; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-1"><a href="#console-1" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">into --&gt; 1</div><div class="line">into --&gt; 4</div><div class="line">Thread Main End</div><div class="line">into --&gt; 3</div><div class="line">into --&gt; 0</div><div class="line">into --&gt; 2</div><div class="line">end --&gt; 2</div><div class="line">into --&gt; 5</div><div class="line">end --&gt; 0</div><div class="line">into --&gt; 6</div><div class="line">end --&gt; 3</div><div class="line">into --&gt; 7</div><div class="line">end --&gt; 1</div><div class="line">into --&gt; 8</div><div class="line">end --&gt; 4</div><div class="line">into --&gt; 9</div><div class="line">end --&gt; 5</div><div class="line">end --&gt; 6</div><div class="line">end --&gt; 8</div><div class="line">end --&gt; 7</div><div class="line">end --&gt; 9</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * ClassName:CachedThreadPoolDemo</div><div class="line"> * Function: TODO 可缓存的线程池</div><div class="line"> * Reason:	 TODO 可重用之前的线程</div><div class="line"> * @author   dzxla</div><div class="line"> * @version  </div><div class="line"> * @since    Ver 1.1</div><div class="line"> * @Date	 2016年11月10日		下午3:22:40</div><div class="line"> */</div><div class="line">public class CachedThreadPoolDemo &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		//实现了SynchronousQueue队列</div><div class="line">		ExecutorService executor = Executors.newCachedThreadPool();</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 20; i++) &#123;</div><div class="line">			final int num = i;</div><div class="line">			Runnable t = new Runnable() &#123;</div><div class="line">				</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					</div><div class="line">					System.out.println(&quot;into --&gt; &quot; + num);</div><div class="line">					try &#123;</div><div class="line">						Thread.sleep(1000L);</div><div class="line">					&#125; catch (InterruptedException e) &#123;</div><div class="line">						e.printStackTrace();</div><div class="line">					&#125;</div><div class="line">					System.out.println(&quot;end --&gt; &quot; + num);</div><div class="line">				&#125;</div><div class="line">			&#125;;</div><div class="line">			executor.execute(t);</div><div class="line">		&#125;</div><div class="line">		executor.shutdown();</div><div class="line">		System.out.println(&quot;Thread Main End&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-2"><a href="#console-2" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">into --&gt; 0</div><div class="line">into --&gt; 2</div><div class="line">into --&gt; 1</div><div class="line">into --&gt; 3</div><div class="line">into --&gt; 4</div><div class="line">into --&gt; 5</div><div class="line">into --&gt; 6</div><div class="line">into --&gt; 7</div><div class="line">into --&gt; 8</div><div class="line">into --&gt; 9</div><div class="line">into --&gt; 10</div><div class="line">into --&gt; 11</div><div class="line">into --&gt; 12</div><div class="line">into --&gt; 13</div><div class="line">Thread Main End</div><div class="line">into --&gt; 15</div><div class="line">into --&gt; 17</div><div class="line">into --&gt; 16</div><div class="line">into --&gt; 14</div><div class="line">into --&gt; 19</div><div class="line">into --&gt; 18</div><div class="line">end --&gt; 3</div><div class="line">end --&gt; 4</div><div class="line">end --&gt; 5</div><div class="line">end --&gt; 0</div><div class="line">end --&gt; 1</div><div class="line">end --&gt; 2</div><div class="line">end --&gt; 6</div><div class="line">end --&gt; 10</div><div class="line">end --&gt; 9</div><div class="line">end --&gt; 7</div><div class="line">end --&gt; 8</div><div class="line">end --&gt; 11</div><div class="line">end --&gt; 12</div><div class="line">end --&gt; 13</div><div class="line">end --&gt; 19</div><div class="line">end --&gt; 14</div><div class="line">end --&gt; 16</div><div class="line">end --&gt; 17</div><div class="line">end --&gt; 15</div><div class="line">end --&gt; 18</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">public class CustomThreadFactory implements ThreadFactory &#123;</div><div class="line"></div><div class="line">	//原子操作进行计数</div><div class="line">	private static final AtomicInteger poolNum = new AtomicInteger(1);</div><div class="line">	</div><div class="line">	private final ThreadGroup group;</div><div class="line">	private final AtomicInteger threadNum = new AtomicInteger(1);</div><div class="line">	private final String namePrefix;</div><div class="line">	</div><div class="line">	CustomThreadFactory() &#123;</div><div class="line">		SecurityManager sm = System.getSecurityManager();</div><div class="line">		group = (sm != null) ? sm.getThreadGroup() : Thread.currentThread().getThreadGroup();</div><div class="line">		namePrefix = &quot;pool-&quot; + poolNum.getAndIncrement() + &quot;-thread-&quot;;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	@Override</div><div class="line">	public Thread newThread(Runnable r) &#123;</div><div class="line">		//自定义线程名称</div><div class="line">        Thread t = new Thread(group,r,namePrefix + threadNum.getAndIncrement(),0);</div><div class="line">        if(t.isDaemon())&#123;</div><div class="line">			t.setDaemon(false);</div><div class="line">		&#125;</div><div class="line">        if(t.getPriority() != Thread.NORM_PRIORITY)&#123;</div><div class="line">        	t.setPriority(Thread.NORM_PRIORITY);</div><div class="line">        &#125;</div><div class="line">        return t;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		Thread r = new Thread(new Runnable() &#123;</div><div class="line">			</div><div class="line">			@Override</div><div class="line">			public void run() &#123;</div><div class="line">				</div><div class="line">				System.out.println(&quot;自定义线程池&quot;);</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">		</div><div class="line">		CustomThreadFactory factory = new CustomThreadFactory();</div><div class="line">		</div><div class="line">		Thread t = factory.newThread(r);</div><div class="line">		System.out.println(t.getName());</div><div class="line">		t.start();</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<h3 id="console-3"><a href="#console-3" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">pool-1-thread-1</div><div class="line">自定义线程池</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——多线程交互：线程阀/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1817,159 +1971,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Session跨域的几种方案/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Session跨域的几种方案/" itemprop="url">Session跨域的几种方案</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:10:33+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/跨域/" itemprop="url" rel="index">
-                    <span itemprop="name">跨域</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>之前项目中涉及到跨域问题（2个不同的域名访问同一个服务器）造成session丢失的问题，请求分发用的是nginx</p>
-<p>总结了以下，常用的session处理方式有以下几种</p>
-<h2 id="ip-hash"><a href="#ip-hash" class="headerlink" title="ip_hash"></a>ip_hash</h2><p>【概念】当对后端的多台动态应用服务器做负载均衡时，ip_hash指令能够将某个客户端IP的请求通过哈希算法定位到同一台后端服务器上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream myproject &#123;</div><div class="line">    ip_hash;</div><div class="line">    server 192.168.40.31:8070 //down 将服务器移除负载</div><div class="line">    server 192.168.40.16:8080; </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>【缺点】使用ip_hash指令<strong>无法保证后端服务器的负载均衡</strong>，可能有些后端服务器接收的请求多，有些后端服务器收到的请求少，而且设置后端服务权重等方法将不起作用</p>
-<p><a href="http://server.zzidc.com/fwqjs/222.html" target="_blank" rel="external">关于ip_hash</a></p>
-<h2 id="session共享"><a href="#session共享" class="headerlink" title="session共享"></a>session共享</h2><h3 id="第三方存储"><a href="#第三方存储" class="headerlink" title="第三方存储"></a>第三方存储</h3><p>【思路】把session数据保存到内存以外的一个统一的地方，例如Memcached/Redis等数据库中。那么问题又来了，如何替换掉Servlet容器创建和管理HttpSession的实现呢？（HttpSession是通过Servlet容器创建和管理的，像Tomcat/Jetty都是保存在内存中的）</p>
-<p>方法<br>1). 设计一个Filter，利用HttpServletRequestWrapper，实现自己的 getSession()方法，接管创建和管理Session数据的工作(SpringSession)</p>
-<blockquote>
-<p>Spring Session提供了一套创建和管理Servlet HttpSession的方案。Spring Session提供了集群Session（Clustered Sessions）功能，默认采用外置的Redis来存储Session数据，以此来解决Session共享的问题</p>
-</blockquote>
-<p>参考<br><a href="https://github.com/spring-projects/spring-session" target="_blank" rel="external">spring-session</a><br><a href="http://docs.spring.io/spring-session/docs/1.3.0.RELEASE/reference/html5/" target="_blank" rel="external">spring-session-官方英文文档</a><br><a href="http://blog.csdn.net/patrickyoung6625/article/details/45694157" target="_blank" rel="external">spring-session-csdn-blog</a></p>
-<p>2). 利用Servlet容器提供的插件功能，自定义HttpSession的创建和管理策略，并通过配置的方式替换掉默认的策略(需要耦合Tomcat/Jetty等Servlet容器的代码)</p>
-<p>参考(基于tomcat6或者7)<br><a href="https://github.com/jcoleman/tomcat-redis-session-manager" target="_blank" rel="external">tomcat-redis-manager</a><br><a href="https://github.com/magro/memcached-session-manager" target="_blank" rel="external">tomcat-memcached-manager</a></p>
-<h2 id="session复制"><a href="#session复制" class="headerlink" title="session复制"></a>session复制</h2><p>与服务器有关<br>参考<br><a href="http://wiki.jikexueyuan.com/project/tomcat/clustering.html" target="_blank" rel="external">tomcat中文文档</a><br><a href="http://tomcat.apache.org/tomcat-8.0-doc/config/cluster.html" target="_blank" rel="external">tomcat官方英文文档</a></p>
-<h2 id="http-无状态-token"><a href="#http-无状态-token" class="headerlink" title="http 无状态 token"></a>http 无状态 token</h2><p><a href="http://baike.baidu.com/item/HTTP%E6%97%A0%E7%8A%B6%E6%80%81%E5%8D%8F%E8%AE%AE" target="_blank" rel="external">百度百科（什么是无状态协议）</a><br><a href="http://wiki.jikexueyuan.com/project/oauth-2/" target="_blank" rel="external">OAuth2文档</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2014,7 +2020,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">130</span>
+                <span class="site-state-item-count">131</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2036,7 +2042,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">102</span>
+                <span class="site-state-item-count">103</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

@@ -254,6 +254,188 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/【消息中间件】MessageQueue介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/07/【消息中间件】MessageQueue介绍/" itemprop="url">【消息中间件】MessageQueue介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T13:50:09+08:00">
+                2017-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="为什么使用消息队列"><a href="#为什么使用消息队列" class="headerlink" title="为什么使用消息队列"></a>为什么使用消息队列</h2><ul>
+<li><strong>解耦</strong> <ul>
+<li>在项目启动之初来预测将来项目会碰到什么需求，是极其困难的。消息系统在处理过程中间插入了一个隐含的、基于数据的接口层，两边的处理过程都要实现这一接口。这允许你独立的扩展或修改两边的处理过程，只要确保它们遵守同样的接口约束。</li>
+</ul>
+</li>
+<li><strong>冗余</strong> <ul>
+<li>有些情况下，处理数据的过程会失败。除非数据被持久化，否则将造成丢失。消息队列把数据进行持久化直到它们已经被完全处理，通过这一方式规避了数据丢失风险。许多消息队列所采用的”插入-获取-删除”范式中，在把一个消息从队列中删除之前，需要你的处理系统明确的指出该消息已经被处理完毕，从而确保你的数据被安全的保存直到你使用完毕。</li>
+</ul>
+</li>
+<li><strong>扩展性</strong> <ul>
+<li>因为消息队列解耦了你的处理过程，所以增大消息入队和处理的频率是很容易的，只要另外增加处理过程即可。不需要改变代码、不需要调节参数。扩展就像调大电力按钮一样简单。</li>
+</ul>
+</li>
+<li><strong>灵活性 &amp; 峰值处理能力</strong> <ul>
+<li>在访问量剧增的情况下，应用仍然需要继续发挥作用，但是这样的突发流量并不常见；如果为以能处理这类峰值访问为标准来投入资源随时待命无疑是巨大的浪费。使用消息队列能够使关键组件顶住突发的访问压力，而不会因为突发的超负荷的请求而完全崩溃。</li>
+</ul>
+</li>
+<li><strong>可恢复性</strong> <ul>
+<li>系统的一部分组件失效时，不会影响到整个系统。消息队列降低了进程间的耦合度，所以即使一个处理消息的进程挂掉，加入队列中的消息仍然可以在系统恢复后被处理。</li>
+</ul>
+</li>
+<li><strong>顺序保证</strong> <ul>
+<li>在大多使用场景下，数据处理的顺序都很重要。大部分消息队列本来就是排序的，并且能保证数据会按照特定的顺序来处理。Kafka保证一个Partition内的消息的有序性。</li>
+</ul>
+</li>
+<li><strong>缓冲</strong> <ul>
+<li>在任何重要的系统中，都会有需要不同的处理时间的元素。例如，加载一张图片比应用过滤器花费更少的时间。消息队列通过一个缓冲层来帮助任务最高效率的执行———写入队列的处理会尽可能的快速。该缓冲有助于控制和优化数据流经过系统的速度。</li>
+</ul>
+</li>
+<li><strong>异步通信</strong> <ul>
+<li>很多时候，用户不想也不需要立即处理消息。消息队列提供了异步处理机制，允许用户把一个消息放入队列，但并不立即处理它。想向队列中放入多少消息就放多少，然后在需要的时候再去处理它们。</li>
+</ul>
+</li>
+</ul>
+<h2 id="RabbitMQ"><a href="#RabbitMQ" class="headerlink" title="RabbitMQ"></a>RabbitMQ</h2><blockquote>
+<p>RabbitMQ是使用Erlang编写的一个开源的消息队列，本身支持很多的协议：AMQP，XMPP, SMTP, STOMP，也正因如此，它非常重量级，更适合于企业级的开发。同时实现了Broker构架，这意味着<strong>消息在发送给客户端时先在中心队列排队。对路由，负载均衡或者数据持久化都有很好的支持。</strong></p>
+</blockquote>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><blockquote>
+<p>Redis是一个基于Key-Value对的NoSQL数据库，开发维护很活跃。虽然它是一个Key-Value数据库存储系统，但它本身支持MQ功能，所以完全可以当做一个轻量级的队列服务来使用。对于RabbitMQ和Redis的入队和出队操作，各执行100万次，每10万次记录一次执行时间。测试数据分为128Bytes、512Bytes、1K和10K四个不同大小的数据。实验表明：入队时，当数据比较小时Redis的性能要高于RabbitMQ，而如果数据大小超过了10K，Redis则慢的无法忍受；出队时，无论数据大小，Redis都表现出非常好的性能，而RabbitMQ的出队性能则远低于Redis。</p>
+</blockquote>
+<h2 id="ZeroMQ"><a href="#ZeroMQ" class="headerlink" title="ZeroMQ"></a>ZeroMQ</h2><blockquote>
+<p>ZeroMQ号称最快的消息队列系统，尤其针对大吞吐量的需求场景。ZeroMQ能够实现RabbitMQ不擅长的高级/复杂的队列，但是开发人员需要自己组合多种技术框架，技术上的复杂度是对这MQ能够应用成功的挑战。ZeroMQ具有一个独特的非中间件的模式，你不需要安装和运行一个消息服务器或中间件，因为你的应用程序将扮演这个服务器角色。你只需要简单的引用ZeroMQ程序库，可以使用NuGet安装，然后你就可以愉快的在应用程序之间发送消息了。但是ZeroMQ仅提供非持久性的队列，也就是说如果宕机，数据将会丢失。其中，Twitter的Storm 0.9.0以前的版本中默认使用ZeroMQ作为数据流的传输（Storm从0.9版本开始同时支持ZeroMQ和Netty作为传输模块）。</p>
+</blockquote>
+<h2 id="ActiveMQ"><a href="#ActiveMQ" class="headerlink" title="ActiveMQ"></a>ActiveMQ</h2><blockquote>
+<p>ActiveMQ是Apache下的一个子项目。 类似于ZeroMQ，它能够以代理人和点对点的技术实现队列。同时类似于RabbitMQ，它少量代码就可以高效地实现高级应用场景。</p>
+</blockquote>
+<h2 id="Kafka-Jafka"><a href="#Kafka-Jafka" class="headerlink" title="Kafka/Jafka"></a>Kafka/Jafka</h2><blockquote>
+<p>Kafka是Apache下的一个子项目，是一个高性能跨语言分布式发布/订阅消息队列系统，而Jafka是在Kafka之上孵化而来的，即Kafka的一个升级版。具有以下特性：快速持久化，可以在O(1)的系统开销下进行消息持久化；高吞吐，在一台普通的服务器上既可以达到10W/s的吞吐速率；完全的分布式系统，Broker、Producer、Consumer都原生自动支持分布式，自动实现负载均衡；支持Hadoop数据并行加载，对于像Hadoop的一样的日志数据和离线分析系统，但又要求实时处理的限制，这是一个可行的解决方案。Kafka通过Hadoop的并行加载机制统一了在线和离线的消息处理。Apache Kafka相对于ActiveMQ是一个非常轻量级的消息系统，除了性能非常好之外，还是一个工作良好的分布式系统</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/Log4j-切换-Logback/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1943,212 +2125,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-二-——-搜索/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-二-——-搜索/" itemprop="url">ElasticSearch学习笔记(二) —— 搜索</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:23:44+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="建立一个员工目录"><a href="#建立一个员工目录" class="headerlink" title="建立一个员工目录"></a>建立一个员工目录</h3><p>假设我们刚好在Megacorp工作，这时人力资源部门出于某种目的需要让我们创建一个员工目录，这个目录用于促进人文关怀和用于实时协同工作，所以它有以下不同的需求</p>
-<ul>
-<li>数据能够包含多个值的标签、数字和纯文本。</li>
-<li>检索任何员工的所有信息。</li>
-<li>支持结构化搜索，例如查找30岁以上的员工。</li>
-<li>支持简单的全文搜索和更复杂的短语(phrase)搜索</li>
-<li>高亮搜索结果中的关键字</li>
-<li>能够利用图表管理分析这些数据</li>
-</ul>
-<h3 id="索引员工文档"><a href="#索引员工文档" class="headerlink" title="索引员工文档"></a>索引员工文档</h3><p>首先要做的是存储员工数据，每个文档代表一个员工。</p>
-<p><strong>在Elasticsearch中存储数据的行为就叫做索引(indexing)</strong>，不过在索引之前，我们需要明确数据应该存储在哪里。</p>
-<p>在Elasticsearch中，文档归属于一种类型(type),而这些类型存在于索引(index)中，我们可以画一些简单的对比图来类比传统关系型数据库</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Relational DB -&gt; Databases -&gt; Tables -&gt; Rows -&gt; Columns</div><div class="line">Elasticsearch -&gt; Indices   -&gt; Types  -&gt; Documents -&gt; Fields</div></pre></td></tr></table></figure>
-<p>Elasticsearch集群可以包含多个索引(indices)（数据库），每一个索引可以包含多个类型(types)（表），每一个类型包含多个文档(documents)（行），然后每个文档包含多个字段(Fields)（列）</p>
-<blockquote>
-<p>「索引」含义的区分<br>你可能已经注意到索引(index)这个词在Elasticsearch中有着不同的含义，所以有必要在此做一下区分:<br>索引（名词） 如上文所述，一个索引(index)就像是传统关系数据库中的数据库，它是相关文档存储的地方，index的复数是indices 或indexes。<br>索引（动词） <strong>「索引一个文档」表示把一个文档存储到索引（名词）里，以便它可以被检索或者查询</strong>。这很像SQL中的INSERT关键字，差别是，<strong>如果文档已经存在，新的文档将覆盖旧的文档</strong>。<br>倒排索引 传统数据库为特定列增加一个索引，例如B-Tree索引来加速检索。Elasticsearch和Lucene使用一种叫做倒排索引(inverted index)的数据结构来达到相同目的。</p>
-</blockquote>
-<p><strong>注：默认情况下，文档中的所有字段都会被索引（拥有一个倒排索引），只有这样他们才是可被搜索的</strong></p>
-<p>为了创建员工目录，我们将进行如下操作</p>
-<ul>
-<li>为每个员工的文档(document)建立索引，每个文档包含了相应员工的所有信息。</li>
-<li>每个文档的类型为employee。</li>
-<li>employee类型归属于索引megacorp。</li>
-<li>megacorp索引存储在Elasticsearch集群中</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">//新增  /索引名/类型名/员工ID</div><div class="line">PUT /megacorp/employee/1</div><div class="line">&#123;</div><div class="line">    &quot;first_name&quot; : &quot;John&quot;,</div><div class="line">    &quot;last_name&quot; :  &quot;Smith&quot;,</div><div class="line">    &quot;age&quot; :        25,</div><div class="line">    &quot;about&quot; :      &quot;I love to go rock climbing&quot;,</div><div class="line">    &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">PUT /megacorp/employee/3</div><div class="line">&#123;</div><div class="line">    &quot;first_name&quot; :  &quot;Douglas&quot;,</div><div class="line">    &quot;last_name&quot; :   &quot;Fir&quot;,</div><div class="line">    &quot;age&quot; :         35,</div><div class="line">    &quot;about&quot;:        &quot;I like to build cabinets&quot;,</div><div class="line">    &quot;interests&quot;:  [ &quot;forestry&quot; ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h2><p>第一个需求是能够检索单个员工的信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/1</div></pre></td></tr></table></figure>
-<p>响应的内容中包含一些文档的元信息，John Smith的原始JSON文档包含在_source字段中</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_index&quot; :   &quot;megacorp&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;employee&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">  &quot;_version&quot; : 1,</div><div class="line">  &quot;found&quot; :    true,</div><div class="line">  &quot;_source&quot; :  &#123;</div><div class="line">      &quot;first_name&quot; :  &quot;John&quot;,</div><div class="line">      &quot;last_name&quot; :   &quot;Smith&quot;,</div><div class="line">      &quot;age&quot; :         25,</div><div class="line">      &quot;about&quot; :       &quot;I love to go rock climbing&quot;,</div><div class="line">      &quot;interests&quot;:  [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>我们通过HTTP方法GET来检索文档，同样的，我们可以使用DELETE方法删除文档，使用HEAD方法检查某文档是否存在。如果想更新已存在的文档，我们只需再PUT一次</p>
-</blockquote>
-<p>###简单搜索<br>尝试一个最简单的搜索全部员工的请求</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div></pre></td></tr></table></figure>
-<p>响应内容的hits数组中包含了我们所有的三个文档。默认情况下搜索会返回前10个结果</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;took&quot;:      6,</div><div class="line">   &quot;timed_out&quot;: false,</div><div class="line">   &quot;_shards&quot;: &#123; ... &#125;,</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      3,</div><div class="line">      &quot;max_score&quot;:  1,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;3&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Douglas&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Fir&quot;,</div><div class="line">               &quot;age&quot;:         35,</div><div class="line">               &quot;about&quot;:       &quot;I like to build cabinets&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;forestry&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;1&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;2&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>搜索姓氏中包含“Smith”的员工。要做到这一点，我们将在命令行中使用轻量级的搜索方法。这种方法常被称作查询字符串(query string)搜索</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//在请求中依旧使用_search关键字，然后将查询语句传递给参数q=</div><div class="line">GET /megacorp/employee/_search?q=last_name:Smith</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      2,</div><div class="line">      &quot;max_score&quot;:  0.30685282,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="使用DSL语句查询"><a href="#使用DSL语句查询" class="headerlink" title="使用DSL语句查询"></a>使用DSL语句查询</h3><blockquote>
-<p>查询字符串搜索便于通过命令行完成特定(ad hoc)的搜索，但是它也有局限性（参阅简单搜索章节）。Elasticsearch提供丰富且灵活的查询语言叫做DSL查询(Query DSL),它允许你构建更加复杂、强大的查询</p>
-</blockquote>
-<p>DSL(Domain Specific Language特定领域语言)以JSON请求体的形式出现。我们可以这样表示之前关于“Smith”的查询</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//相当于/megacorp/employee/_search?q=last_name:&quot;Smith&quot;</div><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123; //查询</div><div class="line">        &quot;match&quot; : &#123; //匹配</div><div class="line">            &quot;last_name&quot; : &quot;Smith&quot; //条件...</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>我们不再使用查询字符串(query string)做为参数，而是使用请求体代替。这个请求体使用JSON表示，其中使用了match语句</p>
-<h3 id="更复杂的搜索"><a href="#更复杂的搜索" class="headerlink" title="更复杂的搜索"></a>更复杂的搜索</h3><p>让搜索稍微再变的复杂一些。我们依旧想要找到姓氏为“Smith”的员工，但是我们只想得到年龄大于30岁的员工。我们的语句将添加过滤器(filter),它使得我们高效率的执行一个结构化搜索</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;filtered&quot; : &#123;</div><div class="line">            &quot;filter&quot; : &#123;</div><div class="line">                &quot;range&quot; : &#123;</div><div class="line">                    &quot;age&quot; : &#123; &quot;gt&quot; : 30 &#125; &lt;1&gt;</div><div class="line">                &#125;</div><div class="line">            &#125;,</div><div class="line">            &quot;query&quot; : &#123;</div><div class="line">                &quot;match&quot; : &#123;</div><div class="line">                    &quot;last_name&quot; : &quot;smith&quot; &lt;2&gt;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><1> 这部分查询属于区间过滤器(range filter),它用于查找所有年龄大于30岁的数据——gt为”greater than”的缩写。</1></p>
-<p><2> 这部分查询与之前的match语句(query)一致</2></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.30685282,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="全文搜索"><a href="#全文搜索" class="headerlink" title="全文搜索"></a>全文搜索</h3><p>到目前为止搜索都很简单：搜索特定的名字，通过年龄筛选。让我们尝试一种更高级的搜索，全文搜索——一种传统数据库很难实现的功能。<br>将会搜索所有喜欢“rock climbing”的员工</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>使用了之前的match查询，从about字段中搜索”rock climbing”，我们得到了两个匹配文档</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      2,</div><div class="line">      &quot;max_score&quot;:  0.16273327,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;: 0.16273327, &lt;1&gt;</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;: 0.016878016, &lt;2&gt;</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><1><2> 结果相关性评分</2></1></p>
-<p>默认情况下，Elasticsearch根据结果相关性评分来对结果集进行排序，所谓的「结果相关性评分」就是文档与查询条件的匹配程度。很显然，排名第一的John Smith的about字段明确的写到“rock climbing”。<br>但是为什么Jane Smith也会出现在结果里呢？原因是“rock”在她的abuot字段中被提及了。因为只有“rock”被提及而“climbing”没有，所以她的_score要低于John</p>
-<blockquote>
-<p>这个例子很好的解释了Elasticsearch如何在各种文本字段中进行全文搜索，并且返回相关性最大的结果集。相关性(relevance)的概念在Elasticsearch中非常重要，而这个概念在传统关系型数据库中是不可想象的，因为传统数据库对记录的查询只有匹配或者不匹配</p>
-</blockquote>
-<h3 id="短语搜索"><a href="#短语搜索" class="headerlink" title="短语搜索"></a>短语搜索</h3><p>目前我们可以在字段中搜索单独的一个词，这挺好的，但是有时候你想要确切的匹配若干个单词或者短语(phrases)。例如我们想要查询同时包含”rock”和”climbing”（并且是相邻的）的员工记录</p>
-<p>只要将match查询变更为match_phrase查询即可</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match_phrase&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.23013961,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;:         0.23013961,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="高亮搜索"><a href="#高亮搜索" class="headerlink" title="高亮搜索"></a>高亮搜索</h3><p>很多应用喜欢从每个搜索结果中高亮(highlight)匹配到的关键字，这样用户可以知道为什么这些文档和查询相匹配。在Elasticsearch中高亮片段是非常容易的</p>
-<p>在之前的语句上增加highlight参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match_phrase&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;,</div><div class="line">    &quot;highlight&quot;: &#123;</div><div class="line">        &quot;fields&quot; : &#123;</div><div class="line">            &quot;about&quot; : &#123;&#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>当我们运行这个语句时，会命中与之前相同的结果，但是在返回结果中会有一个新的部分叫做highlight，这里包含了来自about字段中的文本，并且用<em></em>来标识匹配到的单词</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.23013961,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;:         0.23013961,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;,</div><div class="line">            &quot;highlight&quot;: &#123;</div><div class="line">               &quot;about&quot;: [</div><div class="line">                  &quot;I love to go &lt;em&gt;rock&lt;/em&gt; &lt;em&gt;climbing&lt;/em&gt;&quot; &lt;1&gt;</div><div class="line">               ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2193,7 +2174,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">130</span>
+                <span class="site-state-item-count">131</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2215,7 +2196,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">102</span>
+                <span class="site-state-item-count">103</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
