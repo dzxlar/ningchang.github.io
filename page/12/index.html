@@ -254,6 +254,141 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】new-date-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Java8】new-date-api/" itemprop="url">【Java8】new date api</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:43:21+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div></pre></td><td class="code"><pre><div class="line">LocalDate yMd = LocalDate.of(2017, 4, 1);</div><div class="line">System.out.println(yMd);</div><div class="line">System.out.println(yMd.getYear());</div><div class="line">System.out.println(yMd.getMonth());</div><div class="line">System.out.println(yMd.getDayOfMonth());</div><div class="line">System.out.println(yMd.getDayOfYear());</div><div class="line">System.out.println(yMd.getDayOfWeek());</div><div class="line">System.out.println(yMd.isLeapYear());</div><div class="line">System.out.println(yMd.lengthOfMonth());</div><div class="line">System.out.println(yMd.lengthOfYear());</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate today = LocalDate.now();</div><div class="line">System.out.println(today);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">System.out.println(yMd.get(ChronoField.YEAR));</div><div class="line">System.out.println(yMd.get(ChronoField.MONTH_OF_YEAR));</div><div class="line">System.out.println(yMd.get(ChronoField.DAY_OF_MONTH));</div><div class="line">System.out.println(yMd.get(ChronoField.DAY_OF_WEEK));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalTime hMs = LocalTime.of(17, 50, 10);</div><div class="line">System.out.println(hMs);</div><div class="line">System.out.println(hMs.getHour());</div><div class="line">System.out.println(hMs.getMinute());</div><div class="line">System.out.println(hMs.getSecond());</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate parseDate = LocalDate.parse(&quot;2017-04-05&quot;);</div><div class="line">LocalTime parseTime = LocalTime.parse(&quot;18:10:10&quot;);</div><div class="line">System.out.println(parseDate);</div><div class="line">System.out.println(parseTime);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDateTime yMdhMs = LocalDateTime.of(yMd, hMs);</div><div class="line">LocalDateTime athMs = yMd.atTime(hMs);</div><div class="line">LocalDateTime atyMd = hMs.atDate(yMd);</div><div class="line">System.out.println(athMs);</div><div class="line">System.out.println(atyMd);</div><div class="line">System.out.println(yMdhMs);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate toDate = yMdhMs.toLocalDate();</div><div class="line">LocalTime toTime = yMdhMs.toLocalTime();</div><div class="line">System.out.println(toDate);</div><div class="line">System.out.println(toTime);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">System.out.println(Instant.ofEpochSecond(3));</div><div class="line">System.out.println(Instant.ofEpochSecond(2,1_000_000_000));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">Duration ofMin = Duration.ofMinutes(3);</div><div class="line">Duration of = Duration.of(3, ChronoUnit.MINUTES);</div><div class="line"></div><div class="line">System.out.println(ofMin);</div><div class="line">System.out.println(of);</div><div class="line"></div><div class="line">Period ofDay = Period.ofDays(10);</div><div class="line">Period ofWeek = Period.ofWeeks(3);</div><div class="line">Period yearMonthDay = Period.of(2, 6, 1);//2年6个月1天</div><div class="line"></div><div class="line">System.out.println(ofDay);</div><div class="line">System.out.println(ofWeek);</div><div class="line">System.out.println(yearMonthDay);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate editDate = LocalDate.of(2017, 4, 10);</div><div class="line"></div><div class="line">System.out.println(editDate);</div><div class="line">System.out.println(editDate.withYear(2020));</div><div class="line">System.out.println(editDate.withMonth(7));</div><div class="line">System.out.println(editDate.with(ChronoField.DAY_OF_MONTH,7));</div><div class="line"></div><div class="line">System.out.println(editDate.plusWeeks(1));</div><div class="line">System.out.println(editDate.minusWeeks(3));</div><div class="line">System.out.println(editDate.plus(10,ChronoUnit.MONTHS));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">LocalDate tempDate = LocalDate.of(2017, 4, 6);</div><div class="line"></div><div class="line">System.out.println(tempDate.with(nextOrSame(DayOfWeek.SUNDAY)));</div><div class="line">System.out.println(tempDate.with(lastDayOfMonth()));</div><div class="line">	</div><div class="line">LocalDate lambdaDate = tempDate.with(temporal -&gt; &#123;</div><div class="line">	DayOfWeek dow = DayOfWeek.of(temporal.get(ChronoField.DAY_OF_WEEK));</div><div class="line">	int dayToAdd = 1;</div><div class="line">	if(dow == DayOfWeek.THURSDAY) dayToAdd = 3;</div><div class="line">	else if(dow == DayOfWeek.WEDNESDAY) dayToAdd = 2;</div><div class="line">	return temporal.plus(dayToAdd,ChronoUnit.DAYS);</div><div class="line">&#125;);</div><div class="line">System.out.println(lambdaDate);</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">DateTimeFormatter dtf = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd hh:MM:ss&quot;);</div><div class="line">LocalDateTime date = LocalDateTime.of(yMd, hMs);</div><div class="line">String formatDate = dtf.format(date);</div><div class="line">System.out.println(formatDate);</div><div class="line">   </div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">DateTimeFormatter formatter = </div><div class="line">		new DateTimeFormatterBuilder()</div><div class="line">	    .appendText(ChronoField.DAY_OF_MONTH)</div><div class="line">	    .appendLiteral(&quot;.&quot;)</div><div class="line">	    .appendText(ChronoField.MONTH_OF_YEAR)</div><div class="line">	    .appendLiteral(&quot;.&quot;)</div><div class="line">	    .appendText(ChronoField.YEAR)</div><div class="line">	    .parseCaseInsensitive()</div><div class="line">	    .toFormatter(Locale.ITALIAN);</div><div class="line">System.out.println(formatter.format(date));</div><div class="line"></div><div class="line">System.out.println(&quot;==========================&quot;);</div><div class="line"></div><div class="line">ZoneId zoneId = TimeZone.getDefault().toZoneId();</div><div class="line">System.out.println(zoneId);</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">2017-04-01</div><div class="line">2017</div><div class="line">APRIL</div><div class="line">1</div><div class="line">91</div><div class="line">SATURDAY</div><div class="line">false</div><div class="line">30</div><div class="line">365</div><div class="line">==========================</div><div class="line">2017-04-06</div><div class="line">==========================</div><div class="line">2017</div><div class="line">4</div><div class="line">1</div><div class="line">6</div><div class="line">==========================</div><div class="line">17:50:10</div><div class="line">17</div><div class="line">50</div><div class="line">10</div><div class="line">==========================</div><div class="line">2017-04-05</div><div class="line">18:10:10</div><div class="line">==========================</div><div class="line">2017-04-01T17:50:10</div><div class="line">2017-04-01T17:50:10</div><div class="line">2017-04-01T17:50:10</div><div class="line">==========================</div><div class="line">2017-04-01</div><div class="line">17:50:10</div><div class="line">==========================</div><div class="line">1970-01-01T00:00:03Z</div><div class="line">1970-01-01T00:00:03Z</div><div class="line">==========================</div><div class="line">PT3M</div><div class="line">PT3M</div><div class="line">P10D</div><div class="line">P21D</div><div class="line">P2Y6M1D</div><div class="line">==========================</div><div class="line">2017-04-10</div><div class="line">2020-04-10</div><div class="line">2017-07-10</div><div class="line">2017-04-07</div><div class="line">2017-04-17</div><div class="line">2017-03-20</div><div class="line">2018-02-10</div><div class="line">==========================</div><div class="line">2017-04-09</div><div class="line">2017-04-30</div><div class="line">2017-04-09</div><div class="line">==========================</div><div class="line">2017-04-01 05:04:10</div><div class="line">==========================</div><div class="line">1.aprile.2017</div><div class="line">==========================</div><div class="line">Asia/Shanghai</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java各种对象名称详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1681,246 +1816,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/深入理解JVM学习笔记（三）-——-GC收集器和内存分配/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/深入理解JVM学习笔记（三）-——-GC收集器和内存分配/" itemprop="url">深入理解JVM学习笔记（三） —— GC收集器和内存分配</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:32:08+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="判断对象是否存活"><a href="#判断对象是否存活" class="headerlink" title="判断对象是否存活"></a>判断对象是否存活</h2><h3 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h3><blockquote>
-<p>很多判断对象是否存活的方式就是引用计数算法：给对象添加一个引用计数器，每当一个地方引用它，计数器+1；引用失效，计数器-1。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>任何时刻计数器为0的对象是不可能再被使用的。</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>Java虚拟机没有使用主流的引用计数法管理内存。主要原因是难以解决对象之间相互循环引用的问题</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">classA.instance = classB</div><div class="line">classB.instance = classA</div></pre></td></tr></table></figure>
-<p>classA和classB已经不可能再被访问，但是classA和classB互相引用对方，导致计数器永远不可能是0，导致GC无法回收两个对象</p>
-<hr>
-<h2 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h2><blockquote>
-<p>通过一系列称为”GC Roots”对象作为起始点，从这些节点向下搜索，搜索过的路径称为引用链。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>当一个对象的GCRoots没有任何引用链相连时，则证明该对象不可用。</strong></p>
-</blockquote>
-<p>在java中可作为GCRoots对象的是</p>
-<ol>
-<li>虚拟机栈（栈帧本地变量表）引用的对象</li>
-<li>方法区中类属性引用对象</li>
-<li>方法区中常量引用对象</li>
-<li>本地方法栈（JNI）中引用对象</li>
-</ol>
-<hr>
-<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>Java引用分类(又上到下引用关系依次减弱)</p>
-<ul>
-<li>强引用<ul>
-<li>必须存在的对象</li>
-<li>类似ObjectA objA = new ObjectA()</li>
-</ul>
-</li>
-<li>软引用<ul>
-<li>有用但非必须的对象</li>
-<li>在发生内存溢出后，可进行二次回收</li>
-</ul>
-</li>
-<li>弱引用<ul>
-<li>非必须对象</li>
-<li>无论当前内存是否足够，都会回收掉只被弱关联对象</li>
-</ul>
-</li>
-<li>虚引用<ul>
-<li>是否存在不会对生存时间对其影响</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="生存或者死亡"><a href="#生存或者死亡" class="headerlink" title="生存或者死亡"></a>生存或者死亡</h2><blockquote>
-<p>判断一个对象死亡，<strong>至少经历两次标志过程</strong>：如果对象进行可达性分析，<strong>GCRoot没有相连的引用链，那么被第一次标记进行筛选</strong>；<strong>筛选的条件是是否有必要进行finalize()方法</strong>；对象没有覆盖finalize()方法或者已经被虚拟机调用过finalize()方法，则该对象没必要销毁；<strong>如果这个对象有必要执行finalize()方法，会将它放置在F-Queue队列中</strong>，并在稍后由一个虚拟机自动执行、低优先级的Finalizer线程去执行；<strong>GC稍后会对F-Queue中的对象进行二次标记</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p>如果对象需要拯救自己不被回收。只要重新与引用链的任何一个对象重新关联为止（例如.this)</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>注意：自救的机会只能使用一次；一个对象的finalize方法最多只被系统调用一次</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">private static FinallyProperty escapeGC = null;</div><div class="line"></div><div class="line">@Override</div><div class="line">void finalize() throws Throwable&#123;</div><div class="line">   super.finalize();</div><div class="line">   FinallyProperty.escapeGC = this;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="回收方法区"><a href="#回收方法区" class="headerlink" title="回收方法区"></a>回收方法区</h2><blockquote>
-<p>永久代的垃圾回收主要是2个部分:废弃变量和无用的类</p>
-</blockquote>
-<ul>
-<li>废弃变量：与Java堆中的回收类似；例如.没有任何一个地方引用常量池的”abc”字面量，这时发生了内存回收；这个”abc”会被清理出常量池</li>
-<li>无用的类需要满足的3个条件<ul>
-<li>java堆中不存在该类的任何实例</li>
-<li>加载该类的ClassLoader已被回收</li>
-<li>无法在任何地方通过反射访问该类的方法</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><h3 id="标记-清除"><a href="#标记-清除" class="headerlink" title="标记-清除"></a>标记-清除</h3><blockquote>
-<p>在回收之前，首先标志出需要回收的对象，在标志完成后统一回收所有标志对象<br>后面的算法都是基于”标记-清除”算法的改进</p>
-</blockquote>
-<p>该算法的主要缺点</p>
-<ol>
-<li>效率低下：产生过多内存碎片</li>
-<li>空间占用过多</li>
-</ol>
-<h3 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h3><blockquote>
-<p>解决”标记-清除”算法效率问题</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>将内存划分为容量相等的2个部分，每次只使用其中一块。当这块内存使用完毕，将还存活的对象复制在另一块上面。然后把已使用的空间一次性清理掉。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>每次对整个半区进行回收，而不讨论内存碎片等复杂情况，只需移动堆顶指针、按顺序分配内存即可。</p>
-</blockquote>
-<h3 id="标志-整理算法"><a href="#标志-整理算法" class="headerlink" title="标志-整理算法"></a>标志-整理算法</h3><blockquote>
-<p>复制收集算法在对象存活率过高时进行复制操作，影响效率。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>根据老年代特点，提出了标志-整理算法；标志过程和标志-清除的过程一样。整理：让所有存活对象向一端移动，然后直接清理掉边界以外的内存</p>
-</blockquote>
-<h3 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h3><blockquote>
-<p>一般把Java划分成新生代和老年代；根据各个年代的特点采用合适的收集算法<br>通常新生代采取：复制算法<br>老年代采取：标志-整理或者标志-清除算法</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1970,7 +1865,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">131</span>
+                <span class="site-state-item-count">132</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

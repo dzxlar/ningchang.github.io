@@ -254,6 +254,173 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/31/【JVM】垃圾收集/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/31/【JVM】垃圾收集/" itemprop="url">【JVM】垃圾收集</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-31T16:37:01+08:00">
+                2017-08-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>【问题一】垃圾回收（GC）主要用在哪些区域</p>
+<p>【回答】内存垃圾回收主要集中于 java 堆和方法区中。其他区域都是自动清理</p>
+<p>【问题二】如何判断对象是否存活？</p>
+<p>【回答】通常有2种方式。引用计数和可达性分析</p>
+<p>  引用计数：每个对象有一个引用计数属性，新增一个引用时计数加1，引用释放时计数减1，计数为0时可以回收。此方法简单，无法解决对象相互循环引用的问题。</p>
+<p>  可达性分析（Reachability Analysis）：从GC Roots开始向下搜索，搜索所走过的路径称为引用链。当一个对象到GC Roots没有任何引用链相连时，则证明此对象是不可用的。不可达对象。</p>
+<p>【问题二延伸】描述GC Roots</p>
+<p>【回答】在Java语言中，GC Roots包括：</p>
+<ol>
+<li><p>虚拟机栈中引用的对象。</p>
+</li>
+<li><p>方法区中类静态属性实体引用的对象。</p>
+</li>
+<li><p>方法区中常量引用的对象。</p>
+</li>
+<li><p>本地方法栈中JNI引用的对象。</p>
+</li>
+</ol>
+<p>【问题三】简述几种常用标记算法？</p>
+<p>【回答】</p>
+<p>标记-清除算法(最基础)：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。</p>
+<p>缺点：1.效率低下 2.产生不连续空间碎片（空间碎片太多可能会导致，当程序在以后的运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作）</p>
+<p>复制算法： ​将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉</p>
+<p>缺点：虽然解决标记-清除算法产生不连续空间碎片问题。但是依旧效率不高（将内存缩小为原来的一半，持续复制长生存期的对象则导致效率降低）</p>
+<p>标记-压缩算法：在对象存活率较高时就要执行较多的复制操作，效率将会变低（老年代不能直接选择这种算法）</p>
+<p>分代收集算法：把Java堆分为新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法(在新生代中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本就可以完成收集。而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用“标记-清理”或“标记-整理”算法来进行回收。)</p>
+<p>【问题四】简述垃圾收集器的几个步骤</p>
+<p>【回答】</p>
+<p>1、标记阶段，首先初始标记(Initial-Mark),这个阶段是停顿的(Stop the World Event)，并且会触发一次普通Mintor GC。对应GC log:GC pause (young) (inital-mark)</p>
+<p>2、Root Region Scanning，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young GC之前完成。</p>
+<p>3、Concurrent Marking，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young GC中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)。同时，并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)。</p>
+<p>4、Remark, 再标记，会有短暂停顿(STW)。再标记阶段是用来收集 并发标记阶段 产生新的垃圾(并发阶段和应用程序一同运行)；G1中采用了比CMS更快的初始快照算法:snapshot-at-the-beginning (SATB)。</p>
+<p>5、Copy/Clean up，多线程清除失活对象，会有STW。G1将回收区域的存活对象拷贝到新区域，清除Remember Sets，并发清空回收区域并把它返回到空闲区域链表中。</p>
+<p><a href="http://www.cnblogs.com/ityouknow/p/5614961.html" target="_blank" rel="external">http://www.cnblogs.com/ityouknow/p/5614961.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/23/JVM问题记录总结/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2117,178 +2284,6 @@ FROM page_view pv;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/06/技术网站/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/07/06/技术网站/" itemprop="url">技术网站</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-06T15:59:21+08:00">
-                2017-07-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/技术网站/" itemprop="url" rel="index">
-                    <span itemprop="name">技术网站</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li><p><a href="http://spring4all.com/" target="_blank" rel="external">springforall社区</a></p>
-</li>
-<li><p><a href="https://www.springcloud.cc/" target="_blank" rel="external">SpringCloud中文社区</a></p>
-</li>
-<li><p><a href="http://blog.didispace.com/" target="_blank" rel="external">程序猿DD博客</a></p>
-</li>
-<li><p><a href="https://spring.io/docs/reference" target="_blank" rel="external">spring官方文档</a></p>
-</li>
-<li><p><a href="https://lfvepclr.gitbooks.io/spring-framework-5-doc-cn/content/" target="_blank" rel="external">spring5中文文档</a></p>
-</li>
-<li><p><a href="http://blog.csdn.net/sunshine920103/article/details/50363315" target="_blank" rel="external">springdatajpa多数据源切换</a></p>
-</li>
-<li><p><a href="https://www.ibm.com/developerworks/cn/java/j-master-spring-transactional-use/index.html" target="_blank" rel="external">spring的@Transactional详解</a></p>
-</li>
-<li><p><a href="http://springfox.github.io/springfox/docs/current/" target="_blank" rel="external">SpringFox文档</a></p>
-</li>
-<li><p><a href="http://blog.csdn.net/isea533/article/details/50359390" target="_blank" rel="external">SpringBoot集成Mybatis</a></p>
-</li>
-<li><p><a href="http://www.importnew.com/22908.html" target="_blank" rel="external">SpringMVC集成Shiro</a></p>
-</li>
-<li><p><a href="http://www.downfi.com/video/" target="_blank" rel="external">小视频下载</a></p>
-</li>
-<li><p><a href="https://ezgif.com/" target="_blank" rel="external">gif制作网站</a></p>
-</li>
-<li><p><a href="http://iconfont.cn/" target="_blank" rel="external">阿里图标合集</a></p>
-</li>
-<li><p><a href="https://everypixel.com" target="_blank" rel="external">图片搜索</a></p>
-</li>
-<li><p><a href="http://pandao.github.io/editor.md/" target="_blank" rel="external">JS markdown编辑器</a></p>
-</li>
-<li><p><a href="https://my.oschina.net/feinik/blog/911138" target="_blank" rel="external">Semaphore信号量</a></p>
-</li>
-<li><p><a href="http://ibeetl.com/" target="_blank" rel="external">beetle</a></p>
-</li>
-<li><p><a href="https://jhipster.github.io/" target="_blank" rel="external">JHipster</a></p>
-</li>
-</ol>
-<p>（待补充…）</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2338,7 +2333,7 @@ FROM page_view pv;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">131</span>
+                <span class="site-state-item-count">132</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
