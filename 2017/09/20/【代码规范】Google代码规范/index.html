@@ -1,0 +1,858 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="代码规范," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="文件名 源文件以其最顶层的类名来命名，大小写敏感。例如：包名为com.bcw.ewms，文件名设置为ewms  统一文件编码UTF-8特殊字符- **空白字符**:除了行结束符序列，ASCII水平空格字符(0x20，即空格)是源文件中唯一允许出现的空白字符 - **特殊转义序列**:对于具有特殊转义序列的任何字符(\b, \t, \n, \f, \r, &amp;quot;, &amp;apos;及\)，我们使用">
+<meta name="keywords" content="代码规范">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【代码规范】Google代码规范">
+<meta property="og:url" content="http://yoursite.com/2017/09/20/【代码规范】Google代码规范/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="文件名 源文件以其最顶层的类名来命名，大小写敏感。例如：包名为com.bcw.ewms，文件名设置为ewms  统一文件编码UTF-8特殊字符- **空白字符**:除了行结束符序列，ASCII水平空格字符(0x20，即空格)是源文件中唯一允许出现的空白字符 - **特殊转义序列**:对于具有特殊转义序列的任何字符(\b, \t, \n, \f, \r, &amp;quot;, &amp;apos;及\)，我们使用">
+<meta property="og:updated_time" content="2017-09-20T02:38:51.274Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【代码规范】Google代码规范">
+<meta name="twitter:description" content="文件名 源文件以其最顶层的类名来命名，大小写敏感。例如：包名为com.bcw.ewms，文件名设置为ewms  统一文件编码UTF-8特殊字符- **空白字符**:除了行结束符序列，ASCII水平空格字符(0x20，即空格)是源文件中唯一允许出现的空白字符 - **特殊转义序列**:对于具有特殊转义序列的任何字符(\b, \t, \n, \f, \r, &amp;quot;, &amp;apos;及\)，我们使用">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/20/【代码规范】Google代码规范/"/>
+
+
+
+
+
+  <title>【代码规范】Google代码规范 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/20/【代码规范】Google代码规范/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【代码规范】Google代码规范</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-20T10:04:08+08:00">
+                2017-09-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/代码规范/" itemprop="url" rel="index">
+                    <span itemprop="name">代码规范</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="文件名"><a href="#文件名" class="headerlink" title="文件名"></a>文件名</h2><blockquote>
+<p>源文件以其最顶层的类名来命名，大小写敏感。例如：包名为com.bcw.ewms，文件名设置为ewms</p>
+</blockquote>
+<h2 id="统一文件编码UTF-8"><a href="#统一文件编码UTF-8" class="headerlink" title="统一文件编码UTF-8"></a>统一文件编码UTF-8</h2><h2 id="特殊字符"><a href="#特殊字符" class="headerlink" title="特殊字符"></a>特殊字符</h2><pre><code>- **空白字符**:除了行结束符序列，ASCII水平空格字符(0x20，即空格)是源文件中唯一允许出现的空白字符
+- **特殊转义序列**:对于具有特殊转义序列的任何字符(\b, \t, \n, \f, \r, &quot;, &apos;及\)，我们使用它的转义序列，而不是相应的八进制(比如\012)或Unicode(比如\u000a)转义。
+- **非ASCII字符**:对于剩余的非ASCII字符，是使用实际的Unicode字符(比如∞)，还是使用等价的Unicode转义符(比如\u221e)，取决于哪个能让代码更易于阅读和理解。
+</code></pre><p>Tip: 在使用Unicode转义符或是一些实际的Unicode字符时，建议做些注释给出解释</p>
+<pre><code>`
+      String unitAbbrev = &quot;μs&quot;;                                 | 赞，即使没有注释也非常清晰
+      String unitAbbrev = &quot;\u03bcs&quot;; // &quot;μs&quot;                    | 允许，但没有理由要这样做
+      String unitAbbrev = &quot;\u03bcs&quot;; // Greek letter mu, &quot;s&quot;    | 允许，但这样做显得笨拙还容易出错
+          String unitAbbrev = &quot;\u03bcs&quot;;                            | 很糟，读者根本看不出这是什么
+          return &apos;\ufeff&apos; + content; // byte order mark             | Good，对于非打印字符，使用转义，并在必要时写上注释
+`
+</code></pre><h2 id="源文件结构"><a href="#源文件结构" class="headerlink" title="源文件结构"></a>源文件结构</h2><ol>
+<li>许可证或版权信息(如有需要)</li>
+<li>package语句</li>
+<li>import语句<blockquote>
+<p> import不要使用通配符。例如：import java.util.*;</p>
+</blockquote>
+</li>
+<li>一个顶级类(只有一个)</li>
+</ol>
+<h2 id="类声明"><a href="#类声明" class="headerlink" title="类声明"></a>类声明</h2><ol>
+<li>只有一个顶级类声明<blockquote>
+<p>每个顶级类都在一个与它同名的源文件中</p>
+</blockquote>
+</li>
+<li>类成员顺序<blockquote>
+<p>每个类应该以某种逻辑去排序它的成员，维护者应该要能解释这种排序逻辑。</p>
+</blockquote>
+</li>
+<li>重载：永不分离<blockquote>
+<p>当一个类有多个构造函数，或是多个同名方法，这些函数/方法应该按顺序出现在一起，中间不要放进其它函数/方法。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="格式"><a href="#格式" class="headerlink" title="格式"></a>格式</h2><ol>
+<li>大括号<blockquote>
+<p>大括号与if, else, for, do, while语句一起使用，即使只有一条语句(或是空)，也应该把大括号写上。</p>
+</blockquote>
+</li>
+<li><p>非空块：K &amp; R 风格</p>
+<ul>
+<li>左大括号前不换行</li>
+<li>左大括号后换行</li>
+<li>右大括号前换行</li>
+<li>如果右大括号是一个语句、函数体或类的终止，则右大括号后换行; 否则不换行。例如，如果右大括号后面是else或逗号，则不换行。 </li>
+</ul>
+</li>
+<li><p>空块 </p>
+<pre><code>void doNothing() {}
+</code></pre></li>
+<li><p>每个语句后要换行。      </p>
+</li>
+<li><p>列限制：80或100字符</p>
+</li>
+<li><p>断开</p>
+<ol>
+<li>如果在非赋值运算符处断开，那么在该符号前断开(比如+，它将位于下一行)。注意：这一点与Google其它语言的编程风格不同(如C++和JavaScript)。 这条规则也适用于以下“类运算符”符号：点分隔符(.)，类型界限中的&amp;（<t extends="" foo="" &="" bar="">)，catch块中的管道符号(catch (FooException | BarException e)</t></li>
+<li>如果在赋值运算符处断开，通常的做法是在该符号后断开(比如=，它与前面的内容留在同一行)。这条规则也适用于foreach语句中的分号。</li>
+<li>方法名或构造函数名与左括号留在同一行。</li>
+<li>逗号(,)与其前面的内容留在同一行。】</li>
+</ol>
+</li>
+<li><p>自动换行时缩进至少+4个空格</p>
+</li>
+</ol>
+<h2 id="空白"><a href="#空白" class="headerlink" title="空白"></a>空白</h2><ol>
+<li>水平空白</li>
+<li>垂直空白</li>
+<li>水平对齐</li>
+</ol>
+<h2 id="用小括号来限定组"><a href="#用小括号来限定组" class="headerlink" title="用小括号来限定组"></a>用小括号来限定组</h2><h2 id="具体结构"><a href="#具体结构" class="headerlink" title="具体结构"></a>具体结构</h2><ol>
+<li><p>枚举</p>
+<blockquote>
+<p>枚举常量间用逗号隔开，换行可选。</p>
+</blockquote>
+</li>
+<li><p>每次只声明一个变量</p>
+</li>
+<li><p>需要时才声明，并尽快进行初始化</p>
+</li>
+<li><p>数组</p>
+<ol>
+<li>数组初始化：可写成块状结构</li>
+<li>非C风格的数组声明:中括号是类型的一部分：String[] args， 而非String args[]。</li>
+</ol>
+</li>
+<li><p>switch语句<br> 1.switch块中的内容缩进为2个空格。<br> 2.在一个switch块内，每个语句组要么通过break, continue, return或抛出异常来终止，要么通过一条注释来说明程序将继续执行到下一个语句组， 任何能表达这个意思的注释都是OK的(典型的是用// fall through)。这个特殊的注释并不需要在最后一个语句组(一般是default)中出现</p>
+</li>
+<li><p>注解(Annotations)</p>
+<blockquote>
+<p>注解紧跟在文档块后面，应用于类、方法和构造函数，一个注解独占一行。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><ol>
+<li>块注释风格<blockquote>
+<p>块注释与其周围的代码在同一缩进级别。它们可以是/<em> … </em>/风格，也可以是// …风格。对于多行的/<em> … </em>/注释，后续行必须从<em>开始， 并且与前一行的</em>对齐</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="命名约定"><a href="#命名约定" class="headerlink" title="命名约定"></a>命名约定</h2><ol>
+<li><p>对所有标识符都通用的规则</p>
+<blockquote>
+<p>标识符只能使用ASCII字母和数字，因此每个有效的标识符名称都能匹配正则表达式\w+。在Google其它编程语言风格中使用的特殊前缀或后缀，如name_, mName, s_name和kName，在Java编程风格中都不再使用。</p>
+</blockquote>
+</li>
+<li><p>标识符类型的规则</p>
+<pre><code>1. 包名
+&gt; 包名全部小写，连续的单词只是简单地连接起来，不使用下划线。
+</code></pre><ol>
+<li><p>类名</p>
+<blockquote>
+<p>类名都以UpperCamelCase风格编写。</p>
+</blockquote>
+</li>
+<li><p>方法名</p>
+<blockquote>
+<p>方法名都以lowerCamelCase风格编写。</p>
+</blockquote>
+</li>
+<li><p>常量名</p>
+<blockquote>
+<p>常量名命名模式为CONSTANT_CASE，全部字母大写，用下划线分隔单词。</p>
+</blockquote>
+</li>
+<li><p>非常量字段名</p>
+<blockquote>
+<p>非常量字段名以lowerCamelCase风格编写。</p>
+</blockquote>
+</li>
+<li><p>参数名</p>
+<blockquote>
+<p>参数名以lowerCamelCase风格编写。</p>
+</blockquote>
+</li>
+<li><p>局部变量名</p>
+<blockquote>
+<p>局部变量名以lowerCamelCase风格编写，比起其它类型的名称，局部变量名可以有更为宽松的缩写。</p>
+</blockquote>
+<ol>
+<li>类型变量名<br>类型变量可用以下两种风格之一进行命名：<br>  单个的大写字母，后面可以跟一个数字(如：E, T, X, T2)。<br>  以类命名方式(5.2.2节)，后面加个大写的T(如：RequestT, FooBarT)。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a href="http://www.hawstein.com/posts/google-java-style.html" target="_blank" rel="external">http://www.hawstein.com/posts/google-java-style.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/代码规范/" rel="tag"># 代码规范</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/31/【JVM】垃圾收集/" rel="next" title="【JVM】垃圾收集">
+                <i class="fa fa-chevron-left"></i> 【JVM】垃圾收集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">133</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">104</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件名"><span class="nav-number">1.</span> <span class="nav-text">文件名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#统一文件编码UTF-8"><span class="nav-number">2.</span> <span class="nav-text">统一文件编码UTF-8</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特殊字符"><span class="nav-number">3.</span> <span class="nav-text">特殊字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源文件结构"><span class="nav-number">4.</span> <span class="nav-text">源文件结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类声明"><span class="nav-number">5.</span> <span class="nav-text">类声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#格式"><span class="nav-number">6.</span> <span class="nav-text">格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#空白"><span class="nav-number">7.</span> <span class="nav-text">空白</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用小括号来限定组"><span class="nav-number">8.</span> <span class="nav-text">用小括号来限定组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体结构"><span class="nav-number">9.</span> <span class="nav-text">具体结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注释"><span class="nav-number">10.</span> <span class="nav-text">注释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命名约定"><span class="nav-number">11.</span> <span class="nav-text">命名约定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档"><span class="nav-number">11.1.</span> <span class="nav-text">参考文档</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

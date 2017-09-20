@@ -254,6 +254,212 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/SpringSecurity学习笔记（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/SpringSecurity学习笔记（一）/" itemprop="url">SpringSecurity学习笔记（一）—— Java配置</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T09:58:59+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/权限安全/" itemprop="url" rel="index">
+                    <span itemprop="name">权限安全</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="SpringSecurity学习笔记（一）——-Java配置"><a href="#SpringSecurity学习笔记（一）——-Java配置" class="headerlink" title="SpringSecurity学习笔记（一）—— Java配置"></a>SpringSecurity学习笔记（一）—— Java配置</h2><h3 id="目录概要"><a href="#目录概要" class="headerlink" title="目录概要"></a>目录概要</h3><ul>
+<li>验证应用程序每一个URL</li>
+<li>生成登录表单对象</li>
+<li>通过用户/密码进行表单验证</li>
+<li>用户注销</li>
+<li>阻止CSRF攻击</li>
+<li>设置安全请求头</li>
+<li>集成servletAPI</li>
+</ul>
+<h3 id="Web安全"><a href="#Web安全" class="headerlink" title="Web安全"></a>Web安全</h3><blockquote>
+<p>创建Security过滤器(通过springSecurityFilterChain负责所有安全过滤请求)</p>
+</blockquote>
+<p>基本例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@EnableWebSecurity</div><div class="line">public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected UserDetailsService userDetailsService() &#123;</div><div class="line">		InMemoryUserDetailsManager inMemoryManager = new InMemoryUserDetailsManager();</div><div class="line">		inMemoryManager.createUser(User.withUsername(&quot;admin&quot;).password(&quot;123456&quot;).roles(&quot;SuperAdmin&quot;).build());</div><div class="line">		return inMemoryManager;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">	protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">		http.authorizeRequests()</div><div class="line">            //确保任何请求应用程序需要经过身份验证的用户</div><div class="line">		    .anyRequest().authenticated() </div><div class="line">		        .and()</div><div class="line">            //允许用户进行身份验证和基于表单的登录</div><div class="line">	        .formLogin()</div><div class="line">	        	.and()</div><div class="line">            //允许用户通过HTTP基本认证验证</div><div class="line">	        .httpBasic();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<hr>
+<p><strong>AbstractSecurityWebApplicationInitializer确保springSecurityFilterChain得到注册</strong> </p>
+<h3 id="Http安全和表单登录"><a href="#Http安全和表单登录" class="headerlink" title="Http安全和表单登录"></a>Http安全和表单登录</h3><hr>
+<p>java配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">   @Override</div><div class="line">protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">	http.authorizeRequests()</div><div class="line">           //确保任何请求应用程序需要经过身份验证的用户</div><div class="line">	    .anyRequest().authenticated() </div><div class="line">	        .and()</div><div class="line">           //允许用户进行身份验证和基于表单的登录</div><div class="line">        .formLogin()</div><div class="line">        	.and()</div><div class="line">           //允许用户通过HTTP基本认证验证</div><div class="line">        .httpBasic();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<hr>
+<p>xml配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> &lt;http&gt;</div><div class="line">&lt;intercept-url pattern=&quot;/**&quot; access=&quot;authenticated&quot;/&gt;</div><div class="line">&lt;form-login /&gt;</div><div class="line">&lt;http-basic /&gt;</div><div class="line">&lt;/http&gt;</div></pre></td></tr></table></figure></p>
+<h3 id="认证请求"><a href="#认证请求" class="headerlink" title="认证请求"></a>认证请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">.authorizeRequests()</div><div class="line">     .antMatchers(&quot;/admin&quot;,&quot;/system&quot;,&quot;/resource&quot;).permitAll()</div><div class="line">     .antMatchers(&quot;/product&quot;).hasRole(&quot;admin&quot;)</div><div class="line">     .antMatchers(&quot;/dba&quot;).access(&quot;hasRole(&apos;admin&apos;) and hasRole(&apos;dba&apos;)&quot;)</div><div class="line">     .anyRequest().authenticated()</div></pre></td></tr></table></figure>
+<h3 id="注销"><a href="#注销" class="headerlink" title="注销"></a>注销</h3><ul>
+<li>清除http session</li>
+<li>清除rememberme状态</li>
+<li>清除上下文SecurityContextHolder</li>
+<li><p>重定向/login?logout</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">.logout()</div><div class="line">          //如果开启CSRF，请求必须为POST</div><div class="line">       .logoutUrl(&quot;/logout&quot;)</div><div class="line">          //注销成功后，跳转页面</div><div class="line">       .logoutSuccessUrl(&quot;/index&quot;)</div><div class="line">          //清除无效session</div><div class="line">       .invalidateHttpSession(true)</div><div class="line">          //自定义LogoutSuccessHandler.class。如果该类生效。忽略logoutSuccessUrl</div><div class="line"> .logoutSuccessHandler(logoutSuccessHandler)</div><div class="line">          //添加LogoutHandler</div><div class="line">          .addLogoutHandler(logoutHandler)                                         </div><div class="line">          //删除cookie			   </div><div class="line">          .deleteCookies(cookieNamesToClear)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h4 id="LogoutSuccessHandler-的实现类"><a href="#LogoutSuccessHandler-的实现类" class="headerlink" title="LogoutSuccessHandler 的实现类"></a>LogoutSuccessHandler 的实现类</h4><blockquote>
+<p>注销成功后发生的操作</p>
+</blockquote>
+<ul>
+<li>SimpleUrlLogoutSuccessHandler</li>
+<li>HttpStatusReturningLogoutSuccessHandler</li>
+</ul>
+<h4 id="LogoutHandler-的实现类"><a href="#LogoutHandler-的实现类" class="headerlink" title="LogoutHandler 的实现类"></a>LogoutHandler 的实现类</h4><blockquote>
+<p>处理必要的清理。例如cookie等</p>
+</blockquote>
+<ul>
+<li>PersistentTokenBasedRememberMeServices</li>
+<li>TokenBasedRememberMeServices</li>
+<li>CookieClearingLogoutHandler</li>
+<li>CsrfLogoutHandler</li>
+<li>SecurityContextLogoutHandler</li>
+</ul>
+<h4 id="更多关于注销的文档"><a href="#更多关于注销的文档" class="headerlink" title="更多关于注销的文档"></a>更多关于注销的文档</h4><p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#nsa-logout" target="_blank" rel="external">&lt; logout &gt;</a></p>
+<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#remember-me-impls" target="_blank" rel="external">Remember-Me</a></p>
+<p>通过钩子方法实现自动登录。RememberMeServices接口方法类似如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">autoLogin(req,res)</div><div class="line">loginSuccess(req,res)</div><div class="line">loginFail(req,res)</div></pre></td></tr></table></figure></p>
+<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#servletapi-logout" target="_blank" rel="external">HttpServletRequest.logout()</a></p>
+<blockquote>
+<p>用于记录当前用户。HttpServletRequest.logout()被调用,需要编写一个响应。</p>
+</blockquote>
+<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#ns-logout" target="_blank" rel="external">认证提供者</a></p>
+<p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#test-logout" target="_blank" rel="external">Test Logout</a></p>
+<pre><code>mvc
+.perform(logout())
+</code></pre><p><a href="http://docs.spring.io/spring-security/site/docs/4.2.3.BUILD-SNAPSHOT/reference/htmlsingle/#cas-singlelogout" target="_blank" rel="external">CAS单点注销</a></p>
+<h3 id="高级认证"><a href="#高级认证" class="headerlink" title="高级认证"></a>高级认证</h3><h4 id="In-Memory"><a href="#In-Memory" class="headerlink" title="In-Memory"></a>In-Memory</h4>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@Bean</div><div class="line">   public UserDetailsService userDetailsService() throws Exception &#123;</div><div class="line">  InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();</div><div class="line">  manager.createUser(User.withUsername(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).build());</div><div class="line">  manager.createUser(User.withUsername(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;,&quot;ADMIN&quot;).build());</div><div class="line">  return manager;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<h4 id="JDBC"><a href="#JDBC" class="headerlink" title="JDBC"></a>JDBC</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">   @Autowired</div><div class="line">private DataSource dataSource;</div><div class="line"></div><div class="line">@Autowired</div><div class="line">public void configureGlobal(AuthenticationManagerBuilder 	auth) throws Exception &#123;</div><div class="line"> auth</div><div class="line">	.jdbcAuthentication()</div><div class="line">		.dataSource(dataSource)</div><div class="line">		.withDefaultSchema()</div><div class="line">		.withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).and()</div><div class="line">		.withUser(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;, &quot;ADMIN&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="自定义授权认证"><a href="#自定义授权认证" class="headerlink" title="自定义授权认证"></a>自定义授权认证</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">   @Bean</div><div class="line">   public SpringAuthenticationProvider springAuthenticationProvider() &#123;</div><div class="line">	 return new SpringAuthenticationProvider();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="自定义身份认证"><a href="#自定义身份认证" class="headerlink" title="自定义身份认证"></a>自定义身份认证</h4><pre><code>@Bean
+public SpringDataUserDetailsService springDataUserDetailsService() {
+  return new SpringDataUserDetailsService();
+}
+</code></pre><h4 id="自定义密码加密"><a href="#自定义密码加密" class="headerlink" title="自定义密码加密"></a>自定义密码加密</h4>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"> @Bean</div><div class="line"> public BCryptPasswordEncoder passwordEncoder() &#123;</div><div class="line">return new BCryptPasswordEncoder();</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<h3 id="多个HttpSecurity"><a href="#多个HttpSecurity" class="headerlink" title="多个HttpSecurity"></a>多个HttpSecurity</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">   @EnableWebSecurity</div><div class="line">   public class MultiHttpSecurityConfig &#123;</div><div class="line">@Bean</div><div class="line">public UserDetailsService userDetailsService() throws Exception &#123;</div><div class="line">	InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();</div><div class="line">	manager.createUser(User.withUsername(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).build());</div><div class="line">	manager.createUser(User.withUsername(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;,&quot;ADMIN&quot;).build());</div><div class="line">	return manager;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Configuration</div><div class="line">@Order(1)                                                       1</div><div class="line">public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter &#123;</div><div class="line">	protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">		http</div><div class="line">			.antMatcher(&quot;/api/**&quot;)                               </div><div class="line">			.authorizeRequests()</div><div class="line">				.anyRequest().hasRole(&quot;ADMIN&quot;)</div><div class="line">				.and()</div><div class="line">			.httpBasic();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Configuration                                                   </div><div class="line">public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	protected void configure(HttpSecurity http) throws Exception &#123;</div><div class="line">		http</div><div class="line">			.authorizeRequests()</div><div class="line">				.anyRequest().authenticated()</div><div class="line">				.and()</div><div class="line">			.formLogin();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<h3 id="方法安全"><a href="#方法安全" class="headerlink" title="方法安全"></a>方法安全</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@EnableGlobalMethodSecurity(securedEnabled = true)</div><div class="line">public class MethodSecurityConfig &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public interface BankService &#123;</div><div class="line"></div><div class="line"> @Secured(&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;)</div><div class="line"> public Account readAccount(Long id);</div><div class="line"></div><div class="line"> @Secured(&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;)</div><div class="line"> public Account[] findAccounts();</div><div class="line"></div><div class="line"> @Secured(&quot;ROLE_TELLER&quot;)</div><div class="line"> public Account post(Account account, double amount);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="后置处理"><a href="#后置处理" class="headerlink" title="后置处理"></a>后置处理</h3>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">.withObjectPostProcessor(new ObjectPostProcessor&lt;FilterSecurityInterceptor&gt;() &#123;</div><div class="line">	public &lt;O extends FilterSecurityInterceptor&gt; O postProcess(</div><div class="line">			O fsi) &#123;</div><div class="line">		fsi.setPublishAuthorizationSuccess(true);</div><div class="line">		return fsi;</div><div class="line">	&#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<h3 id="自定义DSLs"><a href="#自定义DSLs" class="headerlink" title="自定义DSLs"></a>自定义DSLs</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">   public class MyCustomDsl extends AbstractHttpConfigurer&lt;CorsConfigurerMyCustomDsl, HttpSecurity&gt; &#123;</div><div class="line">private boolean flag;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void init(H http) throws Exception &#123;</div><div class="line">	// any method that adds another configurer</div><div class="line">	// must be done in the init method</div><div class="line">	http.csrf().disable();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void configure(H http) throws Exception &#123;</div><div class="line">	ApplicationContext context = http.getSharedObject(ApplicationContext.class);</div><div class="line"></div><div class="line">	// here we lookup from the ApplicationContext. You can also just create a new instance.</div><div class="line">	MyFilter myFilter = context.getBean(MyFilter.class);</div><div class="line">	myFilter.setFlag(flag);</div><div class="line">	http.addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public MyCustomDsl flag(boolean value) &#123;</div><div class="line">	this.flag = value;</div><div class="line">	return this;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static MyCustomDsl customDsl() &#123;</div><div class="line">	return new MyCustomDsl();</div><div class="line">&#125;		</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>META-INF/spring.factories.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer = sample.MyCustomDsl</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/MySQL记录概要/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1235,7 +1441,7 @@ show warnings
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">132</span>
+                <span class="site-state-item-count">133</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1246,7 +1452,7 @@ show warnings
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1257,7 +1463,7 @@ show warnings
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">103</span>
+                <span class="site-state-item-count">104</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
