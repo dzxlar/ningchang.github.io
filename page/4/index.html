@@ -254,6 +254,171 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-五-——-查询/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-五-——-查询/" itemprop="url">ElasticSearch学习笔记(五) —— 查询</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:30:55+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>es允许执行搜索查询，返回结果匹配（hits)，甚至跨多个index和执行多个type</p>
+</blockquote>
+<h2 id="SearchSourceBuilder"><a href="#SearchSourceBuilder" class="headerlink" title="SearchSourceBuilder"></a>SearchSourceBuilder</h2><ol>
+<li>所有参数都是可选的<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">import org.elasticsearch.action.search.SearchResponse;</div><div class="line">import org.elasticsearch.action.search.SearchType;</div><div class="line">import org.elasticsearch.index.query.QueryBuilders.*;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">SearchResponse response = client.prepareSearch(&quot;index1&quot;, &quot;index2&quot;) //索引</div><div class="line">        .setTypes(&quot;type1&quot;, &quot;type2&quot;) //类型</div><div class="line">        //检索方式</div><div class="line">        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)</div><div class="line">        //查询条件query_string</div><div class="line">        .setQuery(QueryBuilders.termQuery(&quot;multi&quot;, &quot;test&quot;))      </div><div class="line">		//多条件过滤filters            </div><div class="line">        .setPostFilter(</div><div class="line">		  QueryBuilders.rangeQuery(&quot;age&quot;).from(12).to(20)</div><div class="line">		 )</div><div class="line">        .setFrom(0)</div><div class="line">        .setSize(60)</div><div class="line">        .setExplain(true)</div><div class="line">        .get();</div></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search.html" target="_blank" rel="external">SearchAPI参考</a></p>
+<h2 id="Scrollings-in-Java"><a href="#Scrollings-in-Java" class="headerlink" title="Scrollings in Java"></a>Scrollings in Java</h2><blockquote>
+<p>返回整个”page”, 用来检索大量结果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.index.query.QueryBuilders.*;</div><div class="line">//queryString</div><div class="line">QueryBuilder qb = termQuery(&quot;multi&quot;, &quot;test&quot;);</div><div class="line"></div><div class="line">SearchResponse scrollResp = client.prepareSearch(test)</div><div class="line">        .addSort(FieldSortBuilder.DOC_FIELD_NAME, SortOrder.ASC) //属性排序</div><div class="line">        .setScroll(new TimeValue(60000)) </div><div class="line">        .setQuery(qb) //条件</div><div class="line">        .setSize(100) //每一页返回100条数据</div><div class="line">        .get(); </div><div class="line">//接收scrollResp响应结果</div><div class="line">do &#123;</div><div class="line">    for (SearchHit hit : scrollResp.getHits().getHits()) &#123;</div><div class="line">        //输出结果（封装在hits属性中)</div><div class="line">	&#125;</div><div class="line"> </div><div class="line">    scrollResp = client.</div><div class="line">		  prepareSearchScroll(scrollResp.getScrollId())</div><div class="line">						  .setScroll(new TimeValue(60000))</div><div class="line">						  .execute()</div><div class="line">						  .actionGet();</div><div class="line">&#125; while(scrollResp.getHits().getHits().length != 0);//遍历</div></pre></td></tr></table></figure></p>
+<p>从滚动请求返回的结果反映出当时的状态指数,最初的搜索请求,就像一个快照。索引、更新或删除只会影响以后的搜索请求</p>
+</blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-request-scroll.html" target="_blank" rel="external">Scroll参考API</a></p>
+<h2 id="MultSearch"><a href="#MultSearch" class="headerlink" title="MultSearch"></a>MultSearch</h2><blockquote>
+<p>多个搜索API允许在相同API下执行多个搜索请求</p>
+</blockquote>
+<p>请求格式大致如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">header\n //包括 index / indices 、 type</div><div class="line">body\n //包括典型搜索查询（查询、聚合、大小等）</div><div class="line">header\n </div><div class="line">body\n</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">SearchRequestBuilder srb1 = client</div><div class="line">			    .prepareSearch().setQuery(QueryBuilders.queryStringQuery(&quot;elasticsearch&quot;)).setSize(1);</div><div class="line">			SearchRequestBuilder srb2 = client</div><div class="line">			    .prepareSearch().setQuery(QueryBuilders.matchQuery(&quot;name&quot;, &quot;kimchy&quot;)).setSize(1);</div><div class="line"></div><div class="line">			MultiSearchResponse sr = client.prepareMultiSearch()</div><div class="line">			        .add(srb1)</div><div class="line">			        .add(srb2)</div><div class="line">			        .get();</div><div class="line"></div><div class="line">			// You will get all individual responses from MultiSearchResponse#getResponses()</div><div class="line">			long nbHits = 0;</div><div class="line">			</div><div class="line">			for (MultiSearchResponse.Item item : sr.getResponses()) &#123;</div><div class="line">			    SearchResponse response = item.getResponse();</div><div class="line">			    nbHits += response.getHits().getTotalHits();</div><div class="line">			    for(SearchHit hit : response.getHits())&#123;</div><div class="line">			    	System.out.println(hit.getSourceAsString());</div><div class="line">			    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-multi-search.html" target="_blank" rel="external">multSearchAPI参考</a></p>
+<h2 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = client.prepareSearch()</div><div class="line">    .setQuery(QueryBuilders.matchAllQuery())</div><div class="line">    .addAggregation(</div><div class="line">            AggregationBuilders.terms(&quot;agg1&quot;).field(&quot;field&quot;)</div><div class="line">    )</div><div class="line">    .addAggregation(</div><div class="line">            AggregationBuilders.dateHistogram(&quot;agg2&quot;)</div><div class="line">                    .field(&quot;birth&quot;)</div><div class="line">                    .dateHistogramInterval(DateHistogramInterval.YEAR)</div><div class="line">    )</div><div class="line">    .get();</div><div class="line"></div><div class="line">// Get your facet results</div><div class="line">Terms agg1 = sr.getAggregations().get(&quot;agg1&quot;);</div><div class="line">DateHistogram agg2 = sr.getAggregations().get(&quot;agg2&quot;);</div></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-aggs.html" target="_blank" rel="external">AssociateAPI参考</a></p>
+<h2 id="Search-Template"><a href="#Search-Template" class="headerlink" title="Search Template"></a>Search Template</h2><blockquote>
+<p>达到查询最大文档数量，提前终止</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = client.prepareSearch(INDEX)</div><div class="line">    .setTerminateAfter(1000)    </div><div class="line">    .get();</div><div class="line"></div><div class="line">if (sr.isTerminatedEarly()) &#123;</div><div class="line">    // We finished early</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="搜索模板"><a href="#搜索模板" class="headerlink" title="搜索模板"></a>搜索模板</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Map&lt;String, Object&gt; template_params = new HashMap&lt;&gt;();</div><div class="line">template_params.put(&quot;param_gender&quot;, &quot;male&quot;);</div></pre></td></tr></table></figure>
+<h3 id="创建模板请求"><a href="#创建模板请求" class="headerlink" title="创建模板请求"></a>创建模板请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = new SearchTemplateRequestBuilder(client)</div><div class="line">    .setScript(&quot;template_gender&quot;)                 </div><div class="line">    .setScriptType(ScriptService.ScriptType.FILE) </div><div class="line">    .setScriptParams(template_params)             </div><div class="line">    .setRequest(new SearchRequest())              </div><div class="line">    .get()                                        </div><div class="line">    .getResponse();</div></pre></td></tr></table></figure>
+<h3 id="在集群中存储模板状态"><a href="#在集群中存储模板状态" class="headerlink" title="在集群中存储模板状态"></a>在集群中存储模板状态</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">client.admin().cluster().preparePutStoredScript()</div><div class="line">    .setScriptLang(&quot;mustache&quot;)</div><div class="line">    .setId(&quot;template_gender&quot;)</div><div class="line">    .setSource(new BytesArray(</div><div class="line">        &quot;&#123;\n&quot; +</div><div class="line">        &quot;    \&quot;template\&quot; : &#123;\n&quot; +</div><div class="line">        &quot;        \&quot;query\&quot; : &#123;\n&quot; +</div><div class="line">        &quot;            \&quot;match\&quot; : &#123;\n&quot; +</div><div class="line">        &quot;                \&quot;gender\&quot; : \&quot;&#123;&#123;param_gender&#125;&#125;\&quot;\n&quot; +</div><div class="line">        &quot;            &#125;\n&quot; +</div><div class="line">        &quot;        &#125;\n&quot; +</div><div class="line">        &quot;    &#125;\n&quot; +</div><div class="line">        &quot;&#125;&quot;)).get();</div></pre></td></tr></table></figure>
+<h3 id="执行存储模板"><a href="#执行存储模板" class="headerlink" title="执行存储模板"></a>执行存储模板</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = new SearchTemplateRequestBuilder(client)</div><div class="line">        .setScript(&quot;template_gender&quot;)                       </div><div class="line">        .setScriptType(ScriptType.STORED)     </div><div class="line">        .setScriptParams(template_params)                   </div><div class="line">        .setRequest(new SearchRequest())                    </div><div class="line">        .get()                                              </div><div class="line">        .getResponse();</div></pre></td></tr></table></figure>
+<h3 id="内联模板"><a href="#内联模板" class="headerlink" title="内联模板"></a>内联模板</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">sr = new SearchTemplateRequestBuilder(client)</div><div class="line">        .setScript(&quot;&#123;\n&quot; +                                  </div><div class="line">                &quot;        \&quot;query\&quot; : &#123;\n&quot; +</div><div class="line">                &quot;            \&quot;match\&quot; : &#123;\n&quot; +</div><div class="line">                &quot;                \&quot;gender\&quot; : \&quot;&#123;&#123;param_gender&#125;&#125;\&quot;\n&quot; +</div><div class="line">                &quot;            &#125;\n&quot; +</div><div class="line">                &quot;        &#125;\n&quot; +</div><div class="line">                &quot;&#125;&quot;)</div><div class="line">        .setScriptType(ScriptType.INLINE)    </div><div class="line">        .setScriptParams(template_params)                  </div><div class="line">        .setRequest(new SearchRequest())                   </div><div class="line">        .get()                                             </div><div class="line">        .getResponse();</div></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-template.html" target="_blank" rel="external">更多模板参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-四-——-Java-CRUD/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1755,158 +1920,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【算法】快速排序/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【算法】快速排序/" itemprop="url">【算法】快速排序</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:12:19+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><p><a href="http://bubkoo.com/2014/01/12/sort-algorithm/quick-sort/" target="_blank" rel="external">快速排序图解</a></p>
-<p><a href="http://blog.csdn.net/morewindows/article/details/6684558" target="_blank" rel="external">快速排序实现</a></p>
-<blockquote>
-<p>快速排序应用广泛的原因主要分为二点：①原地排序（需要很小的辅助栈）②长度为N的数组所需时间与NlgN成正比</p>
-</blockquote>
-<p>快速排序采用<strong>分治法</strong>（将一个数组分成两个子数组，独立的排序）。</p>
-<p>快速排序和归并排序互补</p>
-<p><em>切分（partition）的位置</em>取决于数组的内容</p>
-<p>切分过程，数组需要满足3个条件</p>
-<pre><code>1. 对于某个partIndex, arr[partIndex]已经排定
-2.arr[left] 到 arr[partIndex-1] 的值不大于arr[partIndex]
-3.arr[partIndex+1] 到 arr[right] 的值不小于arr[partIndex]
-</code></pre><p>切分注意：</p>
-<pre><code>1. 原地切分（不采用辅助数组，原因复制数组增加开销）
-2. 预防越界（切分元素有可能为最大值/最小值）
-3. 保持随机性（随机选择切分元素）
-4. 终止循环（需要考虑元素与切分元素相同的情况）
-5. 终止递归
-</code></pre><p>算法实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">   public static void quickSort(int [] arr)&#123;</div><div class="line">	quickSort(arr,0,arr.length-1);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void quickSort(int [] arr,int left,int right)&#123;</div><div class="line">	if(left &gt;= right) return;</div><div class="line">	int pivotIndex = partition(arr,left,right); //基准点</div><div class="line">	quickSort(arr,left,pivotIndex-1);//切分点之前的数组排序</div><div class="line">	quickSort(arr,pivotIndex+1,right); //切分点之后的数组排序</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static int partition(int arr[], int left, int right) &#123;</div><div class="line">	int i = left, j = right;  </div><div class="line">    int pivot = arr[left]; //元素的第一个值就是所找的基准点</div><div class="line">    while (i &lt; j)  </div><div class="line">    &#123;  </div><div class="line">        // 从右向左找小于pivot的数来填arr[i]  </div><div class="line">        while(i &lt; j &amp;&amp; arr[j] &gt;= pivot)   </div><div class="line">            j--;    </div><div class="line">        if(i &lt; j)   </div><div class="line">        &#123;  </div><div class="line">            arr[i] = arr[j]; //将arr[j]填到arr[i]中，arr[j]就形成了一个新的坑  </div><div class="line">            i++;  </div><div class="line">        &#125;  </div><div class="line">        // 从左向右找大于或等于x的数来填arr[j]  </div><div class="line">        while(i &lt; j &amp;&amp; arr[i] &lt; pivot)  </div><div class="line">            i++;    </div><div class="line">        if(i &lt; j)   </div><div class="line">        &#123;  </div><div class="line">            arr[j] = arr[i]; //将arr[i]填到arr[j]中，arr[i]就形成了一个新的坑  </div><div class="line">            j--;  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">    //退出时，i等于j。将pivot填到这个坑中。  </div><div class="line">    arr[i] = pivot;   </div><div class="line">    return i; </div><div class="line">   &#125;</div><div class="line"></div><div class="line">public static void main(String[] args) &#123;</div><div class="line">       int [] arr = &#123;8,1,2,5,4,7,6&#125;;</div><div class="line">       quickSort(arr);</div><div class="line">       for (int i = 0; i &lt; arr.length; i++) &#123;</div><div class="line">           System.out.print(arr[i] + &quot; &quot;);</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1956,7 +1969,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">133</span>
+                <span class="site-state-item-count">134</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1967,7 +1980,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1978,7 +1991,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">104</span>
+                <span class="site-state-item-count">105</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

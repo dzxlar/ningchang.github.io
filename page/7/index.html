@@ -254,6 +254,192 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——单例模式-Single-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——单例模式-Single-Pattern/" itemprop="url">【设计模式】创建型模式——单例模式(Single Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:20:49+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="单例模式定义"><a href="#单例模式定义" class="headerlink" title="单例模式定义"></a>单例模式定义</h3><blockquote>
+<p>确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例，这个类称为单例类，它提供全局访问的方法。单例模式是一种对象创建型模式。</p>
+</blockquote>
+<hr>
+<h3 id="单例模式优点"><a href="#单例模式优点" class="headerlink" title="单例模式优点"></a>单例模式优点</h3><ol>
+<li>对于频繁使用的对象，可以<strong>省略创建对象所花费的时间</strong>。</li>
+<li>由于 new 操作的次数减少，因而<strong>降低系统内存使用频率</strong>，减轻 GC 压力，缩短 GC 停顿时间。</li>
+<li><strong>允许可变数目的实例</strong>。使用与单例控制相似的方法来获得指定个数的对象实例，既节省系统资源，又解决了<strong>单例单例对象共享过多有损性能的问题</strong></li>
+</ol>
+<h3 id="单例模式缺点"><a href="#单例模式缺点" class="headerlink" title="单例模式缺点"></a>单例模式缺点</h3><ol>
+<li>由于单例模式中没有抽象层，因此单例类的<strong>难以扩展</strong>。</li>
+<li><strong>单例类的职责过重，在一定程度上违背了“单一职责原则”。</strong>因为单例类既充当了工厂角色，提供了工厂方法，同时又充当了产品角色，包含一些业务方法，<strong>耦合度过高</strong>。</li>
+<li>实例化的共享对象长时间不被利用，系统会认为它是垃圾，会自动销毁并回收资源，下次利用时又将重新实例化，这将<strong>导致共享的单例对象状态的丢失。</strong></li>
+</ol>
+<h3 id="创建单例模式核心要点"><a href="#创建单例模式核心要点" class="headerlink" title="创建单例模式核心要点"></a>创建单例模式核心要点</h3><blockquote>
+<p>单例模式的核心在于通过一个接口返回唯一的对象实例。首要的问题就是要把创建实例的权限收回来，<strong>让类自身来负责自己类的实例的创建工作，然后由这个类来提供外部可以访问这个类实例的一个全局访问方法</strong></p>
+</blockquote>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ol>
+<li>系统只需要一个实例对象，如系统要求提供一个唯一的序列号生成器或资源管理器，或者需要考虑资源消耗太大而只允许创建一个对象。</li>
+<li>客户调用类的单个实例只允许使用一个公共访问点，除了该公共访问点，不能通过其他途径访问该实例。</li>
+</ol>
+<h3 id="单例模式结构"><a href="#单例模式结构" class="headerlink" title="单例模式结构"></a>单例模式结构</h3><p><img src="http://img.blog.csdn.net/20170329151401401?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="单例模式简单结构"><a href="#单例模式简单结构" class="headerlink" title="单例模式简单结构"></a>单例模式简单结构</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class Singleton &#123;</div><div class="line"></div><div class="line"> private Singleton()&#123;</div><div class="line">	</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> private static Singleton instance = null;</div><div class="line"> </div><div class="line"> public static Singleton getInsatnce()&#123;</div><div class="line">	 if(instance == null)&#123;</div><div class="line">	     instance = new Singleton();</div><div class="line">	 &#125;</div><div class="line">	 return instance;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="饿汉式单例与懒汉式单例"><a href="#饿汉式单例与懒汉式单例" class="headerlink" title="饿汉式单例与懒汉式单例"></a>饿汉式单例与懒汉式单例</h2><h3 id="饿汉式单例"><a href="#饿汉式单例" class="headerlink" title="饿汉式单例"></a>饿汉式单例</h3><p>结构图<br><img src="http://img.blog.csdn.net/20170329152903148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<blockquote>
+<p>在定义静态变量的时候实例化单例类，因此在类加载的时候就已经创建了单例对象</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class EagerSingleton &#123;   </div><div class="line">    private static final EagerSingleton instance = new EagerSingleton();   </div><div class="line">    private EagerSingleton() &#123; &#125;   </div><div class="line">  </div><div class="line">    public static EagerSingleton getInstance() &#123;  </div><div class="line">        return instance;   </div><div class="line">    &#125;     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="懒汉式单例类"><a href="#懒汉式单例类" class="headerlink" title="懒汉式单例类"></a>懒汉式单例类</h3><p>结构图<br><img src="http://img.blog.csdn.net/20170329153358270?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class LazySingleton &#123;</div><div class="line"></div><div class="line"> private LazySingleton()&#123;</div><div class="line">	</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> private static LazySingletoninstance = null;</div><div class="line"> </div><div class="line"> public static synchronized LazySingleton getInsatnce()&#123;</div><div class="line">	 if(instance == null)&#123;</div><div class="line">	     instance = new LazySingleton();</div><div class="line">	 &#125;</div><div class="line">	 return instance;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>懒汉式单例在第一次调用getInstance()方法时实例化，在类加载时并不自行实例化，这种技术又称为<strong>延迟加载(Lazy Load)技术</strong>，即需要的时候再加载实例，为了避免多个线程同时创建instance对象，可以使用<strong>关键字synchronized</strong></p>
+</blockquote>
+<p>由于上述在getInstance()方法前增加同步锁，解决了性能安全问题，但是每次调用getInstance()时都需要进行线程锁定判断，在多线程高并发访问环境中，将会导致系统性能大大降低。将方法锁改为方法块锁</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">private static byte[] lock = new byte[0];</div><div class="line">public static LazySingleton getInstance() &#123;   </div><div class="line">    if (instance == null) &#123;  </div><div class="line">        synchronized (lock) &#123;  </div><div class="line">            instance = new LazySingleton();   </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">    return instance;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>改为方法块锁，虽然解决了性能问题，但是在某一时刻线程A和线程B同时访问该对象，线程A进入synchronized锁定的代码中执行实例。线程B处于排队等待状态，必须等待线程A执行完毕后才可以进入synchronized锁定代码。但是线程B并不知道实例已经创建，将继续创建新的实例。所以可能导致创建多个单例对象。违背了单例模式的设计初衷。需要进入代码块锁的时候再做一次判断instance == null。这种称为双重检查锁定（DSL）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class LazySingleton &#123;   </div><div class="line">    //被volatile修饰的成员变量可以确保多个线程都能够正确处理</div><div class="line">    private volatile static LazySingleton instance = null;   </div><div class="line">  </div><div class="line">    private LazySingleton() &#123; &#125;   </div><div class="line">  </div><div class="line">    public static LazySingleton getInstance() &#123;   </div><div class="line">        //第一重判断  </div><div class="line">        if (instance == null) &#123;  </div><div class="line">            //锁定代码块  </div><div class="line">            synchronized (LazySingleton.class) &#123;  </div><div class="line">                //第二重判断  </div><div class="line">                if (instance == null) &#123;  </div><div class="line">                    instance = new LazySingleton(); //创建单例实例  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">        return instance;   </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>由于volatile关键字会屏蔽Java虚拟机所做的一些代码优化，可能会导致系统运行效率降低，因此即使使用双重检查锁定来实现单例模式也不是一种完美的实现方式</p>
+<h3 id="饿汉式单例类与懒汉式单例类比较"><a href="#饿汉式单例类与懒汉式单例类比较" class="headerlink" title="饿汉式单例类与懒汉式单例类比较"></a>饿汉式单例类与懒汉式单例类比较</h3><ol>
+<li>饿汉式单例类在<strong>类被加载时就将自己实例化</strong>，它的优点在于无须考虑多线程访问问题，可以确保实例的唯一性。</li>
+<li>懒汉式单例类在<strong>第一次使用时创建，无须一直占用系统资源，实现了延迟加载</strong>。但是必须处理<strong>多线程访问问题</strong>。在实例化时必然涉及资源初始化，而资源初始化很有可能耗费大量时间，这意味着出现多线程同时首次引用此类的机率变得较大，需要通过双重检查锁定等机制进行控制，这将导致系统性能受到一定影响</li>
+</ol>
+<hr>
+<h3 id="Initialization-Demand-Holder-IoDH"><a href="#Initialization-Demand-Holder-IoDH" class="headerlink" title="Initialization Demand Holder (IoDH)"></a>Initialization Demand Holder (IoDH)</h3><blockquote>
+<p>静态内部类:在该内部类中创建单例对象，再将该单例对象通过getInstance()方法返回给外部使用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class StaticSingleton &#123;</div><div class="line">	  private StaticSingleton()&#123;</div><div class="line"> </div><div class="line">	  &#125;</div><div class="line">	  private static class SingletonHolder&#123;</div><div class="line">	  private static StaticSingleton instance = </div><div class="line">									  new StaticSingleton();</div><div class="line">	  </div><div class="line">	 &#125;</div><div class="line">	 public static StaticSingleton getInstance()&#123;</div><div class="line">		 return SingletonHolder.instance;</div><div class="line">	 &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>StaticSingleton 被加载时，其内部类并不会被初始化，故可以确保当 StaticSingleton 类被载入 JVM 时，不会初始化单例类，而当 getInstance() 方法调用时，才会加载 SingletonHolder，从而初始化 instance。同时，由于实例的建立是时在类加载时完成，故天生对多线程友好，getInstance() 方法也无需使用同步关键字</p>
+</blockquote>
+<p><strong>通过使用IoDH，我们既可以实现延迟加载，又可以保证线程安全，不影响系统性能，不失为一种最好的Java语言单例模式实现方式</strong></p>
+<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-Singleton/" target="_blank" rel="external">ibm单例模式参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】面向对象原则/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1711,158 +1897,6 @@ Direct Bytebuffer JNI Compile GC;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Nginx/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Nginx/" itemprop="url">【Linux】Centos6.8安装Nginx</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:00+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">nginx</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>安装条件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">yum install -y gcc-c++</div><div class="line"></div><div class="line">yum install -y pcre pcre-devel</div><div class="line"></div><div class="line">yum install -y zlib zlib-devel</div><div class="line"></div><div class="line">yum install -y openssl openssl-devel</div></pre></td></tr></table></figure>
-<p>安装</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget  https://nginx.org/download/nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">tar zxvf nginx-1.8.0.tar.gz</div><div class="line"></div><div class="line">cd nginx-1.8.0</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_stub_status_module --with-pcre</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
-<p>远程访问设置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl http://172.16.41.156    在本机中检测是否可以访问</div><div class="line"></div><div class="line">iptables -F  （不然无法远程访问）</div></pre></td></tr></table></figure>
-<p><a href="http://172.16.41.156" target="_blank" rel="external">http://172.16.41.156</a></p>
-<p><a href="https://my.oschina.net/psuyun/blog/113694" target="_blank" rel="external">nginx常用命令</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1912,7 +1946,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">133</span>
+                <span class="site-state-item-count">134</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1923,7 +1957,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1934,7 +1968,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">104</span>
+                <span class="site-state-item-count">105</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
