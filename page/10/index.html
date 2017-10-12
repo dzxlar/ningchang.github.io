@@ -254,6 +254,173 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——-线程协作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——-线程协作/" itemprop="url">线程笔记—— 线程协作</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:26:08+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p><strong>在 Java 中，可以通过配合调用 Object 对象的 wait() 方法和 notify()方法或 notifyAll() 方法来实现线程间的通信。</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>在线程中调用 wait() 方法，将阻塞等待其他线程的通知</li>
+<li>在线程中调用 notify() 方法或 notifyAll() 方法，将通知其他线程从 wait() 方法处返回</li>
+</ul>
+<hr>
+<blockquote>
+<p>Object 是所有类的超类，它有 5 个方法组成了等待/通知机制的核心：<strong>notify()、notifyAll()、wait()、wait(long)和 wait(long，int)</strong></p>
+</blockquote>
+<h3 id="wait"><a href="#wait" class="headerlink" title="wait()"></a>wait()</h3><blockquote>
+<p>该方法用来将当前线程置入休眠状态，直到接到通知或被中断为止。<br>① 在调用 wait()之前，线程必须要获得该对象的对象级别锁，即<strong>只能在同步方法或同步块中调用 wait()方法</strong>。② 进入 wait()方法后，当前线程释放锁。③ 在从 wait()返回前，线程与其他线程竞争重新获得锁。</p>
+</blockquote>
+<p><strong>如果调用 wait()时，没有持有适当的锁，则抛出 IllegalMonitorStateException，它是 RuntimeException 的一个子类，因此，不需要 try-catch 结构</strong></p>
+<h3 id="notify"><a href="#notify" class="headerlink" title="notify()"></a>notify()</h3><blockquote>
+<p>该方法也要在同步方法或同步块中调用，即在调用前，线程也必须要获得该对象的对象级别锁，如果没有持有适当的锁，也会抛出 IllegalMonitorStateException</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>该方法用来通知那些可能等待该对象的对象锁的其他线程。</strong>如果有多个线程等待，则线程规划器任意挑选出其中一个 wait()状态的线程来发出通知，并使它等待获取该对象的对象锁（notify 后，当前线程不会马上释放该对象锁，wait 所在的线程并不能马上获取该对象锁，要等到程序退出 synchronized 代码块后，当前线程才会释放锁，wait所在的线程也才可以获取该对象锁），但不惊动其他同样在等待被该对象notify的线程们。当第一个获得了该对象锁的 wait 线程运行完毕以后，它会释放掉该对象锁，此时如果该对象没有再次使用 notify 语句，则即便该对象已经空闲，其他 wait 状态等待的线程由于没有得到该对象的通知，会继续阻塞在 wait 状态，直到这个对象发出一个 notify 或 notifyAll</p>
+</blockquote>
+<h3 id="notifyAll"><a href="#notifyAll" class="headerlink" title="notifyAll()"></a>notifyAll()</h3><blockquote>
+<p>notifyAll 使所有原来在该对象上 wait 的线程统统退出 wait 的状态（即全部被唤醒，不再等待 notify 或 notifyAll，但由于此时还没有获取到该对象锁，因此还不能继续往下执行），变成等待获取该对象上的锁，一旦该对象锁被释放（notifyAll 线程退出调用了 notifyAll 的 synchronized 代码块的时候），他们就会去竞争。如果其中一个线程获得了该对象锁，它就会继续往下执行，在它退出 synchronized 代码块，释放锁后，其他的已经被唤醒的线程将会继续竞争获取该锁，一直进行下去，直到所有被唤醒的线程都执行完毕</p>
+</blockquote>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><p>如果线程调用了对象的 wait()方法，那么线程便会处于该对象的等待池中，等待池中的线程不会去竞争该对象的锁。</p>
+</li>
+<li><p>当有线程调用了对象的 notifyAll()方法（唤醒所有 wait 线程）或 notify()方法（只随机唤醒一个 wait 线程），被唤醒的的线程便会进入该对象的锁池中，锁池中的线程会去竞争该对象锁。</p>
+</li>
+<li><p>优先级高的线程竞争到对象锁的概率大，假若某线程没有竞争到该对象锁，它还会留在锁池中，唯有线程再次调用 wait()方法，它才会重新回到等待池中。而竞争到对象锁的线程则继续往下执行，直到执行完了 synchronized 代码块，它会释放掉该对象锁，这时锁池中的线程会继续竞争该对象锁。</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——死锁/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1696,202 +1863,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——显式锁Lock和ReentrantLock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——显式锁Lock和ReentrantLock/" itemprop="url">线程笔记——显式锁Lock和ReentrantLock</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:18:28+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a>Lock</h3><blockquote>
-<p><strong>Lock是一个接口提供了无条件的、可轮询的、定时的、可中断的获取锁操作</strong></p>
-</blockquote>
-<p>包路径</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">import java.util.concurrent.locks.Lock</div></pre></td></tr></table></figure>
-<p><img src="http://img.blog.csdn.net/20170324155208298?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="LockApi"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">lock() //获取锁，如果线程不可用，将禁用当前线程，并且在获取锁之前，该线程一直处于休眠状态</div><div class="line">lockInterruptibly() //如果当前线程未被中断，获取锁;如果锁可用，获取锁</div><div class="line">tryLock() //仅在锁为空闲状态获取锁</div><div class="line">unlock() //释放锁，防止死锁</div><div class="line">newCondition() //返回与Lock一起使用的Condition实例</div></pre></td></tr></table></figure>
-<h3 id="ReentrantLock"><a href="#ReentrantLock" class="headerlink" title="ReentrantLock"></a>ReentrantLock</h3><blockquote>
-<p>ReentrantLock是Lock的实现类，ReentrantLock的实现比在synchronized实现更具有伸缩性。意味着多个线程竞争相同锁时，比synchronized吞吐量高，jvm将话费较少时间调度线程，而花更多时间执行线程<br>【缺点】① 需要每次使用的时候，释放锁。②Lock只适用代码块锁</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">		final Count c = new Count();</div><div class="line">		for (int i = 0; i &lt; 2; i++) &#123;</div><div class="line">			new Thread()&#123;</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					c.get();</div><div class="line">				&#125;</div><div class="line">			&#125;.start();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		for (int i = 0; i &lt; 2; i++) &#123;</div><div class="line">			new Thread()&#123;</div><div class="line">				@Override</div><div class="line">				public void run() &#123;</div><div class="line">					c.put();</div><div class="line">				&#125;</div><div class="line">			&#125;.start();;</div><div class="line">		&#125;</div><div class="line">		ReadWriteLock lock = new ReadWriteLock();</div><div class="line">		System.out.println(lock.readWrite(&quot;key&quot;));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	static class Count&#123;</div><div class="line">	    //使用相同的锁，每次运行结果都是一样的</div><div class="line">	    //如果使用不同的锁，每次运行结果不一样</div><div class="line">		final ReentrantLock lock = new ReentrantLock();</div><div class="line">		public void get()&#123;</div><div class="line">			lock.lock();</div><div class="line">			</div><div class="line">			System.out.println(&quot;&#123;&quot;+Thread.currentThread().getName() + &quot;&#125; get Starting&quot;);</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000L);</div><div class="line">				System.out.println(&quot;&#123;&quot;+Thread.currentThread().getName() + &quot;&#125; get Ending&quot;);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			lock.unlock();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		public void put()&#123;</div><div class="line">			lock.lock();</div><div class="line">			System.out.println(&quot;[&quot;+Thread.currentThread().getName() + &quot;] put Starting&quot;);</div><div class="line">			try &#123;</div><div class="line">				Thread.sleep(1000L);</div><div class="line">				System.out.println(&quot;[&quot;+Thread.currentThread().getName() + &quot;] put Ending&quot;);</div><div class="line">			&#125; catch (InterruptedException e) &#123;</div><div class="line">				e.printStackTrace();</div><div class="line">			&#125;</div><div class="line">			lock.unlock();</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
-<h3 id="console"><a href="#console" class="headerlink" title="console"></a>console</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&#123;Thread-1&#125; get Starting</div><div class="line">hello world</div><div class="line">&#123;Thread-1&#125; get Ending</div><div class="line">[Thread-2] put Starting</div><div class="line">[Thread-2] put Ending</div><div class="line">[Thread-3] put Starting</div><div class="line">[Thread-3] put Ending</div><div class="line">&#123;Thread-0&#125; get Starting</div><div class="line">&#123;Thread-0&#125; get Ending</div></pre></td></tr></table></figure>
-<h3 id="ReadWriteLock-和-ReentrantReadWriteLock"><a href="#ReadWriteLock-和-ReentrantReadWriteLock" class="headerlink" title="ReadWriteLock 和 ReentrantReadWriteLock"></a>ReadWriteLock 和 ReentrantReadWriteLock</h3><blockquote>
-<p><strong>提供了一个资源能被多个读线程访问或者被1个写线程访问。但是不能存在读写进程</strong><br>ReadWriteLock不是Lock的子接口，只是借助Lock实现两个锁并存、互斥的操作机制<br> <strong>ReentrantReadWriteLock时ReadWriteLock唯一实现类</strong><br> 当很多线程从数据结构中获取数据大于写入数据，而很少有线程对其修改。允许读取器线程访问，写入器依然必须为互斥访问</p>
-</blockquote>
-<p><img src="http://img.blog.csdn.net/20170324161430118?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>ReadWriteLock的特性</p>
-<ol>
-<li>公平性<blockquote>
-<p>非公平锁(默认),<br>读操作不存在锁竞争，所以不存在公平性和非公平性<br>写操作，可能会立即获取到锁，所以会推迟一个或者多个读操作或写操作。因此<strong>非公平锁的吞吐量高于公平锁</strong><br>公平锁利用AQS和CLH队列，释放当前保持的锁。优先为等待时间最长的写线程分配写入锁。前提是，<strong>写线程的等待时间要比所有读线程都长</strong><br>一个线程持有写入锁或者有一个写线程在等待，那么获取公平锁(飞重入)的所有线程都将被阻塞，直到最先的写线程释放锁<br>如果读线程等待时间比写线程长，一旦上一写线程释放锁，这一组读线程获取锁</p>
-</blockquote>
-</li>
-</ol>
-<ol>
-<li><p>重入性</p>
-<blockquote>
-<p><strong>读写锁允许读线程和写线程按照请求锁的顺序重新获取读取锁和写入锁</strong><br>只有写线程释放锁，读线程才可以获取重入锁<br>写线程获取锁后，可以再次获取读取锁。反之，则不能。</p>
-</blockquote>
-</li>
-<li><p>锁升级</p>
-<blockquote>
-<p>读取锁不能直接升级为写入锁。因为获取写入锁需要释放所有读取锁<br>如果有两个读取锁获取写入锁，且都不释放锁，会造成死锁现象。</p>
-</blockquote>
-</li>
-<li><p>锁降级</p>
-<blockquote>
-<p>写线程获取写入锁后可以获取读取锁，释放写入锁，写入锁就成了读取锁。</p>
-</blockquote>
-</li>
-<li><p>锁获取中断</p>
-<blockquote>
-<p>读取锁和写入锁都可以支持获取期间被中断和独占锁一致</p>
-</blockquote>
-</li>
-<li><p>条件变量</p>
-<blockquote>
-<p>写入锁提供条件变量(Condition)的支持，和独占锁一致。但是读取锁不能获取条件变量，否则异常。</p>
-</blockquote>
-</li>
-<li><p>重入数</p>
-<blockquote>
-<p>读取锁和写入锁最大数量只能是<strong>65535</strong></p>
-</blockquote>
-</li>
-</ol>
-<p>简单概括</p>
-<blockquote>
-<h4 id="读-读不互斥。读-写互斥。写-写互斥"><a href="#读-读不互斥。读-写互斥。写-写互斥" class="headerlink" title="读-读不互斥。读-写互斥。写-写互斥"></a><strong>读-读不互斥。读-写互斥。写-写互斥</strong></h4></blockquote>
-<h3 id="读写锁方法步骤"><a href="#读写锁方法步骤" class="headerlink" title="读写锁方法步骤"></a>读写锁方法步骤</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">public class ReentrantReadWriteLockDemo &#123;</div><div class="line"></div><div class="line">	</div><div class="line">	private final Map&lt;String,Object&gt; map = new HashMap&lt;String,Object&gt;();</div><div class="line">	</div><div class="line">	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();</div><div class="line">	</div><div class="line">	public Object readWrite(String key)&#123;</div><div class="line">		Object value = null;</div><div class="line">		//开启读锁</div><div class="line">		lock.readLock().lock();</div><div class="line">		try&#123;</div><div class="line">			value = map.get(key);</div><div class="line">			//如果缓存中没有释放读锁，上写锁</div><div class="line">			if(value == null)&#123;</div><div class="line">				lock.readLock().unlock();</div><div class="line">				lock.writeLock().lock();</div><div class="line">				try&#123;</div><div class="line">					if(value == null)&#123;</div><div class="line">						//可以去数据库中查找</div><div class="line">						value = &quot;hello world&quot;;</div><div class="line">					&#125;</div><div class="line">				&#125;finally&#123;</div><div class="line">					//释放写锁</div><div class="line">					lock.writeLock().unlock();</div><div class="line">				&#125;</div><div class="line">				//开启读锁</div><div class="line">				lock.readLock().lock();</div><div class="line">			&#125;</div><div class="line">		&#125;finally&#123;</div><div class="line">		    //释放读锁</div><div class="line">			lock.readLock().unlock();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		return value;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="ReentrantLock和ReentrantReadWriteLock区别"><a href="#ReentrantLock和ReentrantReadWriteLock区别" class="headerlink" title="ReentrantLock和ReentrantReadWriteLock区别"></a>ReentrantLock和ReentrantReadWriteLock区别</h3><ol>
-<li>相同点：显式锁。手动加锁/解锁。适用高并发场景</li>
-<li>不同点：①ReentrantReadWriteLock是对ReentrantLock的复杂扩展。能适用更加复杂的业务场景。②ReentrantReadWriteLock可以实现一个方法中读写分离锁机制。而ReentrantLock只有一种机制</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1941,7 +1912,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">134</span>
+                <span class="site-state-item-count">135</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

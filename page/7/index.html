@@ -254,6 +254,181 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——装饰模式-Decorator-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】结构性模式——装饰模式-Decorator-Pattern/" itemprop="url">【设计模式】结构性模式——装饰模式(Decorator Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:21:50+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="装饰模式定义"><a href="#装饰模式定义" class="headerlink" title="装饰模式定义"></a>装饰模式定义</h3><blockquote>
+<p>动态地给一个对象增加一些额外的职责(Responsibility)，就增加对象功能来说，装饰模式比生成子类实现更为灵活。其别名也可以称为包装器(Wrapper)</p>
+</blockquote>
+<p>通常有两种模式可以实现给一个类或对象增加行为</p>
+<ul>
+<li>静态方法：继承机制是给现有类添加功能的一种有效途径，通过继承一个现有类可以使得子类在拥有自身方法的同时还拥有父类的方法</li>
+<li>动态方法 : 关联机制将一个类的对象嵌入另一个对象中，由另一个对象来决定是否调用嵌入对象的行为以便扩展自己的行为，个嵌入的对象为装饰器(Decorator)</li>
+</ul>
+<h3 id="装饰模式优点"><a href="#装饰模式优点" class="headerlink" title="装饰模式优点"></a>装饰模式优点</h3><ul>
+<li>装饰模式与继承关系的目的都是要扩展对象的功能，但是装饰模式可以提供比继承更多的<strong>灵活性</strong>。</li>
+<li>可以通过一种<strong>动态的方式来扩展一个对象的功能</strong>，通过配置文件可以在运行时选择不同的装饰器，从而实现不同的行为。</li>
+<li>通过使用不同的具体装饰类以及这些装饰类的排列组合，可以创造出很多不同行为的组合。可以<strong>使用多个具体装饰类来装饰同一对象</strong>，得到功能更为强大的对象。</li>
+<li><strong>具体构件类与具体装饰类可以独立变化</strong>，用户可以根据需要增加新的具体构件类和具体装饰类，在使用时再对其进行组合，原有代码无须改变，符合“开闭原则”</li>
+</ul>
+<h3 id="装饰模式缺点"><a href="#装饰模式缺点" class="headerlink" title="装饰模式缺点"></a>装饰模式缺点</h3><ul>
+<li>使用<strong>装饰模式进行系统设计时将产生很多小对象</strong>，这些对象的区别在于<strong>它们之间相互连接的方式有所不同</strong>，而不是它们的类或者属性值有所不同，同时还将产生很多具体装饰类。这些装饰类和小对象的产生将增加系统的复杂度</li>
+<li>这种比继承更加灵活机动的特性，也同时意味着装饰模式比继承更加易于出错，排错也很困难，对于多次装饰的对象，<strong>调试时寻找错误可能需要逐级排查</strong>，较为烦琐。</li>
+</ul>
+<h3 id="模式应用"><a href="#模式应用" class="headerlink" title="模式应用"></a>模式应用</h3><ul>
+<li><strong>一个装饰类的接口必须与被装饰类的接口保持相同</strong>，对于客户端来说无论是装饰之前的对象还是装饰之后的对象都可以一致对待。</li>
+<li>尽量保持具体构件类Component作为一个“轻”类，也就是说<strong>不要把太多的逻辑和状态放在具体构件类中，可以通过装饰类</strong></li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ol>
+<li>在不影响其他对象的情况下，以动态、透明的方式给单个对象添加职责。</li>
+<li>当不能采用继承的方式对系统进行扩展或者采用继承不利于系统扩展和维护时可以使用装饰模式。不能采用继承的情况主要有两类：第一类是<strong>系统中存在大量独立的扩展，为支持每一种扩展或者扩展之间的组合将产生大量的子类</strong>，使得子类数目呈爆炸性增长；第二类是因为<strong>类已定义为不能被继承</strong>（如Java语言中的final类）</li>
+</ol>
+<h3 id="装饰模式具体例子"><a href="#装饰模式具体例子" class="headerlink" title="装饰模式具体例子"></a>装饰模式具体例子</h3><ol>
+<li>Mybatis缓存原理的实现</li>
+</ol>
+<p>装饰模式结构<br><img src="http://img.blog.csdn.net/20170329172141963?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* Decorator（抽象装饰类）</div><div class="line">* 给具体构件增加职责，但是具体职责在其子类中实现。它维护一个指向抽象构件	* 对象的引用，通过该引用可以调用装饰之前构件对象的方法，并通过其子类扩展</div><div class="line">* 该方法，以达到装饰的目的。</div><div class="line">*/</div><div class="line">public class Decorator implements Component</div><div class="line">&#123;</div><div class="line">       private Component component;  //维持一个对抽象构件对象的引用</div><div class="line">       public Decorator(Component component)  //注入一个抽象构件类型的对象</div><div class="line">       &#123;</div><div class="line">              this.component=component;</div><div class="line">       &#125;</div><div class="line"> </div><div class="line">       public void operation()</div><div class="line">       &#123;</div><div class="line">              component.operation();  //调用原有业务方法</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">*  ConcreteDecorator（具体装饰类）</div><div class="line">* 它是抽象装饰类的子类，负责向构件添加新的职责。每一个具体装饰类都定义了</div><div class="line">* 一些新的行为，它可以调用在抽象装饰类中定义的方法，并可以增加新的方法用</div><div class="line">* 以扩充对象的行为</div><div class="line">*/</div><div class="line">public class ConcreteDecorator extends Decorator</div><div class="line">&#123;</div><div class="line">       public ConcreteDecorator(Component  component)</div><div class="line">       &#123;</div><div class="line">              super(component);</div><div class="line">       &#125;</div><div class="line"> </div><div class="line">       public void operation()</div><div class="line">       &#123;</div><div class="line">              super.operation();  //调用原有业务方法</div><div class="line">              addedBehavior();  //调用新增业务方法</div><div class="line">       &#125;</div><div class="line"> </div><div class="line">       //新增业务方法</div><div class="line">       public  void addBehavior()</div><div class="line">       &#123;    </div><div class="line">         ……</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="透明装饰模式与半透明装饰模式"><a href="#透明装饰模式与半透明装饰模式" class="headerlink" title="透明装饰模式与半透明装饰模式"></a>透明装饰模式与半透明装饰模式</h2><h3 id="透明装饰模式"><a href="#透明装饰模式" class="headerlink" title="透明装饰模式"></a>透明装饰模式</h3><blockquote>
+<p><strong>针对抽象编程</strong><br>装饰模式的透明性要求客户端程序不应该将对象声明为具体构件类型或具体装饰类型，而应该全部声明为抽象构件类型。对于客户端而言，具体构件对象和具体装饰对象没有任何区别<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Component  c, c1; //使用抽象构件类型定义对象</div><div class="line">c = new ConcreteComponent()；</div><div class="line">c1 = new ConcreteDecorator (c)；</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="半透明装饰模式"><a href="#半透明装饰模式" class="headerlink" title="半透明装饰模式"></a>半透明装饰模式</h3><blockquote>
+<p>为了能够调用到新增方法，用具体装饰类型来定义装饰之后的对象，而具体构件类型还是可以使用抽象构件类型来定义</p>
+</blockquote>
+<p><strong>对于客户端而言，具体构件类型无须关心，是透明的；但是具体装饰类型必须指定，这是不透明的</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Component  component; //使用抽象构件类型定义</div><div class="line">component = new ConcreteDecoratorA();</div><div class="line">ConcreteDecoratorB decoratorB;//使用具体装饰类型定义</div><div class="line">decoratorB = new ConcreteDecoratorB(component);</div></pre></td></tr></table></figure>
+<p><a href="http://design-patterns.readthedocs.io/zh_CN/latest/structural_patterns/decorator.html" target="_blank" rel="external">装饰者模式参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——单例模式-Single-Pattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1717,186 +1892,6 @@ Direct Bytebuffer JNI Compile GC;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Redis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装Redis/" itemprop="url">【Linux】Centos6.8安装Redis</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:44:36+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>1.下载源码并编译</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd /tmp &amp;&amp; wget http://download.redis.io/redis-stable.tar.gz#tar zxvf  redis-stable.tar.gz &amp;&amp; cd redis-stable &amp;&amp; make</div></pre></td></tr></table></figure>
-<p>2.为了能在任何路径下都能执行redis相关命令，我们需要copy以下两个文件到/usr/local/bin目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp src/redis-server /usr/local/bin/#cp src/redis-cli /usr/local/bin/</div></pre></td></tr></table></figure>
-<p>3.创建文件夹分别保存Redis的配置文件和数据</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /etc/redis#mkdir /var/redis</div></pre></td></tr></table></figure>
-<p>4.将Redis初始化文件copy进/etc/init.d，并重命名为redis_6379</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp utils/redis_init_script /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
-<p>5.查看文件redis_6379的内容</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat /etc/init.d/redis_6379</div></pre></td></tr></table></figure>
-<p>6.copy配置文件模板到上图中指定的路径并重命名为6379.conf</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp redis.conf /etc/redis/6379.conf</div></pre></td></tr></table></figure>
-<p>7.在第3步新建的/var/redis路径下新建目录6379作为当前Redis实例的工作目录和数据存放目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /var/redis/6379</div></pre></td></tr></table></figure>
-<p>8.编辑配置文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/redis/6379.confport 6379#Redis默认监听端口daemonize yes   #是否作为守护进程运行，默认为nopidfile /var/run/redis_6379.pid   #如以后台进程运行，则需指定一个pid文件位置loglevel notice   #日志记录等级，有4个可选值，debug，verbose（默认值），notice，warninglogfile /var/log/redis_6379.log   #指定日志输出文件名，可设为/dev/null屏蔽日志dir /var/redis/6379#本地数据库存放路径和工作目录(非常重要！！！)bind 127.0.0.1#绑定主机IP，默认值为127.0.0.1</div></pre></td></tr></table></figure>
-<p>9.添加开机自启动。开机启动要配置在 rc.local 中，而 /etc/profile 文件，要有用户登录了，才会被执行。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo &quot;/etc/init.d/redis_6379 start &amp;&quot; &gt;&gt; /etc/rc.local</div></pre></td></tr></table></figure>
-<p>10.启动Redis并测试</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# /etc/init.d/redis_6379 start</div></pre></td></tr></table></figure>
-<p>Starting Redis server…</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root@dzx~]# redis-cli</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set test jinbitou.net</div></pre></td></tr></table></figure>
-<p>OK</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; get test</div></pre></td></tr></table></figure>
-<p>“jinbitou.net”</p>
-<p>127.0.0.1:6379&gt;</p>
-<p>11.检测是否开启远程连接<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps -ef | grep redis</div></pre></td></tr></table></figure></p>
-<p>12.配置密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; config set requirepass admin #密码为admin</div></pre></td></tr></table></figure>
-<p>13.如果java无法访问远程redis</p>
-<p>关闭虚拟机防火墙  <code>service iptables stop</code></p>
-<p>以上转载</p>
-<p><a href="http://jinbitou.net/2016/10/28/2110.html" target="_blank" rel="external">http://jinbitou.net/2016/10/28/2110.html</a></p>
-<p>相关资料</p>
-<p><a href="http://www.tianshouzhi.com/api/tutorials/redis/189" target="_blank" rel="external">http://www.tianshouzhi.com/api/tutorials/redis/189</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1946,7 +1941,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">134</span>
+                <span class="site-state-item-count">135</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
