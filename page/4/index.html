@@ -254,6 +254,308 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-八-——-语法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-八-——-语法/" itemprop="url">ElasticSearch学习笔记(八) —— 语法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T15:16:10+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h3><blockquote>
+<p>程序中大多的实体或对象能够被序列化为包含键值对的JSON对象，键(key)是字段(field)或属性(property)的名字，值(value)可以是字符串、数字、布尔类型、另一个对象、值数组或者其他特殊类型，比如表示日期的字符串或者表示地理位置的对象</p>
+</blockquote>
+<h3 id="文档元数据"><a href="#文档元数据" class="headerlink" title="文档元数据"></a>文档元数据</h3><blockquote>
+<p>一个文档不只有数据。它还包含了元数据(metadata)——关于文档的信息。三个必须的元数据节点</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">_index	//文档存储的地方</div><div class="line">_type	//文档代表的对象的类</div><div class="line">_id	    //文档的唯一标识</div></pre></td></tr></table></figure>
+<p>_index</p>
+<p>索引(index)类似于关系型数据库里的“数据库”——它是我们存储和索引关联数据的地方</p>
+<blockquote>
+<p>事实上，我们的数据被存储和索引在分片(shards)中，索引只是一个把一个或多个分片分组在一起的逻辑空间。然而，这只是一些内部细节——我们的程序完全不用关心分片。对于我们的程序而言，文档存储在索引(index)中</p>
+</blockquote>
+<p>_type</p>
+<blockquote>
+<p>在应用中，我们使用对象表示一些“事物”，例如一个用户、一篇博客、一个评论，或者一封邮件。每个对象都属于一个类(class)，这个类定义了属性或与对象关联的数据。user类的对象可能包含姓名、性别、年龄和Email地址</p>
+<p>每个类型(type)都有自己的映射(mapping)或者结构定义，就像传统数据库表中的列一样。所有类型下的文档被存储在同一个索引下，但是类型的映射(mapping)会告诉Elasticsearch不同的文档如何被索引</p>
+</blockquote>
+<p><strong>_type的名字可以是大写或小写，不能包含下划线或逗号。我们将使用blog做为类型名。</strong></p>
+<p>_id</p>
+<blockquote>
+<p>id仅仅是一个字符串，它与_index和_type组合时，就可以在Elasticsearch中唯一标识一个文档。当创建一个文档，你可以自定义_id，也可以让Elasticsearch帮你自动生成</p>
+</blockquote>
+<h3 id="索引一个文档"><a href="#索引一个文档" class="headerlink" title="索引一个文档"></a>索引一个文档</h3><p>文档通过index API被索引——使数据可以被存储和搜索</p>
+<p>使用自定义ID</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Just trying this out...&quot;,</div><div class="line">  &quot;date&quot;:  &quot;2014/01/01&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot;:    &quot;website&quot;,</div><div class="line">   &quot;_type&quot;:     &quot;blog&quot;,</div><div class="line">   &quot;_id&quot;:       &quot;123&quot;,</div><div class="line">   &quot;_version&quot;:  1,</div><div class="line">   &quot;created&quot;:   true </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>1.Elasticsearch中每个文档都有版本号，每当文档变化（包括删除）都会使_version增加<br>2.响应指出请求的索引已经被成功创建create:true</p>
+<p>自增ID</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My second blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Still trying this out...&quot;,</div><div class="line">  &quot;date&quot;:  &quot;2014/01/01&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot;:    &quot;website&quot;,</div><div class="line">   &quot;_type&quot;:     &quot;blog&quot;,</div><div class="line">   &quot;_id&quot;:       &quot;wM0OSFhDQXGZAWDf0-drSA&quot;,</div><div class="line">   &quot;_version&quot;:  1,</div><div class="line">   &quot;created&quot;:   true</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>1.自动生成的ID有22个字符长，URL-safe, Base64-encoded string universally unique identifiers, 或者叫 UUIDs</p>
+<h3 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /website/blog/123?pretty</div></pre></td></tr></table></figure>
+<p>响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 1,</div><div class="line">  &quot;found&quot; :    true,</div><div class="line">  &quot;_source&quot; :  &#123; //得到的数据通过_source封装</div><div class="line">      &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">      &quot;text&quot;:  &quot;Just trying this out...&quot;,</div><div class="line">      &quot;date&quot;:  &quot;2014/01/01&quot;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>1.pretty在任意的查询字符串中增加pretty参数，类似于上面的例子。会让Elasticsearch美化输出(pretty-print)JSON响应以便更加容易阅读。_source字段不会被美化，它的样子与我们输入的一致。<br>2.如果我们请求一个不存在的文档，依旧会得到一个JSON，不过found值变成了false</p>
+<p>查看响应头</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XGET http://localhost:9200/website/blog/124?pretty</div></pre></td></tr></table></figure>
+<p>未找到的数据类似</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 404 Not Found</div><div class="line">Content-Type: application/json; charset=UTF-8</div><div class="line">Content-Length: 83</div><div class="line"></div><div class="line">&#123;</div><div class="line">  &quot;_index&quot; : &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :  &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :    &quot;124&quot;,</div><div class="line">  &quot;found&quot; :  false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="检索文档的一部分"><a href="#检索文档的一部分" class="headerlink" title="检索文档的一部分"></a>检索文档的一部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /website/blog/123?_source=title,text</div></pre></td></tr></table></figure>
+<h4 id="只得到-source字段"><a href="#只得到-source字段" class="headerlink" title="只得到_source字段"></a>只得到_source字段</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /website/blog/123/_source</div></pre></td></tr></table></figure>
+<h4 id="检查文档是否存在"><a href="#检查文档是否存在" class="headerlink" title="检查文档是否存在"></a>检查文档是否存在</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XHEAD http://localhost:9200/website/blog/123</div></pre></td></tr></table></figure>
+<p>响应</p>
+<p>存在返回200<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 200 OK</div><div class="line">Content-Type: text/plain; charset=UTF-8</div><div class="line">Content-Length: 0</div></pre></td></tr></table></figure></p>
+<p>不存在返回404</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 404 Not Found</div><div class="line">Content-Type: text/plain; charset=UTF-8</div><div class="line">Content-Length: 0</div></pre></td></tr></table></figure>
+<p><strong>注意：当然，这只表示你在查询的那一刻文档不存在，但并不表示几毫秒后依旧不存在。另一个进程在这期间可能创建新文档</strong></p>
+<h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><h4 id="更新整个文档"><a href="#更新整个文档" class="headerlink" title="更新整个文档"></a>更新整个文档</h4><blockquote>
+<p>文档在Elasticsearch中是不可变的——我们不能修改他们。如果需要更新已存在的文档，我们可以使用《索引文档》章节提到的index API 重建索引(reindex) 或者替换掉它</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;I am starting to get the hang of this...&quot;,</div><div class="line">  &quot;date&quot;:  &quot;2014/01/02&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 2, //版本增加</div><div class="line">  &quot;created&quot;:   false  //同索引、同类型下已经存在同ID的文档</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在内部，Elasticsearch已经标记旧文档为删除并添加了一个完整的新文档。旧版本文档不会立即消失，但你也不能去访问它。Elasticsearch会在你继续索引更多数据时清理被删除的文档</p>
+<p>updateAPI 允许你修改文档的局部，但事实上Elasticsearch遵循与之前所说完全相同的过程，这个过程如下：<br>1.从旧文档中检索JSON<br>2.修改它<br>3.删除旧文档<br>4.索引新文档</p>
+<p><strong>唯一的不同是update API完成这一过程只需要一个客户端请求既可，不再需要get和index请求了</strong></p>
+<h3 id="创建一个新文档"><a href="#创建一个新文档" class="headerlink" title="创建一个新文档"></a>创建一个新文档</h3><p>如果想使用自定义的_id，我们必须告诉Elasticsearch应该在_index、_type、_id三者都不同时才接受请求。为了做到这点有两种方法</p>
+<p>第一种方法使用op_type查询参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123?op_type=create</div><div class="line">&#123; ... &#125;</div></pre></td></tr></table></figure>
+<p>第二种方法是在URL后加/_create做为端点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123/_create</div><div class="line">&#123; ... &#125;</div></pre></td></tr></table></figure>
+<p>如果请求成功的创建了一个新文档，Elasticsearch将返回正常的元数据且响应状态码是201 Created。</p>
+<p>另一方面，如果包含相同的_index、_type和_id的文档已经存在，Elasticsearch将返回409 Conflict响应状态码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;error&quot; : &quot;DocumentAlreadyExistsException[[website][4] [blog][123]:</div><div class="line">             document already exists]&quot;,</div><div class="line">  &quot;status&quot; : 409</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DELETE /website/blog/123</div></pre></td></tr></table></figure>
+<p>文档被找到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;found&quot; :    true,</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 3</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>文档未找到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;found&quot; :    false,</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 4</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>注意：尽管文档不存在——“found”的值是false——_version依旧增加了。这是内部记录的一部分，它确保在多节点间不同操作可以有正确的顺序</strong></p>
+<h3 id="处理冲突"><a href="#处理冲突" class="headerlink" title="处理冲突"></a>处理冲突</h3><blockquote>
+<p>当使用index API更新文档的时候，我们读取原始文档，做修改，然后将整个文档(whole document)一次性重新索引。最近的索引请求会生效——Elasticsearch中只存储最后被索引的任何文档。如果其他人同时也修改了这个文档，他们的修改将会丢失</p>
+</blockquote>
+<p><strong>悲观并发控制（Pessimistic concurrency control）</strong></p>
+<p>这在关系型数据库中被广泛的使用，假设冲突的更改经常发生，为了解决冲突我们把访问区块化。典型的例子是在读一行数据前锁定这行，然后确保只有加锁的那个线程可以修改这行数据。</p>
+<p><strong>乐观并发控制（Optimistic concurrency control）：</strong></p>
+<p>被Elasticsearch使用，假设冲突不经常发生，也不区块化访问，然而，如果在读写过程中数据发生了变化，更新操作将失败。这时候由程序决定在失败后如何解决冲突。实际情况中，可以重新尝试更新，刷新数据（重新读取）或者直接反馈给用户。</p>
+<h4 id="乐观并发控制"><a href="#乐观并发控制" class="headerlink" title="乐观并发控制"></a>乐观并发控制</h4><p>lasticsearch是分布式的。当文档被创建、更新或删除，文档的新版本会被复制到集群的其它节点。Elasticsearch即是同步的又是异步的，意思是这些复制请求都是平行发送的，并无序(out of sequence)的到达目的地。这就需要一种方法确保老版本的文档永远不会覆盖新的版本。</p>
+<p>上文我们提到index、get、delete请求时，我们指出每个文档都有一个_version号码，这个号码在文档被改变时加一。Elasticsearch使用这个_version保证所有修改都被正确排序。当一个旧版本出现在新版本之后，它会被简单的忽略。</p>
+<p>我们利用_version的这一优点确保数据不会因为修改冲突而丢失。我们可以指定文档的version来做想要的更改。如果那个版本号不是现在的，我们的请求就失败了</p>
+<p>创建一个新文档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/1/_create</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Just trying this out...&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>指定version参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//只希望文档的_version是1时更新才生效</div><div class="line">PUT /website/blog/1?version=1 </div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Starting to get the hang of this...&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="使用外部版本控制系统"><a href="#使用外部版本控制系统" class="headerlink" title="使用外部版本控制系统"></a>使用外部版本控制系统</h4><blockquote>
+<p>一种常见的结构是使用一些其他的数据库做为主数据库，然后使用Elasticsearch搜索数据，这意味着所有主数据库发生变化，就要将其拷贝到Elasticsearch中。如果有多个进程负责这些数据的同步，就会遇到上面提到的并发问题</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>如果主数据库有版本字段——或一些类似于timestamp等可以用于版本控制的字段——是你就可以在Elasticsearch的查询字符串后面添加version_type=external来使用这些版本号。版本号必须是整数，大于零小于9.2e+18——Java中的正的long</p>
+</blockquote>
+<p><strong>外部版本号不仅在索引和删除请求中指定，也可以在创建(create)新文档中指定</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/2?version=5&amp;version_type=external</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first external blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Starting to get the hang of this...&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="局部更新"><a href="#局部更新" class="headerlink" title="局部更新"></a>局部更新</h3><blockquote>
+<p>通过检索，修改，然后重建整文档的索引方法来更新文档。这是对的。然而，使用update API，我们可以使用一个请求来实现局部更新</p>
+</blockquote>
+<p>文档是不可变的——它们不能被更改，只能被替换。update API必须遵循相同的规则。表面看来，我们似乎是局部更新了文档的位置，内部却是像我们之前说的一样简单的使用update API处理相同的检索-修改-重建索引流程，我们也减少了其他进程可能导致冲突的修改</p>
+<p>最简单的update请求表单接受一个局部文档参数doc，它会合并到现有文档中——对象合并在一起，存在的标量字段被覆盖，新字段被添加。举个例子，我们可以使用以下请求为博客添加一个tags字段和一个views字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line">   &quot;doc&quot; : &#123;</div><div class="line">      &quot;tags&quot; : [ &quot;testing&quot; ],</div><div class="line">      &quot;views&quot;: 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>请求响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">   &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">   &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">   &quot;_version&quot; : 3</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>检索文档文档显示被更新的_source字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot;:    &quot;website&quot;,</div><div class="line">   &quot;_type&quot;:     &quot;blog&quot;,</div><div class="line">   &quot;_id&quot;:       &quot;1&quot;,</div><div class="line">   &quot;_version&quot;:  3,</div><div class="line">   &quot;found&quot;:     true,</div><div class="line">   &quot;_source&quot;: &#123;</div><div class="line">      &quot;title&quot;:  &quot;My first blog entry&quot;,</div><div class="line">      &quot;text&quot;:   &quot;Starting to get the hang of this...&quot;,</div><div class="line">      &quot;tags&quot;: [ &quot;testing&quot; ], &lt;1&gt;</div><div class="line">      &quot;views&quot;:  0 &lt;1&gt;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="更新可能不存在的文档"><a href="#更新可能不存在的文档" class="headerlink" title="更新可能不存在的文档"></a>更新可能不存在的文档</h4><blockquote>
+<p>想象我们要在Elasticsearch中存储浏览量计数器。每当有用户访问页面，我们增加这个页面的浏览量。但如果这是个新页面，我们并不确定这个计数器存在与否。当我们试图更新一个不存在的文档，更新将失败。<br>在这种情况下，我们可以使用upsert参数定义文档来使其不存在时被创建</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/pageviews/1/_update</div><div class="line">&#123;</div><div class="line">   &quot;script&quot; : &quot;ctx._source.views+=1&quot;,</div><div class="line">   &quot;upsert&quot;: &#123;</div><div class="line">       &quot;views&quot;: 1</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>第一次执行这个请求，upsert值被索引为一个新文档，初始化views字段为1.接下来文档已经存在，所以script被更新代替，增加views数量</p>
+<h4 id="更新和冲突"><a href="#更新和冲突" class="headerlink" title="更新和冲突"></a>更新和冲突</h4><p>如何在检索(retrieve)和重建索引(reindex)中保持更小的窗口，如何减少冲突性变更发生的概率，不过这些无法被完全避免，像一个其他进程在update进行重建索引时修改了文档这种情况依旧可能发生。</p>
+<p>为了避免丢失数据，update API在检索(retrieve)阶段检索文档的当前_version，然后在重建索引(reindex)阶段通过index请求提交。如果其他进程在检索(retrieve)和重建索引(reindex)阶段修改了文档，_version将不能被匹配，然后更新失败。</p>
+<p>对于多用户的局部更新，文档被修改了并不要紧。例如，两个进程都要增加页面浏览量，增加的顺序我们并不关心——如果冲突发生，我们唯一要做的仅仅是重新尝试更新既可。</p>
+<p>这些可以通过retry_on_conflict参数设置重试次数来自动完成，这样update操作将会在发生错误前重试——这个值默认为0</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//在错误发生前重试更新5次</div><div class="line">POST /website/pageviews/1/_update?retry_on_conflict=5 </div><div class="line">&#123;</div><div class="line">   &quot;script&quot; : &quot;ctx._source.views+=1&quot;,</div><div class="line">   &quot;upsert&quot;: &#123;</div><div class="line">       &quot;views&quot;: 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这适用于像增加计数这种顺序无关的操作，但是还有一种顺序非常重要的情况。例如index API，使用“保留最后更新(last-write-wins)”的update API，但它依旧接受一个version参数以允许你使用乐观并发控制(optimistic concurrency control)来指定你要更细文档的版本</p>
+<h3 id="检索多个文档"><a href="#检索多个文档" class="headerlink" title="检索多个文档"></a>检索多个文档</h3><blockquote>
+<p>像Elasticsearch一样，检索多个文档依旧非常快。合并多个请求可以避免每个请求单独的网络开销。如果你需要从Elasticsearch中检索多个文档，相对于一个一个的检索，更快的方式是在一个请求中使用multi-get或者mget API</p>
+</blockquote>
+<p><strong>mget API参数是一个docs数组，数组的每个节点定义一个文档的_index、_type、_id元数据。如果你只想检索一个或几个确定的字段，也可以定义一个_source参数</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">POST /_mget</div><div class="line">&#123;</div><div class="line">   &quot;docs&quot; : [</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; : &quot;website&quot;,</div><div class="line">         &quot;_type&quot; :  &quot;blog&quot;,</div><div class="line">         &quot;_id&quot; :    2</div><div class="line">      &#125;,</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; : &quot;website&quot;,</div><div class="line">         &quot;_type&quot; :  &quot;pageviews&quot;,</div><div class="line">         &quot;_id&quot; :    1,</div><div class="line">         &quot;_source&quot;: &quot;views&quot;</div><div class="line">      &#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>响应体也包含一个docs数组，每个文档还包含一个响应，它们按照请求定义的顺序排列。每个这样的响应与单独使用get request响应体相同</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;docs&quot; : [</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">         &quot;_id&quot; :      &quot;2&quot;,</div><div class="line">         &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">         &quot;found&quot; :    true,</div><div class="line">         &quot;_source&quot; : &#123;</div><div class="line">            &quot;text&quot; :  &quot;This is a piece of cake...&quot;,</div><div class="line">            &quot;title&quot; : &quot;My first external blog entry&quot;</div><div class="line">         &#125;,</div><div class="line">         &quot;_version&quot; : 10</div><div class="line">      &#125;,</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">         &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">         &quot;_type&quot; :    &quot;pageviews&quot;,</div><div class="line">         &quot;found&quot; :    true,</div><div class="line">         &quot;_version&quot; : 2,</div><div class="line">         &quot;_source&quot; : &#123;</div><div class="line">            &quot;views&quot; : 2</div><div class="line">         &#125;</div><div class="line">      &#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果你想检索的文档在同一个_index中（甚至在同一个_type中），你就可以在URL中定义一个默认的/_index或者/_index/_type</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/_mget</div><div class="line">&#123;</div><div class="line">   &quot;docs&quot; : [</div><div class="line">      &#123; &quot;_id&quot; : 2 &#125;,</div><div class="line">      &#123; &quot;_type&quot; : &quot;pageviews&quot;, &quot;_id&quot; :   1 &#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>事实上，如果所有文档具有相同_index和_type，你可以通过简单的ids数组来代替完整的docs数组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/_mget</div><div class="line">&#123;</div><div class="line">   &quot;ids&quot; : [ &quot;2&quot;, &quot;1&quot; ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意到我们请求的第二个文档并不存在。我们定义了类型为blog，但是ID为1的文档类型为pageviews。这个不存在的文档会在响应体中被告知</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;docs&quot; : [</div><div class="line">    &#123;</div><div class="line">      &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">      &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">      &quot;_id&quot; :      &quot;2&quot;,</div><div class="line">      &quot;_version&quot; : 10,</div><div class="line">      &quot;found&quot; :    true,</div><div class="line">      &quot;_source&quot; : &#123;</div><div class="line">        &quot;title&quot;:   &quot;My first external blog entry&quot;,</div><div class="line">        &quot;text&quot;:    &quot;This is a piece of cake...&quot;</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">      &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">      &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">      &quot;found&quot; :    false  //id为2的文档不存在</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h3><blockquote>
+<p>就像mget允许我们一次性检索多个文档一样，bulk API允许我们使用单一请求来实现多个文档的create、index、update或delete。这对索引类似于日志活动这样的数据流非常有用，它们可以以成百上千的数据为一个批次按序进行索引</p>
+</blockquote>
+<p>bulk请求体如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body        &#125;\n</div><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body        &#125;\n</div></pre></td></tr></table></figure>
+<p>这种格式类似于用”\n”符号连接起来的一行一行的JSON文档流(stream)。两个重要的点需要注意</p>
+<ul>
+<li><strong>每行必须以”\n”符号结尾，包括最后一行。这些都是作为每行有效的分离而做的标记。</strong></li>
+<li><strong>每一行的数据不能包含未被转义的换行符，它们会干扰分析——这意味着JSON不能被美化打印。</strong></li>
+</ul>
+<p><strong>action/metadata这一行定义了文档行为(what action)发生在哪个文档(which document)之上</strong></p>
+<p>action行为：<br>create、update、delete、index</p>
+<p>例如删除请求的格式如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123; &quot;delete&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div></pre></td></tr></table></figure>
+<p>请求体(request body)由文档的_source组成——文档所包含的一些字段以及其值。它被index和create操作所必须，这是有道理的：你必须提供文档用来索引。</p>
+<p>这些还被update操作所必需，而且请求体的组成应该与update API（doc, upsert, script等等）一致。</p>
+<p>删除操作不需要请求体(request body)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123; &quot;create&quot;:  &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My first blog post&quot; &#125;</div></pre></td></tr></table></figure>
+<p>如果定义ID</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123; &quot;index&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My second blog post&quot; &#125;</div></pre></td></tr></table></figure>
+<p>bulk请求表单</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; &quot;delete&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125; </div><div class="line">&#123; &quot;create&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My first blog post&quot; &#125;</div><div class="line">&#123; &quot;index&quot;:  &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My second blog post&quot; &#125;</div><div class="line">&#123; &quot;update&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot;, &quot;_retry_on_conflict&quot; : 3&#125; &#125;</div><div class="line">&#123; &quot;doc&quot; : &#123;&quot;title&quot; : &quot;My updated blog post&quot;&#125; &#125;</div></pre></td></tr></table></figure>
+<p>注意delete行为(action)没有请求体，它紧接着另一个行为(action)<br>记得最后加一个换行符</p>
+<p>Elasticsearch响应包含一个items数组，它罗列了每一个请求的结果，结果的顺序与我们请求的顺序相同</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;took&quot;: 4,</div><div class="line">   &quot;errors&quot;: false, //所有请求成功</div><div class="line">   &quot;items&quot;: [</div><div class="line">      &#123;  &quot;delete&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 2,</div><div class="line">            &quot;status&quot;:   200,</div><div class="line">            &quot;found&quot;:    true</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;create&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 3,</div><div class="line">            &quot;status&quot;:   201</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;create&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;EiwfApScQiiy7TIKFxRCTw&quot;,</div><div class="line">            &quot;_version&quot;: 1,</div><div class="line">            &quot;status&quot;:   201</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;update&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 4,</div><div class="line">            &quot;status&quot;:   200</div><div class="line">      &#125;&#125;</div><div class="line">   ]</div><div class="line">&#125;&#125;</div></pre></td></tr></table></figure>
+<p>每个子请求都被独立的执行，所以一个子请求的错误并不影响其它请求。如果任何一个请求失败，顶层的error标记将被设置为true，然后错误的细节将在相应的请求中被报告</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; &quot;create&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;Cannot create - it already exists&quot; &#125;</div><div class="line">&#123; &quot;index&quot;:  &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;But we can update it&quot; &#125;</div></pre></td></tr></table></figure>
+<p>响应中我们将看到create文档123失败了，因为文档已经存在，但是后来的在123上执行的index请求成功了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;took&quot;: 3,</div><div class="line">   &quot;errors&quot;: true, &lt;1&gt;</div><div class="line">   &quot;items&quot;: [</div><div class="line">      &#123;  &quot;create&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;status&quot;:   409, &lt;2&gt;</div><div class="line">            &quot;error&quot;:    &quot;DocumentAlreadyExistsException &lt;3&gt;</div><div class="line">                        [[website][4] [blog][123]:</div><div class="line">                        document already exists]&quot;</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;index&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 5,</div><div class="line">            &quot;status&quot;:   200 &lt;4&gt;</div><div class="line">      &#125;&#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><1> 一个或多个请求失败。</1></p>
+<p><2> 这个请求的HTTP状态码被报告为409 CONFLICT。</2></p>
+<p><3> 错误消息说明了什么请求错误。</3></p>
+<p><4> 第二个请求成功了，状态码是200 OK。</4></p>
+<h4 id="不要重复"><a href="#不要重复" class="headerlink" title="不要重复"></a>不要重复</h4><p>你可能在同一个index下的同一个type里批量索引日志数据。为每个文档指定相同的元数据是多余的。就像mget API，bulk请求也可以在URL中使用/_index或/_index/_type</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">POST /website/_bulk</div><div class="line">&#123; &quot;index&quot;: &#123; &quot;_type&quot;: &quot;log&quot; &#125;&#125;</div><div class="line">&#123; &quot;event&quot;: &quot;User logged in&quot; &#125;</div></pre></td></tr></table></figure>
+<p>你依旧可以覆盖元数据行的_index和_type，在没有覆盖时它会使用URL中的值作为默认值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">POST /website/log/_bulk</div><div class="line">&#123; &quot;index&quot;: &#123;&#125;&#125;</div><div class="line">&#123; &quot;event&quot;: &quot;User logged in&quot; &#125;</div><div class="line">&#123; &quot;index&quot;: &#123; &quot;_type&quot;: &quot;blog&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;: &quot;Overriding the default type&quot; &#125;</div></pre></td></tr></table></figure>
+<h3 id="多大才算太大？"><a href="#多大才算太大？" class="headerlink" title="多大才算太大？"></a>多大才算太大？</h3><p>整个批量请求需要被加载到接受我们请求节点的内存里，所以请求越大，给其它请求可用的内存就越小。有一个最佳的bulk请求大小。超过这个大小，性能不再提升而且可能降低。</p>
+<p>最佳大小，当然并不是一个固定的数字。它完全取决于你的硬件、你文档的大小和复杂度以及索引和搜索的负载。幸运的是，这个最佳点(sweetspot)还是容易找到的：</p>
+<p>试着批量索引标准的文档，随着大小的增长，当性能开始降低，说明你每个批次的大小太大了。开始的数量可以在1000~5000个文档之间，如果你的文档非常大，可以使用较小的批次。</p>
+<p>通常着眼于你请求批次的物理大小是非常有用的。一千个1kB的文档和一千个1MB的文档大不相同。一个好的批次最好保持在5-15MB大小间</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-七-——-集群/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1831,172 +2133,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/tomcat性能调优/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/tomcat性能调优/" itemprop="url">tomcat性能调优</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:20:58+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/调优笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">调优笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="tomcat性能调优"><a href="#tomcat性能调优" class="headerlink" title="tomcat性能调优"></a>tomcat性能调优</h2><p>【一】内存溢出（out of memory）     </p>
-<p>通过配置Tomcat的配置文件(Windows 下的catalina.bat或Linux下的catalina.sh)可以解决(原理： 增加JVM的栈内存实现）</p>
-<p>catalina.bat 文件内容（更改配置后，需重启才生效）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">JAVA_OPTS=&quot;-Djava.awt.headless=true-Dfile.encoding=UTF-8</div><div class="line"></div><div class="line">-server-Xms1024m-Xmx1024m</div><div class="line"></div><div class="line">-XX:NewSize=512m-XX:MaxNewSize=512m</div><div class="line"></div><div class="line">-XX:PermSize=512m-XX:MaxPermSize=512m</div><div class="line"></div><div class="line">-XX:+DisableExplicitGC&quot;</div></pre></td></tr></table></figure>
-<p>-Xms – 指定初始化时化的栈内存</p>
-<p>-Xmx – 指定最大栈内存</p>
-<p>【二】解决JRE内存泄露<br>始终使用最新的tomcat服务器以获得更好的性能和可伸缩性。如果我们使用最新的tomcat版本6.0.26及以上就可以解决这个错误，因为它包含了一个监听器来处理JRE和PermGen的内存泄漏</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;Listener className=&quot;org.apache.catalina.core.JreMemoryLeakPreventionListener&quot; /&gt;</div></pre></td></tr></table></figure>
-<p>【三】线程池设置</p>
-<p>线程池指定Web请求负载的数量</p>
-<p>maxThreads的值应该根据流量的大小，如果值过低，将有没有足够的线程来处理所有的请求，请求将进入等待状态，只有当一个的处理线程释放后才被处理；如果设置的太大，Tomcat的启动将花费更多时间。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;Connector port=&quot;8080&quot; address=&quot;localhost&quot;</div><div class="line">maxThreads=&quot;250&quot; maxHttpHeaderSize=&quot;8192&quot;</div><div class="line">emptySessionPath=&quot;true&quot; protocol=&quot;HTTP/1.1&quot;</div><div class="line">enableLookups=&quot;false&quot; redirectPort=&quot;8181&quot; acceptCount=&quot;100&quot;</div><div class="line">connectionTimeout=&quot;20000&quot; disableUploadTimeout=&quot;true&quot; /&gt;</div></pre></td></tr></table></figure>
-<p>在上述配置中，maxThreads值设定为“250”，这指定可以由服务器处理的并发请求的最大数量。</p>
-<p>如果没有指定，这个属性的默认值为“200”。任何多出的并发请求将收到“拒绝连接”的错误提示，直到另一个处理请求进程被释放</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">org.apache.tomcat.util.threads.ThreadPool logFull SEVERE: All threads (250) are</div><div class="line">currently busy, waiting. Increase maxThreads (250) or check the servlet status</div></pre></td></tr></table></figure>
-<p>如果应用提示上述错误，务必检查上述错误是否是由于单个请求花费太长时间造成的</p>
-<p><strong>注意：如果请求的数量超过了“750”，这将不是意味着将maxThreads属性值设置为“750”，它意外着最好使用“Tomcat集群”的多个实例。也就是说，如果有“1000”请求，两个Tomcat实例设置“maxThreads= 500”，而不在单Tomcat实例的情况下设置maxThreads=1000</strong></p>
-<p>【四】压缩</p>
-<p>Tomcat有一个通过在server.xml配置文件中设置压缩的选项</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;</div><div class="line">connectionTimeout=&quot;20000&quot;</div><div class="line">redirectPort=&quot;8181&quot; compression=&quot;500&quot;</div><div class="line">compressableMimeType=&quot;text/html,text/xml,text/plain,application/octet-stream&quot; /&gt;</div></pre></td></tr></table></figure>
-<p>当文件的大小大于等于500bytes时才会压缩。如果当文件达到了大小但是却没有被压缩，那么设置属性compression=”on”。否则Tomcat默认设置是“off”</p>
-<p>【五】数据库性能调优</p>
-<p>Tomcat性能在等待数据库查询被执行期间会降低。</p>
-<p>Tomcat会在启动时默认加载命名查询，这个可能会提升性能。</p>
-<p>另一件重要事是确保所有数据库连接正确地关闭。</p>
-<p>给数据库连接池设置正确值也是十分重要的。我所说的值是指Resource要素的最大空闲数（maxIdle），最大连接数（maxActive）,最大建立连接等待时间（maxWait）属性的值</p>
-<p>【六】Tomcat原生库</p>
-<p>【七】其他</p>
-<ul>
-<li>开启浏览器的缓存，这样读取存放在webapps文件夹里的静态内容会更快，大大推动整体性能。</li>
-<li>每当开机时，Tomcat服务器应当自动地重启。</li>
-<li>一般情况下HTTPS请求会比HTTP请求慢。如果你想要更好的安全性，即使慢一点我们还是要选择HTTPS。 </li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2046,7 +2182,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">136</span>
+                <span class="site-state-item-count">137</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2057,7 +2193,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">53</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2068,7 +2204,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">106</span>
+                <span class="site-state-item-count">107</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

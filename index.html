@@ -254,6 +254,181 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/19/分布式事务/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/19/分布式事务/" itemprop="url">分布式事务</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-19T14:40:57+08:00">
+                2017-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式事务/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式事务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="传统数据库事务特性ACID"><a href="#传统数据库事务特性ACID" class="headerlink" title="传统数据库事务特性ACID"></a>传统数据库事务特性ACID</h1><ol>
+<li>原子性（atomicity）：事务是数据库的逻辑工作单位，而且是必须是原子工作单位，对于其数据修改，要么全部执行，要么全部不执行。</li>
+<li>一致性（consistency）：事务在完成时，必须是所有的数据都保持一致状态。在相关数据库中，所有规则都必须应用于事务的修改，以保持所有数据的完整性。</li>
+<li>隔离性（isolation）：一个事务的执行不能被其他事务所影响。</li>
+<li>持久性（durability）：一个事务一旦提交，事物的操作便永久性的保存在DB中。即使此时再执行回滚操作也不能撤消所做的更改。</li>
+</ol>
+<p>一般单机应用采用<a href="http://www.cnblogs.com/azhqiang/p/4044127.html" target="_blank" rel="external">JavaJDBC事务</a>控制即可</p>
+<pre><code>try {  
+    conn.setAutoCommit(false); 
+    //业务代码
+    conn.commit();      
+} catch (Exception e) {  
+    conn.rollback();    
+    e.printStackTrace();  
+} 
+</code></pre><h1 id="分布式数据一致性"><a href="#分布式数据一致性" class="headerlink" title="分布式数据一致性"></a>分布式数据一致性</h1><p>为了保证数据高可用，数据会存放在多个副本（replica）不同物理机器中，需要把保持这些数据的一致性，采用了常用的几种算法<strong>二阶提交(2PC)、三阶提交(3PC)</strong>和<strong>Paxos算法</strong></p>
+<h1 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a><a href="http://blog.jobbole.com/95632/" target="_blank" rel="external">分布式事务</a></h1><blockquote>
+<p>指会涉及到操作多个数据库的事务。目的是为了保证分布式系统中的数据一致性。</p>
+</blockquote>
+<p>分布式事务处理的关键是必须有一种方法可以知道事务在任何地方所做的所有动作，提交或回滚事务的决定必须产生统一的结果（全部提交或全部回滚）</p>
+<p>由于存在事务机制，可以保证每个独立节点的ACID，但是不能知道其他节点的执行情况，所以不能保证数据一致。要想多台机器的数据一致。必须保证在所有节点的数据写操作，要不全部都执行，要么全部的都不执行。解决方案就是通过<strong>引入一个“协调者”的组件来统一调度所有分布式节点的执行。</strong></p>
+<h1 id="XA规范"><a href="#XA规范" class="headerlink" title="XA规范"></a>XA规范</h1><p>X/Open 组织（即现在的 Open Group ）定义了分布式事务处理模型包括应用程序（ AP ）、事务管理器（ TM ）、资源管理器（ RM ）、通信资源管理器（ CRM ）四部分。</p>
+<blockquote>
+<p>XA 就是 X/Open DTP 定义的交易中间件与数据库之间的接口规范（即接口函数），交易中间件用它来通知数据库事务的开始、结束以及提交、回滚等。 XA 接口函数由数据库厂商提供。</p>
+</blockquote>
+<p>二阶提交协议和三阶提交协议就是根据这一思想衍生出来的。<br><strong>两阶段提交主要保证了分布式事务的原子性</strong></p>
+<h1 id="2PC"><a href="#2PC" class="headerlink" title="2PC"></a>2PC</h1><blockquote>
+<p>所谓的两个阶段是指：<strong>准备阶段和提交阶段</strong>。</p>
+</blockquote>
+<p>两阶段提交算法思路：<strong>参与者将操作成败通知协调者，再由协调者根据所有参与者的反馈情报决定各参与者是否要提交操作还是中止操作</strong></p>
+<p>但是两阶段提交可能出现一些问题：<strong>同步阻塞、单点故障、数据不一致等问题</strong></p>
+<p>二阶段无法解决：协调者再发出commit消息之后宕机，而唯一接收到这条消息的参与者同时也宕机了。那么即使协调者通过选举协议产生了新的协调者，这条事务的状态也是不确定的，没人知道事务是否被已经提交</p>
+<h1 id="3PC"><a href="#3PC" class="headerlink" title="3PC"></a>3PC</h1><blockquote>
+<p>在2PC基础上，新增超时机制和在第一阶段和第二阶段中插入一个准备阶段。</p>
+</blockquote>
+<p>保证了在最后提交阶段之前各参与节点的状态是一致的（CanCommit阶段、PreCommit阶段、doCommit阶段）</p>
+<h1 id="2PC与3PC的区别"><a href="#2PC与3PC的区别" class="headerlink" title="2PC与3PC的区别"></a>2PC与3PC的区别</h1><ol>
+<li>相对于2PC，3PC主要解决的单点故障问题，并减少阻塞，因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit</li>
+<li>3PC也可能导致数据一致性问题，因为，由于网络原因，协调者发送的abort响应没有及时被参与者接收到，那么参与者在等待超时之后执行了commit操作。这样就和其他接到abort命令并执行回滚的参与者之间存在数据不一致的情况</li>
+</ol>
+<h4 id="分布式事务具体实例"><a href="#分布式事务具体实例" class="headerlink" title="分布式事务具体实例"></a><a href="http://blog.jobbole.com/110805/" target="_blank" rel="external">分布式事务具体实例</a></h4><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://blog.csdn.net/u014403546/article/details/54924054" target="_blank" rel="external">分布式系统事务一致性到CAP,BASE理论</a></p>
+<p><a href="https://www.qcloud.com/community/article/120564" target="_blank" rel="external">企鹅讲解分布式事务</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/13/Linux-CPU-load/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2054,279 +2229,6 @@ javac -J-agentlib:hprof[=options] ToBeProfiledClass
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/17/Querydsl学习笔记-一/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/17/Querydsl学习笔记-一/" itemprop="url">Querydsl学习笔记(一)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-17T10:28:07+08:00">
-                2017-08-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/querydsl/" itemprop="url" rel="index">
-                    <span itemprop="name">querydsl</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="引用POM"><a href="#引用POM" class="headerlink" title="引用POM"></a>引用POM</h1><pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;com.querydsl&lt;/groupId&gt;
-  &lt;artifactId&gt;querydsl-jpa&lt;/artifactId&gt;
-  &lt;version&gt;${querydsl.version}&lt;/version&gt;
-&lt;/dependency&gt;
-
-&lt;dependency&gt;
-  &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
-  &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
-  &lt;version&gt;1.6.1&lt;/version&gt;
-&lt;/dependency&gt;
-
-&lt;dependency&gt;
-  &lt;groupId&gt;com.querydsl&lt;/groupId&gt;
-  &lt;artifactId&gt;querydsl-apt&lt;/artifactId&gt;
-  &lt;version&gt;${querydsl.version}&lt;/version&gt;
-  &lt;scope&gt;provided&lt;/scope&gt;
-&lt;/dependency&gt;
-</code></pre><h1 id="引入插件"><a href="#引入插件" class="headerlink" title="引入插件"></a>引入插件</h1><pre><code>&lt;plugin&gt;
-  &lt;groupId&gt;com.mysema.maven&lt;/groupId&gt;
-  &lt;artifactId&gt;apt-maven-plugin&lt;/artifactId&gt;
-  &lt;version&gt;1.1.3&lt;/version&gt;
-  &lt;executions&gt;
-    &lt;execution&gt;
-      &lt;goals&gt;
-        &lt;goal&gt;process&lt;/goal&gt;
-      &lt;/goals&gt;
-      &lt;configuration&gt;
-        &lt;outputDirectory&gt;target/generated-sources/java&lt;/outputDirectory&gt;
-        &lt;processor&gt;com.querydsl.apt.jpa.JPAAnnotationProcessor&lt;/processor&gt;
-      &lt;/configuration&gt;
-    &lt;/execution&gt;
-  &lt;/executions&gt;
-&lt;/plugin&gt;                
-</code></pre><h2 id="实体"><a href="#实体" class="headerlink" title="实体"></a>实体</h2><pre><code>  @Data
-@Entity
-public class Article{
-            private Integer id;
-            private Integer tag; 
-            private String title;
-            private String subtitle;
-            private String content;
-            private String author;
-            private Integer likeCount;
-            private Integer collectCount;
-            private String createTime;
-}
-
-@Data
-@Entity
-public class Tag{
-            private Integer id;
-            private String name;
-            private String createTime;
-}
-</code></pre><p>Querydsl生成查询类型QXxxx包装实体对象Xxxx，作为静态类型变量的代表</p>
-<pre><code>QArticle article = QArticle.article;
-QTag tag = new QTag(&quot;tag&quot;);
-</code></pre><p>Querydsl支持JPA和hibernateAPI</p>
-<pre><code>JPAQuery&lt;?&gt; query = new JPAQuery&lt;Void&gt;(entityManager);
-HibernateQuery&lt;?&gt; query = new HibernateQuery&lt;Void&gt;(session);
-</code></pre><p>JPAQuery和HibernateQUery实现JPQLQuery接口</p>
-<h2 id="构建JPAQueryFactory实例"><a href="#构建JPAQueryFactory实例" class="headerlink" title="构建JPAQueryFactory实例"></a>构建JPAQueryFactory实例</h2><pre><code>  @Bean
-public JPAQueryFactory queryFactory(EntityManager entityManager) {
-    return new JPAQueryFactory(new HQLTemplates(), entityManager);
-}
-</code></pre><h2 id="用法实例"><a href="#用法实例" class="headerlink" title="用法实例"></a>用法实例</h2><h3 id="fetchOne返回单条数据"><a href="#fetchOne返回单条数据" class="headerlink" title="fetchOne返回单条数据"></a>fetchOne返回单条数据</h3><pre><code>// select * from Article as article where title = &quot;hello world&quot;; 
-Article article = queryFactory.selectFrom(article)
-                                                    .where(article.title,eq(&quot;hello world&quot;))
-                                                    .fetchOne();
-</code></pre><h3 id="多数据源查询"><a href="#多数据源查询" class="headerlink" title="多数据源查询"></a>多数据源查询</h3><pre><code>// select * from article,tag;
-query.from(article,tag);
-</code></pre><h3 id="多条件查询"><a href="#多条件查询" class="headerlink" title="多条件查询"></a>多条件查询</h3><pre><code>// select * from Article as article where article.title = &quot;hello world&quot; and article.subtitle=&quot;querydsl&quot;; 
-Article article = queryFactory.selectFrom(article)
-                              .where(article.title,eq(&quot;hello world&quot;),and(artitle.subtitle,eq(&quot;querydsl&quot;)))
-</code></pre><h3 id="连接查询"><a href="#连接查询" class="headerlink" title="连接查询"></a>连接查询</h3><pre><code>// select * from Article as article inner join Tag as tag on tag.id = article.tag where tag.name = &apos;tagName&apos;
-queryFactory.selectFrom(article)
-            .innerJoin(article.tag,tag)
-           //.leftJoin(article.tag,tag)
-            .on(tag.name.eq(&quot;tagName&quot;))
-            .fetch();  
-</code></pre><h3 id="一般处理业务的API"><a href="#一般处理业务的API" class="headerlink" title="一般处理业务的API"></a>一般处理业务的API</h3><ul>
-<li>select</li>
-<li>from</li>
-<li>innerJoin </li>
-<li>where</li>
-<li>groupBy</li>
-<li>having</li>
-<li>orderBy</li>
-<li>limit</li>
-<li>like</li>
-</ul>
-<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><pre><code>//select * from Article as article order by article.id asc,article.tag desc;
-queryFactory.selectFrom(article)
-            .orderyBy(article.id.asc(),article.tag.desc())
-            .fetch();
-</code></pre><h3 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h3><pre><code>//select * from Article as article group by article.tag;
-queryFactory.selectFrom(article)
-            .groupBy(article.tag)
-            .fetch();
-</code></pre><h3 id="CRUD"><a href="#CRUD" class="headerlink" title="CRUD"></a>CRUD</h3><h4 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h4><pre><code>queryFactory.delete(article).execute();
-queryFactory.delete(article).where(article.tag,&quot;tagName&quot;).execute();
-</code></pre><h4 id="update"><a href="#update" class="headerlink" title="update"></a>update</h4><pre><code>queryFactory.update(article)
-            .where(article.id,eq(1))
-            .set(article.title,&quot;updateTitle&quot;)
-            .execute();
-</code></pre><h4 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h4><pre><code>queryFactory.update(article)
-            .where(article.likeCount.eq(
-               JPAExpressions.select(article.likeCount.max()).from(artile)
-             ))
-             .fetch()l
-</code></pre><h4 id="改变结构"><a href="#改变结构" class="headerlink" title="改变结构"></a>改变结构</h4><pre><code>Query jpaQuery = queryFactory.selectFrom(article).createQuery();
- results = jpaQuery.getResultList();
-</code></pre><h4 id="使用JPA或者本地查询"><a href="#使用JPA或者本地查询" class="headerlink" title="使用JPA或者本地查询"></a>使用JPA或者本地查询</h4><pre><code>&lt;plugins&gt;
-      &lt;plugin&gt;
-        &lt;groupId&gt;com.querydsl&lt;/groupId&gt;
-        &lt;artifactId&gt;querydsl-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;${querydsl.version}&lt;/version&gt;
-        &lt;executions&gt;
-          &lt;execution&gt;
-            &lt;goals&gt;
-              &lt;goal&gt;export&lt;/goal&gt;
-            &lt;/goals&gt;
-          &lt;/execution&gt;
-        &lt;/executions&gt;
-        &lt;configuration&gt;
-          &lt;jdbcDriver&gt;org.apache.derby.jdbc.EmbeddedDriver&lt;/jdbcDriver&gt;
-          &lt;jdbcUrl&gt;jdbc:derby:target/demoDB;create=true&lt;/jdbcUrl&gt;
-          &lt;packageName&gt;com.mycompany.mydomain&lt;/packageName&gt;
-          &lt;targetFolder&gt;${project.basedir}/target/generated-sources/java&lt;/targetFolder&gt;
-        &lt;/configuration&gt;
-        &lt;dependencies&gt;
-          &lt;dependency&gt;
-            &lt;groupId&gt;org.apache.derby&lt;/groupId&gt;
-            &lt;artifactId&gt;derby&lt;/artifactId&gt;
-            &lt;version&gt;${derby.version}&lt;/version&gt;
-          &lt;/dependency&gt;
-        &lt;/dependencies&gt;
-      &lt;/plugin&gt;
-</code></pre><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="http://www.querydsl.com/" target="_blank" rel="external">官网</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2376,7 +2278,7 @@ queryFactory.delete(article).where(article.tag,&quot;tagName&quot;).execute();
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">136</span>
+                <span class="site-state-item-count">137</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2387,7 +2289,7 @@ queryFactory.delete(article).where(article.tag,&quot;tagName&quot;).execute();
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">53</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2398,7 +2300,7 @@ queryFactory.delete(article).where(article.tag,&quot;tagName&quot;).execute();
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">106</span>
+                <span class="site-state-item-count">107</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
