@@ -254,6 +254,158 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（一）——-基础概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/jvm调优笔记（一）——-基础概念/" itemprop="url">jvm调优笔记（一）—— 基础概念</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:46:17+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jvm调优/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm调优</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="java内存组成介绍：堆-Heap-和非堆-Non-heap-内存"><a href="#java内存组成介绍：堆-Heap-和非堆-Non-heap-内存" class="headerlink" title="java内存组成介绍：堆(Heap)和非堆(Non-heap)内存"></a>java内存组成介绍：堆(Heap)和非堆(Non-heap)内存</h2><blockquote>
+<p>Java 虚拟机具有一个堆，<strong>堆是运行时数据区域，所有类实例和数组的内存均从此处分配。堆是在 Java 虚拟机启动时创建的。</strong>”“在JVM中堆之外的内存称为非堆内存(Non-heap memory)</p>
+</blockquote>
+<h2 id="方法栈-amp-本地方法栈"><a href="#方法栈-amp-本地方法栈" class="headerlink" title="方法栈&amp;本地方法栈:"></a>方法栈&amp;本地方法栈:</h2><blockquote>
+<p>线程创建时产生,方法执行时生成栈帧</p>
+</blockquote>
+<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><blockquote>
+<p>存储类的元数据信息 常量等</p>
+</blockquote>
+<h2 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h2><blockquote>
+<p>java代码中所有的new操作</p>
+</blockquote>
+<pre><code>native Memory(C heap)
+Direct Bytebuffer JNI Compile GC;
+</code></pre><h2 id="堆内存分配"><a href="#堆内存分配" class="headerlink" title="堆内存分配"></a>堆内存分配</h2><p><strong>JVM初始分配的内存由-Xms指定</strong>，默认是物理内存的1/64；<strong>JVM最大分配的内存由-Xmx指定</strong>，默认是物理内存的1/4。<strong><em>默认空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制；空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制</em></strong>。因此服务器一般设置-Xms、-Xmx相等以避免在每次GC 后调整堆的大小。对象的堆内存由称为垃圾回收器的自动内存管理系统回收。</p>
+<h2 id="非堆内存分配"><a href="#非堆内存分配" class="headerlink" title="非堆内存分配"></a>非堆内存分配</h2><p>JVM使用<strong>-XX:PermSize</strong>设置非堆内存初始值，默认是物理内存的1/64；由 <strong>-XX:MaxPermSize</strong>设置最大非堆内存的大小，默认是物理内存的1/4。</p>
+<h2 id="JVM内存限制-最大值"><a href="#JVM内存限制-最大值" class="headerlink" title="JVM内存限制(最大值)"></a>JVM内存限制(最大值)</h2><blockquote>
+<p>JVM内存的最大值跟操作系统有很大的关系。简单的说就32位处理器虽然 可控内存空间有4GB,但是具体的操作系统会给一个限制，这个限制一般是2GB-3GB（一般来说Windows系统下为1.5G-2G，Linux系统 下为2G-3G），而64bit以上的处理器就不会有限制了。</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java序列化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1767,167 +1919,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（五）——-Topic/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（五）——-Topic/" itemprop="url">RabbitMq学习笔记（五）—— Topic</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:38:24+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">ReceiveTopicOne 匹配规则1</div><div class="line"></div><div class="line">//声明交换器和队列</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;topic&quot;);</div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line">//路由关键字规则</div><div class="line"></div><div class="line">String[] routingKeys = new String[]&#123;&quot;*.*.rabbit&quot;, &quot;lazy.#&quot;&#125;; </div><div class="line"></div><div class="line">//绑定路由关键字</div><div class="line"></div><div class="line">for (String bindingKey : routingKeys) &#123;  </div><div class="line"></div><div class="line">      channel.queueBind(queueName, EXCHANGE_NAME, bindingKey);  </div><div class="line"></div><div class="line"> &#125;  </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">ReceiveTopicTwo 匹配规则2</div><div class="line"></div><div class="line">//声明交换器和队列</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;topic&quot;);</div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line">//路由关键字规则</div><div class="line"></div><div class="line">String[] routingKeys = new String[]&#123;&quot;*.orange.*&quot;&#125;;  </div><div class="line"></div><div class="line">//绑定路由关键字</div><div class="line"></div><div class="line">for (String bindingKey : routingKeys) &#123;  </div><div class="line"></div><div class="line">     channel.queueBind(queueName, EXCHANGE_NAME, bindingKey);  </div><div class="line"></div><div class="line">&#125;  </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">TopicSend 发送</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;topic&quot;);  </div><div class="line"></div><div class="line">//待发送信息</div><div class="line"></div><div class="line">String[] routingKeys = new String[]&#123;&quot;quick.orange.rabbit&quot;,</div><div class="line"></div><div class="line">                                                            &quot;lazy.orange.elephant&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;quick.orange.fox&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;lazy.brown.fox&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;quick.brown.fox&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;quick.orange.male.rabbit&quot;,   </div><div class="line"></div><div class="line">                                                            &quot;lazy.orange.male.rabbit&quot;&#125;;  </div><div class="line"></div><div class="line">for (String bindingKey : routingKeys) &#123;  </div><div class="line"></div><div class="line">     channel.queueBind(queueName, EXCHANGE_NAME, bindingKey);  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>用三个关键字来绑定，Q1绑定关键字是【<em>.orange.</em>】,Q2绑定关键字是【<em>.</em>.rabbit】和【lazy.#】，然后分析会发生什么：</p>
-<p><img src="http://img.blog.csdn.net/20160114155849562?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>Q1会收到所有orange这种颜色相关的消息</p>
-<p>Q2会收到所有rabbit这个动物相关的消息和所有速度lazy的动物的消息</p>
-<p> 分析：</p>
-<p>生产者发送“quick.orange.rabbit”的消息，两个队列都会收到</p>
-<p>生产者发送“lazy.orange.elephant”，两队列也都会收到。</p>
-<p>生产者发送”quick.orange.fox”，那么只有Q1会收到。</p>
-<p>生产者发送”lazy.brown.fox”，那么只会有Q2能收到。</p>
-<p>生产者发送”quick.brown.fox”，那么这条消息会被丢弃，谁也收不到。</p>
-<p>生产者发送”quick.orange.male.rabbit”，这个消息也会被丢弃，谁也收不到。</p>
-<p>生产者发送”lazy.orange.male.rabbit”，这个消息会被Q2的【lazy.#】规则匹配上，发送到Q2队列中。</p>
-<p>注意</p>
-<p>交换器在匹配模式下：</p>
-<p>如果消费者端的路由关键字只使用【#】来匹配消息，在匹配【topic】模式下，它会变成一个分发【fanout】模式，接收所有消息。</p>
-<p>如果消费者端的路由关键字中没有【#】或者【*】，它就变成直连【direct】模式来工作。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1977,7 +1968,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">137</span>
+                <span class="site-state-item-count">138</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1988,7 +1979,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">54</span>
+                <span class="site-state-item-count">55</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>

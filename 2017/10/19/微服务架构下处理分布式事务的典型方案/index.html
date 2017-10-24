@@ -96,14 +96,19 @@
 <meta name="description" content="传统数据库事务特性ACID 原子性（atomicity）：事务是数据库的逻辑工作单位，而且是必须是原子工作单位，对于其数据修改，要么全部执行，要么全部不执行。 一致性（consistency）：事务在完成时，必须是所有的数据都保持一致状态。在相关数据库中，所有规则都必须应用于事务的修改，以保持所有数据的完整性。 隔离性（isolation）：一个事务的执行不能被其他事务所影响。 持久性（durab">
 <meta name="keywords" content="分布式事务">
 <meta property="og:type" content="article">
-<meta property="og:title" content="分布式事务">
-<meta property="og:url" content="http://yoursite.com/2017/10/19/分布式事务/index.html">
+<meta property="og:title" content="微服务架构下处理分布式事务的典型方案">
+<meta property="og:url" content="http://yoursite.com/2017/10/19/微服务架构下处理分布式事务的典型方案/index.html">
 <meta property="og:site_name" content="dzxblog">
 <meta property="og:description" content="传统数据库事务特性ACID 原子性（atomicity）：事务是数据库的逻辑工作单位，而且是必须是原子工作单位，对于其数据修改，要么全部执行，要么全部不执行。 一致性（consistency）：事务在完成时，必须是所有的数据都保持一致状态。在相关数据库中，所有规则都必须应用于事务的修改，以保持所有数据的完整性。 隔离性（isolation）：一个事务的执行不能被其他事务所影响。 持久性（durab">
-<meta property="og:updated_time" content="2017-10-19T07:19:32.544Z">
+<meta property="og:image" content="http://spider.nosdn.127.net/2a517d9dd2583d9fc082f2cc950d838c.png">
+<meta property="og:image" content="http://spider.nosdn.127.net/a5f15918aceb6e93bdb57af337b3f6d3.png">
+<meta property="og:image" content="http://spider.nosdn.127.net/312ab5a124e68a2bcc41a28314a813f4.png">
+<meta property="og:image" content="http://spider.nosdn.127.net/1923ecc60ac01aeb99aac67023490929.jpeg">
+<meta property="og:updated_time" content="2017-10-24T03:44:42.088Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分布式事务">
+<meta name="twitter:title" content="微服务架构下处理分布式事务的典型方案">
 <meta name="twitter:description" content="传统数据库事务特性ACID 原子性（atomicity）：事务是数据库的逻辑工作单位，而且是必须是原子工作单位，对于其数据修改，要么全部执行，要么全部不执行。 一致性（consistency）：事务在完成时，必须是所有的数据都保持一致状态。在相关数据库中，所有规则都必须应用于事务的修改，以保持所有数据的完整性。 隔离性（isolation）：一个事务的执行不能被其他事务所影响。 持久性（durab">
+<meta name="twitter:image" content="http://spider.nosdn.127.net/2a517d9dd2583d9fc082f2cc950d838c.png">
 
 
 
@@ -131,13 +136,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/10/19/分布式事务/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/10/19/微服务架构下处理分布式事务的典型方案/"/>
 
 
 
 
 
-  <title>分布式事务 | dzxblog</title>
+  <title>微服务架构下处理分布式事务的典型方案 | dzxblog</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -257,7 +262,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/19/分布式事务/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/19/微服务架构下处理分布式事务的典型方案/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -274,7 +279,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">分布式事务</h1>
+          <h1 class="post-title" itemprop="name headline">微服务架构下处理分布式事务的典型方案</h1>
         
 
         <div class="post-meta">
@@ -349,6 +354,12 @@
 <li>隔离性（isolation）：一个事务的执行不能被其他事务所影响。</li>
 <li>持久性（durability）：一个事务一旦提交，事物的操作便永久性的保存在DB中。即使此时再执行回滚操作也不能撤消所做的更改。</li>
 </ol>
+<h2 id="分布式事务的讨论主要聚焦于强一致性和最终一致性的解决方案"><a href="#分布式事务的讨论主要聚焦于强一致性和最终一致性的解决方案" class="headerlink" title="分布式事务的讨论主要聚焦于强一致性和最终一致性的解决方案"></a>分布式事务的讨论主要聚焦于强一致性和最终一致性的解决方案</h2><ol>
+<li>两阶段提交（2PC) 和 三阶段提交(3PC)、paxos算法</li>
+<li>eBay事件队列方案</li>
+<li>TCC 补偿模式</li>
+<li>缓存数据最终一致性</li>
+</ol>
 <p>一般单机应用采用<a href="http://www.cnblogs.com/azhqiang/p/4044127.html" target="_blank" rel="external">JavaJDBC事务</a>控制即可</p>
 <pre><code>try {  
     conn.setAutoCommit(false); 
@@ -383,8 +394,61 @@
 <li>相对于2PC，3PC主要解决的单点故障问题，并减少阻塞，因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit</li>
 <li>3PC也可能导致数据一致性问题，因为，由于网络原因，协调者发送的abort响应没有及时被参与者接收到，那么参与者在等待超时之后执行了commit操作。这样就和其他接到abort命令并执行回滚的参与者之间存在数据不一致的情况</li>
 </ol>
+<h2 id="一致性理论"><a href="#一致性理论" class="headerlink" title="一致性理论"></a>一致性理论</h2><blockquote>
+<p>分布式最终目的是保障分库数据一致，但是会由于各种外界因素，而导致不可控因素（例如：个别节点永久性宕机、无法已知各个节点的事务状态。</p>
+<p>2PC是分布式事务较为经典的方案，但是扩展性极差。eBay架构师提出了BASE理论为了<strong>解决大规模分布式系统下的数据一致性问题</strong>。BASE理论：<strong>可以通过放弃系统在每个时刻的强一致性来换取系统的可扩展性。</strong></p>
+</blockquote>
+<h2 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h2><blockquote>
+<p>在分布式系统中，一致性（Consistency）、可用性（Availability）和<strong>分区容忍性（Partition Tolerance</strong>3个要素最多只能同时满足两个。</p>
+</blockquote>
+<ul>
+<li>一致性：分布式环境下多个节点的数据是否强一致。</li>
+<li>可用性：分布式服务能一直保证可用状态。当用户发出一个请求后，服务能在有限时间内返回结果。</li>
+<li>分区容忍性：特指对网络分区的容忍性。</li>
+</ul>
+<p><img src="http://spider.nosdn.127.net/2a517d9dd2583d9fc082f2cc950d838c.png" alt=""></p>
+<p>举例：Cassandra、Dynamo等，默认优先选择AP，弱化C；HBase、MongoDB 等，默认优先选择CP，弱化A</p>
+<h2 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h2><h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><ul>
+<li><strong>基本可用（Basically Available）</strong>：指分布式系统在出现故障时，允许损失部分的可用性来保证核心可用。</li>
+<li><strong>软状态（Soft State）</strong>：指允许分布式系统存在中间状态，该中间状态不会影响到系统的整体可用性。</li>
+<li><strong>最终一致性（Eventual Consistency）</strong>：指分布式系统中的所有副本数据经过一定时间后，最终能够达到一致的状态。</li>
+</ul>
+<h3 id="一致性模型"><a href="#一致性模型" class="headerlink" title="一致性模型"></a>一致性模型</h3><ul>
+<li><strong>强一致性</strong>：数据更新成功后，任意时刻所有副本中的数据都是一致的，一般采用同步的方式实现。</li>
+<li><strong>弱一致性</strong>：数据更新成功后，系统不承诺立即可以读到最新写入的值，也不承诺具体多久之后可以读到。</li>
+<li><strong>最终一致性</strong>：弱一致性的一种形式，数据更新成功后，系统不承诺立即可以返回最新写入的值，但是保证最终会返回上一次更新操作的值。
+　　</li>
+</ul>
+<blockquote>
+<p>分布式系统数据的强一致性、弱一致性和最终一致性可以通过Quorum NRW算法分析。</p>
+</blockquote>
+<h2 id="eBay-事件队列方案——最终一致性"><a href="#eBay-事件队列方案——最终一致性" class="headerlink" title="eBay 事件队列方案——最终一致性"></a>eBay 事件队列方案——最终一致性</h2><h3 id="核心思想-1"><a href="#核心思想-1" class="headerlink" title="核心思想"></a>核心思想</h3><blockquote>
+<p>将需要分布式处理的任务通过<strong>消息或者日志的方式来异步执行</strong>，消息或日志可以存到<strong>本地文件、数据库或消息队列</strong>，再通过<strong>业务规则进行失败重试</strong>，它要求各服务的接口是幂等</p>
+</blockquote>
+<p>具体业务场景：</p>
+<p>用户表user 和交易表transaction，用户表存储用户信息、总销售额和总购买额，交易表存储每一笔交易的流水号、买家信息、卖家信息和交易金额。如果产生了一笔交易，需要在交易表增加记录，同时还要修改用户表的金额</p>
+<p><img src="http://spider.nosdn.127.net/a5f15918aceb6e93bdb57af337b3f6d3.png" alt=""></p>
+<p>提出的解决方法是将更新交易表记录和用户表更新消息放在一个本地事务来完成</p>
+<p>为了避免重复消费用户表更新消息带来的问题，增加一个操作记录表updates_applied来记录已经完成的交易相关的信息</p>
+<p><img src="http://spider.nosdn.127.net/312ab5a124e68a2bcc41a28314a813f4.png" alt=""></p>
+<h2 id="TCC-（Try-Confirm-Cancel）补偿模式——最终一致性"><a href="#TCC-（Try-Confirm-Cancel）补偿模式——最终一致性" class="headerlink" title="TCC （Try-Confirm-Cancel）补偿模式——最终一致性"></a>TCC （Try-Confirm-Cancel）补偿模式——最终一致性</h2><p><img src="http://spider.nosdn.127.net/1923ecc60ac01aeb99aac67023490929.jpeg" alt=""></p>
+<blockquote>
+<p>服务A 需要依次调用服务B、服务C 和服务D 共同完成一个操作。当服务A 调用服务D 失败时，若要保证整个系统数据的一致性，就要对服务B 和服务C 的invoke 操作进行回滚，执行反向的revert 操作。回滚成功后，整个微服务系统是数据一致的</p>
+</blockquote>
+<h3 id="实现关键要素"><a href="#实现关键要素" class="headerlink" title="实现关键要素"></a>实现关键要素</h3><p>1.服务调用链必须被记录下来；<br>2.每个服务提供者都需要提供一组业务逻辑相反的操作，互为补偿，同时回滚操作要保证幂等；<br>3.必须按失败原因执行不同的回滚策略。</p>
+<h3 id="实现难点"><a href="#实现难点" class="headerlink" title="实现难点"></a>实现难点</h3><ol>
+<li>补偿模式的特点是实现简单，但是想形成一定程度的通用方案比较困难，特别是服务链的记录，因为大部分时候，业务参数或者业务逻辑千差万别。</li>
+<li>很多业务特征使得该服务无法提供一个安全的回滚操作。</li>
+</ol>
+<h2 id="缓存数据最终一致性"><a href="#缓存数据最终一致性" class="headerlink" title="缓存数据最终一致性"></a>缓存数据最终一致性</h2><p>在具体业务系统中，缓存通常被用在数据库前面，作为数据读取的缓冲，使得I/O 操作不至于直接落在数据库上</p>
+<p>###缓存和数据库数据不一致的问题解决方案</p>
+<ol>
+<li><strong>为缓存数据设置过期时间</strong>。当缓存中数据过期后，业务系统会从数据库中获取数据，并将新值放入缓存。这个过期时间就是系统可以达到最终一致的容忍时间</li>
+<li><strong>更新数据库数据后同时清除缓存数据。</strong>数据库数据更新后，同步删除缓存中数据，使得下次对商品详情的获取直接从数据库中获取，并同步到缓存</li>
+</ol>
 <h4 id="分布式事务具体实例"><a href="#分布式事务具体实例" class="headerlink" title="分布式事务具体实例"></a><a href="http://blog.jobbole.com/110805/" target="_blank" rel="external">分布式事务具体实例</a></h4><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://blog.csdn.net/u014403546/article/details/54924054" target="_blank" rel="external">分布式系统事务一致性到CAP,BASE理论</a></p>
 <p><a href="https://www.qcloud.com/community/article/120564" target="_blank" rel="external">企鹅讲解分布式事务</a></p>
+<p><a href="http://dy.163.com/v2/article/detail/CTR51LFC0518DLIO.html" target="_blank" rel="external">网易云分布式架构解决方案</a></p>
 
       
     </div>
@@ -436,6 +500,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/24/MySQL处理海量数据架构优化/" rel="prev" title="MySQL处理海量数据架构优化">
+                MySQL处理海量数据架构优化 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -507,7 +575,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">137</span>
+                <span class="site-state-item-count">138</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -518,7 +586,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">54</span>
+                <span class="site-state-item-count">55</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -564,7 +632,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#传统数据库事务特性ACID"><span class="nav-number">1.</span> <span class="nav-text">传统数据库事务特性ACID</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分布式数据一致性"><span class="nav-number">2.</span> <span class="nav-text">分布式数据一致性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分布式事务"><span class="nav-number">3.</span> <span class="nav-text">分布式事务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XA规范"><span class="nav-number">4.</span> <span class="nav-text">XA规范</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2PC"><span class="nav-number">5.</span> <span class="nav-text">2PC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3PC"><span class="nav-number">6.</span> <span class="nav-text">3PC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2PC与3PC的区别"><span class="nav-number">7.</span> <span class="nav-text">2PC与3PC的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式事务具体实例"><span class="nav-number">7.0.0.1.</span> <span class="nav-text">分布式事务具体实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">7.1.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#传统数据库事务特性ACID"><span class="nav-number">1.</span> <span class="nav-text">传统数据库事务特性ACID</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式事务的讨论主要聚焦于强一致性和最终一致性的解决方案"><span class="nav-number">1.1.</span> <span class="nav-text">分布式事务的讨论主要聚焦于强一致性和最终一致性的解决方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分布式数据一致性"><span class="nav-number">2.</span> <span class="nav-text">分布式数据一致性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分布式事务"><span class="nav-number">3.</span> <span class="nav-text">分布式事务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XA规范"><span class="nav-number">4.</span> <span class="nav-text">XA规范</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2PC"><span class="nav-number">5.</span> <span class="nav-text">2PC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3PC"><span class="nav-number">6.</span> <span class="nav-text">3PC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2PC与3PC的区别"><span class="nav-number">7.</span> <span class="nav-text">2PC与3PC的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一致性理论"><span class="nav-number">7.1.</span> <span class="nav-text">一致性理论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAP理论"><span class="nav-number">7.2.</span> <span class="nav-text">CAP理论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BASE理论"><span class="nav-number">7.3.</span> <span class="nav-text">BASE理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#核心思想"><span class="nav-number">7.3.1.</span> <span class="nav-text">核心思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一致性模型"><span class="nav-number">7.3.2.</span> <span class="nav-text">一致性模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eBay-事件队列方案——最终一致性"><span class="nav-number">7.4.</span> <span class="nav-text">eBay 事件队列方案——最终一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#核心思想-1"><span class="nav-number">7.4.1.</span> <span class="nav-text">核心思想</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCC-（Try-Confirm-Cancel）补偿模式——最终一致性"><span class="nav-number">7.5.</span> <span class="nav-text">TCC （Try-Confirm-Cancel）补偿模式——最终一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现关键要素"><span class="nav-number">7.5.1.</span> <span class="nav-text">实现关键要素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现难点"><span class="nav-number">7.5.2.</span> <span class="nav-text">实现难点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存数据最终一致性"><span class="nav-number">7.6.</span> <span class="nav-text">缓存数据最终一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式事务具体实例"><span class="nav-number">7.6.0.1.</span> <span class="nav-text">分布式事务具体实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">7.7.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
             
 
           </div>
