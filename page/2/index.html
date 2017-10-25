@@ -758,6 +758,44 @@ queryFactory.delete(article).where(article.tag,&quot;tagName&quot;).execute();
 </code></pre><h1 id="得到结果"><a href="#得到结果" class="headerlink" title="得到结果"></a>得到结果</h1><pre><code>   微服务架构
 微服务架构 微服务是系统架构上的设计风格，主旨是将一个原本独立的系统拆分成多个小型服务，这些小型服务都在各自独立的进程中运行，服务之间通过基于http的RESTful AP进行通信协作。被拆分成的每一个小型服务都围绕着系统中的某一项或一些耦合度较高的业务功能进行构建，并且每个服务都维护着自身的数据存储、业务开发、自动化测试案例以及独立部署机制。 与单体系统的区别 传统的企业系统中，针对一个复杂的业务需求通常使用对象或业务类型来构建一个单体项目。 在项目中通常将需求分为三个主要部分：数据库、服务端处理、前端展现。在业务发展初期，由于所有的业务逻辑在一个应用中，开发、测试、部署、都比较容易方便。但是企业发展，系统为了应对不同的业务需求会不断为该单体项目增加不同的业务模块；同时随着移动端设备的进步，前端展现模块已经不仅局限于web的形式，这对于系统后端向前端的支持需要更多的接口模块。单体应用由于面对的业务需求更为宽泛，不断扩大的需求会使得单体应用变得越来越臃肿。单体应用的问题就逐渐凸显出来，由于单体系统部署在一个进程中，如果修改了一个小的功能，为了部署上线会影响其他的功能运行。并且单体应用中的这些功能模块的使...
     yangty2017 发布于 3天前 阅读 138
+</code></pre><h1 id="如何获取JSON数据"><a href="#如何获取JSON数据" class="headerlink" title="如何获取JSON数据"></a>如何获取JSON数据</h1><pre><code>Response result = Jsoup.connect(HttpUrl)
+               .header(&quot;accept&quot;, &quot;application/json, text/plain, */*&quot;)
+               .header(&quot;Accept-Encoding&quot;, &quot;gzip, deflate, br&quot;)
+               .header(&quot;Accept-Language&quot;, &quot;zh-CN,zh;q=0.8&quot;)
+               .header(&quot;Content-Type&quot;, &quot;application/json;charset=UTF-8&quot;)
+               .header(&quot;Host&quot;, &quot;www.zhihu.com&quot;)
+               .header(&quot;authorization&quot;, &quot;Bearer Mi4xb2NlWUF3QUFBQUFBRUlLdG1SNDlEQmNBQUFCaEFsVk5EbERjV2dDZGp1SzlYX2ZXLWE4Y2tGMDd5VndqbXRuNG5B|1508835854|9f6e06f9ec3699813204f7dcfbce40ea7b746029&quot;)
+               .timeout(3000)
+               .ignoreContentType(true)
+               .execute();
+</code></pre><h1 id="如何从网上下载图片"><a href="#如何从网上下载图片" class="headerlink" title="如何从网上下载图片"></a>如何从网上下载图片</h1><pre><code>     public static void downloadImages(String filePath,String imgUrl) throws UnsupportedEncodingException {  
+
+    String beforeUrl = imgUrl.substring(0,imgUrl.lastIndexOf(&quot;/&quot;)+1);  
+    String fileName = imgUrl.substring(imgUrl.lastIndexOf(&quot;/&quot;)+1);  
+    String newFileName = URLEncoder.encode(fileName, &quot;UTF-8&quot;);  
+    newFileName = newFileName.replaceAll(&quot;\\+&quot;, &quot;\\%20&quot;);  
+    imgUrl = beforeUrl + newFileName;  
+
+    try {  
+        File files = new File(filePath);  
+        if (!files.exists()) {  
+            files.mkdirs();  
+        }  
+        URL url = new URL(imgUrl);  
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();  
+        InputStream is = connection.getInputStream();  
+        File file = new File(filePath + fileName);  
+        FileOutputStream out = new FileOutputStream(file);  
+        int i = 0;  
+        while((i = is.read()) != -1){  
+            out.write(i);  
+        }  
+        out.close();  
+        is.close();  
+    } catch (Exception e) {  
+        e.printStackTrace();  
+    }  
+}  
 </code></pre><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p>   <a href="https://jsoup.org/cookbook/" target="_blank" rel="external">Jsoup官网</a></p>
 
           
