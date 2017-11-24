@@ -254,6 +254,707 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记（三）——-聚合/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记（三）——-聚合/" itemprop="url">ElasticSearch学习笔记（三）—— 聚合</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:27:08+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>最后，我们还有一个需求需要完成：允许管理者在职员目录中进行一些分析。 Elasticsearch有一个功能叫做聚合(aggregations)，它允许你在数据上生成复杂的分析统计。它很像SQL中的GROUP BY但是功能更强大</p>
+<p>举个例子，让我们找到所有职员中最大的共同点是什么</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">  &quot;aggs&quot;: &#123;</div><div class="line">    &quot;all_interests&quot;: &#123; </div><div class="line">	  //类似以GroupBy interests</div><div class="line">      &quot;terms&quot;: &#123; &quot;field&quot;: &quot;interests&quot; &#125; </div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123; ... &#125;,</div><div class="line">   &quot;aggregations&quot;: &#123;</div><div class="line">      &quot;all_interests&quot;: &#123;</div><div class="line">         &quot;buckets&quot;: [</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;music&quot;,</div><div class="line">               &quot;doc_count&quot;: 2</div><div class="line">            &#125;,</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;forestry&quot;,</div><div class="line">               &quot;doc_count&quot;: 1</div><div class="line">            &#125;,</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;sports&quot;,</div><div class="line">               &quot;doc_count&quot;: 1</div><div class="line">            &#125;</div><div class="line">         ]</div><div class="line">      &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以看到两个职员对音乐有兴趣，一个喜欢林学，一个喜欢运动。这些数据并没有被预先计算好，它们是实时的从匹配查询语句的文档中动态计算生成的</p>
+<p>如果我们想知道所有姓”Smith”的人最大的共同点（兴趣爱好）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;match&quot;: &#123;</div><div class="line">      &quot;last_name&quot;: &quot;smith&quot;</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  &quot;aggs&quot;: &#123;</div><div class="line">    &quot;all_interests&quot;: &#123;</div><div class="line">      &quot;terms&quot;: &#123;</div><div class="line">        &quot;field&quot;: &quot;interests&quot;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>all_interests聚合已经变成只包含和查询语句相匹配的文档了</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line"> &quot;all_interests&quot;: &#123;</div><div class="line">    &quot;buckets&quot;: [</div><div class="line">       &#123;</div><div class="line">          &quot;key&quot;: &quot;music&quot;,</div><div class="line">          &quot;doc_count&quot;: 2</div><div class="line">       &#125;,</div><div class="line">       &#123;</div><div class="line">          &quot;key&quot;: &quot;sports&quot;,</div><div class="line">          &quot;doc_count&quot;: 1</div><div class="line">       &#125;</div><div class="line">    ]</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>聚合也允许分级汇总。例如，让我们统计每种兴趣下职员的平均年龄</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;aggs&quot; : &#123;</div><div class="line">        &quot;all_interests&quot; : &#123;</div><div class="line">            &quot;terms&quot; : &#123; &quot;field&quot; : &quot;interests&quot; &#125;,</div><div class="line">            &quot;aggs&quot; : &#123;</div><div class="line">                &quot;avg_age&quot; : &#123;</div><div class="line">                    &quot;avg&quot; : &#123; &quot;field&quot; : &quot;age&quot; &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">  &quot;all_interests&quot;: &#123;</div><div class="line">     &quot;buckets&quot;: [</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;music&quot;,</div><div class="line">           &quot;doc_count&quot;: 2,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 28.5</div><div class="line">           &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;forestry&quot;,</div><div class="line">           &quot;doc_count&quot;: 1,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 35</div><div class="line">           &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;sports&quot;,</div><div class="line">           &quot;doc_count&quot;: 1,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 25</div><div class="line">           &#125;</div><div class="line">        &#125;</div><div class="line">     ]</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>该聚合结果比之前的聚合结果要更加丰富。我们依然得到了兴趣以及数量（指具有该兴趣的员工人数）的列表，但是现在每个兴趣额外拥有avg_age字段来显示具有该兴趣员工的平均年龄</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Elasticsearch致力于隐藏分布式系统的复杂性。以下这些操作都是在底层自动完成的：</p>
+<ul>
+<li>将你的文档分区到不同的容器或者分片(shards)中，它们可以存在于一个或多个节点中。</li>
+<li>将分片均匀的分配到各个节点，对索引和搜索做负载均衡。</li>
+<li>冗余每一个分片，防止硬件故障造成的数据丢失。</li>
+<li>将集群中任意一个节点上的请求路由到相应数据所在的节点。</li>
+<li>无论是增加节点，还是移除节点，分片都可以做到无缝的扩展和迁移。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-二-——-搜索/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-二-——-搜索/" itemprop="url">ElasticSearch学习笔记(二) —— 搜索</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:23:44+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="建立一个员工目录"><a href="#建立一个员工目录" class="headerlink" title="建立一个员工目录"></a>建立一个员工目录</h3><p>假设我们刚好在Megacorp工作，这时人力资源部门出于某种目的需要让我们创建一个员工目录，这个目录用于促进人文关怀和用于实时协同工作，所以它有以下不同的需求</p>
+<ul>
+<li>数据能够包含多个值的标签、数字和纯文本。</li>
+<li>检索任何员工的所有信息。</li>
+<li>支持结构化搜索，例如查找30岁以上的员工。</li>
+<li>支持简单的全文搜索和更复杂的短语(phrase)搜索</li>
+<li>高亮搜索结果中的关键字</li>
+<li>能够利用图表管理分析这些数据</li>
+</ul>
+<h3 id="索引员工文档"><a href="#索引员工文档" class="headerlink" title="索引员工文档"></a>索引员工文档</h3><p>首先要做的是存储员工数据，每个文档代表一个员工。</p>
+<p><strong>在Elasticsearch中存储数据的行为就叫做索引(indexing)</strong>，不过在索引之前，我们需要明确数据应该存储在哪里。</p>
+<p>在Elasticsearch中，文档归属于一种类型(type),而这些类型存在于索引(index)中，我们可以画一些简单的对比图来类比传统关系型数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Relational DB -&gt; Databases -&gt; Tables -&gt; Rows -&gt; Columns</div><div class="line">Elasticsearch -&gt; Indices   -&gt; Types  -&gt; Documents -&gt; Fields</div></pre></td></tr></table></figure>
+<p>Elasticsearch集群可以包含多个索引(indices)（数据库），每一个索引可以包含多个类型(types)（表），每一个类型包含多个文档(documents)（行），然后每个文档包含多个字段(Fields)（列）</p>
+<blockquote>
+<p>「索引」含义的区分<br>你可能已经注意到索引(index)这个词在Elasticsearch中有着不同的含义，所以有必要在此做一下区分:<br>索引（名词） 如上文所述，一个索引(index)就像是传统关系数据库中的数据库，它是相关文档存储的地方，index的复数是indices 或indexes。<br>索引（动词） <strong>「索引一个文档」表示把一个文档存储到索引（名词）里，以便它可以被检索或者查询</strong>。这很像SQL中的INSERT关键字，差别是，<strong>如果文档已经存在，新的文档将覆盖旧的文档</strong>。<br>倒排索引 传统数据库为特定列增加一个索引，例如B-Tree索引来加速检索。Elasticsearch和Lucene使用一种叫做倒排索引(inverted index)的数据结构来达到相同目的。</p>
+</blockquote>
+<p><strong>注：默认情况下，文档中的所有字段都会被索引（拥有一个倒排索引），只有这样他们才是可被搜索的</strong></p>
+<p>为了创建员工目录，我们将进行如下操作</p>
+<ul>
+<li>为每个员工的文档(document)建立索引，每个文档包含了相应员工的所有信息。</li>
+<li>每个文档的类型为employee。</li>
+<li>employee类型归属于索引megacorp。</li>
+<li>megacorp索引存储在Elasticsearch集群中</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">//新增  /索引名/类型名/员工ID</div><div class="line">PUT /megacorp/employee/1</div><div class="line">&#123;</div><div class="line">    &quot;first_name&quot; : &quot;John&quot;,</div><div class="line">    &quot;last_name&quot; :  &quot;Smith&quot;,</div><div class="line">    &quot;age&quot; :        25,</div><div class="line">    &quot;about&quot; :      &quot;I love to go rock climbing&quot;,</div><div class="line">    &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">PUT /megacorp/employee/3</div><div class="line">&#123;</div><div class="line">    &quot;first_name&quot; :  &quot;Douglas&quot;,</div><div class="line">    &quot;last_name&quot; :   &quot;Fir&quot;,</div><div class="line">    &quot;age&quot; :         35,</div><div class="line">    &quot;about&quot;:        &quot;I like to build cabinets&quot;,</div><div class="line">    &quot;interests&quot;:  [ &quot;forestry&quot; ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h2><p>第一个需求是能够检索单个员工的信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/1</div></pre></td></tr></table></figure>
+<p>响应的内容中包含一些文档的元信息，John Smith的原始JSON文档包含在_source字段中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_index&quot; :   &quot;megacorp&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;employee&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">  &quot;_version&quot; : 1,</div><div class="line">  &quot;found&quot; :    true,</div><div class="line">  &quot;_source&quot; :  &#123;</div><div class="line">      &quot;first_name&quot; :  &quot;John&quot;,</div><div class="line">      &quot;last_name&quot; :   &quot;Smith&quot;,</div><div class="line">      &quot;age&quot; :         25,</div><div class="line">      &quot;about&quot; :       &quot;I love to go rock climbing&quot;,</div><div class="line">      &quot;interests&quot;:  [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>我们通过HTTP方法GET来检索文档，同样的，我们可以使用DELETE方法删除文档，使用HEAD方法检查某文档是否存在。如果想更新已存在的文档，我们只需再PUT一次</p>
+</blockquote>
+<p>###简单搜索<br>尝试一个最简单的搜索全部员工的请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div></pre></td></tr></table></figure>
+<p>响应内容的hits数组中包含了我们所有的三个文档。默认情况下搜索会返回前10个结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;took&quot;:      6,</div><div class="line">   &quot;timed_out&quot;: false,</div><div class="line">   &quot;_shards&quot;: &#123; ... &#125;,</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      3,</div><div class="line">      &quot;max_score&quot;:  1,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;3&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Douglas&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Fir&quot;,</div><div class="line">               &quot;age&quot;:         35,</div><div class="line">               &quot;about&quot;:       &quot;I like to build cabinets&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;forestry&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;1&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;2&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>搜索姓氏中包含“Smith”的员工。要做到这一点，我们将在命令行中使用轻量级的搜索方法。这种方法常被称作查询字符串(query string)搜索</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//在请求中依旧使用_search关键字，然后将查询语句传递给参数q=</div><div class="line">GET /megacorp/employee/_search?q=last_name:Smith</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      2,</div><div class="line">      &quot;max_score&quot;:  0.30685282,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="使用DSL语句查询"><a href="#使用DSL语句查询" class="headerlink" title="使用DSL语句查询"></a>使用DSL语句查询</h3><blockquote>
+<p>查询字符串搜索便于通过命令行完成特定(ad hoc)的搜索，但是它也有局限性（参阅简单搜索章节）。Elasticsearch提供丰富且灵活的查询语言叫做DSL查询(Query DSL),它允许你构建更加复杂、强大的查询</p>
+</blockquote>
+<p>DSL(Domain Specific Language特定领域语言)以JSON请求体的形式出现。我们可以这样表示之前关于“Smith”的查询</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//相当于/megacorp/employee/_search?q=last_name:&quot;Smith&quot;</div><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123; //查询</div><div class="line">        &quot;match&quot; : &#123; //匹配</div><div class="line">            &quot;last_name&quot; : &quot;Smith&quot; //条件...</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们不再使用查询字符串(query string)做为参数，而是使用请求体代替。这个请求体使用JSON表示，其中使用了match语句</p>
+<h3 id="更复杂的搜索"><a href="#更复杂的搜索" class="headerlink" title="更复杂的搜索"></a>更复杂的搜索</h3><p>让搜索稍微再变的复杂一些。我们依旧想要找到姓氏为“Smith”的员工，但是我们只想得到年龄大于30岁的员工。我们的语句将添加过滤器(filter),它使得我们高效率的执行一个结构化搜索</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;filtered&quot; : &#123;</div><div class="line">            &quot;filter&quot; : &#123;</div><div class="line">                &quot;range&quot; : &#123;</div><div class="line">                    &quot;age&quot; : &#123; &quot;gt&quot; : 30 &#125; &lt;1&gt;</div><div class="line">                &#125;</div><div class="line">            &#125;,</div><div class="line">            &quot;query&quot; : &#123;</div><div class="line">                &quot;match&quot; : &#123;</div><div class="line">                    &quot;last_name&quot; : &quot;smith&quot; &lt;2&gt;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><1> 这部分查询属于区间过滤器(range filter),它用于查找所有年龄大于30岁的数据——gt为”greater than”的缩写。</1></p>
+<p><2> 这部分查询与之前的match语句(query)一致</2></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.30685282,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="全文搜索"><a href="#全文搜索" class="headerlink" title="全文搜索"></a>全文搜索</h3><p>到目前为止搜索都很简单：搜索特定的名字，通过年龄筛选。让我们尝试一种更高级的搜索，全文搜索——一种传统数据库很难实现的功能。<br>将会搜索所有喜欢“rock climbing”的员工</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用了之前的match查询，从about字段中搜索”rock climbing”，我们得到了两个匹配文档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      2,</div><div class="line">      &quot;max_score&quot;:  0.16273327,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;: 0.16273327, &lt;1&gt;</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;: 0.016878016, &lt;2&gt;</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><1><2> 结果相关性评分</2></1></p>
+<p>默认情况下，Elasticsearch根据结果相关性评分来对结果集进行排序，所谓的「结果相关性评分」就是文档与查询条件的匹配程度。很显然，排名第一的John Smith的about字段明确的写到“rock climbing”。<br>但是为什么Jane Smith也会出现在结果里呢？原因是“rock”在她的abuot字段中被提及了。因为只有“rock”被提及而“climbing”没有，所以她的_score要低于John</p>
+<blockquote>
+<p>这个例子很好的解释了Elasticsearch如何在各种文本字段中进行全文搜索，并且返回相关性最大的结果集。相关性(relevance)的概念在Elasticsearch中非常重要，而这个概念在传统关系型数据库中是不可想象的，因为传统数据库对记录的查询只有匹配或者不匹配</p>
+</blockquote>
+<h3 id="短语搜索"><a href="#短语搜索" class="headerlink" title="短语搜索"></a>短语搜索</h3><p>目前我们可以在字段中搜索单独的一个词，这挺好的，但是有时候你想要确切的匹配若干个单词或者短语(phrases)。例如我们想要查询同时包含”rock”和”climbing”（并且是相邻的）的员工记录</p>
+<p>只要将match查询变更为match_phrase查询即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match_phrase&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.23013961,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;:         0.23013961,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="高亮搜索"><a href="#高亮搜索" class="headerlink" title="高亮搜索"></a>高亮搜索</h3><p>很多应用喜欢从每个搜索结果中高亮(highlight)匹配到的关键字，这样用户可以知道为什么这些文档和查询相匹配。在Elasticsearch中高亮片段是非常容易的</p>
+<p>在之前的语句上增加highlight参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match_phrase&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;,</div><div class="line">    &quot;highlight&quot;: &#123;</div><div class="line">        &quot;fields&quot; : &#123;</div><div class="line">            &quot;about&quot; : &#123;&#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>当我们运行这个语句时，会命中与之前相同的结果，但是在返回结果中会有一个新的部分叫做highlight，这里包含了来自about字段中的文本，并且用<em></em>来标识匹配到的单词</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.23013961,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;:         0.23013961,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;,</div><div class="line">            &quot;highlight&quot;: &#123;</div><div class="line">               &quot;about&quot;: [</div><div class="line">                  &quot;I love to go &lt;em&gt;rock&lt;/em&gt; &lt;em&gt;climbing&lt;/em&gt;&quot; &lt;1&gt;</div><div class="line">               ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-一-——-入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-一-——-入门/" itemprop="url">ElasticSearch学习笔记(一) —— 入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:21:09+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="ElasticSearch是什么"><a href="#ElasticSearch是什么" class="headerlink" title="ElasticSearch是什么"></a>ElasticSearch是什么</h2><blockquote>
+<p>Elasticsearch是一个基于Apache Lucene(TM)的开源搜索引擎。无论在开源还是专有领域，Lucene可以被认为是迄今为止最先进、性能最好的、功能最全的搜索引擎库。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>Elasticsearch也使用Java开发并使用Lucene作为其核心来实现所有索引和搜索的功能，但是它的目的是通过简单的RESTful API来隐藏Lucene的复杂性，从而让全文搜索变得简单</p>
+</blockquote>
+<ul>
+<li>分布式的实时文件存储，每个字段都被索引并可被搜索</li>
+<li>分布式的实时分析搜索引擎</li>
+<li>可以扩展到上百台服务器，处理PB级结构化或非结构化数据</li>
+</ul>
+<p>上手Elasticsearch非常容易。它提供了许多合理的缺省值，并对初学者隐藏了复杂的搜索引擎理论。它开箱即用（安装即可使用），只需很少的学习既可在生产环境中使用</p>
+<hr>
+<h3 id="与Elasticsearch交互"><a href="#与Elasticsearch交互" class="headerlink" title="与Elasticsearch交互"></a>与Elasticsearch交互</h3><p>如何与Elasticsearch交互取决于你是否使用Java</p>
+<p><strong>Java API</strong></p>
+<p>Elasticsearch为Java用户提供了两种内置客户端：</p>
+<h4 id="节点客户端-node-client"><a href="#节点客户端-node-client" class="headerlink" title="节点客户端(node client)"></a>节点客户端(node client)</h4><p>节点客户端以<strong>无数据节点(none data node)身份加入集群</strong>，换言之，它自己不存储任何数据，但是它知道数据在集群中的具体位置，并且<strong>能够直接转发请求到对应的节点上</strong>。</p>
+<h4 id="传输客户端-Transport-client"><a href="#传输客户端-Transport-client" class="headerlink" title="传输客户端(Transport client)"></a>传输客户端(Transport client)</h4><p>这个更轻量的传输客户端能够发送请求到远程集群。它自己不加入集群，只是简单<strong>转发请求给集群中的节点</strong>。</p>
+<p><strong>两个Java客户端都通过9300端口与集群交互，使用Elasticsearch传输协议(Elasticsearch Transport Protocol)</strong></p>
+<p><strong>集群中的节点之间也通过9300端口进行通信。如果此端口未开放，你的节点将不能组成集群</strong></p>
+<blockquote>
+<p>TIP<br>Java客户端所在的Elasticsearch版本必须与集群中其他节点一致，否则，它们可能互相无法识别。</p>
+</blockquote>
+<h3 id="基于HTTP协议，以JSON为数据交互格式的RESTful-API"><a href="#基于HTTP协议，以JSON为数据交互格式的RESTful-API" class="headerlink" title="基于HTTP协议，以JSON为数据交互格式的RESTful API"></a>基于HTTP协议，以JSON为数据交互格式的RESTful API</h3><p><strong>其他所有程序语言都可以使用RESTful API，通过9200端口的与Elasticsearch进行通信</strong>，你可以使用你喜欢的WEB客户端，事实上，如你所见，你甚至可以通过curl命令与Elasticsearch通信</p>
+<p>请求格式和普通的Http请求相同<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -X&lt;VERB&gt; &apos;&lt;PROTOCOL&gt;://&lt;HOST&gt;:&lt;PORT&gt;/&lt;PATH&gt;?&lt;QUERY_STRING&gt;&apos; -d &apos;&lt;BODY&gt;&apos;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>VERB HTTP方法：GET, POST, PUT, HEAD, DELETE</li>
+<li>PROTOCOL http或者https协议（只有在Elasticsearch前面有https代理的时候可用）</li>
+<li>HOST Elasticsearch集群中的任何一个节点的主机名，如果是在本地的节点，那么就叫localhost</li>
+<li>PORT Elasticsearch HTTP服务所在的端口，默认为9200</li>
+<li>PATH API路径（例如_count将返回集群中文档的数量），PATH可以包含多个组件，例如_cluster/stats或者_nodes/stats/jvm</li>
+<li>QUERY_STRING 一些可选的查询请求参数，例如?pretty参数将使请求返回更加美观易读的JSON数据</li>
+<li>BODY 一个JSON格式的请求主体（如果请求需要的话）</li>
+</ul>
+<p>e.g 为了计算集群中的文档数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">curl -XGET &apos;http://localhost:9200/_count?pretty&apos; -d &apos;</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Elasticsearch返回一个类似200 OK的HTTP状态码和JSON格式的响应主体（除了HEAD请求）。上面的请求会得到如下的JSON格式的响应主体</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;count&quot; : 0,</div><div class="line">    &quot;_shards&quot; : &#123;</div><div class="line">        &quot;total&quot; : 5,</div><div class="line">        &quot;successful&quot; : 5,</div><div class="line">        &quot;failed&quot; : 0</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们看不到HTTP头是因为我们没有让curl显示它们，如果要显示，使用curl命令后跟-i参数:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XGET &apos;localhost:9200/&apos;</div></pre></td></tr></table></figure>
+<p>对于本书的其余部分，我们将简写curl请求中重复的部分，例如主机名和端口，还有curl命令本身。<br>一个完整的请求形如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">curl -XGET &apos;localhost:9200/_count?pretty&apos; -d &apos;</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;&apos;</div></pre></td></tr></table></figure>
+<p>将简写成这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">GET /_count</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>事实上，在Sense控制台中也使用了与上面相同的格式</p>
+<hr>
+<h3 id="面向文档"><a href="#面向文档" class="headerlink" title="面向文档"></a>面向文档</h3><blockquote>
+<p>Elasticsearch是面向文档(document oriented)的，这意味着它可以<strong>存储整个对象或文档(document)</strong>。然而<strong>它不仅仅是存储，还会索引(index)每个文档的内容使之可以被搜索</strong>。<em>在Elasticsearch中，你可以对文档（而非成行成列的数据）进行索引、搜索、排序、过滤。这种理解数据的方式与以往完全不同，这也是Elasticsearch能够执行复杂的全文搜索的原因之一</em></p>
+</blockquote>
+<h3 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h3><blockquote>
+<p>ELasticsearch使用Javascript对象符号(JavaScript Object Notation)，也就是JSON，作为文档序列化格式<br>使用JSON格式来表示一个用户对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;email&quot;:      &quot;john@smith.com&quot;,</div><div class="line">    &quot;first_name&quot;: &quot;John&quot;,</div><div class="line">    &quot;last_name&quot;:  &quot;Smith&quot;,</div><div class="line">    &quot;info&quot;: &#123;</div><div class="line">        &quot;bio&quot;:         &quot;Eco-warrior and defender of the weak&quot;,</div><div class="line">        &quot;age&quot;:         25,</div><div class="line">        &quot;interests&quot;: [ &quot;dolphins&quot;, &quot;whales&quot; ]</div><div class="line">    &#125;,</div><div class="line">    &quot;join_date&quot;: &quot;2014/05/01&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p><a href="https://es.xiaoleilu.com/010_Intro/15_API.html" target="_blank" rel="external">官方文档</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/" itemprop="url">【SpringBoot】 SpringBoot整合Mybatis</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T13:47:40+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/Mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">Mybatis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="1-创建SpringBoot项目"><a href="#1-创建SpringBoot项目" class="headerlink" title="1. 创建SpringBoot项目"></a>1. 创建SpringBoot项目</h2><blockquote>
+<p><a href="https://start.spring.io/" target="_blank" rel="external">https://start.spring.io/</a></p>
+</blockquote>
+<h2 id="2-pom-xml文件"><a href="#2-pom-xml文件" class="headerlink" title="2.pom.xml文件"></a>2.pom.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.5.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/parent&gt;</div><div class="line"> </div><div class="line">&lt;properties&gt;</div><div class="line">    &lt;mybatis-spring-boot&gt;1.2.0&lt;/mybatis-spring-boot&gt;</div><div class="line">    &lt;mysql-connector&gt;5.1.39&lt;/mysql-connector&gt;</div><div class="line">&lt;/properties&gt;</div><div class="line"> </div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;test&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;!-- start mybatis --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mybatis-spring-boot&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- mybatis end --&gt;</div><div class="line">   </div><div class="line">    &lt;!-- start mysql --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;mysql&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mysql-connector&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;!-- mysql end --&gt;</div><div class="line">     </div><div class="line">    &lt;!-- start junit --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;junit&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;junit&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;4.12&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- junit end --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
+<h2 id="3-application-yml"><a href="#3-application-yml" class="headerlink" title="3.application.yml"></a>3.application.yml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">     typeAliasesPackage: com.alex.spring.domain </div><div class="line">     mapperLocations: classpath:mapper/*.xml</div></pre></td></tr></table></figure>
+<ul>
+<li>typeAliasesPackage: 指向实体类包路径</li>
+<li>mapperLocations: classpath 路径下 mapper 包下，* 代表会扫描所有 xml 文件</li>
+</ul>
+<p>其他配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">    config: #配置文件名称</div><div class="line">    typeHandlersPackage: #处理器包路径</div><div class="line">    check-config-location: #检查 mybatis 配置是否存在，一般命名为 mybatis-config.xml</div><div class="line">    executorType: #执行模式。默认是 SIMPLE3.在 Application 应用启动类添加注解 MapperScan</div></pre></td></tr></table></figure>
+<h2 id="3-启动文件添加注解"><a href="#3-启动文件添加注解" class="headerlink" title="3. 启动文件添加注解"></a>3. 启动文件添加注解</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">@MapperScan(&quot;com.alex.spring.dao&quot;) //扫描mapper接口</div><div class="line">public class SpringMybatisApplication&#123;</div><div class="line">		public static void main(String[] args) &#123;</div><div class="line">       		 SpringApplication.run(SpringMybatisApplication.class,args);</div><div class="line">  	    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="4-创建实体"><a href="#4-创建实体" class="headerlink" title="4.创建实体"></a>4.创建实体</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class User&#123;</div><div class="line">      private String userId;</div><div class="line">      private String userName;</div><div class="line">      private String userPass;</div><div class="line">      private String userImage;</div><div class="line">      //省略getter/setter方法</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="5-创建Mapper接口"><a href="#5-创建Mapper接口" class="headerlink" title="5.创建Mapper接口"></a>5.创建Mapper接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface UserDao&#123;</div><div class="line">     </div><div class="line">     User findById(@Param(&quot;userId&quot;) String userId);</div><div class="line">     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h2><p><a href="http://www.bysocket.com/?p=1610" target="_blank" rel="external">原文参考</a><br><a href="https://segmentfault.com/a/1190000004316491" target="_blank" rel="external">application.properties属性详解</a><br><a href="https://git.oschina.net/baomidou/mybatis-plus" target="_blank" rel="external">mybatis增强工具包</a><br><a href="https://git.oschina.net/free/Mybatis_PageHelper" target="_blank" rel="external">mybatis分页助手</a><br><a href="https://git.oschina.net/ht896632/mybatis-generator-core" target="_blank" rel="external">mybatis自动生成工具</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/【Spring5】WebFlux-and-JDBC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1166,1108 +1867,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:04:54+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存"><a href="#《亿级流量网站架构核心技术》学习笔记-（九）-——-应用级缓存" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存"></a>《亿级流量网站架构核心技术》学习笔记 （九） —— 应用级缓存</h2><blockquote>
-<p>使用缓存目的让访问速度更快。处理经常读取的数据、频繁查询的数据、热点数据、I/O瓶颈数据、计算昂贵的数据等</p>
-<p><strong>符合5分钟法则和局部性原理的数据都可以用来缓存</strong></p>
-</blockquote>
-<hr>
-<h2 id="缓存命中率"><a href="#缓存命中率" class="headerlink" title="缓存命中率"></a>缓存命中率</h2><blockquote>
-<p><strong>缓存命中率是从缓存中读取数据的次数与总读取次数比率</strong>.命中率越高越好</p>
-</blockquote>
-<p>缓存命中率 = 从缓存中读取次数/总读取次数</p>
-<hr>
-<h2 id="缓存回收策略"><a href="#缓存回收策略" class="headerlink" title="缓存回收策略"></a>缓存回收策略</h2><p>1.基于空间</p>
-<blockquote>
-<p>缓存设置了存储空间</p>
-</blockquote>
-<p>2.基于容量</p>
-<blockquote>
-<p>缓存设置了最大大小</p>
-</blockquote>
-<p>3.基于时间</p>
-<ul>
-<li>TTL(存活期) 缓存数据从创建开始到到期的一个时间段</li>
-<li>TTI（空闲期） 缓存数据多久不被访问到后移除缓存的时间</li>
-</ul>
-<hr>
-<h3 id="基于Java对象引用"><a href="#基于Java对象引用" class="headerlink" title="基于Java对象引用"></a>基于Java对象引用</h3><ul>
-<li><p>软引用</p>
-<blockquote>
-<p>如果对象是软引用，那么当JVM堆内存不足时候，垃圾回收器回收对象。软引用适合做缓存</p>
-</blockquote>
-</li>
-<li><p>弱引用</p>
-<blockquote>
-<p>当垃圾回收对象时，发现弱引用，则将它回收</p>
-</blockquote>
-</li>
-</ul>
-<p><strong>注意：只有在没有其他强引用对象引用弱引用/软引用对象垃圾回收才能回收。即如果有一个对象引用了弱引用/软引用，那么垃圾回收不会回收该软引用/弱引用对象</strong></p>
-<hr>
-<h3 id="Java缓存类型"><a href="#Java缓存类型" class="headerlink" title="Java缓存类型"></a>Java缓存类型</h3><ul>
-<li><p>堆缓存</p>
-<ul>
-<li>通过Java堆缓存对象</li>
-<li>优点 <ol>
-<li>没有序列化/反序列化，速度快</li>
-</ol>
-</li>
-<li>缺点<ol>
-<li>数据量过大的情况，GC暂停时间变长</li>
-<li>存储容量受堆空间影响</li>
-</ol>
-</li>
-<li>适用场景<ul>
-<li>堆缓存用于存储较热数据</li>
-</ul>
-</li>
-<li>GuavaCache、Ehcache3.x、MapDB等实现</li>
-</ul>
-</li>
-<li><p>堆外缓存</p>
-<ul>
-<li>存储在堆外缓存</li>
-<li>优点<ol>
-<li>减少GC暂停时间，支持更大缓存空间</li>
-</ol>
-</li>
-<li>缺点<ol>
-<li>读取数据需要序列化/反序列化，速度较慢</li>
-</ol>
-</li>
-<li>Ehcache3.下、MapDB等实现</li>
-</ul>
-</li>
-<li><p>磁盘缓存</p>
-<ul>
-<li>存储在磁盘的数据，JVM重启时数据仍然存在</li>
-<li>堆缓存/堆外缓存数据丢失</li>
-<li>Ehcache3.下、MapDB等实现</li>
-</ul>
-</li>
-<li><p>分布式缓存</p>
-<ul>
-<li>多JVM实例会存在两个问题<ol>
-<li>单机容量问题</li>
-<li>数据一致性问题<ul>
-<li>可设置缓存时间定时更新数据</li>
-</ul>
-</li>
-<li>缓存不命中时，需要回源到DB加载数据，DB访问量 增加<ul>
-<li>通过一致性哈希分片算法解决</li>
-</ul>
-</li>
-<li>可以使用Java进程间分布式缓存或者Redis分布式缓存</li>
-</ol>
-</li>
-</ul>
-</li>
-<li><p>单机模式</p>
-<blockquote>
-<p>存储最热的数据到堆缓存，相对热的数据到堆外缓存，不热的数据到磁盘缓存</p>
-</blockquote>
-</li>
-<li><p>集群时</p>
-<blockquote>
-<p>存储最热的数据到堆缓存，相对热的数据到堆外缓存，全量数据到分布式缓存</p>
-</blockquote>
-</li>
-</ul>
-<hr>
-<p><strong>堆缓存  -&gt; 堆外缓存 -&gt; 磁盘缓存 -&gt; 分布式缓存<br>L1 -&gt; L2 -&gt;3级缓存架构</strong></p>
-<hr>
-<h1 id="堆内缓存"><a href="#堆内缓存" class="headerlink" title="堆内缓存"></a>堆内缓存</h1><h3 id="GuavaCache"><a href="#GuavaCache" class="headerlink" title="GuavaCache"></a>GuavaCache</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Cache&lt;String,String&gt; guavaCache = </div><div class="line">     CacheBuilder.newBuilder()</div><div class="line">                 .concurrencyLevel(4)</div><div class="line">                 .expireAfterWrite(10,TimeUnit.SECONDS)</div><div class="line">                 .maximumSize(10000)</div><div class="line">                 .build();</div></pre></td></tr></table></figure>
-<p><a href="http://www.cnblogs.com/-OYK/archive/2012/12/05/2803317.html" target="_blank" rel="external">LRU算法</a></p>
-<ul>
-<li>maximumSize:缓存容量，超出之后，按照LRU进行缓存回收</li>
-<li>expireAfterWrite：设置TTL。定期回收缓存数据</li>
-<li>weakKeys/weakValues：设置弱引用缓存</li>
-<li>softValues：设置软引用缓存</li>
-<li>invalidate：主动失效某些缓存数据<ul>
-<li>什么时候触发失效?<strong>GuavaCache不会再缓存数据失效时立即触发回收操作，而在put时主动进行一次缓存清理</strong></li>
-</ul>
-</li>
-<li>concurrencyLevel：缓存级别<ul>
-<li>Cache重写了ConcurrentHashMap，concurrencyLevel设置Segment数量，concurrencyLevel越大并发能力越强</li>
-<li>recordStats:启动记录统计消息，比如命中率</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="Ehcache3-x实现"><a href="#Ehcache3-x实现" class="headerlink" title="Ehcache3.x实现"></a>Ehcache3.x实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);</div><div class="line"></div><div class="line">CacheConfigurationBuilder&lt;String,String&gt; cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder(</div><div class="line">    String.class,</div><div class="line">    String.class,</div><div class="line">    ResourcePoolsBuilder.newResourcePoolsBuilder()</div><div class="line">                        .heap(100,EntryUnit.ENTRIES)</div><div class="line">)</div><div class="line">.withDispatcherConcurrency(4)</div><div class="line">.withExpiry(Expirations.timeToLiveExpiration(Duration.of(10,TimeUnit.SECONDS)));</div><div class="line"></div><div class="line">Cache&lt;String,String&gt; ehcache = cacheManager.createCache(&quot;ehcache&quot;,cacheConfig);</div></pre></td></tr></table></figure>
-<h3 id="回收缓存策略"><a href="#回收缓存策略" class="headerlink" title="回收缓存策略"></a>回收缓存策略</h3><ul>
-<li>基于空间<ul>
-<li>heap(100,EntryUnit.ENTRIES) 设置缓存内存空间，超过此空间LRU回收</li>
-</ul>
-</li>
-</ul>
-<p>= 基于时间</p>
-<ul>
-<li>withExpiry(Expirations.timeToLiveExpiration(Duration.of(10,TimeUnit.SECONDS))) 设置TTL</li>
-<li>.withExpiry(Expirations.timeToIdleExpiration(Duration.of(10,TimeUnit.SECONDS))) 设置TTL、TTI</li>
-</ul>
-<ul>
-<li><p>缓存主动失效</p>
-<ul>
-<li>remove()/removeAll()<ul>
-<li>类似GuavaCache失效机制</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>并发级别</p>
-<ul>
-<li>withDispatcherConcurrency(4)用来设置事件分发时的并发级别</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="MapDB"><a href="#MapDB" class="headerlink" title="MapDB"></a>MapDB</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">HTreeMap mapDBCache = </div><div class="line">        DBMarker.heapDB()</div><div class="line">                .concurrencyScale(16)</div><div class="line">                .make()</div><div class="line">                .hashMap(&quot;mapDBCache&quot;)</div><div class="line">                .expireMaxSize(10000)</div><div class="line">                .expireAfterCreate(10,TimeUnit.SECONDS)</div><div class="line">                .expireAfterUpdate(10,TimeUnit.SECONDS)</div><div class="line">                .expireAfterGet(10,TimeUnit.SECONDS)</div><div class="line">                .create();</div></pre></td></tr></table></figure>
-<h3 id="回收策略"><a href="#回收策略" class="headerlink" title="回收策略"></a>回收策略</h3><ul>
-<li><p>基于容量</p>
-<ul>
-<li>expireMaxSize 缓存容量</li>
-</ul>
-</li>
-<li><p>基于时间</p>
-<ul>
-<li>expireAfterCreate/expireAfterUpdate 设置TTL</li>
-<li>expireAfterGet 设置TTI</li>
-</ul>
-</li>
-</ul>
-<h3 id="失效机制"><a href="#失效机制" class="headerlink" title="失效机制"></a>失效机制</h3><ul>
-<li>remove()/clear() 主动失效某些缓存数据<ul>
-<li>类似GuavaCache失效机制，不过，需要配置线程池定期执行缓存失效</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">.expireExecutor(scheduledExecutorService)</div><div class="line">.expireExecutorPeriod(3000)</div></pre></td></tr></table></figure>
-<h3 id="并发级别"><a href="#并发级别" class="headerlink" title="并发级别"></a>并发级别</h3><ul>
-<li>concurrencyScale() 类似GuavaCache的配置</li>
-</ul>
-<hr>
-<h3 id="堆内缓存-1"><a href="#堆内缓存-1" class="headerlink" title="堆内缓存"></a>堆内缓存</h3><h3 id="磁盘缓存"><a href="#磁盘缓存" class="headerlink" title="磁盘缓存"></a>磁盘缓存</h3><h3 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h3><hr>
-<h1 id="应用级缓存具体实例"><a href="#应用级缓存具体实例" class="headerlink" title="应用级缓存具体实例"></a>应用级缓存具体实例</h1><h3 id="多级缓存API封装"><a href="#多级缓存API封装" class="headerlink" title="多级缓存API封装"></a>多级缓存API封装</h3><blockquote>
-<p>对业务数据的一些基本信息进行适当的本地缓存，提升性能。对于多实例，还会使用分布式缓存，所以会对适当api进行封装</p>
-</blockquote>
-<h3 id="本地缓存初始化"><a href="#本地缓存初始化" class="headerlink" title="本地缓存初始化"></a>本地缓存初始化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public class LocalCacheInitService extends BaseService &#123;</div><div class="line">    </div><div class="line">    @Override</div><div class="line">    public void afterPropertiesSet() throws Exception&#123;</div><div class="line">        Cache&lt;String,Object&gt; categoryCache =</div><div class="line">             CacheBuilder.newBuilder()</div><div class="line">                         .softValues()</div><div class="line">                         .maximumSize(10000)</div><div class="line">                         .expireAfterWrite(Switches.CATEGORY.getExpiresInSeconds)</div><div class="line">                         .build();</div><div class="line">        </div><div class="line">        addCache(CacheKeys.CATEGORY_KEY,categoryCache)</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    public void addCache(String key,Cache&lt;?,?&gt; cache)&#123;</div><div class="line">        localCacheService.addCache(key,value);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>注意：本地缓存时间使用分布式缓存过期时间的一半，防止本地缓存数据缓存时间太长，导致多实例间的数据不一致</strong></p>
-<h3 id="写缓存API"><a href="#写缓存API" class="headerlink" title="写缓存API"></a>写缓存API</h3><h3 id="读缓存API"><a href="#读缓存API" class="headerlink" title="读缓存API"></a>读缓存API</h3><h3 id="NullCache"><a href="#NullCache" class="headerlink" title="NullCache"></a>NullCache</h3><hr>
-<h1 id="缓存模式"><a href="#缓存模式" class="headerlink" title="缓存模式"></a>缓存模式</h1><ul>
-<li>Cache-Aside<blockquote>
-<p>由业务代码直接维护缓存</p>
-</blockquote>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">value = myCache.getIfPresent(key);</div><div class="line">if(value == null)&#123;</div><div class="line">    //读场景</div><div class="line">    value = loadFromSoR(key);</div><div class="line">    //写场景</div><div class="line">    //value = writeToSoR(key);</div><div class="line">    //myCache.invalidate(key);</div><div class="line">    //放入缓存</div><div class="line">    myCache.put(value,key);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>适用于AOP模式</li>
-<li><p>Cache-Aside存在并发更新</p>
-<ol>
-<li>用户维度，加上缓存过期时间解决</li>
-<li>商品基础数据，考虑canal订阅binlog，进行增量更新分布式缓存，但是缓存会存在延迟，本地缓存可根据不一致容忍度设置合理过期时间</li>
-<li>读服务场景，可考虑一致性哈希，或者设置比较短的过期时间</li>
-</ol>
-</li>
-<li><p>Cache-As-SoR</p>
-<ul>
-<li>Read-Through<blockquote>
-<p>首先调用Cache，如果Cache不命中，由Cache回源到SoR</p>
-<ul>
-<li>通过配置CacheLoader组件回源到SoR加载源 数据</li>
-</ul>
-</blockquote>
-</li>
-<li>Write-Through</li>
-<li>Write-Behind</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>Cache看成SoR，然后Cache委托SoR进行真实读写.业务中只看到Cache操作</p>
-</blockquote>
-<ul>
-<li>Copy Pattern</li>
-</ul>
-<hr>
-<h3 id="名词"><a href="#名词" class="headerlink" title="名词"></a>名词</h3><ul>
-<li>SoR：记录系统（数据源）</li>
-<li>Cache：缓存，是SoR的快照</li>
-<li>回源：回到数据源获取数据</li>
-</ul>
-<p><a href="http://jinnianshilongnian.iteye.com/blog/2283670" target="_blank" rel="external">多级缓存</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（五）-——-降级/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（五）-——-降级/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （五） —— 降级</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:04:24+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（五）-——-降级"><a href="#《亿级流量网站架构核心技术》学习笔记-（五）-——-降级" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （五） —— 降级"></a>《亿级流量网站架构核心技术》学习笔记 （五） —— 降级</h2><blockquote>
-<p>当访问量剧增、服务出现问题(响应时间长或不响应)或非核心服务影响到核心服务性能时，仍然保证服务是可用的，即使有损服务</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>降级最终目的是保证服务可用，即使有损，有些服务是无法降级的（加入购物车、结算等）</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p>降级需要根据吞吐量、响应时间、可用率等条件进行手工降级或自动降级</p>
-</blockquote>
-<hr>
-<h2 id="降级预案"><a href="#降级预案" class="headerlink" title="降级预案"></a>降级预案</h2><ul>
-<li>一般：有些服务偶尔因为网络抖动或者服务正在上线而超时，可以自动降级</li>
-<li>警告：有些服务在一段时间内成功率有波动，可以自动降级或人工降级，并发送警告</li>
-<li>错误：比如数据库连接池用完、访问量突增到系统能承受的最大阙值</li>
-<li>严重错误：因为特殊原因导致数据出错，需要紧急人工降级</li>
-</ul>
-<hr>
-<h3 id="降级分类"><a href="#降级分类" class="headerlink" title="降级分类"></a>降级分类</h3><ul>
-<li>按照是否自动化：自动开关降级和人工开关降级</li>
-<li>按照功能：读服务降级和写服务降级</li>
-<li>按照系统层次：多层降级</li>
-</ul>
-<hr>
-<p>降级功能点主要从服务器链路考虑(根据用户访问的服务调用链路来梳理哪里需要降级)</p>
-<ul>
-<li>页面降级<blockquote>
-<p>在大促或者某些特殊情况，某些页面占用了稀缺服务资源，紧急情况可对其整个降级，达到丢车保帅目的</p>
-</blockquote>
-</li>
-<li>页面片段降级<blockquote>
-<p>商品详情页中的商家部分因为数据错误，需对此进行降级</p>
-</blockquote>
-</li>
-<li>页面异步请求降级<blockquote>
-<p>商品详情页上推荐信息/配送等异步信息加载，如果响应慢或者后端服务出错，可考虑降级</p>
-</blockquote>
-</li>
-<li>服务功能降级<blockquote>
-<p>渲染商品详情，需要调用不太重要的数据(热销、分类等)，而这些服务在异常不获取，即降级</p>
-</blockquote>
-</li>
-<li>读降级<blockquote>
-<p>多级缓存模式，如果后端服务有问题，可以降级为只读缓存，适用于读一致性不高的场景</p>
-</blockquote>
-</li>
-<li>写降级<blockquote>
-<p>秒杀抢购，可以只进行Cache更新，然后异步扣减库存到DB，保证最终一致性即可，此时DB降级为Cache</p>
-</blockquote>
-</li>
-<li>爬虫降级<blockquote>
-<p>在大促活动时，可将爬虫流量导向静态页或者返回空数据，保护稀缺资源</p>
-</blockquote>
-</li>
-<li>风控降级<blockquote>
-<p>抢购/秒杀业务，完全可以识别机器人、用户画像或者根据用户风控进行降级处理</p>
-</blockquote>
-</li>
-</ul>
-<hr>
-<h2 id="自动开关降级"><a href="#自动开关降级" class="headerlink" title="自动开关降级"></a>自动开关降级</h2><blockquote>
-<p>自动降级时根据系统负载、资源使用情况、SLA等指标进行降级</p>
-</blockquote>
-<ul>
-<li>超时降级<blockquote>
-<p>当访问数据库/http服务/远程调用响应慢。且该服务不是核心服务可考虑在超时后自动降级。比如商品详情有推荐和评价，可以暂不显示，对用户购物流程不会有太大影响</p>
-</blockquote>
-</li>
-</ul>
-<p><strong>要配置好超时时间和重试次数机制</strong></p>
-<ul>
-<li><p>统计失败次数降级</p>
-<blockquote>
-<p>有时依赖一些不稳定的API，调用外部机票服务，当失败调用到一定阙值自动降级(熔断器),通过异步线程探测服务是否恢复，恢复取消降级</p>
-</blockquote>
-</li>
-<li><p>故障降级</p>
-</li>
-</ul>
-<blockquote>
-<p>若调用的远程服务挂掉（网络故障、DNS故障、Http返回错误状态码、RPC异常），可直接降级。 </p>
-<p>降级后处理方案: 默认值、兜底数据、缓存</p>
-</blockquote>
-<ul>
-<li>限流降级</li>
-</ul>
-<blockquote>
-<p>去秒杀抢购一些商品，可能会因为访问量太大导致系统崩溃，通常使用限流限制访问量，当达到限流阙值，后续请求被降级</p>
-<p>降级后处理方案：排队、无货、错误页</p>
-</blockquote>
-<hr>
-<h2 id="人工开关降级"><a href="#人工开关降级" class="headerlink" title="人工开关降级"></a>人工开关降级</h2><blockquote>
-<p>在大促期间通过监控发现一些线上服务存在问题，这个时候需要暂时摘掉、通过任务系统调用一些服务，服务依赖的数据库可能占满了，数据库挂掉或者慢查询比较多，需要暂停任务系统让服务方进行处理、或者突然调用量增大</p>
-<p>处理方式：使用开关降级、开关可以存放到配置文件、数据库、Redis/Zk。如果不不存放到本地，则可定期同步开关数据，通过判断某个值是否降级</p>
-</blockquote>
-<hr>
-<h2 id="读服务降级"><a href="#读服务降级" class="headerlink" title="读服务降级"></a>读服务降级</h2><blockquote>
-<p>处理方案：暂时切换读(降级到读缓存、降级到静态化)、暂时屏蔽读(屏蔽读服务、屏蔽读入口)</p>
-</blockquote>
-<hr>
-<h2 id="写服务降级"><a href="#写服务降级" class="headerlink" title="写服务降级"></a>写服务降级</h2><blockquote>
-<p>写服务在大多场景不可降级，不过可以通过其他方案:同步转异步、限制写的比例</p>
-</blockquote>
-<hr>
-<h2 id="多级降级"><a href="#多级降级" class="headerlink" title="多级降级"></a>多级降级</h2><blockquote>
-<p>缓存离客户越近越高效；降级离客户越近保护更好</p>
-</blockquote>
-<ul>
-<li>页面JS降级开关</li>
-<li>接入层降级开关</li>
-<li>应用层降级开关</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（四）-——-限流/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（四）-——-限流/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （四） —— 限流</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:03:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（四）-——-限流"><a href="#《亿级流量网站架构核心技术》学习笔记-（四）-——-限流" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （四） —— 限流"></a>《亿级流量网站架构核心技术》学习笔记 （四） —— 限流</h2><blockquote>
-<p><strong>限流的目的是通过对并发访问/请求进行限速或者一个时间窗口内的请求进行限速来保护系统</strong>,一旦达到限制速率可拒绝服务、排队或者等待、降级</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>限流标准可以通过压测数据找出每个系统的处理峰值，通过设置峰值，防止系统过载时，通过拒绝处理过载请求保障系统可用。另外通过吞吐量、响应时间、可用率动态调整峰值</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>常见限流手段：限制总并发数(etc.数据库连接池、连接池)、限制瞬时并发数(etc.Nginx的limit_conn)、限制时间窗口内的平均速率（etc.Nginx的limit_req）、限制远程接口调用速率、限制MQ消费速率、网络连接数、网络流量、CPU或者内存负载等</p>
-</blockquote>
-<hr>
-<h2 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a>限流算法</h2><ul>
-<li>令牌桶</li>
-<li>漏桶</li>
-<li>计数器(粗暴限流实现)</li>
-</ul>
-<h3 id="令牌桶"><a href="#令牌桶" class="headerlink" title="令牌桶"></a>令牌桶</h3><blockquote>
-<p>存放固定容量令牌的桶，按照固定速率往里面加令牌</p>
-</blockquote>
-<p>令牌桶描述如下</p>
-<ol>
-<li>假设限制2r/s，则按照500ms固定速率往桶中添加令牌</li>
-<li>桶中最多存放b个令牌，当桶满时，新添加的令牌丢弃或者拒绝</li>
-<li>当一个n个字节大小的数据包到达，将从桶中删除n个令牌，接着数据包被发送到网络</li>
-<li>如果桶中令牌没有n个，则不会被删除，且该数据包会被限流（要么丢弃、要么在缓冲区等待）</li>
-</ol>
-<hr>
-<h3 id="漏桶"><a href="#漏桶" class="headerlink" title="漏桶"></a>漏桶</h3><blockquote>
-<p><strong>漏桶作为计量工具时，可以用于流量整形和流量控制</strong></p>
-</blockquote>
-<p>漏桶描述如下<br>1.一个固定流量的漏桶，按照常量速率流出水滴<br>2.如果桶是空的，则不流出水滴<br>3.可以以任意速率流入水滴到漏桶<br>4.如果流入水滴超出了桶的容量，则流入的水滴溢出（丢弃），而漏桶是不变的</p>
-<hr>
-<h3 id="两种令牌算法的对比"><a href="#两种令牌算法的对比" class="headerlink" title="两种令牌算法的对比"></a>两种令牌算法的对比</h3><ul>
-<li>令牌桶通过固定速率往桶中添加令牌，请求是否被处理需要看桶中令牌是否足够，当令牌减为0时，拒绝新请求</li>
-<li>漏桶通过按照常量固定速率，流入请求速率任意，当流入的请求数累积到漏桶容量时，则新流入的请求被拒绝</li>
-<li>令牌桶限制的是平均速率(允许突发请求)，并允许一定程度的突发流量</li>
-<li>漏桶限制的是常量流出速率，从而平滑突发流入速率</li>
-<li>令牌桶允许一定程度的突发，而漏桶的目的是平滑流入速率</li>
-<li>两个算法实现可以一样，但是方向相反，对于相同参数得到的限流效果是一样的</li>
-</ul>
-<hr>
-<blockquote>
-<p><strong>通过计数器来进行限流，主要用于限制总并发数，</strong>比如线程池大小、数据库连接池大小、秒杀并发数都是计数器用法。只要全局总请求数或者一定时间段的总请求数达到设定阙值，则进行限流</p>
-</blockquote>
-<hr>
-<h2 id="应用级限流"><a href="#应用级限流" class="headerlink" title="应用级限流"></a>应用级限流</h2><h3 id="限流总并发-连接-请求数"><a href="#限流总并发-连接-请求数" class="headerlink" title="限流总并发/连接/请求数"></a>限流总并发/连接/请求数</h3><blockquote>
-<p>对于一个应用系统，总有一个TPS/QPS阙值(极限并发/请求数)</p>
-</blockquote>
-<p>Tomcat的Connector参数</p>
-<ul>
-<li>acceptCount：tomcat线程忙于响应，新来连接进入队列排队，超出队列大小，拒绝连接</li>
-<li>maxConnections：瞬时最大连接数，超出会排队等待</li>
-<li>maxThreads: Thread能启动用来处理请求的最大线程数，如果请求数远远大于线程数，程序会引起响应变慢甚至僵死    </li>
-</ul>
-<hr>
-<h3 id="限流总资源数"><a href="#限流总资源数" class="headerlink" title="限流总资源数"></a>限流总资源数</h3><blockquote>
-<p>如果有的资源是稀缺资源。可以通过池化技术限制总资源数，如连接池数，线程池等</p>
-</blockquote>
-<h3 id="限流某个接口的总并发-请求数"><a href="#限流某个接口的总并发-请求数" class="headerlink" title="限流某个接口的总并发/请求数"></a>限流某个接口的总并发/请求数</h3><blockquote>
-<p>接口可能会有突发访问情况，但又担心访问量太大而崩溃，如抢购，这时候需要限制总并发/请求数了，属于细粒度控制. 通过适用AtomicLong(原子操作)和Semaphore(同步计数器)、以及Hystrix在信号量模式下也适用Semaphore限制接口并发数</p>
-</blockquote>
-<p><strong>适用于可降级业务或者需要过载访问的服务进行限流</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">try&#123;</div><div class="line">    if(atomic.incrementAndGet() &gt; 限流数)&#123;</div><div class="line">        //拒绝请求</div><div class="line">    &#125;</div><div class="line">&#125; finally &#123;</div><div class="line">    atomic.decrementAndGet()</div><div class="line">&#125;</div><div class="line">//处理请求</div></pre></td></tr></table></figure></p>
-<h3 id="限流某个接口的时间窗请求数"><a href="#限流某个接口的时间窗请求数" class="headerlink" title="限流某个接口的时间窗请求数"></a>限流某个接口的时间窗请求数</h3><blockquote>
-<p>即一个时间窗内的请求数，如想限制某个接口服务每秒/每分钟/每日的调用量。比如商品详情页服务会调用基础商品服务调用，但是更新量比较大可能将基础服务打挂。对每秒/每分钟进行限速</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">LoadCache&lt;Long,AtomicLong&gt; counter = </div><div class="line">    CacheBuilder.newBuilder()</div><div class="line">                .expireAfterWrite(2,TimeUnit.SECONDS)</div><div class="line">                .build(new CacheLoader&lt;Long,AtomicLong&gt;()&#123;</div><div class="line">                    @Override</div><div class="line">                    public AtomicLong load(Long seconds) throws Exception&#123;</div><div class="line">                        return new AtomicLong(0);</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">long limit = 1000;</div><div class="line">while(true)&#123;</div><div class="line">    long currentSeconds = System.currentTimeMillis() / 1000;</div><div class="line">    if(conuter.get(currentSeconds).incrementAndGet() &gt; limit)&#123;</div><div class="line">        System.out.println(&quot;限流:&quot;+currentSenconds);</div><div class="line">        continue;</div><div class="line">    &#125;</div><div class="line">    //业务处理</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><strong>使用Guava的Cache存储计数器，过期时间设置2s（保证能记录1s内计数）。然后获取当前时间戳，取秒数作为key进行计数统计和限流</strong></li>
-</ul>
-<p><a href="http://ifeve.com/google-guava-cachesexplained/" target="_blank" rel="external">Guava-Cache</a></p>
-<hr>
-<h3 id="平滑限流某个接口的请求数"><a href="#平滑限流某个接口的请求数" class="headerlink" title="平滑限流某个接口的请求数"></a>平滑限流某个接口的请求数</h3><blockquote>
-<p>在一些场景，需要对突发请求进行整形，整形为平均速率请求处理；可以使用令牌桶和漏桶实现。Guava提供了令牌桶的实现</p>
-</blockquote>
-<p><a href="http://ifeve.com/guava-ratelimiter/" target="_blank" rel="external">Guava RateLimiter</a><br>提供的令牌桶算法可用于平滑突发限流和平滑预热限流</p>
-<ul>
-<li><p>表示桶容量为5且每秒新增5个令牌(即每隔200ms增加一个令牌)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">RateLimiter limiter = RateLimiter.create(5);</div></pre></td></tr></table></figure>
-</li>
-<li><p>表示消费一个令牌（获取许可）。如果桶中有足够的令牌，则成功（0），如果没有令牌暂停一段时间</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">limiter.acquire();</div></pre></td></tr></table></figure>
-<p><strong>总结：该限流针对单应用限流，如果将应用部署在多台机器，不能进行全局限流。需要用分布式和接入层限流解决这个问题</strong></p>
-<hr>
-<h3 id="分布式限流"><a href="#分布式限流" class="headerlink" title="分布式限流"></a>分布式限流</h3><blockquote>
-<p><strong>分布式限流的关键是将限流服务做成原子化</strong> 解决方案Redis+Lua或者Nginx+Lua技术实现高并发和高性能</p>
-</blockquote>
-<p>Lua语言支持漏桶和令牌桶算法</p>
-<p><a href="http://coolshell.cn/articles/10739.html" target="_blank" rel="external">Lua简明教程</a></p>
-<p><a href="https://wizardforcel.gitbooks.io/lua-doc/content/" target="_blank" rel="external">Lua参考手册</a></p>
-<hr>
-<h3 id="接入层限流"><a href="#接入层限流" class="headerlink" title="接入层限流"></a>接入层限流</h3><blockquote>
-<p>接入层通常指请求流量的入口，该层目的：负载均衡、非法请求过滤、请求聚合、缓存、降级、限流、A/B测试、服务质量监控等</p>
-</blockquote>
-<h4 id="Nginx接入层"><a href="#Nginx接入层" class="headerlink" title="Nginx接入层"></a>Nginx接入层</h4><blockquote>
-<p>连接数限流模块ngx_http_limit_conn_module</p>
-<p>漏桶算法实现的请求限流模块ngx_http_limit_req_module</p>
-<p>OpenRestry提供的Lua限流模块lua-resty-limit-traffic</p>
-</blockquote>
-<p>limit_conn 用来对某个key对应的总的网络连接数进行限流。可以按照维度（ip、域名）等进行限流</p>
-<p>limit_req 用来对某个key对应的请求的平均速率进行限流（平滑模式和允许突发模式）</p>
-<h3 id="ngx-http-limit-conn-module"><a href="#ngx-http-limit-conn-module" class="headerlink" title="ngx_http_limit_conn_module"></a>ngx_http_limit_conn_module</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    limit_conn_zone $binary_remote_addr zone=addr:10m;</div><div class="line">    limit_conn_log_level error;</div><div class="line">    limit_conn_status 503;</div><div class="line">    </div><div class="line">    server &#123;</div><div class="line">        </div><div class="line">        location /limit &#123;</div><div class="line">            limit_conn addr 1;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>limit_conn 主要执行过程</p>
-<ul>
-<li>请求进入后判断limit_conn_zone中相应key连接数是否超过了配置的最大连接数</li>
-<li>如果超过了配置的最大大小，则被限流，返回limit_conn_status状态码，否则，相应key连接数+1，并注册请求处理完成的回调函数</li>
-<li>进行请求处理</li>
-<li>在结束请求阶段会调用注册的回调函数对相应key连接数-1</li>
-</ul>
-<p><strong>limit_conn可以根据限制某个key的总并发/请求数，key根据需要变化</strong></p>
-<h4 id="根据ip限制并发连接数"><a href="#根据ip限制并发连接数" class="headerlink" title="根据ip限制并发连接数"></a>根据ip限制并发连接数</h4><ol>
-<li>定义ip维度的限流区域</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">limit_conn_zone $binary_remote_addr zone=perip:10m;</div></pre></td></tr></table></figure>
-<ol>
-<li>添加限流逻辑</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">location /limit &#123;</div><div class="line">        limit_conn perip 2;</div><div class="line">        echo &quot;123&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ol>
-<li>AB测试工具进行测试</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ab -n 5 -c 5 http://localhost/limit</div></pre></td></tr></table></figure>
-<h4 id="根据域名限制并发连接数配置"><a href="#根据域名限制并发连接数配置" class="headerlink" title="根据域名限制并发连接数配置"></a>根据域名限制并发连接数配置</h4><ol>
-<li>定义ip维度的限流区域</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">limit_conn_zone $binary_remote_addr zone=perserver:10m;</div></pre></td></tr></table></figure>
-<ol>
-<li>添加限流逻辑</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">location /limit &#123;</div><div class="line">        limit_conn perserver 2;</div><div class="line">        echo &quot;123&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h3 id="ngx-http-limit-req-module"><a href="#ngx-http-limit-req-module" class="headerlink" title="ngx_http_limit_req_module"></a>ngx_http_limit_req_module</h3><blockquote>
-<p>limit_req通过漏桶算法实现，用于对指定key的请求进行限流 (etc.按照维度限制请求速率)</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    limit_conn_zone $binary_remote_addr zone=one:10m rate=1r/s;</div><div class="line">    limit_conn_log_level error;</div><div class="line">    limit_conn_status 503;</div><div class="line">    </div><div class="line">    server &#123;</div><div class="line">        </div><div class="line">        location /limit &#123;</div><div class="line">            limit_req zone = one burst=5 nodelay;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>limit_req主要执行过程</p>
-<p>1.请求进入后首先判断最后一次请求时间相对与当前时间是否需要限流</p>
-<p>2.如果没有配置桶容量(burst)，则桶容量为0，按照固定速率处理请求，如果请求被限流，返回相应错误码</p>
-<p>如果配置桶容量(burst&gt;0)及延迟模式(不配置nodelay),<br>桶满了，则新请求被限流；如果未满，按照固定平均速率处理</p>
-<p>如果配置桶容量(burst&gt;0)及非延迟模式(配置Nodelay),则不会按照固定速率，而是允许突发处理请求；桶满了则限流，直接返回相应错误码</p>
-<p>3.如果没有被限流，则正常处理请求</p>
-<p>4.Nginx会在相应时机选择一些(3个节点)限流key进行过期处理，内存回收</p>
-<hr>
-<h2 id="节流"><a href="#节流" class="headerlink" title="节流"></a>节流</h2><blockquote>
-<p>允许在特定时间窗口内对重复的相同事件最多一次处理</p>
-</blockquote>
-<h3 id="throttleFirst-throttleLast"><a href="#throttleFirst-throttleLast" class="headerlink" title="throttleFirst / throttleLast"></a>throttleFirst / throttleLast</h3><blockquote>
-<p>在特定时间窗口内对重复的多个相同事件只处理第一个或最后一个</p>
-</blockquote>
-<h3 id="throttleWithTimeout"><a href="#throttleWithTimeout" class="headerlink" title="throttleWithTimeout"></a>throttleWithTimeout</h3><blockquote>
-<p>也叫去抖(debounce),限制两个连续事件的先后执行时间不得小于某个时间窗口</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术/" itemprop="url">## 《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:03:31+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术"><a href="#《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术"></a>《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术</h2><blockquote>
-<p><strong>系统隔离</strong>是为了在系统发生故障时，能限定传播范围和影响范围，即发生故障时不会产生滚雪球效应，从而保证只能故障服务不可用，其他服务仍然可用</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>资源隔离</strong>是通过隔离减少资源竞争，保证服务间的相互不影响和可用性</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>其他常见隔离手段：线程隔离、进程隔离、集群隔离、机房隔离、读写隔离、快慢隔离、动静隔离、爬虫隔离、环境隔离（测试、预发布/灰度、正式环境）、AB测试（版本测试）、缓存隔离、压测隔离（真实/压测数据）、查询隔离（简单/批量/复杂查询条件分别路由到不同集群）</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>常用解决手段：负载均衡路由、自动/手动切换分组、降级等保障程序可用性</p>
-</blockquote>
-<hr>
-<h2 id="线程隔离"><a href="#线程隔离" class="headerlink" title="线程隔离"></a>线程隔离</h2><blockquote>
-<p>主要指线程池分离，在实际使用中，会将不同的请求分类，交给不同线程池处理。当一种业务的请求处理发生故障时，不会扩散到其他线程池，从而保障服务可用</p>
-</blockquote>
-<hr>
-<h2 id="进程隔离"><a href="#进程隔离" class="headerlink" title="进程隔离"></a>进程隔离</h2><blockquote>
-<p>通过系统拆分多个子系统来实现物理隔离，通过进程隔离使得某一个子系统出现问题而不会影响其他子系统</p>
-</blockquote>
-<hr>
-<h2 id="集群隔离"><a href="#集群隔离" class="headerlink" title="集群隔离"></a>集群隔离</h2><blockquote>
-<p>通过部署多个服务形成服务集群，从而提升系统容量。随着调用方增多，当某个服务影响其他服务的稳定性，应考虑为某个服务提供单个的服务集群（服务分组）</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;jsf:provider id=&quot;myService&quot; interface=&quot;com.test.MyService&quot; alias=&quot;$&#123;服务分组名&#125;&quot; ref=&quot;myServiceImpl&quot;/&gt;</div></pre></td></tr></table></figure>
-<h2 id="机房隔离"><a href="#机房隔离" class="headerlink" title="机房隔离"></a>机房隔离</h2><blockquote>
-<p>对系统可用性要求，会进行多机房部署，每个机房都有服务器组。本机房的服务只调用本机服务，不进行跨机房调用，其中一个机房出现问题时，可以通过DNS负载均衡将请求切换到另外一个机房，或许考虑服务能自动重试其他机房服务。一种方法是根据ip自动分组，还有一种方法在分组名中加上机房名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;jsf:provider id=&quot;myService&quot; interface=&quot;com.test.MyService&quot; alias=&quot;$&#123;服务分组名&#125;-$&#123;机房名&#125;&quot; ref=&quot;myServiceImpl&quot;/&gt;</div></pre></td></tr></table></figure></p>
-</blockquote>
-<hr>
-<h2 id="读写隔离"><a href="#读写隔离" class="headerlink" title="读写隔离"></a>读写隔离</h2><blockquote>
-<p>通过主从模式将读和写集群分离，读服务只从redis集群获取数据，当主Redis集群出错时，从Redis集群仍然可用。而当从Redis出现问题时，可以进行其他集群重试</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">--先读取从</div><div class="line">status , resp = slave_get(key)</div><div class="line">if status == STATUS_OK then</div><div class="line">   return status ,value</div><div class="line">end</div><div class="line">--失败之后，在读取主</div><div class="line">status , resp = master_get(key)</div></pre></td></tr></table></figure>
-<p>–</p>
-<h2 id="动静隔离"><a href="#动静隔离" class="headerlink" title="动静隔离"></a>动静隔离</h2><blockquote>
-<p>如果用户访问结算页，JS/CSS等静态资源出现在系统中，很可能由于访问量太大，导致带宽满，从而出现不可用。一般静态资源放在CDN上</p>
-</blockquote>
-<hr>
-<h2 id="爬虫隔离"><a href="#爬虫隔离" class="headerlink" title="爬虫隔离"></a>爬虫隔离</h2><blockquote>
-<p>在实际业务中，爬虫比例远高于正常流量。而爬虫访问量太大可能导致服务不可用。一种通过限流解决。另一种通过负载均衡层面将爬虫路由到单独集群，从而保证正常服务可用，爬虫流量尽量可用</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Nginx.conf</div><div class="line">set $flag = 0;</div><div class="line">if($http_user_agent ~* &quot;splider&quot;)&#123;</div><div class="line">    set $flag &quot;1&quot;;</div><div class="line">&#125;</div><div class="line">if($flag = &quot;0&quot;)&#123;</div><div class="line">    //代理到正常集群</div><div class="line">&#125;</div><div class="line">if($flag = &quot;1&quot;)&#123;</div><div class="line">    //代理到爬虫集群</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="热点隔离"><a href="#热点隔离" class="headerlink" title="热点隔离"></a>热点隔离</h2><blockquote>
-<p>秒杀、抢购就属于热点例子。做成独立系统或服务隔离从而保证热点服务出问题，不会影响主服务。还有一些热点可能由于价格或者突发事件，对于读热点，可以采取多级缓存搞定（缓存+队列进行削峰）</p>
-</blockquote>
-<hr>
-<h2 id="资源隔离"><a href="#资源隔离" class="headerlink" title="资源隔离"></a>资源隔离</h2><blockquote>
-<p>磁盘、CPU、网络等外界存在竞争关系的因素</p>
-</blockquote>
-<hr>
-<h2 id="Hystrix隔离"><a href="#Hystrix隔离" class="headerlink" title="Hystrix隔离"></a>Hystrix隔离</h2><p><a href="http://www.infoq.com/cn/news/2013/01/netflix-hystrix-fault-tolerance" target="_blank" rel="external">Hystrix-应对复杂分布式系统中的延时和故障容错</a></p>
-<hr>
-<h2 id="基于Servlet3的请求隔离"><a href="#基于Servlet3的请求隔离" class="headerlink" title="基于Servlet3的请求隔离"></a>基于Servlet3的请求隔离</h2><p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet30/" target="_blank" rel="external">servlet3新特性</a></p>
-<blockquote>
-<p>Tomcat7以上支持Servlet3异步化，在此之前，所有请求都是同步的。</p>
-</blockquote>
-<p>异步化优点</p>
-<ul>
-<li>基于NIO能处理更高的并发连接数</li>
-<li>请求解析和业务处理线程池分离</li>
-<li>根据业务重要性进行业务分级、并分级线程池</li>
-<li>对业务线程池进行监控、降级、运维等处理</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2312,7 +1916,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">142</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2323,7 +1927,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">55</span>
+                <span class="site-state-item-count">57</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2334,7 +1938,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">107</span>
+                <span class="site-state-item-count">108</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

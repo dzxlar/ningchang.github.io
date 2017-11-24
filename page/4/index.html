@@ -254,6 +254,666 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/【消息队列】Kafka学习笔记-一-——-基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/07/【消息队列】Kafka学习笔记-一-——-基础/" itemprop="url">【消息队列】Kafka学习笔记(一) —— 基础</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T13:57:35+08:00">
+                2017-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Kafka简介"><a href="#Kafka简介" class="headerlink" title="Kafka简介"></a>Kafka简介</h2><p>Kafka是一种分布式的，基于发布/订阅的消息系统。主要设计目标如下：</p>
+<ul>
+<li>以<strong>时间复杂度为O(1)</strong>的方式提供消息持久化能力，即使对TB级以上数据也能保证常数时间复杂度的访问性能。 </li>
+<li><strong>高吞吐率。</strong>即使在非常廉价的商用机器上也能做到单机支持每秒100K条以上消息的传输。 </li>
+<li>支持Kafka Server间的消息分区，及分布式消费，同时<strong>保证每个Partition内的消息顺序传输。 </strong></li>
+<li>同时支持<strong>离线数据处理和实时数据处理</strong>。 </li>
+<li>Scale out：支持在线水平扩展。</li>
+</ul>
+<h2 id="Kafka架构"><a href="#Kafka架构" class="headerlink" title="Kafka架构"></a>Kafka架构</h2><ul>
+<li><strong>Broker </strong><ul>
+<li>Kafka集群包含一个或多个服务器，这种服务器被称为broker</li>
+</ul>
+</li>
+<li><strong>Topic </strong><ul>
+<li>每条发布到Kafka集群的消息都有一个类别，这个类别被称为Topic。（物理上不同- Topic的消息分开存储，逻辑上一个Topic的消息虽然保存于一个或多个broker上但用户只需指定消息的Topic即可生产或消费数据而不必关心数据存于何处）</li>
+</ul>
+</li>
+<li><strong>Partition </strong><ul>
+<li>Parition是物理上的概念，每个Topic包含一个或多个Partition.</li>
+</ul>
+</li>
+<li><strong>Producer </strong><ul>
+<li>负责发布消息到Kafka broker</li>
+</ul>
+</li>
+<li><strong>Consumer</strong> <ul>
+<li>消息消费者，向Kafka broker读取消息的客户端。</li>
+</ul>
+</li>
+<li><p><strong>Consumer Group </strong></p>
+<ul>
+<li>每个Consumer属于一个特定的Consumer Group（可为每个Consumer指定group name，若不指定group name则属于默认的group）。</li>
+</ul>
+<h2 id="Kafka拓扑结构"><a href="#Kafka拓扑结构" class="headerlink" title="Kafka拓扑结构"></a>Kafka拓扑结构</h2><p><img src="http://cdn3.infoqstatic.com/statics_s1_20170606-0324u2/resource/articles/kafka-analysis-part-1/zh/resources/0310020.png" alt="Kafka拓扑结构"></p>
+</li>
+</ul>
+<p>一个典型的Kafka集群中包含若干Producer（可以是web前端产生的Page View，或者是服务器日志，系统CPU、Memory等），若干broker（Kafka支持水平扩展，一般broker数量越多，集群吞吐率越高），若干Consumer Group，以及一个Zookeeper集群。Kafka通过Zookeeper管理集群配置，选举leader，以及在Consumer Group发生变化时进行rebalance。Producer使用push模式将消息发布到broker，Consumer使用pull模式从broker订阅并消费消息</p>
+<h2 id="Topic-amp-Partition"><a href="#Topic-amp-Partition" class="headerlink" title="Topic &amp; Partition"></a>Topic &amp; Partition</h2><p>每条消费都必须指定它的Topic。为了使得Kafka的吞吐率可以线性提高，物理上把Topic分成一个或多个Partition，每个Partition在物理上对应一个文件夹，该文件夹下存储这个Partition的所有消息和索引文件。</p>
+<blockquote>
+<p>etc. 若创建topic1和topic2两个topic，且分别有13个和19个分区，则整个集群上会相应会生成共32个文件夹</p>
+</blockquote>
+<h2 id="Producer消息路由"><a href="#Producer消息路由" class="headerlink" title="Producer消息路由"></a>Producer消息路由</h2><p>根据Paritition机制选择将其存储到哪一个Partition。如果Partition机制设置合理，所有消息可以均匀分布到不同的Partition里，这样就实现了负载均衡</p>
+<blockquote>
+<p>TIPS: $KAFKA_HOME/config/server.properties中通过配置项num.partitions来指定新建Topic的默认Partition数量，也可在创建Topic时通过参数指定，同时也可以在Topic创建之后通过Kafka提供的工具修改。</p>
+</blockquote>
+<p>在发送一条消息时，可以指定这条消息的key，Producer根据这个key和Partition机制来判断应该将这条消息发送到哪个Parition。Paritition机制可以通过指定Producer的paritition. class这一参数来指定，该class必须实现kafka.producer.Partitioner接口。</p>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>该实例中。如果key可以被解析为整数则将对应的整数与Partition总数取余，该消息会被发送到该数对应的Partition（每个Parition都会有个序号,序号从0开始）</p>
+<h3 id="1-设置分区"><a href="#1-设置分区" class="headerlink" title="1. 设置分区"></a>1. 设置分区</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">import kafka.producer.Partitioner;</div><div class="line">import kafka.utils.VerifiableProperties;</div><div class="line"></div><div class="line">public class CustomPartitioner&lt;T&gt; implements Partitioner &#123;</div><div class="line"></div><div class="line">    public CustomPartitioner(VerifiableProperties verifiableProperties) &#123;&#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public int partition(Object key, int numPartitions) &#123;</div><div class="line">        try &#123;</div><div class="line">            int partitionNum = Integer.parseInt((String) key);</div><div class="line">            return Math.abs(Integer.parseInt((String) key) % numPartitions);</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            return Math.abs(key.hashCode() % numPartitions);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2-发送消息测试"><a href="#2-发送消息测试" class="headerlink" title="2.发送消息测试"></a>2.发送消息测试</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public void sendMessage() throws InterruptedException&#123;</div><div class="line">　　for(int i = 1; i &lt;= 5; i++)&#123;</div><div class="line">　　      List&lt;KeyedMessage&lt;String, String&gt;&gt; messageList = Lists.newArrayList();</div><div class="line">　　      for(int j = 0; j &lt; 4; j++）&#123;</div><div class="line">　　          messageList.add(new KeyedMessage&lt;String, String&gt;(&quot;topic2&quot;, j+&quot;&quot;, &quot;The &quot; + i + &quot; message for key &quot; + j));</div><div class="line">　　      &#125;</div><div class="line">　　      producer.send(messageList);</div><div class="line">    &#125;</div><div class="line">　　producer.close();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>结论：则key相同的消息会被发送并存储到同一个partition里，而且key的序号正好和Partition序号相同</strong></p>
+<p><img src="http://cdn3.infoqstatic.com/statics_s1_20170606-0324u2/resource/articles/kafka-analysis-part-1/zh/resources/0310024.png" alt=""></p>
+<h2 id="Consumer-Group"><a href="#Consumer-Group" class="headerlink" title="Consumer Group"></a>Consumer Group</h2><p>使用Consumer high level API时，同一Topic的一条消息只能被同一个Consumer Group内的一个Consumer消费，但多个Consumer Group可同时消费这一消息</p>
+<p><img src="http://cdn3.infoqstatic.com/statics_s1_20170606-0324u2/resource/articles/kafka-analysis-part-1/zh/resources/0310025.png" alt=""></p>
+<p>这是Kafka用来实现一个Topic消息的广播（发给所有的Consumer）和单播（发给某一个Consumer）的手段</p>
+<p>一个Topic可以对应多个Consumer Group。如果需要实现广播，只要每个Consumer有一个独立的Group就可以了。要实现单播只要所有的Consumer在同一个Group里。用Consumer Group还可以将Consumer进行自由的分组而不需要多次发送消息到不同的Topic</p>
+<p>Kafka的设计理念之一就是同时提供离线处理和实时处理。根据这一特性，可以使用Storm这种实时流处理系统对消息进行实时在线处理，同时使用Hadoop这种批处理系统进行离线处理，还可以同时将数据实时备份到另一个数据中心，只需要保证这三个操作所使用的Consumer属于不同的Consumer Group即可</p>
+<p><img src="http://cdn3.infoqstatic.com/statics_s1_20170606-0324u2/resource/articles/kafka-analysis-part-1/zh/resources/0310026.png" alt=""></p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a href="http://www.infoq.com/cn/articles/kafka-analysis-part-1" target="_blank" rel="external">文章出处</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/【消息中间件】MessageQueue介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/07/【消息中间件】MessageQueue介绍/" itemprop="url">【消息中间件】MessageQueue介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T13:50:09+08:00">
+                2017-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="为什么使用消息队列"><a href="#为什么使用消息队列" class="headerlink" title="为什么使用消息队列"></a>为什么使用消息队列</h2><ul>
+<li><strong>解耦</strong> <ul>
+<li>在项目启动之初来预测将来项目会碰到什么需求，是极其困难的。消息系统在处理过程中间插入了一个隐含的、基于数据的接口层，两边的处理过程都要实现这一接口。这允许你独立的扩展或修改两边的处理过程，只要确保它们遵守同样的接口约束。</li>
+</ul>
+</li>
+<li><strong>冗余</strong> <ul>
+<li>有些情况下，处理数据的过程会失败。除非数据被持久化，否则将造成丢失。消息队列把数据进行持久化直到它们已经被完全处理，通过这一方式规避了数据丢失风险。许多消息队列所采用的”插入-获取-删除”范式中，在把一个消息从队列中删除之前，需要你的处理系统明确的指出该消息已经被处理完毕，从而确保你的数据被安全的保存直到你使用完毕。</li>
+</ul>
+</li>
+<li><strong>扩展性</strong> <ul>
+<li>因为消息队列解耦了你的处理过程，所以增大消息入队和处理的频率是很容易的，只要另外增加处理过程即可。不需要改变代码、不需要调节参数。扩展就像调大电力按钮一样简单。</li>
+</ul>
+</li>
+<li><strong>灵活性 &amp; 峰值处理能力</strong> <ul>
+<li>在访问量剧增的情况下，应用仍然需要继续发挥作用，但是这样的突发流量并不常见；如果为以能处理这类峰值访问为标准来投入资源随时待命无疑是巨大的浪费。使用消息队列能够使关键组件顶住突发的访问压力，而不会因为突发的超负荷的请求而完全崩溃。</li>
+</ul>
+</li>
+<li><strong>可恢复性</strong> <ul>
+<li>系统的一部分组件失效时，不会影响到整个系统。消息队列降低了进程间的耦合度，所以即使一个处理消息的进程挂掉，加入队列中的消息仍然可以在系统恢复后被处理。</li>
+</ul>
+</li>
+<li><strong>顺序保证</strong> <ul>
+<li>在大多使用场景下，数据处理的顺序都很重要。大部分消息队列本来就是排序的，并且能保证数据会按照特定的顺序来处理。Kafka保证一个Partition内的消息的有序性。</li>
+</ul>
+</li>
+<li><strong>缓冲</strong> <ul>
+<li>在任何重要的系统中，都会有需要不同的处理时间的元素。例如，加载一张图片比应用过滤器花费更少的时间。消息队列通过一个缓冲层来帮助任务最高效率的执行———写入队列的处理会尽可能的快速。该缓冲有助于控制和优化数据流经过系统的速度。</li>
+</ul>
+</li>
+<li><strong>异步通信</strong> <ul>
+<li>很多时候，用户不想也不需要立即处理消息。消息队列提供了异步处理机制，允许用户把一个消息放入队列，但并不立即处理它。想向队列中放入多少消息就放多少，然后在需要的时候再去处理它们。</li>
+</ul>
+</li>
+</ul>
+<h2 id="RabbitMQ"><a href="#RabbitMQ" class="headerlink" title="RabbitMQ"></a>RabbitMQ</h2><blockquote>
+<p>RabbitMQ是使用Erlang编写的一个开源的消息队列，本身支持很多的协议：AMQP，XMPP, SMTP, STOMP，也正因如此，它非常重量级，更适合于企业级的开发。同时实现了Broker构架，这意味着<strong>消息在发送给客户端时先在中心队列排队。对路由，负载均衡或者数据持久化都有很好的支持。</strong></p>
+</blockquote>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><blockquote>
+<p>Redis是一个基于Key-Value对的NoSQL数据库，开发维护很活跃。虽然它是一个Key-Value数据库存储系统，但它本身支持MQ功能，所以完全可以当做一个轻量级的队列服务来使用。对于RabbitMQ和Redis的入队和出队操作，各执行100万次，每10万次记录一次执行时间。测试数据分为128Bytes、512Bytes、1K和10K四个不同大小的数据。实验表明：入队时，当数据比较小时Redis的性能要高于RabbitMQ，而如果数据大小超过了10K，Redis则慢的无法忍受；出队时，无论数据大小，Redis都表现出非常好的性能，而RabbitMQ的出队性能则远低于Redis。</p>
+</blockquote>
+<h2 id="ZeroMQ"><a href="#ZeroMQ" class="headerlink" title="ZeroMQ"></a>ZeroMQ</h2><blockquote>
+<p>ZeroMQ号称最快的消息队列系统，尤其针对大吞吐量的需求场景。ZeroMQ能够实现RabbitMQ不擅长的高级/复杂的队列，但是开发人员需要自己组合多种技术框架，技术上的复杂度是对这MQ能够应用成功的挑战。ZeroMQ具有一个独特的非中间件的模式，你不需要安装和运行一个消息服务器或中间件，因为你的应用程序将扮演这个服务器角色。你只需要简单的引用ZeroMQ程序库，可以使用NuGet安装，然后你就可以愉快的在应用程序之间发送消息了。但是ZeroMQ仅提供非持久性的队列，也就是说如果宕机，数据将会丢失。其中，Twitter的Storm 0.9.0以前的版本中默认使用ZeroMQ作为数据流的传输（Storm从0.9版本开始同时支持ZeroMQ和Netty作为传输模块）。</p>
+</blockquote>
+<h2 id="ActiveMQ"><a href="#ActiveMQ" class="headerlink" title="ActiveMQ"></a>ActiveMQ</h2><blockquote>
+<p>ActiveMQ是Apache下的一个子项目。 类似于ZeroMQ，它能够以代理人和点对点的技术实现队列。同时类似于RabbitMQ，它少量代码就可以高效地实现高级应用场景。</p>
+</blockquote>
+<h2 id="Kafka-Jafka"><a href="#Kafka-Jafka" class="headerlink" title="Kafka/Jafka"></a>Kafka/Jafka</h2><blockquote>
+<p>Kafka是Apache下的一个子项目，是一个高性能跨语言分布式发布/订阅消息队列系统，而Jafka是在Kafka之上孵化而来的，即Kafka的一个升级版。具有以下特性：快速持久化，可以在O(1)的系统开销下进行消息持久化；高吞吐，在一台普通的服务器上既可以达到10W/s的吞吐速率；完全的分布式系统，Broker、Producer、Consumer都原生自动支持分布式，自动实现负载均衡；支持Hadoop数据并行加载，对于像Hadoop的一样的日志数据和离线分析系统，但又要求实时处理的限制，这是一个可行的解决方案。Kafka通过Hadoop的并行加载机制统一了在线和离线的消息处理。Apache Kafka相对于ActiveMQ是一个非常轻量级的消息系统，除了性能非常好之外，还是一个工作良好的分布式系统</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/Log4j-切换-Logback/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/07/Log4j-切换-Logback/" itemprop="url">Log4j 切换 Logback</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T11:22:44+08:00">
+                2017-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Log/" itemprop="url" rel="index">
+                    <span itemprop="name">Log</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="1-移除Log4j-JAR依赖"><a href="#1-移除Log4j-JAR依赖" class="headerlink" title="1. 移除Log4j JAR依赖"></a>1. 移除Log4j JAR依赖</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;log4j&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;log4j&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h2 id="2-新增logback-JAR依赖"><a href="#2-新增logback-JAR依赖" class="headerlink" title="2. 新增logback JAR依赖"></a>2. 新增logback JAR依赖</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">&lt;!-- start logback --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;logback-access&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;log4j-over-slf4j&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;!-- logback end --&gt;</div></pre></td></tr></table></figure>
+<h2 id="3-删除log4j-properties文件，新增logback-xml文件"><a href="#3-删除log4j-properties文件，新增logback-xml文件" class="headerlink" title="3. 删除log4j.properties文件，新增logback.xml文件"></a>3. 删除log4j.properties文件，新增logback.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;configuration&gt;</div><div class="line">	&lt;appender name=&quot;CONSOLE&quot; class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;</div><div class="line">		&lt;Target&gt;System.out&lt;/Target&gt;</div><div class="line">		&lt;encoder&gt;</div><div class="line">			&lt;pattern&gt;%date [%level] [%thread] %logger&#123;80&#125; [%file : %line] %msg%n&lt;/pattern&gt;</div><div class="line">		&lt;/encoder&gt;</div><div class="line">	&lt;/appender&gt;</div><div class="line">	&lt;appender name=&quot;FILE&quot; class=&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;</div><div class="line">		&lt;encoder&gt;</div><div class="line">			&lt;pattern&gt;%date [%level] [%thread] %logger&#123;80&#125; [%file : %line] %msg%n&lt;/pattern&gt;</div><div class="line">		&lt;/encoder&gt;</div><div class="line">		&lt;rollingPolicy class=&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;</div><div class="line">			&lt;fileNamePattern&gt;$&#123;catalina.home&#125;/logs/yzf/sql%d&#123;yyyy-MM-dd&#125;.log&lt;/fileNamePattern&gt;</div><div class="line">			&lt;!-- 保留 30天数据，默认无限--&gt;</div><div class="line">			&lt;MaxHistory&gt;30&lt;/MaxHistory&gt;</div><div class="line">		&lt;/rollingPolicy&gt;</div><div class="line">	&lt;/appender&gt;</div><div class="line">	&lt;logger name=&quot;org.springframework&quot; level=&quot;INFO&quot; /&gt;</div><div class="line">	&lt;logger name=&quot;org.apache&quot; level=&quot;INFO&quot; /&gt;</div><div class="line">	&lt;logger name=&quot;com.itmuch&quot; level=&quot;WARN&quot; /&gt;</div><div class="line">	&lt;root level=&quot;INFO&quot;&gt;</div><div class="line">		&lt;appender-ref ref=&quot;CONSOLE&quot; /&gt;</div><div class="line">		&lt;appender-ref ref=&quot;FILE&quot; /&gt;</div><div class="line">	&lt;/root&gt;</div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p>log4j-over-slf4j与slf4j-log4j12不能共存，可能会引发异常，详见<a href="http://www.tuicool.com/articles/INveIf" target="_blank" rel="external">http://www.tuicool.com/articles/INveIf</a> 。</p>
+<p>slf4j-api、slf4j-log4j12以及log4j之间的关系<a href="http://blog.csdn.net/tengdazhang770960436/article/details/18006127" target="_blank" rel="external">http://blog.csdn.net/tengdazhang770960436/article/details/18006127</a></p>
+<p><a href="http://www.itmuch.com/work-sum-log4j-to-logback/" target="_blank" rel="external">原文地址</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/【SpringBoot】乱码解决方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/07/【SpringBoot】乱码解决方案/" itemprop="url">【SpringBoot】乱码解决方案</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T10:30:49+08:00">
+                2017-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/springboot/" itemprop="url" rel="index">
+                    <span itemprop="name">springboot</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ol>
+<li>修改数据库存储编码</li>
+<li>修改源码编码</li>
+<li>配置文件修改</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">spring:</div><div class="line">    http: </div><div class="line">       encoding: </div><div class="line">           force: true</div><div class="line">           charset: UTF-8</div><div class="line">           enabled: true</div><div class="line">server:</div><div class="line">    tomcat: </div><div class="line">       uri-encoding: UTF-8</div></pre></td></tr></table></figure>
+<ol>
+<li><p>controller设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">@RequestMapping中增加produces=&quot;text/plain;charset=UTF-8&quot;</div></pre></td></tr></table></figure>
+</li>
+<li><p>编码转换器</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">@Bean</div><div class="line">public HttpMessageConverter&lt;String&gt; responseBodyConverter() &#123;</div><div class="line">    StringHttpMessageConverter converter = new StringHttpMessageConverter(Charset.forName(&quot;UTF-8&quot;));</div><div class="line">    return converter;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void configureMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</div><div class="line">    super.configureMessageConverters(converters);</div><div class="line">    converters.add(responseBodyConverter());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://blog.csdn.net/wujianmin577/article/details/61197485" target="_blank" rel="external">原文参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/SpringBoot】SpringSecurity和JWT保护RestfulAPI/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1502,712 +2162,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记（三）——-聚合/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记（三）——-聚合/" itemprop="url">ElasticSearch学习笔记（三）—— 聚合</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:27:08+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>最后，我们还有一个需求需要完成：允许管理者在职员目录中进行一些分析。 Elasticsearch有一个功能叫做聚合(aggregations)，它允许你在数据上生成复杂的分析统计。它很像SQL中的GROUP BY但是功能更强大</p>
-<p>举个例子，让我们找到所有职员中最大的共同点是什么</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">  &quot;aggs&quot;: &#123;</div><div class="line">    &quot;all_interests&quot;: &#123; </div><div class="line">	  //类似以GroupBy interests</div><div class="line">      &quot;terms&quot;: &#123; &quot;field&quot;: &quot;interests&quot; &#125; </div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123; ... &#125;,</div><div class="line">   &quot;aggregations&quot;: &#123;</div><div class="line">      &quot;all_interests&quot;: &#123;</div><div class="line">         &quot;buckets&quot;: [</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;music&quot;,</div><div class="line">               &quot;doc_count&quot;: 2</div><div class="line">            &#125;,</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;forestry&quot;,</div><div class="line">               &quot;doc_count&quot;: 1</div><div class="line">            &#125;,</div><div class="line">            &#123;</div><div class="line">               &quot;key&quot;:       &quot;sports&quot;,</div><div class="line">               &quot;doc_count&quot;: 1</div><div class="line">            &#125;</div><div class="line">         ]</div><div class="line">      &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>我们可以看到两个职员对音乐有兴趣，一个喜欢林学，一个喜欢运动。这些数据并没有被预先计算好，它们是实时的从匹配查询语句的文档中动态计算生成的</p>
-<p>如果我们想知道所有姓”Smith”的人最大的共同点（兴趣爱好）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;match&quot;: &#123;</div><div class="line">      &quot;last_name&quot;: &quot;smith&quot;</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  &quot;aggs&quot;: &#123;</div><div class="line">    &quot;all_interests&quot;: &#123;</div><div class="line">      &quot;terms&quot;: &#123;</div><div class="line">        &quot;field&quot;: &quot;interests&quot;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p><strong>all_interests聚合已经变成只包含和查询语句相匹配的文档了</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line"> &quot;all_interests&quot;: &#123;</div><div class="line">    &quot;buckets&quot;: [</div><div class="line">       &#123;</div><div class="line">          &quot;key&quot;: &quot;music&quot;,</div><div class="line">          &quot;doc_count&quot;: 2</div><div class="line">       &#125;,</div><div class="line">       &#123;</div><div class="line">          &quot;key&quot;: &quot;sports&quot;,</div><div class="line">          &quot;doc_count&quot;: 1</div><div class="line">       &#125;</div><div class="line">    ]</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p>聚合也允许分级汇总。例如，让我们统计每种兴趣下职员的平均年龄</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;aggs&quot; : &#123;</div><div class="line">        &quot;all_interests&quot; : &#123;</div><div class="line">            &quot;terms&quot; : &#123; &quot;field&quot; : &quot;interests&quot; &#125;,</div><div class="line">            &quot;aggs&quot; : &#123;</div><div class="line">                &quot;avg_age&quot; : &#123;</div><div class="line">                    &quot;avg&quot; : &#123; &quot;field&quot; : &quot;age&quot; &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">  &quot;all_interests&quot;: &#123;</div><div class="line">     &quot;buckets&quot;: [</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;music&quot;,</div><div class="line">           &quot;doc_count&quot;: 2,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 28.5</div><div class="line">           &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;forestry&quot;,</div><div class="line">           &quot;doc_count&quot;: 1,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 35</div><div class="line">           &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">           &quot;key&quot;: &quot;sports&quot;,</div><div class="line">           &quot;doc_count&quot;: 1,</div><div class="line">           &quot;avg_age&quot;: &#123;</div><div class="line">              &quot;value&quot;: 25</div><div class="line">           &#125;</div><div class="line">        &#125;</div><div class="line">     ]</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-<p>该聚合结果比之前的聚合结果要更加丰富。我们依然得到了兴趣以及数量（指具有该兴趣的员工人数）的列表，但是现在每个兴趣额外拥有avg_age字段来显示具有该兴趣员工的平均年龄</p>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Elasticsearch致力于隐藏分布式系统的复杂性。以下这些操作都是在底层自动完成的：</p>
-<ul>
-<li>将你的文档分区到不同的容器或者分片(shards)中，它们可以存在于一个或多个节点中。</li>
-<li>将分片均匀的分配到各个节点，对索引和搜索做负载均衡。</li>
-<li>冗余每一个分片，防止硬件故障造成的数据丢失。</li>
-<li>将集群中任意一个节点上的请求路由到相应数据所在的节点。</li>
-<li>无论是增加节点，还是移除节点，分片都可以做到无缝的扩展和迁移。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-二-——-搜索/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-二-——-搜索/" itemprop="url">ElasticSearch学习笔记(二) —— 搜索</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:23:44+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="建立一个员工目录"><a href="#建立一个员工目录" class="headerlink" title="建立一个员工目录"></a>建立一个员工目录</h3><p>假设我们刚好在Megacorp工作，这时人力资源部门出于某种目的需要让我们创建一个员工目录，这个目录用于促进人文关怀和用于实时协同工作，所以它有以下不同的需求</p>
-<ul>
-<li>数据能够包含多个值的标签、数字和纯文本。</li>
-<li>检索任何员工的所有信息。</li>
-<li>支持结构化搜索，例如查找30岁以上的员工。</li>
-<li>支持简单的全文搜索和更复杂的短语(phrase)搜索</li>
-<li>高亮搜索结果中的关键字</li>
-<li>能够利用图表管理分析这些数据</li>
-</ul>
-<h3 id="索引员工文档"><a href="#索引员工文档" class="headerlink" title="索引员工文档"></a>索引员工文档</h3><p>首先要做的是存储员工数据，每个文档代表一个员工。</p>
-<p><strong>在Elasticsearch中存储数据的行为就叫做索引(indexing)</strong>，不过在索引之前，我们需要明确数据应该存储在哪里。</p>
-<p>在Elasticsearch中，文档归属于一种类型(type),而这些类型存在于索引(index)中，我们可以画一些简单的对比图来类比传统关系型数据库</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Relational DB -&gt; Databases -&gt; Tables -&gt; Rows -&gt; Columns</div><div class="line">Elasticsearch -&gt; Indices   -&gt; Types  -&gt; Documents -&gt; Fields</div></pre></td></tr></table></figure>
-<p>Elasticsearch集群可以包含多个索引(indices)（数据库），每一个索引可以包含多个类型(types)（表），每一个类型包含多个文档(documents)（行），然后每个文档包含多个字段(Fields)（列）</p>
-<blockquote>
-<p>「索引」含义的区分<br>你可能已经注意到索引(index)这个词在Elasticsearch中有着不同的含义，所以有必要在此做一下区分:<br>索引（名词） 如上文所述，一个索引(index)就像是传统关系数据库中的数据库，它是相关文档存储的地方，index的复数是indices 或indexes。<br>索引（动词） <strong>「索引一个文档」表示把一个文档存储到索引（名词）里，以便它可以被检索或者查询</strong>。这很像SQL中的INSERT关键字，差别是，<strong>如果文档已经存在，新的文档将覆盖旧的文档</strong>。<br>倒排索引 传统数据库为特定列增加一个索引，例如B-Tree索引来加速检索。Elasticsearch和Lucene使用一种叫做倒排索引(inverted index)的数据结构来达到相同目的。</p>
-</blockquote>
-<p><strong>注：默认情况下，文档中的所有字段都会被索引（拥有一个倒排索引），只有这样他们才是可被搜索的</strong></p>
-<p>为了创建员工目录，我们将进行如下操作</p>
-<ul>
-<li>为每个员工的文档(document)建立索引，每个文档包含了相应员工的所有信息。</li>
-<li>每个文档的类型为employee。</li>
-<li>employee类型归属于索引megacorp。</li>
-<li>megacorp索引存储在Elasticsearch集群中</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">//新增  /索引名/类型名/员工ID</div><div class="line">PUT /megacorp/employee/1</div><div class="line">&#123;</div><div class="line">    &quot;first_name&quot; : &quot;John&quot;,</div><div class="line">    &quot;last_name&quot; :  &quot;Smith&quot;,</div><div class="line">    &quot;age&quot; :        25,</div><div class="line">    &quot;about&quot; :      &quot;I love to go rock climbing&quot;,</div><div class="line">    &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">PUT /megacorp/employee/3</div><div class="line">&#123;</div><div class="line">    &quot;first_name&quot; :  &quot;Douglas&quot;,</div><div class="line">    &quot;last_name&quot; :   &quot;Fir&quot;,</div><div class="line">    &quot;age&quot; :         35,</div><div class="line">    &quot;about&quot;:        &quot;I like to build cabinets&quot;,</div><div class="line">    &quot;interests&quot;:  [ &quot;forestry&quot; ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h2><p>第一个需求是能够检索单个员工的信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/1</div></pre></td></tr></table></figure>
-<p>响应的内容中包含一些文档的元信息，John Smith的原始JSON文档包含在_source字段中</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_index&quot; :   &quot;megacorp&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;employee&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">  &quot;_version&quot; : 1,</div><div class="line">  &quot;found&quot; :    true,</div><div class="line">  &quot;_source&quot; :  &#123;</div><div class="line">      &quot;first_name&quot; :  &quot;John&quot;,</div><div class="line">      &quot;last_name&quot; :   &quot;Smith&quot;,</div><div class="line">      &quot;age&quot; :         25,</div><div class="line">      &quot;about&quot; :       &quot;I love to go rock climbing&quot;,</div><div class="line">      &quot;interests&quot;:  [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>我们通过HTTP方法GET来检索文档，同样的，我们可以使用DELETE方法删除文档，使用HEAD方法检查某文档是否存在。如果想更新已存在的文档，我们只需再PUT一次</p>
-</blockquote>
-<p>###简单搜索<br>尝试一个最简单的搜索全部员工的请求</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div></pre></td></tr></table></figure>
-<p>响应内容的hits数组中包含了我们所有的三个文档。默认情况下搜索会返回前10个结果</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;took&quot;:      6,</div><div class="line">   &quot;timed_out&quot;: false,</div><div class="line">   &quot;_shards&quot;: &#123; ... &#125;,</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      3,</div><div class="line">      &quot;max_score&quot;:  1,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;3&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Douglas&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Fir&quot;,</div><div class="line">               &quot;age&quot;:         35,</div><div class="line">               &quot;about&quot;:       &quot;I like to build cabinets&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;forestry&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;1&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            &quot;_index&quot;:         &quot;megacorp&quot;,</div><div class="line">            &quot;_type&quot;:          &quot;employee&quot;,</div><div class="line">            &quot;_id&quot;:            &quot;2&quot;,</div><div class="line">            &quot;_score&quot;:         1,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>搜索姓氏中包含“Smith”的员工。要做到这一点，我们将在命令行中使用轻量级的搜索方法。这种方法常被称作查询字符串(query string)搜索</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//在请求中依旧使用_search关键字，然后将查询语句传递给参数q=</div><div class="line">GET /megacorp/employee/_search?q=last_name:Smith</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      2,</div><div class="line">      &quot;max_score&quot;:  0.30685282,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="使用DSL语句查询"><a href="#使用DSL语句查询" class="headerlink" title="使用DSL语句查询"></a>使用DSL语句查询</h3><blockquote>
-<p>查询字符串搜索便于通过命令行完成特定(ad hoc)的搜索，但是它也有局限性（参阅简单搜索章节）。Elasticsearch提供丰富且灵活的查询语言叫做DSL查询(Query DSL),它允许你构建更加复杂、强大的查询</p>
-</blockquote>
-<p>DSL(Domain Specific Language特定领域语言)以JSON请求体的形式出现。我们可以这样表示之前关于“Smith”的查询</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//相当于/megacorp/employee/_search?q=last_name:&quot;Smith&quot;</div><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123; //查询</div><div class="line">        &quot;match&quot; : &#123; //匹配</div><div class="line">            &quot;last_name&quot; : &quot;Smith&quot; //条件...</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>我们不再使用查询字符串(query string)做为参数，而是使用请求体代替。这个请求体使用JSON表示，其中使用了match语句</p>
-<h3 id="更复杂的搜索"><a href="#更复杂的搜索" class="headerlink" title="更复杂的搜索"></a>更复杂的搜索</h3><p>让搜索稍微再变的复杂一些。我们依旧想要找到姓氏为“Smith”的员工，但是我们只想得到年龄大于30岁的员工。我们的语句将添加过滤器(filter),它使得我们高效率的执行一个结构化搜索</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;filtered&quot; : &#123;</div><div class="line">            &quot;filter&quot; : &#123;</div><div class="line">                &quot;range&quot; : &#123;</div><div class="line">                    &quot;age&quot; : &#123; &quot;gt&quot; : 30 &#125; &lt;1&gt;</div><div class="line">                &#125;</div><div class="line">            &#125;,</div><div class="line">            &quot;query&quot; : &#123;</div><div class="line">                &quot;match&quot; : &#123;</div><div class="line">                    &quot;last_name&quot; : &quot;smith&quot; &lt;2&gt;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><1> 这部分查询属于区间过滤器(range filter),它用于查找所有年龄大于30岁的数据——gt为”greater than”的缩写。</1></p>
-<p><2> 这部分查询与之前的match语句(query)一致</2></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.30685282,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="全文搜索"><a href="#全文搜索" class="headerlink" title="全文搜索"></a>全文搜索</h3><p>到目前为止搜索都很简单：搜索特定的名字，通过年龄筛选。让我们尝试一种更高级的搜索，全文搜索——一种传统数据库很难实现的功能。<br>将会搜索所有喜欢“rock climbing”的员工</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>使用了之前的match查询，从about字段中搜索”rock climbing”，我们得到了两个匹配文档</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      2,</div><div class="line">      &quot;max_score&quot;:  0.16273327,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;: 0.16273327, &lt;1&gt;</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;: 0.016878016, &lt;2&gt;</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;Jane&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         32,</div><div class="line">               &quot;about&quot;:       &quot;I like to collect rock albums&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><1><2> 结果相关性评分</2></1></p>
-<p>默认情况下，Elasticsearch根据结果相关性评分来对结果集进行排序，所谓的「结果相关性评分」就是文档与查询条件的匹配程度。很显然，排名第一的John Smith的about字段明确的写到“rock climbing”。<br>但是为什么Jane Smith也会出现在结果里呢？原因是“rock”在她的abuot字段中被提及了。因为只有“rock”被提及而“climbing”没有，所以她的_score要低于John</p>
-<blockquote>
-<p>这个例子很好的解释了Elasticsearch如何在各种文本字段中进行全文搜索，并且返回相关性最大的结果集。相关性(relevance)的概念在Elasticsearch中非常重要，而这个概念在传统关系型数据库中是不可想象的，因为传统数据库对记录的查询只有匹配或者不匹配</p>
-</blockquote>
-<h3 id="短语搜索"><a href="#短语搜索" class="headerlink" title="短语搜索"></a>短语搜索</h3><p>目前我们可以在字段中搜索单独的一个词，这挺好的，但是有时候你想要确切的匹配若干个单词或者短语(phrases)。例如我们想要查询同时包含”rock”和”climbing”（并且是相邻的）的员工记录</p>
-<p>只要将match查询变更为match_phrase查询即可</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match_phrase&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.23013961,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;:         0.23013961,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="高亮搜索"><a href="#高亮搜索" class="headerlink" title="高亮搜索"></a>高亮搜索</h3><p>很多应用喜欢从每个搜索结果中高亮(highlight)匹配到的关键字，这样用户可以知道为什么这些文档和查询相匹配。在Elasticsearch中高亮片段是非常容易的</p>
-<p>在之前的语句上增加highlight参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">GET /megacorp/employee/_search</div><div class="line">&#123;</div><div class="line">    &quot;query&quot; : &#123;</div><div class="line">        &quot;match_phrase&quot; : &#123;</div><div class="line">            &quot;about&quot; : &quot;rock climbing&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;,</div><div class="line">    &quot;highlight&quot;: &#123;</div><div class="line">        &quot;fields&quot; : &#123;</div><div class="line">            &quot;about&quot; : &#123;&#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>当我们运行这个语句时，会命中与之前相同的结果，但是在返回结果中会有一个新的部分叫做highlight，这里包含了来自about字段中的文本，并且用<em></em>来标识匹配到的单词</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   ...</div><div class="line">   &quot;hits&quot;: &#123;</div><div class="line">      &quot;total&quot;:      1,</div><div class="line">      &quot;max_score&quot;:  0.23013961,</div><div class="line">      &quot;hits&quot;: [</div><div class="line">         &#123;</div><div class="line">            ...</div><div class="line">            &quot;_score&quot;:         0.23013961,</div><div class="line">            &quot;_source&quot;: &#123;</div><div class="line">               &quot;first_name&quot;:  &quot;John&quot;,</div><div class="line">               &quot;last_name&quot;:   &quot;Smith&quot;,</div><div class="line">               &quot;age&quot;:         25,</div><div class="line">               &quot;about&quot;:       &quot;I love to go rock climbing&quot;,</div><div class="line">               &quot;interests&quot;: [ &quot;sports&quot;, &quot;music&quot; ]</div><div class="line">            &#125;,</div><div class="line">            &quot;highlight&quot;: &#123;</div><div class="line">               &quot;about&quot;: [</div><div class="line">                  &quot;I love to go &lt;em&gt;rock&lt;/em&gt; &lt;em&gt;climbing&lt;/em&gt;&quot; &lt;1&gt;</div><div class="line">               ]</div><div class="line">            &#125;</div><div class="line">         &#125;</div><div class="line">      ]</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-一-——-入门/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-一-——-入门/" itemprop="url">ElasticSearch学习笔记(一) —— 入门</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:21:09+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="ElasticSearch是什么"><a href="#ElasticSearch是什么" class="headerlink" title="ElasticSearch是什么"></a>ElasticSearch是什么</h2><blockquote>
-<p>Elasticsearch是一个基于Apache Lucene(TM)的开源搜索引擎。无论在开源还是专有领域，Lucene可以被认为是迄今为止最先进、性能最好的、功能最全的搜索引擎库。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>Elasticsearch也使用Java开发并使用Lucene作为其核心来实现所有索引和搜索的功能，但是它的目的是通过简单的RESTful API来隐藏Lucene的复杂性，从而让全文搜索变得简单</p>
-</blockquote>
-<ul>
-<li>分布式的实时文件存储，每个字段都被索引并可被搜索</li>
-<li>分布式的实时分析搜索引擎</li>
-<li>可以扩展到上百台服务器，处理PB级结构化或非结构化数据</li>
-</ul>
-<p>上手Elasticsearch非常容易。它提供了许多合理的缺省值，并对初学者隐藏了复杂的搜索引擎理论。它开箱即用（安装即可使用），只需很少的学习既可在生产环境中使用</p>
-<hr>
-<h3 id="与Elasticsearch交互"><a href="#与Elasticsearch交互" class="headerlink" title="与Elasticsearch交互"></a>与Elasticsearch交互</h3><p>如何与Elasticsearch交互取决于你是否使用Java</p>
-<p><strong>Java API</strong></p>
-<p>Elasticsearch为Java用户提供了两种内置客户端：</p>
-<h4 id="节点客户端-node-client"><a href="#节点客户端-node-client" class="headerlink" title="节点客户端(node client)"></a>节点客户端(node client)</h4><p>节点客户端以<strong>无数据节点(none data node)身份加入集群</strong>，换言之，它自己不存储任何数据，但是它知道数据在集群中的具体位置，并且<strong>能够直接转发请求到对应的节点上</strong>。</p>
-<h4 id="传输客户端-Transport-client"><a href="#传输客户端-Transport-client" class="headerlink" title="传输客户端(Transport client)"></a>传输客户端(Transport client)</h4><p>这个更轻量的传输客户端能够发送请求到远程集群。它自己不加入集群，只是简单<strong>转发请求给集群中的节点</strong>。</p>
-<p><strong>两个Java客户端都通过9300端口与集群交互，使用Elasticsearch传输协议(Elasticsearch Transport Protocol)</strong></p>
-<p><strong>集群中的节点之间也通过9300端口进行通信。如果此端口未开放，你的节点将不能组成集群</strong></p>
-<blockquote>
-<p>TIP<br>Java客户端所在的Elasticsearch版本必须与集群中其他节点一致，否则，它们可能互相无法识别。</p>
-</blockquote>
-<h3 id="基于HTTP协议，以JSON为数据交互格式的RESTful-API"><a href="#基于HTTP协议，以JSON为数据交互格式的RESTful-API" class="headerlink" title="基于HTTP协议，以JSON为数据交互格式的RESTful API"></a>基于HTTP协议，以JSON为数据交互格式的RESTful API</h3><p><strong>其他所有程序语言都可以使用RESTful API，通过9200端口的与Elasticsearch进行通信</strong>，你可以使用你喜欢的WEB客户端，事实上，如你所见，你甚至可以通过curl命令与Elasticsearch通信</p>
-<p>请求格式和普通的Http请求相同<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -X&lt;VERB&gt; &apos;&lt;PROTOCOL&gt;://&lt;HOST&gt;:&lt;PORT&gt;/&lt;PATH&gt;?&lt;QUERY_STRING&gt;&apos; -d &apos;&lt;BODY&gt;&apos;</div></pre></td></tr></table></figure></p>
-<ul>
-<li>VERB HTTP方法：GET, POST, PUT, HEAD, DELETE</li>
-<li>PROTOCOL http或者https协议（只有在Elasticsearch前面有https代理的时候可用）</li>
-<li>HOST Elasticsearch集群中的任何一个节点的主机名，如果是在本地的节点，那么就叫localhost</li>
-<li>PORT Elasticsearch HTTP服务所在的端口，默认为9200</li>
-<li>PATH API路径（例如_count将返回集群中文档的数量），PATH可以包含多个组件，例如_cluster/stats或者_nodes/stats/jvm</li>
-<li>QUERY_STRING 一些可选的查询请求参数，例如?pretty参数将使请求返回更加美观易读的JSON数据</li>
-<li>BODY 一个JSON格式的请求主体（如果请求需要的话）</li>
-</ul>
-<p>e.g 为了计算集群中的文档数量</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">curl -XGET &apos;http://localhost:9200/_count?pretty&apos; -d &apos;</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Elasticsearch返回一个类似200 OK的HTTP状态码和JSON格式的响应主体（除了HEAD请求）。上面的请求会得到如下的JSON格式的响应主体</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;count&quot; : 0,</div><div class="line">    &quot;_shards&quot; : &#123;</div><div class="line">        &quot;total&quot; : 5,</div><div class="line">        &quot;successful&quot; : 5,</div><div class="line">        &quot;failed&quot; : 0</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>我们看不到HTTP头是因为我们没有让curl显示它们，如果要显示，使用curl命令后跟-i参数:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XGET &apos;localhost:9200/&apos;</div></pre></td></tr></table></figure>
-<p>对于本书的其余部分，我们将简写curl请求中重复的部分，例如主机名和端口，还有curl命令本身。<br>一个完整的请求形如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">curl -XGET &apos;localhost:9200/_count?pretty&apos; -d &apos;</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;&apos;</div></pre></td></tr></table></figure>
-<p>将简写成这样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">GET /_count</div><div class="line">&#123;</div><div class="line">    &quot;query&quot;: &#123;</div><div class="line">        &quot;match_all&quot;: &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>事实上，在Sense控制台中也使用了与上面相同的格式</p>
-<hr>
-<h3 id="面向文档"><a href="#面向文档" class="headerlink" title="面向文档"></a>面向文档</h3><blockquote>
-<p>Elasticsearch是面向文档(document oriented)的，这意味着它可以<strong>存储整个对象或文档(document)</strong>。然而<strong>它不仅仅是存储，还会索引(index)每个文档的内容使之可以被搜索</strong>。<em>在Elasticsearch中，你可以对文档（而非成行成列的数据）进行索引、搜索、排序、过滤。这种理解数据的方式与以往完全不同，这也是Elasticsearch能够执行复杂的全文搜索的原因之一</em></p>
-</blockquote>
-<h3 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h3><blockquote>
-<p>ELasticsearch使用Javascript对象符号(JavaScript Object Notation)，也就是JSON，作为文档序列化格式<br>使用JSON格式来表示一个用户对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;email&quot;:      &quot;john@smith.com&quot;,</div><div class="line">    &quot;first_name&quot;: &quot;John&quot;,</div><div class="line">    &quot;last_name&quot;:  &quot;Smith&quot;,</div><div class="line">    &quot;info&quot;: &#123;</div><div class="line">        &quot;bio&quot;:         &quot;Eco-warrior and defender of the weak&quot;,</div><div class="line">        &quot;age&quot;:         25,</div><div class="line">        &quot;interests&quot;: [ &quot;dolphins&quot;, &quot;whales&quot; ]</div><div class="line">    &#125;,</div><div class="line">    &quot;join_date&quot;: &quot;2014/05/01&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-</blockquote>
-<p><a href="https://es.xiaoleilu.com/010_Intro/15_API.html" target="_blank" rel="external">官方文档</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/" itemprop="url">【SpringBoot】 SpringBoot整合Mybatis</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T13:47:40+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
-                    <span itemprop="name">SpringBoot</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SpringBoot/Mybatis/" itemprop="url" rel="index">
-                    <span itemprop="name">Mybatis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="1-创建SpringBoot项目"><a href="#1-创建SpringBoot项目" class="headerlink" title="1. 创建SpringBoot项目"></a>1. 创建SpringBoot项目</h2><blockquote>
-<p><a href="https://start.spring.io/" target="_blank" rel="external">https://start.spring.io/</a></p>
-</blockquote>
-<h2 id="2-pom-xml文件"><a href="#2-pom-xml文件" class="headerlink" title="2.pom.xml文件"></a>2.pom.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.5.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/parent&gt;</div><div class="line"> </div><div class="line">&lt;properties&gt;</div><div class="line">    &lt;mybatis-spring-boot&gt;1.2.0&lt;/mybatis-spring-boot&gt;</div><div class="line">    &lt;mysql-connector&gt;5.1.39&lt;/mysql-connector&gt;</div><div class="line">&lt;/properties&gt;</div><div class="line"> </div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;test&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;!-- start mybatis --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mybatis-spring-boot&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- mybatis end --&gt;</div><div class="line">   </div><div class="line">    &lt;!-- start mysql --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;mysql&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mysql-connector&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;!-- mysql end --&gt;</div><div class="line">     </div><div class="line">    &lt;!-- start junit --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;junit&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;junit&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;4.12&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- junit end --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
-<h2 id="3-application-yml"><a href="#3-application-yml" class="headerlink" title="3.application.yml"></a>3.application.yml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">     typeAliasesPackage: com.alex.spring.domain </div><div class="line">     mapperLocations: classpath:mapper/*.xml</div></pre></td></tr></table></figure>
-<ul>
-<li>typeAliasesPackage: 指向实体类包路径</li>
-<li>mapperLocations: classpath 路径下 mapper 包下，* 代表会扫描所有 xml 文件</li>
-</ul>
-<p>其他配置文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">    config: #配置文件名称</div><div class="line">    typeHandlersPackage: #处理器包路径</div><div class="line">    check-config-location: #检查 mybatis 配置是否存在，一般命名为 mybatis-config.xml</div><div class="line">    executorType: #执行模式。默认是 SIMPLE3.在 Application 应用启动类添加注解 MapperScan</div></pre></td></tr></table></figure>
-<h2 id="3-启动文件添加注解"><a href="#3-启动文件添加注解" class="headerlink" title="3. 启动文件添加注解"></a>3. 启动文件添加注解</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">@MapperScan(&quot;com.alex.spring.dao&quot;) //扫描mapper接口</div><div class="line">public class SpringMybatisApplication&#123;</div><div class="line">		public static void main(String[] args) &#123;</div><div class="line">       		 SpringApplication.run(SpringMybatisApplication.class,args);</div><div class="line">  	    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="4-创建实体"><a href="#4-创建实体" class="headerlink" title="4.创建实体"></a>4.创建实体</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class User&#123;</div><div class="line">      private String userId;</div><div class="line">      private String userName;</div><div class="line">      private String userPass;</div><div class="line">      private String userImage;</div><div class="line">      //省略getter/setter方法</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="5-创建Mapper接口"><a href="#5-创建Mapper接口" class="headerlink" title="5.创建Mapper接口"></a>5.创建Mapper接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface UserDao&#123;</div><div class="line">     </div><div class="line">     User findById(@Param(&quot;userId&quot;) String userId);</div><div class="line">     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h2><p><a href="http://www.bysocket.com/?p=1610" target="_blank" rel="external">原文参考</a><br><a href="https://segmentfault.com/a/1190000004316491" target="_blank" rel="external">application.properties属性详解</a><br><a href="https://git.oschina.net/baomidou/mybatis-plus" target="_blank" rel="external">mybatis增强工具包</a><br><a href="https://git.oschina.net/free/Mybatis_PageHelper" target="_blank" rel="external">mybatis分页助手</a><br><a href="https://git.oschina.net/ht896632/mybatis-generator-core" target="_blank" rel="external">mybatis自动生成工具</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2252,7 +2211,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">142</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2263,7 +2222,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">55</span>
+                <span class="site-state-item-count">57</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2274,7 +2233,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">107</span>
+                <span class="site-state-item-count">108</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

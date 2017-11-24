@@ -254,6 +254,853 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/Eureka源码解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/24/Eureka源码解析/" itemprop="url">Eureka源码解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T16:53:44+08:00">
+                2017-11-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>SpringBoot注册到EurekaServer服务器列表</p>
+<ol>
+<li><code>@EnableDiscoveryClient</code> 激活Eureka中的DiscoveryClient实现</li>
+<li><code>eureka.client.serviceUrl.defaultZone=http://localhost:10010/eureka/</code> 指定服务器注册中心</li>
+</ol>
+<h3 id="EnableDiscoveryClient实现"><a href="#EnableDiscoveryClient实现" class="headerlink" title="@EnableDiscoveryClient实现"></a>@EnableDiscoveryClient实现</h3><p>开启DiscoveryClient</p>
+<pre><code>/**
+ * Annotation to enable a DiscoveryClient implementation.
+ * @author Spencer Gibb
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Import(EnableDiscoveryClientImportSelector.class)
+public @interface EnableDiscoveryClient {
+
+}
+</code></pre><h3 id="DiscoveryClient"><a href="#DiscoveryClient" class="headerlink" title="DiscoveryClient"></a>DiscoveryClient</h3><p>DiscoveryClient职责</p>
+<ol>
+<li>向EurekaServer注册服务</li>
+<li>向EurekaServer租约续期</li>
+<li>当服务器关闭时，取消租约</li>
+<li>查询EureServer中的服务列表</li>
+<li>EurekaClient需要配置一个EurekaServer URL列表</li>
+</ol>
+<p>根据配置属性<code>eureka.client.serviceUrl.defaultZone</code>从DiscoveryClient中找到serviceUrl</p>
+<pre><code>private final EndpointUtils.ServiceUrlRandomizer urlRandomizer;
+</code></pre><p>EndpointUtils中找到<code>getServiceUrlsFromConfig</code>方法</p>
+<blockquote>
+<p>Get the list of all eureka service urls from properties file for the eureka client to talk to.<br>从配置文件中得到所有eureka的serviceUrl与EurekaClient进行对话</p>
+</blockquote>
+<p>参数</p>
+<ul>
+<li>clientConfig clientConfig中使用</li>
+<li>instanceZone 客户端所在的Zone</li>
+<li>preferSameZone 必须选择与客户端相同的Zone</li>
+</ul>
+<pre><code>     public static List&lt;String&gt; getServiceUrlsFromConfig(EurekaClientConfig clientConfig, String instanceZone, boolean preferSameZone) {
+    List&lt;String&gt; orderedUrls = new ArrayList&lt;String&gt;();
+    String region = getRegion(clientConfig);
+    String[] availZones = clientConfig.getAvailabilityZones(clientConfig.getRegion());
+    if (availZones == null || availZones.length == 0) {
+        availZones = new String[1];
+        availZones[0] = DEFAULT_ZONE;
+    }
+    logger.debug(&quot;The availability zone for the given region {} are {}&quot;, region, availZones);
+    int myZoneOffset = getZoneOffset(instanceZone, preferSameZone, availZones);
+
+    List&lt;String&gt; serviceUrls = clientConfig.getEurekaServerServiceUrls(availZones[myZoneOffset]);
+    if (serviceUrls != null) {
+        orderedUrls.addAll(serviceUrls);
+    }
+    int currentOffset = myZoneOffset == (availZones.length - 1) ? 0 : (myZoneOffset + 1);
+    while (currentOffset != myZoneOffset) {
+        serviceUrls = clientConfig.getEurekaServerServiceUrls(availZones[currentOffset]);
+        if (serviceUrls != null) {
+            orderedUrls.addAll(serviceUrls);
+        }
+        if (currentOffset == (availZones.length - 1)) {
+            currentOffset = 0;
+        } else {
+            currentOffset++;
+        }
+    }
+
+    if (orderedUrls.size() &lt; 1) {
+        throw new IllegalArgumentException(&quot;DiscoveryClient: invalid serviceUrl specified!&quot;);
+    }
+    return orderedUrls;
+}
+</code></pre><p>方法中可以得到两个内容Region、Zone</p>
+<pre><code>String region = getRegion(clientConfig);
+String[] availZones = clientConfig.getAvailabilityZones(clientConfig.getRegion());
+</code></pre><p>tip：<strong>一个微服务只可以属于一个region</strong>，不特别配置，region和zone值就为default，如果需要自定义可以通过<code>eureka.client.region</code>设置</p>
+<pre><code>public static String getRegion(EurekaClientConfig clientConfig) {
+    String region = clientConfig.getRegion();
+    if (region == null) {
+        region = DEFAULT_REGION;
+    }
+    region = region.trim().toLowerCase();
+    return region;
+}
+</code></pre><p>EurekaClientConfigBean是EurekaClientConfig实现类</p>
+<p><code>getAvailabilityZones</code>如果未配置region，会采用默认defaultZone，这就是<code>eureka.client.serviceUrl.defaultZone</code>配置参数的由来</p>
+<p>   public String[] getAvailabilityZones(String region) {<br>        String value = this.availabilityZones.get(region);<br>        if (value == null) {<br>            value = DEFAULT_ZONE;<br>        }<br>        return value.split(“,”);<br>    }</p>
+<p><strong>Region和Zone之间的关系是一对多关系</strong></p>
+<h2 id="ServiceUrls"><a href="#ServiceUrls" class="headerlink" title="ServiceUrls"></a>ServiceUrls</h2><p>具体实现</p>
+<pre><code>public List&lt;String&gt; getEurekaServerServiceUrls(String myZone) {
+    String serviceUrls = this.serviceUrl.get(myZone);
+    if (serviceUrls == null || serviceUrls.isEmpty()) {
+        serviceUrls = this.serviceUrl.get(DEFAULT_ZONE);
+    }
+    if (!StringUtils.isEmpty(serviceUrls)) {
+        final String[] serviceUrlsSplit = StringUtils.commaDelimitedListToStringArray(serviceUrls);
+        List&lt;String&gt; eurekaServiceUrls = new ArrayList&lt;&gt;(serviceUrlsSplit.length);
+        for (String eurekaServiceUrl : serviceUrlsSplit) {
+            if (!endsWithSlash(eurekaServiceUrl)) {
+                eurekaServiceUrl += &quot;/&quot;;
+            }
+            eurekaServiceUrls.add(eurekaServiceUrl);
+        }
+        return eurekaServiceUrls;
+    }
+
+    return new ArrayList&lt;&gt;();
+}
+</code></pre><p>在获取了Region和Zone信息之后，才开始真正加载Eureka Server的具体地址。它根据传入的参数按一定算法确定加载位于哪一个Zone配置的serviceUrls</p>
+<pre><code>int myZoneOffset = getZoneOffset(instanceZone, preferSameZone, availZones);
+List&lt;String&gt; serviceUrls = clientConfig.getEurekaServerServiceUrls(availZones[myZoneOffset]);
+</code></pre><p><strong><code>eureka.client.serviceUrl.defaultZone</code>属性可以配置多个，并且需要通过逗号分隔</strong></p>
+<h2 id="服务注册原理"><a href="#服务注册原理" class="headerlink" title="服务注册原理"></a>服务注册原理</h2><pre><code>public DiscoveryClient(ApplicationInfoManager applicationInfoManager, final EurekaClientConfig config, AbstractDiscoveryClientOptionalArgs args) {
+    this(applicationInfoManager, config, args, new Provider&lt;BackupRegistry&gt;() {
+        private volatile BackupRegistry backupRegistryInstance;
+
+        @Override
+        public synchronized BackupRegistry get() {
+            if (backupRegistryInstance == null) {
+                String backupRegistryClassName = config.getBackupRegistryImpl();
+                if (null != backupRegistryClassName) {
+                    try {
+                        backupRegistryInstance = (BackupRegistry) Class.forName(backupRegistryClassName).newInstance();
+                        logger.info(&quot;Enabled backup registry of type {}&quot;, backupRegistryInstance.getClass());
+                    } catch (InstantiationException e) {
+                        logger.error(&quot;Error instantiating BackupRegistry.&quot;, e);
+                    } catch (IllegalAccessException e) {
+                        logger.error(&quot;Error instantiating BackupRegistry.&quot;, e);
+                    } catch (ClassNotFoundException e) {
+                        logger.error(&quot;Error instantiating BackupRegistry.&quot;, e);
+                    }
+                }
+
+                if (backupRegistryInstance == null) {
+                    logger.warn(&quot;Using default backup registry implementation which does not do anything.&quot;);
+                    backupRegistryInstance = new NotImplementedRegistryImpl();
+                }
+            }
+
+            return backupRegistryInstance;
+        }
+    });
+}
+</code></pre><h2 id="服务注册原理-1"><a href="#服务注册原理-1" class="headerlink" title="服务注册原理"></a>服务注册原理</h2><p><code>initScheduledTasks</code></p>
+<pre><code>//判断是否应该被发现通过Eureka注册的实例
+if (clientConfig.shouldRegisterWithEureka()) {
+    ...
+    //复制因子
+    instanceInfoReplicator = new InstanceInfoReplicator(
+                this,
+                instanceInfo,
+                clientConfig.getInstanceInfoReplicationIntervalSeconds(),
+                2);     
+    ..
+}
+</code></pre><p><code>InstanceInfoReplicator</code> </p>
+<pre><code>public void run() {
+    try {
+        discoveryClient.refreshInstanceInfo();
+
+        Long dirtyTimestamp = instanceInfo.isDirtyWithTime();
+        if (dirtyTimestamp != null) {
+             //真正执行服务注册的地方 
+            discoveryClient.register();
+            instanceInfo.unsetIsDirty(dirtyTimestamp);
+        }
+    } catch (Throwable t) {
+        logger.warn(&quot;There was a problem with the instance info replicator&quot;, t);
+    } finally {
+        Future next = scheduler.schedule(this, replicationIntervalSeconds, TimeUnit.SECONDS);
+        scheduledPeriodicRef.set(next);
+    }
+}
+</code></pre><p><code>register</code></p>
+<p>eureka通过rest服务调用</p>
+<pre><code>boolean register() throws Throwable {
+    logger.info(PREFIX + &quot;{}: registering service...&quot;, appPathIdentifier);
+    EurekaHttpResponse&lt;Void&gt; httpResponse;
+    try {
+        //通过rest进行调用的，同时传入com.netflix.appinfo.InstanceInfo元数据对象
+        httpResponse = eurekaTransport.registrationClient.register(instanceInfo);
+    } catch (Exception e) {
+        logger.warn(PREFIX + &quot;{} - registration failed {}&quot;, appPathIdentifier, e.getMessage(), e);
+        throw e;
+    }
+    if (logger.isInfoEnabled()) {
+        logger.info(PREFIX + &quot;{} - registration status: {}&quot;, appPathIdentifier, httpResponse.getStatusCode());
+    }
+    return httpResponse.getStatusCode() == 204;
+}
+</code></pre><h2 id="服务获取与服务续约"><a href="#服务获取与服务续约" class="headerlink" title="服务获取与服务续约"></a>服务获取与服务续约</h2><pre><code>if (clientConfig.shouldFetchRegistry()) {
+        // registry cache refresh timer
+        int registryFetchIntervalSeconds = clientConfig.getRegistryFetchIntervalSeconds();
+        int expBackOffBound = clientConfig.getCacheRefreshExecutorExponentialBackOffBound();
+        scheduler.schedule(
+                new TimedSupervisorTask(
+                        &quot;cacheRefresh&quot;,
+                        scheduler,
+                        cacheRefreshExecutor,
+                        registryFetchIntervalSeconds,
+                        TimeUnit.SECONDS,
+                        expBackOffBound,
+                        new CacheRefreshThread()
+                ),
+                registryFetchIntervalSeconds, TimeUnit.SECONDS);
+    }
+</code></pre><p>时间控制参数<code>eureka.instance.lease-renewal-interval-in-seconds=30</code><br>和 <code>eureka.instance.lease-expiration-duration-in-seconds=90</code></p>
+<p>服务续约</p>
+<pre><code>    boolean renew() {
+    EurekaHttpResponse&lt;InstanceInfo&gt; httpResponse;
+    try {
+        httpResponse = eurekaTransport.registrationClient.sendHeartBeat(instanceInfo.getAppName(), instanceInfo.getId(), instanceInfo, null);
+        logger.debug(PREFIX + &quot;{} - Heartbeat status: {}&quot;, appPathIdentifier, httpResponse.getStatusCode());
+        if (httpResponse.getStatusCode() == 404) {
+            REREGISTER_COUNTER.increment();
+            logger.info(PREFIX + &quot;{} - Re-registering apps/{}&quot;, appPathIdentifier, instanceInfo.getAppName());
+            long timestamp = instanceInfo.setIsDirtyWithTime();
+            boolean success = register();
+            if (success) {
+                instanceInfo.unsetIsDirty(timestamp);
+            }
+            return success;
+        }
+        return httpResponse.getStatusCode() == 200;
+    } catch (Throwable e) {
+        logger.error(PREFIX + &quot;{} - was unable to send heartbeat!&quot;, appPathIdentifier, e);
+        return false;
+    }
+}
+</code></pre><p><a href="http://blog.didispace.com/springcloud-sourcecode-eureka/" target="_blank" rel="external">Eureka源码分析</a></p>
+<p><a href="http://xujin.org/sc/sc-netflix-eureka/" target="_blank" rel="external">Eureka架构</a></p>
+<p><a href="http://blog.spring-cloud.io/blog/sc-eureka.html" target="_blank" rel="external">Eureka源码排坑处</a></p>
+<p><a href="http://nobodyiam.com/2016/06/25/dive-into-eureka/" target="_blank" rel="external">Eureka内部实现细节</a></p>
+<p><a href="https://github.com/Netflix/eureka/wiki" target="_blank" rel="external">Eureka官方文档</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/Eureka源码解析——项目结构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/24/Eureka源码解析——项目结构/" itemprop="url">Eureka源码解析——项目结构</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T16:53:09+08:00">
+                2017-11-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Eureka源码解析"><a href="#Eureka源码解析" class="headerlink" title="Eureka源码解析"></a>Eureka源码解析</h1><h2 id="EurekaClient"><a href="#EurekaClient" class="headerlink" title="EurekaClient"></a>EurekaClient</h2><ul>
+<li><p><code>com.netflix.appinfo</code> Eureka应用配置文件信息</p>
+</li>
+<li><p><code>com.netflix.discovery</code> EurekaClient注册与发现相关功能</p>
+<ul>
+<li><code>EurekaClient</code> 注册发现客户端接口</li>
+<li><code>DiscoveryClient</code> 注册发现客户端实现类</li>
+<li><a href="https://baike.baidu.com/item/Guice/3227716?fr=aladdin" target="_blank" rel="external"><code>Guice</code></a> 使用Google轻量级IoC依赖注入框架，避免与Spring冲突 <a href="http://www.blogjava.net/xylz/archive/2009/12/22/306955.html" target="_blank" rel="external">Guice入门教程</a></li>
+<li><code>converters</code> Eureka 内部传输数据编解码转换器。支持XML和JSON的格式</li>
+<li><code>provider</code> 自定义的Jersey 请求和响应的序列化和反序列化实现</li>
+<li><code>providers</code> 实现 javax.inject.Provider 接口，设置 EurekaClientConfig (Eureka 客户端配置)的生成工厂 <a href="http://blog.csdn.net/derekjiang/article/details/7231490" target="_blank" rel="external">GoogleGuice入门介绍</a></li>
+<li><code>shared</code> EurekaClient 和 EurekaServer 注册发现相关的共享重用的代码</li>
+<li><code>util</code> 工具类</li>
+<li><code>endpoint</code> 未知</li>
+</ul>
+</li>
+</ul>
+<h2 id="EurekaClientArchaius2"><a href="#EurekaClientArchaius2" class="headerlink" title="EurekaClientArchaius2"></a>EurekaClientArchaius2</h2><p><a href="http://blog.csdn.net/zhangfb95/article/details/48297907" target="_blank" rel="external">Archaius是Netflix开源的配置管理组件</a></p>
+<h2 id="EurekaClientJersey2"><a href="#EurekaClientJersey2" class="headerlink" title="EurekaClientJersey2"></a>EurekaClientJersey2</h2><p><a href="https://baike.baidu.com/item/Jersey/17577306?fr=aladdin" target="_blank" rel="external">Jersey 是 JAX-RS（JSR311）开源参考实现，用于构建 RESTful WebService</a></p>
+<p><a href="http://blog.csdn.net/a19881029/article/details/43056429" target="_blank" rel="external">Jersey基本使用</a></p>
+<ul>
+<li>EurekaServer 使用 Jersey Server 创建 RESTful Server </li>
+<li>EurekaClient 使用 Jersey Client 请求 Eureka-Server </li>
+</ul>
+<h2 id="EurekaCore"><a href="#EurekaCore" class="headerlink" title="EurekaCore"></a>EurekaCore</h2><ul>
+<li><code>com.netflix.eureka</code> 为 Eureka-Server 的功能实现<ul>
+<li><code>EurekaBootStrap</code> EurekaServer启动类</li>
+<li><code>cluster</code> EurekaServer 集群数据复制相关</li>
+<li><code>lease</code> 应用注册后的租约管理( 注册 / 取消 / 续期 / 过期 )</li>
+<li><code>resources</code> 基于 Jersey Server 实现，相当于 Spring MVC 的控制层代码</li>
+<li><code>transport</code>基于com.netflix.discovery.shared.transport封装实现</li>
+</ul>
+</li>
+</ul>
+<h3 id="EurekaResources"><a href="#EurekaResources" class="headerlink" title="EurekaResources"></a>EurekaResources</h3><p>运维后台管理界面</p>
+<h2 id="EurekaServer"><a href="#EurekaServer" class="headerlink" title="EurekaServer"></a>EurekaServer</h2><p>打war包:EurekaClient + EurekaCore + EurekaResources</p>
+<h3 id="EurekaServerGovernator"><a href="#EurekaServerGovernator" class="headerlink" title="EurekaServerGovernator"></a>EurekaServerGovernator</h3><p><a href="http://www.codeweblog.com/guice-%E6%A1%86%E6%9E%B6%E6%89%A9%E5%B1%95-governator/" target="_blank" rel="external">使用 Netflix Governator 管理 Eureka-Server 的生命周期——governator</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/untitled-1511491947278/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/24/untitled-1511491947278/" itemprop="url">性能调优——编译优化技术</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T10:52:27+08:00">
+                2017-11-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>即时编译器JIT：为了提高热点代码执行效率，虚拟机将热点代码编译成本地平台相关机器码，并进行各种层次的优化，完成此任务的编译器就叫即时编译器</p>
+<p>什么是热点代码？</p>
+<p>热点代码就是程序中频繁执行的方法或者代码块</p>
+<p>如何判定热点代码？</p>
+<p>基于采样的热点探测：周期性的检查各个线程中的栈顶，某些代码（方法）经常出现于栈顶，就属于热点代码</p>
+<p>该方法的优缺点？<br>优点：获取方法之间调用关系（通过堆栈展开）<br>缺点：无法精确到具体热度，容易受线程阻塞等外界因素扰乱热点探测</p>
+<p>基于计数器的热点探测：为每个方法（代码块）设置计数器，统计执行次数，执行次数超过一定阈值就被认为是热点方法</p>
+<p>该方法的优缺点？<br>优点：可以获取精确热度<br>缺点：需要为每个方法建立计数器，不能获取方法之间具体调用关系</p>
+<p>Tips: HotSpot虚拟机基于计数器探测方法(方法调用计数器和回边计数器)。</p>
+<p>计数器超过一定阈值就会触发JIT编译</p>
+<p>默认阈值Client模式下是1500次，Server模式下是10000。可以通过-XX:CompileThresold和-XX :BackEdgeThresold进行设置。还可通过-XX:OnStackReplacePercentage间接设置</p>
+<p>计算公式：</p>
+<p>虚拟机在Client模式下：</p>
+<p>回边计数器阈值计算公式 = 方法调用计数器阈值 * OSR比率(OnStackReplacePercentage) / 100</p>
+<p>OnStackReplacePercentage默认值933。 都取默认值的情况下，阈值为13995</p>
+<p>虚拟机在Server模式下：</p>
+<p>回边计数器阈值计算公式 = 方法调用计数器阈值 * OSR比率(OnStackReplacePercentage) - 解释器监控比率（InterpreterProfilePercentage） / 100</p>
+<p>OnStackReplacePercentage默认值140。 InterpreterProfilePercentage默认值33，都取默认值的情况下，阈值为10700</p>
+<p>编译过程</p>
+<p>JVM参数</p>
+<p>-XX:printCompilation 要求虚拟机在JIT时将编译成本地代码的方法名称打印出来</p>
+<p>-XX:+PrintCFGToFile<br>-XX:PrintIdealGraphFile<br>将虚拟机各个级段的数据输出到文件</p>
+<p>-XX:CompileThresold<br>-XX :BackEdgeThresold<br>-XX:OnStackReplacePercentage</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/untitled-1511491469418/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/24/untitled-1511491469418/" itemprop="url">性能调优——线程安全和锁优化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T10:44:29+08:00">
+                2017-11-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/深入虚拟机/" itemprop="url" rel="index">
+                    <span itemprop="name">深入虚拟机</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="线程安全的概念"><a href="#线程安全的概念" class="headerlink" title="线程安全的概念"></a>线程安全的概念</h2><p>通过搜索引擎搜索出来的结果是：“一个变量可以安全的被多个线程同时使用，就是线程安全的”。这样的描述并不准确。有一个更恰当的定义</p>
+<p>“当多线程访问同一个对象，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那这个对象就是安全的</p>
+<h2 id="Java中的线程安全"><a href="#Java中的线程安全" class="headerlink" title="Java中的线程安全"></a>Java中的线程安全</h2><p>线程安全的前提是：存在多个线程之间对共享数据进行访问。如果不与其他线程共享数据，那他是串行执行或者多线程执行是没有区别的。</p>
+<p>Java共享数据类型：不可变、绝对线程安全、相对线程安全、线程兼容和线程对立</p>
+<p>不可变对象一定是线程安全的。final修饰来声明不可变对象</p>
+<p>java.lang.String是一个不可变对象，通过对字符串进行任何操作，构造出来的也是一个新字符串，而不会影响原来的值</p>
+<p>不可变对象：java.lang.Number部分子类（Long和Double、BigDecimal和BigInteger）、枚举类型</p>
+<h2 id="线程安全的实现方法"><a href="#线程安全的实现方法" class="headerlink" title="线程安全的实现方法"></a>线程安全的实现方法</h2><h3 id="互斥同步：最常见的一种并发正确性保障手段"><a href="#互斥同步：最常见的一种并发正确性保障手段" class="headerlink" title="互斥同步：最常见的一种并发正确性保障手段"></a>互斥同步：最常见的一种并发正确性保障手段</h3><p>“同步指在多个线程并发访问共享数据情况下，保障共享数据只能在同一时刻只被一条线程使用。互斥是实现同步的一种手段。互斥实现方式：临界区、互斥量和信号量</p>
+<p>最基本的互斥同步是synchronized关键字。产生monitorenter和monitorexit两个字节码，需要一个reference类型参数锁定和解锁对象。如果没有指定类型参数，默认就是当前实例作为同步对象</p>
+<p>synchronized执行原理：根据虚拟机规范，在执行monitorenter指令时，首先要去尝试获取对象的锁，如果对象并未锁定，或者当前线程已经拥有该对象的锁，把锁的计数器+1.相应的，monitorexit指令时将锁计数器减1，当计数器为0时，锁被释放。如果获取锁对象失败，那当前线程就要阻塞等待，直到对象锁被另外一个线程释放</p>
+<p>tips：synchronized同步块对同一条线程时可重入的，不会出现把自己锁死的情况。<br>同步块在已进入线程执行完之前，会阻塞后面其他线程的进入。<br>所以被synchronized修饰的方法getter/setter方法，消耗时间比较长，所以在Java中称为重量级锁。<br>除了重量级锁，可以引用java.util.concurrent中的轻量级锁ReentrantLock实现同步。都可以实现线程重入。但是lock()和unlock()需要配合try{}finally{}模块完成，还新增几个功能：等待可中断、实现公平锁以及锁绑定多个条件</p>
+<p>等待可中断：当持有锁的线程长期不释放锁的时候，正在等待的线程可以选择放弃等待，改为处理其他事情<br>公平锁：多个线程申请同一个锁时，必须按照申请锁的时间顺序来获取锁；而非公平锁不能保证，在锁被释放时，任何一个等待锁的线程都有机会获取锁。synchronized和ReentrantLock是非公平锁<br>锁绑定多个条件：一个ReentrantLock对象可以绑定多个Condition对象，多次调用newCondition()方法。而在synchronized中需要额外多加锁才能实现</p>
+<h3 id="非阻塞同步"><a href="#非阻塞同步" class="headerlink" title="非阻塞同步"></a>非阻塞同步</h3><p>非同步方案</p>
+<p>可重入代码：可在代码的任何时刻中断，转而去执行另外一段代码。</p>
+<p>如何判断代码是否具有可重入性:一个方法，返回结果是可预测的，只要输入相同的数据，返回相同的结果。具备可重入性线程就是安全的</p>
+<h2 id="线程本地存储"><a href="#线程本地存储" class="headerlink" title="线程本地存储"></a>线程本地存储</h2><h3 id="锁优化"><a href="#锁优化" class="headerlink" title="锁优化"></a>锁优化</h3><p>常见的锁优化技术：适应式自旋、锁消除、锁粗化、轻量级锁和偏向锁等</p>
+<p>自旋锁<br>JDK1.6默认开启自旋锁。或者通过-XX:+UseSpinning开启。自旋次数默认10次 可以通过 -XX: PreBlockSpin参数更改</p>
+<p>锁消除<br>指在JIT运行时候，对一些代码要求同步，但是被检测到不可能存在共享数据竞争的锁进行消除</p>
+<p>锁消除主要依据：来源于逃逸分析的数据支持</p>
+<p>锁粗化</p>
+<p>轻量级锁</p>
+<p>重量级锁</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/24/MySQL处理海量数据架构优化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1579,780 +2426,11 @@ public HashMap(int initialCapacity)
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/31/【JVM】垃圾收集/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/31/【JVM】垃圾收集/" itemprop="url">【JVM】垃圾收集</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-31T16:37:01+08:00">
-                2017-08-31
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>【问题一】垃圾回收（GC）主要用在哪些区域</p>
-<p>【回答】内存垃圾回收主要集中于 java 堆和方法区中。其他区域都是自动清理</p>
-<p>【问题二】如何判断对象是否存活？</p>
-<p>【回答】通常有2种方式。引用计数和可达性分析</p>
-<p>  引用计数：每个对象有一个引用计数属性，新增一个引用时计数加1，引用释放时计数减1，计数为0时可以回收。此方法简单，无法解决对象相互循环引用的问题。</p>
-<p>  可达性分析（Reachability Analysis）：从GC Roots开始向下搜索，搜索所走过的路径称为引用链。当一个对象到GC Roots没有任何引用链相连时，则证明此对象是不可用的。不可达对象。</p>
-<p>【问题二延伸】描述GC Roots</p>
-<p>【回答】在Java语言中，GC Roots包括：</p>
-<ol>
-<li><p>虚拟机栈中引用的对象。</p>
-</li>
-<li><p>方法区中类静态属性实体引用的对象。</p>
-</li>
-<li><p>方法区中常量引用的对象。</p>
-</li>
-<li><p>本地方法栈中JNI引用的对象。</p>
-</li>
-</ol>
-<p>【问题三】简述几种常用标记算法？</p>
-<p>【回答】</p>
-<p>标记-清除算法(最基础)：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。</p>
-<p>缺点：1.效率低下 2.产生不连续空间碎片（空间碎片太多可能会导致，当程序在以后的运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作）</p>
-<p>复制算法： ​将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉</p>
-<p>缺点：虽然解决标记-清除算法产生不连续空间碎片问题。但是依旧效率不高（将内存缩小为原来的一半，持续复制长生存期的对象则导致效率降低）</p>
-<p>标记-压缩算法：在对象存活率较高时就要执行较多的复制操作，效率将会变低（老年代不能直接选择这种算法）</p>
-<p>分代收集算法：把Java堆分为新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法(在新生代中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本就可以完成收集。而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用“标记-清理”或“标记-整理”算法来进行回收。)</p>
-<p>【问题四】简述垃圾收集器的几个步骤</p>
-<p>【回答】</p>
-<p>1、标记阶段，首先初始标记(Initial-Mark),这个阶段是停顿的(Stop the World Event)，并且会触发一次普通Mintor GC。对应GC log:GC pause (young) (inital-mark)</p>
-<p>2、Root Region Scanning，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young GC之前完成。</p>
-<p>3、Concurrent Marking，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young GC中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)。同时，并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)。</p>
-<p>4、Remark, 再标记，会有短暂停顿(STW)。再标记阶段是用来收集 并发标记阶段 产生新的垃圾(并发阶段和应用程序一同运行)；G1中采用了比CMS更快的初始快照算法:snapshot-at-the-beginning (SATB)。</p>
-<p>5、Copy/Clean up，多线程清除失活对象，会有STW。G1将回收区域的存活对象拷贝到新区域，清除Remember Sets，并发清空回收区域并把它返回到空闲区域链表中。</p>
-<p><a href="http://www.cnblogs.com/ityouknow/p/5614961.html" target="_blank" rel="external">http://www.cnblogs.com/ityouknow/p/5614961.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/23/JVM问题记录总结/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/23/JVM问题记录总结/" itemprop="url">JVM问题记录总结</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-23T11:44:23+08:00">
-                2017-08-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="【问题一】什么是类的加载？"><a href="#【问题一】什么是类的加载？" class="headerlink" title="【问题一】什么是类的加载？"></a>【问题一】什么是类的加载？</h2><p>【问题延伸】1. 如何访问方法区内的数据结构？ 2. 谈谈类加载机制 </p>
-<p>【答案】首先理解类加载的概念：将.class文件中的二进制数据读取到内存中，放在运行时数据区的方法区内，在堆中创建一个java.lang.Class对象，封装方法区内的数据结构。所以该机制向程序猿通过该对象访问方法区中的这些数据提供了访问方法区内的数据结构的接口</p>
-<h2 id="【问题二】-类加载有哪几种方式？"><a href="#【问题二】-类加载有哪几种方式？" class="headerlink" title="【问题二】 类加载有哪几种方式？"></a>【问题二】 类加载有哪几种方式？</h2><p>【答案】有5种方式。</p>
-<ol>
-<li>从本地系统中直接加载 2. 通过网络下载.class文件 3. 从zip，jar等归档文件中加载.class文件 4. 从专有数据库中提取.class文件 5. 将Java源文件动态编译为.class文件</li>
-</ol>
-<h2 id="【问题三】概述类的生命周期"><a href="#【问题三】概述类的生命周期" class="headerlink" title="【问题三】概述类的生命周期"></a>【问题三】概述类的生命周期</h2><p>【问题延伸】一个类从开始加载后会经历几个阶段？</p>
-<p>【答案】生命周期一共经历7个阶段：类加载过程 -&gt; 卸载 -&gt; 使用</p>
-<p>类加载阶段：加载 -&gt; 验证 -&gt; 准备 -&gt; 解析 -&gt; 初始化</p>
-<p>在类加载阶段中，除解析阶段，其它阶段的过程顺序是确定的。而解析，可以在初始化阶段之后开始，为了支持Java语言的动态绑定。但是这4个阶段是按顺序开始，换句话说就是这些阶段通常都是互相交叉地混合进行的，通常在一个阶段执行的过程中调用或激活另一个阶段</p>
-<p>详解每个阶段的处理过程</p>
-<ol>
-<li><p>加载：查找并加载类的二进制数据</p>
-<p>  i、通过一个类的全限定名来获取其定义的二进制字节流。</p>
-<p>  ii、将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构。</p>
-<p>  iii、在Java堆中生成一个代表这个类的java.lang.Class对象，作为对方法区中这些数据的访问入口。</p>
-</li>
-</ol>
-<ol>
-<li><p>连接</p>
-<p> 2.1. 验证：确保被加载的类的正确性</p>
-<pre><code> i. 文件格式验证：验证字节流是否符合Class文件格式的规范；例如：是否以0xCAFEBABE开头、主次版本号是否在当前虚拟机的处理范围之内、常量池中的常量是否有不被支持的类型。
-
- ii. 元数据验证：对字节码描述的信息进行语义分析（注意：对比javac编译阶段的语义分析），以保证其描述的信息符合Java语言规范的要求；例如：这个类是否有父类，除了java.lang.Object之外。
-
-iii. 字节码验证：通过数据流和控制流分析，确定程序语义是合法的、符合逻辑的。
-
-iiii. 符号引用验证：确保解析动作能正确执行。
-</code></pre><p> 2.2. 准备： 为类的静态变量分配内存，并将其初始化为默认值</p>
-<pre><code>i. 这时候进行内存分配的仅包括类变量（static），而不包括实例变量，实例变量会在对象实例化时随着对象一块分配在Java堆中。
-
-ii. 这里所设置的初始值通常情况下是数据类型默认的零值（如0、0L、null、false等），而不是被在Java代码中被显式地赋予的值。
-</code></pre></li>
-</ol>
-<p>假设一个类变量的定义为：public static int value = 3；那么变量value在准备阶段过后的初始值为0，而不是3，因为这时候尚未开始执行任何Java方法，而把value赋值为3的putstatic指令是在程序编译后，存放于类构造器<clinit>（）方法之中的，所以把value赋值为3的动作将在初始化阶段才会执行。</clinit></p>
-<p>注意：</p>
-<ol>
-<li><p>对基本数据类型来说，对于类变量（static）和全局变量，如果不显式地对其赋值而直接使用，则系统会为其赋予默认的零值，而对于局部变量来说，在使用前必须显式地为其赋值，否则编译时不通过。</p>
-</li>
-<li><p>对于同时被static和final修饰的常量，必须在声明的时候就为其显式地赋值，否则编译时不通过；而只被final修饰的常量则既可以在声明时显式地为其赋值，也可以在类初始化时显式地为其赋值，总之，在使用前必须为其显式地赋值，系统不会为其赋予默认零值。</p>
-</li>
-<li><p>对于引用数据类型reference来说，如数组引用、对象引用等，如果没有对其进行显式地赋值而直接使用，系统都会为其赋予默认的零值，即null。</p>
-</li>
-<li><p>如果在数组初始化时没有对数组中的各元素赋值，那么其中的元素将根据对应的数据类型而被赋予默认的零值。</p>
-</li>
-</ol>
-<p>假设上面的类变量value被定义为： public static final int value = 3；编译时Javac将会为value生成ConstantValue属性，在准备阶段虚拟机就会根据ConstantValue的设置将value赋值为3</p>
-<ol>
-<li>解析：把类中的符号引用转换为直接引用</li>
-</ol>
-<p>解析阶段是虚拟机将常量池内的符号引用替换为直接引用的过程，解析动作主要针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用点限定符7类符号引用进行。</p>
-<p>符号引用就是一组符号来描述目标，可以是任何字面量。</p>
-<p>直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄。</p>
-<ol>
-<li>初始化</li>
-</ol>
-<p>初始化，为类的静态变量赋予正确的初始值，JVM负责对类进行初始化，主要对类变量进行初始化。在Java中对类变量进行初始值设定有两种方式：</p>
-<p>  ①声明类变量时指定初始值</p>
-<p>  ②使用静态代码块为类变量指定初始值</p>
-<p>JVM初始化步骤</p>
-<ol>
-<li><p>假如这个类还没有被加载和连接，则程序先加载并连接该类</p>
-</li>
-<li><p>假如该类的直接父类还没有被初始化，则先初始化其直接父类</p>
-</li>
-<li><p>假如类中有初始化语句，则系统依次执行这些初始化语句</p>
-</li>
-</ol>
-<p>类初始化时机：只有当对类的主动使用的时候才会导致类的初始化</p>
-<p>类使用的6种方式</p>
-<p>– 创建类的实例，也就是new的方式</p>
-<p>– 访问某个类或接口的静态变量，或者对该静态变量赋值</p>
-<p>– 调用类的静态方法</p>
-<p>– 反射（如Class.forName(“com.test.TestMain”)）</p>
-<p>– 初始化某个类的子类，则其父类也会被初始化</p>
-<p>– Java虚拟机启动时被标明为启动类的类（Java Test），直接使用java.exe命令来运行某个主类</p>
-<ol>
-<li>结束生命周期</li>
-</ol>
-<p>– 执行了System.exit()方法</p>
-<p>– 程序正常执行结束</p>
-<p>– 程序在执行过程中遇到了异常或错误而异常终止</p>
-<p>– 由于操作系统出现错误而导致Java虚拟机进程终止</p>
-<h2 id="【问题四】类加载器有几种？"><a href="#【问题四】类加载器有几种？" class="headerlink" title="【问题四】类加载器有几种？"></a>【问题四】类加载器有几种？</h2><p>【回答】总的概括为3种：启动类加载器(Bootstrap ClassLoader)、扩展类加载器(Extension ClassLoader)、应用程序类加载器(Application ClassLoader) *默认的类加载器</p>
-<p>可以​实现自定义类加载器(优点：1. 在执行非置信代码之前，自动验证数字签名。2. 动态地创建符合用户特定需要的定制化构建类。 3. 从特定的场所取得java class，例如数据库中和网络中)</p>
-<h2 id="【问题5】谈谈类加载机制？"><a href="#【问题5】谈谈类加载机制？" class="headerlink" title="【问题5】谈谈类加载机制？"></a>【问题5】谈谈类加载机制？</h2><p>【回答】全盘负责、父类委托、缓存机制。</p>
-<p>•全盘负责，当一个类加载器负责加载某个Class时，该Class所依赖的和引用的其他Class也将由该类加载器负责载入，除非显示使用另外一个类加载器来载入</p>
-<p>•父类委托，先让父类加载器试图加载该类，只有在父类加载器无法加载该类时才尝试从自己的类路径中加载该类</p>
-<p>•缓存机制，缓存机制将会保证所有加载过的Class都会被缓存，当程序中需要使用某个Class时，类加载器先从缓存区寻找该Class，只有缓存区不存在，系统才会读取该类对应的二进制数据，并将其转换成Class对象，存入缓存区。这就是为什么修改了Class后，必须重启JVM，程序的修改才会生效</p>
-<h2 id="【问题6】类加载有几种方式？"><a href="#【问题6】类加载有几种方式？" class="headerlink" title="【问题6】类加载有几种方式？"></a>【问题6】类加载有几种方式？</h2><p>【回答】3种。</p>
-<p>ClassLoader loader = HelloWorld.class.getClassLoader(); </p>
-<p>1、命令行启动应用时候由JVM初始化加载</p>
-<p>2、通过Class.forName()方法动态加载</p>
-<pre><code>默认会执行初始化块 
-</code></pre><p> Class.forName(“Test”, false, loader); </p>
-<p>3、通过ClassLoader.loadClass()方法动态加载</p>
-<pre><code>初始化时不执行静态块 
-</code></pre><p>loader.loadClass(“Test”); </p>
-<h2 id="【问题七】谈谈Class-forName-和ClassLoader-loadClass-区别？"><a href="#【问题七】谈谈Class-forName-和ClassLoader-loadClass-区别？" class="headerlink" title="【问题七】谈谈Class.forName()和ClassLoader.loadClass()区别？"></a>【问题七】谈谈Class.forName()和ClassLoader.loadClass()区别？</h2><p>【回答】Class.forName()：将类的.class文件加载到jvm中之外，还会对类进行解释，执行类中的static块；ClassLoader.loadClass()：只干一件事情，就是将.class文件加载到jvm中，不会执行static中的内容,只有在newInstance才会去执行static块。</p>
-<p>Class.forName(name, initialize, loader)带参函数也可控制是否加载static块。并且只有调用了newInstance()方法采用调用构造函数，创建类的对象 。</p>
-<h2 id="【问题八】什么是双亲委派模型？"><a href="#【问题八】什么是双亲委派模型？" class="headerlink" title="【问题八】什么是双亲委派模型？"></a>【问题八】什么是双亲委派模型？</h2><p>【回答】如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类</p>
-<h2 id="【问题九】双亲委派模型意义？"><a href="#【问题九】双亲委派模型意义？" class="headerlink" title="【问题九】双亲委派模型意义？"></a>【问题九】双亲委派模型意义？</h2><p>【回答】</p>
-<p>-系统类防止内存中出现多份同样的字节码</p>
-<p>-保证Java程序安全稳定运行</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.cnblogs.com/ityouknow/p/5603287.html" target="_blank" rel="external">http://www.cnblogs.com/ityouknow/p/5603287.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/22/【JVM调优】工具/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/22/【JVM调优】工具/" itemprop="url">【JVM调优】工具</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-22T10:34:48+08:00">
-                2017-08-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="jps"><a href="#jps" class="headerlink" title="jps"></a>jps</h2><blockquote>
-<p>输出JVM中运行的进程状态信息</p>
-</blockquote>
-<pre><code>jps [options] [host]
-</code></pre><ul>
-<li>host 默认本机地址</li>
-<li><p>options</p>
-<pre><code>-q 不输出类名、Jar名和传入main方法的参数
--m 输出传入main方法的参数
--l 输出main类或Jar的全限名
--v 输出传入JVM的参数
-</code></pre></li>
-</ul>
-<h2 id="jstack"><a href="#jstack" class="headerlink" title="jstack"></a>jstack</h2><blockquote>
-<p>查看某个Java进程内的线程堆栈信息</p>
-</blockquote>
-<pre><code>jstack [option] pid
-jstack [option] executable core
-jstack [option] [server-id@]remote-hostname-or-ip
-</code></pre><ul>
-<li>-l，会打印出额外的锁信息，在发生死锁时可以用jstack -l pid来观察锁持有情况</li>
-<li>-m，不仅会输出Java堆栈信息，还会输出C/C++堆栈信息（比如Native方法）</li>
-</ul>
-<p><strong> jstack可以定位到线程堆栈，根据堆栈信息我们可以定位到具体代码，所以它在JVM性能调优中使用得非常多</strong></p>
-<h3 id="调试步骤"><a href="#调试步骤" class="headerlink" title="调试步骤"></a>调试步骤</h3><ol>
-<li><p>找到项目进程</p>
-<pre><code>ps -ef | grep mrf-center | grep -v grep
-</code></pre></li>
-<li><p>找出该进程内最耗费CPU的线程</p>
-<pre><code>ps -Lfp pid
-ps -mp pid -o THREAD, tid, time
-top -Hp pid
-</code></pre></li>
-<li><p>得到进程耗费CPU时间的十六进制pid</p>
-<pre><code>printf &quot;%x\n&quot; pid
-</code></pre></li>
-<li><p>得到进程pid的堆栈信息</p>
-<pre><code>jstack 21711 | grep 16进制pid
-</code></pre></li>
-</ol>
-<h2 id="jmap"><a href="#jmap" class="headerlink" title="jmap"></a>jmap</h2><blockquote>
-<p>查看堆内存使用状况，一般结合jhat使用</p>
-</blockquote>
-<pre><code>jmap [option] pid
-jmap [option] executable core
-jmap [option] [server-id@]remote-hostname-or-ip
-</code></pre><p><strong>注意：64位JVM需要指定-J-d64参数</strong></p>
-<p>打印进程的类加载器和类加载器加载的持久代对象信息，输出：类加载器名称、对象是否存活（不可靠）、对象地址、父类加载器、已加载的类大小等信息</p>
-<pre><code>jmap -permstat pid
-</code></pre><p>  使用jmap -heap pid查看进程堆内存使用情况，包括使用的GC算法、堆配置参数和各代中堆内存使用情况</p>
-<pre><code>jmap -heap pid
-</code></pre><p> 查看堆内存中的对象数目、大小统计直方图，如果带上live则只统计活对象</p>
-<pre><code>jmap -histo:live pid | more
-</code></pre><p>  用jmap把进程内存使用情况dump到文件中，再用jhat分析查看</p>
-<pre><code>jmap -dump:format=b,file=/tmp/dump.dat pid
-
- jhat -port 9998 /tmp/dump.dat
-</code></pre><p>  <strong>如果Dump文件太大，可能需要加上-J-Xmx512m这种参数指定最大堆内存，即jhat -J-Xmx512m -port 9998 /tmp/dump.dat。然后就可以在浏览器中输入主机地址:9998</strong></p>
-<h2 id="jstat"><a href="#jstat" class="headerlink" title="jstat"></a>jstat</h2><pre><code>jstat [ generalOption | outputOptions vmid [interval[s|ms] [count]] ]
-</code></pre><p>vmid是Java虚拟机ID，在Linux/Unix系统上一般就是进程ID。interval是采样时间间隔。count是采样数目</p>
-<pre><code>jstat -gc pid time count
-</code></pre><hr>
-<p> <strong> 堆内存 = 年轻代 + 年老代 + 永久代<br>年轻代 = Eden区 + 两个Survivor区（From和To）</strong></p>
-<p>S0C、S1C、S0U、S1U：Survivor 0/1区容量（Capacity）和使用量（Used）<br>EC、EU：Eden区容量和使用量<br>OC、OU：年老代容量和使用量<br>PC、PU：永久代容量和使用量<br>YGC、YGT：年轻代GC次数和GC耗时<br>FGC、FGCT：Full GC次数和Full GC耗时<br>GCT：GC总耗时</p>
-<hr>
-<h2 id="hprof"><a href="#hprof" class="headerlink" title="hprof"></a>hprof</h2><blockquote>
-<p>展现CPU使用率，统计堆内存使用情况</p>
-</blockquote>
-<pre><code>java -agentlib:hprof[=options] ToBeProfiledClass
-java -Xrunprof[:options] ToBeProfiledClass
-javac -J-agentlib:hprof[=options] ToBeProfiledClass    
-</code></pre><h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a href="https://my.oschina.net/feichexia/blog/196575" target="_blank" rel="external">开源中国</a><br><a href="http://www.ityouknow.com/java/2017/02/22/jvm-tool.html" target="_blank" rel="external">博客参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/17/hashCode/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/17/hashCode/" itemprop="url">hashCode()</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-17T16:19:33+08:00">
-                2017-08-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/源码/" itemprop="url" rel="index">
-                    <span itemprop="name">源码</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><pre><code>/**
- *  计算公式
- * s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
- */
- public int hashCode() {
-     int h = hash;
-     if (h == 0 &amp;&amp; value.length &gt; 0) {
-         char val[] = value;
-         for (int i = 0; i &lt; value.length; i++) {
-             h = 31 * h + val[i];
-         }
-         hash = h;
-     }
-     return h;
- }
-</code></pre><h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><blockquote>
-<p>根据一定的规则将与对象相关的信息（比如对象的存储地址，对象的字段等）映射成一个数值，这个数值称作为散列值</p>
-</blockquote>
-<p><strong>注意:虽然不能根据hashcode值判断两个对象是否相等，但是可以直接根据hashcode值判断两个对象不等，如果两个对象的hashcode值不等，则必定是两个不同的对象。如果要判断两个对象是否真正相等，必须通过equals方法</strong></p>
-<ul>
-<li>如果equals()相等，hashCode()一定相等</li>
-<li>如果equals()不等，hashCode()一定不等</li>
-<li>如果hashCode()不等，equals()一定不等</li>
-<li>如果hashCode()相等，equals()不一定相等</li>
-</ul>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://my.oschina.net/u/3624220/blog/1512125" target="_blank" rel="external">hashCode和equals</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2397,7 +2475,7 @@ javac -J-agentlib:hprof[=options] ToBeProfiledClass
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">142</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2408,7 +2486,7 @@ javac -J-agentlib:hprof[=options] ToBeProfiledClass
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">55</span>
+                <span class="site-state-item-count">57</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2419,7 +2497,7 @@ javac -J-agentlib:hprof[=options] ToBeProfiledClass
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">107</span>
+                <span class="site-state-item-count">108</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

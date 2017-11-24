@@ -254,6 +254,609 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Nginx配置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Nginx配置/" itemprop="url">Nginx配置</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:12:41+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">http &#123; ##重点①</div><div class="line">  upstream mynginx &#123;</div><div class="line">    server 127.0.0.1:8000 weight=3; ##设置访问权重（默认每个url访问一次</div><div class="line">    server 127.0.0.1:8001;</div><div class="line">    server 127.0.0.1:8002;</div><div class="line">    server 127.0.0.1:8003;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  server &#123;</div><div class="line">    listen 80;</div><div class="line">    server_name www.domain.com; ##服务器名称</div><div class="line">    location / &#123;</div><div class="line">      proxy_pass http://mynginx; ##必须与upstream后边名称相同</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="反向代理-缓存"><a href="#反向代理-缓存" class="headerlink" title="反向代理/缓存"></a>反向代理/缓存</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    proxy_cache_path  /data/nginx/cache  levels=1:2    keys_zone=STATIC:10m</div><div class="line">    inactive=24h  max_size=1g;</div><div class="line">    server &#123;</div><div class="line">        location / &#123;</div><div class="line">            proxy_pass             http://1.2.3.4;</div><div class="line">            proxy_set_header       Host $host;</div><div class="line">            proxy_cache            STATIC;</div><div class="line">            proxy_cache_valid      200  1d;</div><div class="line">            proxy_cache_use_stale  error timeout invalid_header updating</div><div class="line">                                   http_500 http_502 http_503 http_504;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="SSI"><a href="#SSI" class="headerlink" title="SSI"></a>SSI</h2><p>什么是SSI</p>
+<blockquote>
+<p>Server Side Include(服务器端嵌入)</p>
+</blockquote>
+<p>为什么使用SSI?</p>
+<blockquote>
+<p>一个静态化的页面中，需要嵌入一小块实时变化的内容。例如首页，大部分的页面内容需要缓存但是用户登录后的个人信息是动态信息，不能缓存。那么如何解决这个”页面部分缓存”问题，利用SSI就可以解决，在首页的静态页面中嵌入个人信息的动态页，由于是服务器端的嵌入，所以用户浏览的时候都是一个嵌入后的页面。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">user nginx;</div><div class="line">worker_processes  1;</div><div class="line"></div><div class="line">events &#123;</div><div class="line">    worker_connections  1024;</div><div class="line">&#125;</div><div class="line"></div><div class="line">http &#123;</div><div class="line">    include       mime.types;</div><div class="line">    default_type  application/octet-stream;</div><div class="line"></div><div class="line">    sendfile      on;</div><div class="line">    tcp_nopush    on;</div><div class="line">    keepalive_timeout 10;</div><div class="line">    gzip          on;</div><div class="line"></div><div class="line">    server &#123;</div><div class="line">        server_name  localhost;</div><div class="line">        charset      utf-8;</div><div class="line">        access_log   /var/log/nginx/access.log;</div><div class="line"></div><div class="line">        root    /var/www;</div><div class="line"></div><div class="line">        location = / &#123;</div><div class="line">            rewrite ^ /home redirect;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">            ssi on; //开启ssi</div><div class="line">            ssi_silent_errors on; //处理SSI文件出错时不输出错误提示</div><div class="line">            ssi_types text/html;//默认</div><div class="line">            set $inc $request_uri;</div><div class="line">            if (!-f $request_filename) &#123;</div><div class="line">                rewrite ^ /index.html last;</div><div class="line">            &#125;</div><div class="line">            if (!-f $document_root$inc.html) &#123;</div><div class="line">                return 404;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="简单配置信息"><a href="#简单配置信息" class="headerlink" title="简单配置信息"></a>简单配置信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div></pre></td><td class="code"><pre><div class="line">user  www www;</div><div class="line">worker_processes  2;</div><div class="line">pid /var/run/nginx.pid;</div><div class="line"></div><div class="line"># [ debug | info | notice | warn | error | crit ]</div><div class="line">error_log  /var/log/nginx.error_log  info;</div><div class="line"></div><div class="line">events &#123;</div><div class="line">  worker_connections   2000;</div><div class="line">  # use [ kqueue | rtsig | epoll | /dev/poll | select | poll ] ;</div><div class="line">  use kqueue;</div><div class="line">&#125;</div><div class="line"></div><div class="line">http &#123;</div><div class="line">  include       conf/mime.types;</div><div class="line">  default_type  application/octet-stream;</div><div class="line"></div><div class="line">  log_format main      &apos;$remote_addr - $remote_user [$time_local]  &apos;</div><div class="line">    &apos;&quot;$request&quot; $status $bytes_sent &apos;</div><div class="line">    &apos;&quot;$http_referer&quot; &quot;$http_user_agent&quot; &apos;</div><div class="line">    &apos;&quot;$gzip_ratio&quot;&apos;;</div><div class="line"></div><div class="line">  log_format download  &apos;$remote_addr - $remote_user [$time_local]  &apos;</div><div class="line">    &apos;&quot;$request&quot; $status $bytes_sent &apos;</div><div class="line">    &apos;&quot;$http_referer&quot; &quot;$http_user_agent&quot; &apos;</div><div class="line">    &apos;&quot;$http_range&quot; &quot;$sent_http_content_range&quot;&apos;;</div><div class="line"></div><div class="line">  client_header_timeout  3m;</div><div class="line">  client_body_timeout    3m;</div><div class="line">  send_timeout           3m;</div><div class="line"></div><div class="line">  client_header_buffer_size    1k;</div><div class="line">  large_client_header_buffers  4 4k;</div><div class="line"></div><div class="line">  gzip on;</div><div class="line">  gzip_min_length  1100;</div><div class="line">  gzip_buffers     4 8k;</div><div class="line">  gzip_types       text/plain;</div><div class="line"></div><div class="line">  output_buffers   1 32k;</div><div class="line">  postpone_output  1460;</div><div class="line"></div><div class="line">  sendfile         on;</div><div class="line">  tcp_nopush       on;</div><div class="line"></div><div class="line">  tcp_nodelay      on;</div><div class="line">  send_lowat       12000;</div><div class="line"></div><div class="line">  keepalive_timeout  75 20;</div><div class="line"></div><div class="line">  # lingering_time     30;</div><div class="line">  # lingering_timeout  10;</div><div class="line">  # reset_timedout_connection  on;</div><div class="line"></div><div class="line"></div><div class="line">  server &#123;</div><div class="line">    listen        one.example.com;</div><div class="line">    server_name   one.example.com  www.one.example.com;</div><div class="line"></div><div class="line">    access_log   /var/log/nginx.access_log  main;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">      proxy_pass         http://127.0.0.1/;</div><div class="line">      proxy_redirect     off;</div><div class="line"></div><div class="line">      proxy_set_header   Host             $host;</div><div class="line">      proxy_set_header   X-Real-IP        $remote_addr;</div><div class="line">      # proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;</div><div class="line"></div><div class="line">      client_max_body_size       10m;</div><div class="line">      client_body_buffer_size    128k;</div><div class="line"></div><div class="line">      client_body_temp_path      /var/nginx/client_body_temp;</div><div class="line"></div><div class="line">      proxy_connect_timeout      90;</div><div class="line">      proxy_send_timeout         90;</div><div class="line">      proxy_read_timeout         90;</div><div class="line">      proxy_send_lowat           12000;</div><div class="line"></div><div class="line">      proxy_buffer_size          4k;</div><div class="line">      proxy_buffers              4 32k;</div><div class="line">      proxy_busy_buffers_size    64k;</div><div class="line">      proxy_temp_file_write_size 64k;</div><div class="line"></div><div class="line">      proxy_temp_path            /var/nginx/proxy_temp;</div><div class="line"></div><div class="line">      charset  koi8-r;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    error_page  404  /404.html;</div><div class="line"></div><div class="line">    location /404.html &#123;</div><div class="line">      root  /spool/www;</div><div class="line"></div><div class="line">      charset         on;</div><div class="line">      source_charset  koi8-r;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location /old_stuff/ &#123;</div><div class="line">      rewrite   ^/old_stuff/(.*)$  /new_stuff/$1  permanent;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location /download/ &#123;</div><div class="line">      valid_referers  none  blocked  server_names  *.example.com;</div><div class="line"></div><div class="line">      if ($invalid_referer) &#123;</div><div class="line">        #rewrite   ^/   http://www.example.com/;</div><div class="line">        return   403;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      # rewrite_log  on;</div><div class="line">      # rewrite /download/*/mp3/*.any_ext to /download/*/mp3/*.mp3</div><div class="line">      rewrite ^/(download/.*)/mp3/(.*)\..*$ /$1/mp3/$2.mp3 break;</div><div class="line"></div><div class="line">      root         /spool/www;</div><div class="line">      # autoindex    on;</div><div class="line">      access_log   /var/log/nginx-download.access_log  download;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location ~* ^.+\.(jpg|jpeg|gif)$ &#123;</div><div class="line">      root         /spool/www;</div><div class="line">      access_log   off;</div><div class="line">      expires      30d;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="完整配置信息"><a href="#完整配置信息" class="headerlink" title="完整配置信息"></a>完整配置信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div></pre></td><td class="code"><pre><div class="line">Nginx.conf</div><div class="line"></div><div class="line">user       www www;  ## Default: nobody</div><div class="line">worker_processes  5;  ## Default: 1</div><div class="line">error_log  logs/error.log;</div><div class="line">pid        logs/nginx.pid;</div><div class="line">worker_rlimit_nofile 8192;</div><div class="line"></div><div class="line">events &#123;</div><div class="line">  worker_connections  4096;  ## Default: 1024</div><div class="line">&#125;</div><div class="line"></div><div class="line">http &#123;</div><div class="line">  include    conf/mime.types;</div><div class="line">  include    /etc/nginx/proxy.conf;</div><div class="line">  include    /etc/nginx/fastcgi.conf;</div><div class="line">  index    index.html index.htm index.php;</div><div class="line"></div><div class="line">  default_type application/octet-stream;</div><div class="line">  log_format   main &apos;$remote_addr - $remote_user [$time_local]  $status &apos;</div><div class="line">    &apos;&quot;$request&quot; $body_bytes_sent &quot;$http_referer&quot; &apos;</div><div class="line">    &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</div><div class="line">  access_log   logs/access.log  main;</div><div class="line">  sendfile     on;</div><div class="line">  tcp_nopush   on;</div><div class="line">  server_names_hash_bucket_size 128; # this seems to be required for some vhosts</div><div class="line"></div><div class="line">  server &#123; # php/fastcgi</div><div class="line">    listen       80;</div><div class="line">    server_name  domain1.com www.domain1.com;</div><div class="line">    access_log   logs/domain1.access.log  main;</div><div class="line">    root         html;</div><div class="line"></div><div class="line">    location ~ \.php$ &#123;</div><div class="line">      fastcgi_pass   127.0.0.1:1025;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  server &#123; # simple reverse-proxy</div><div class="line">    listen       80;</div><div class="line">    server_name  domain2.com www.domain2.com;</div><div class="line">    access_log   logs/domain2.access.log  main;</div><div class="line"></div><div class="line">    # serve static files</div><div class="line">    location ~ ^/(images|javascript|js|css|flash|media|static)/  &#123;</div><div class="line">      root    /var/www/virtual/big.server.com/htdocs;</div><div class="line">      expires 30d;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    # pass requests for dynamic content to rails/turbogears/zope, et al</div><div class="line">    location / &#123;</div><div class="line">      proxy_pass      http://127.0.0.1:8080;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  upstream big_server_com &#123;</div><div class="line">    server 127.0.0.3:8000 weight=5;</div><div class="line">    server 127.0.0.3:8001 weight=5;</div><div class="line">    server 192.168.0.1:8000;</div><div class="line">    server 192.168.0.1:8001;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  server &#123; # simple load balancing</div><div class="line">    listen          80;</div><div class="line">    server_name     big.server.com;</div><div class="line">    access_log      logs/big.server.access.log main;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">      proxy_pass      http://big_server_com;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">proxy_conf</div><div class="line"></div><div class="line">proxy_redirect          off;</div><div class="line">proxy_set_header        Host            $host;</div><div class="line">proxy_set_header        X-Real-IP       $remote_addr;</div><div class="line">proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;</div><div class="line">client_max_body_size    10m;</div><div class="line">client_body_buffer_size 128k;</div><div class="line">proxy_connect_timeout   90;</div><div class="line">proxy_send_timeout      90;</div><div class="line">proxy_read_timeout      90;</div><div class="line">proxy_buffers           32 4k;</div><div class="line">fastcgi_conf</div><div class="line"></div><div class="line">fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;</div><div class="line">fastcgi_param  QUERY_STRING       $query_string;</div><div class="line">fastcgi_param  REQUEST_METHOD     $request_method;</div><div class="line">fastcgi_param  CONTENT_TYPE       $content_type;</div><div class="line">fastcgi_param  CONTENT_LENGTH     $content_length;</div><div class="line">fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;</div><div class="line">fastcgi_param  REQUEST_URI        $request_uri;</div><div class="line">fastcgi_param  DOCUMENT_URI       $document_uri;</div><div class="line">fastcgi_param  DOCUMENT_ROOT      $document_root;</div><div class="line">fastcgi_param  SERVER_PROTOCOL    $server_protocol;</div><div class="line">fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;</div><div class="line">fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;</div><div class="line">fastcgi_param  REMOTE_ADDR        $remote_addr;</div><div class="line">fastcgi_param  REMOTE_PORT        $remote_port;</div><div class="line">fastcgi_param  SERVER_ADDR        $server_addr;</div><div class="line">fastcgi_param  SERVER_PORT        $server_port;</div><div class="line">fastcgi_param  SERVER_NAME        $server_name;</div><div class="line"></div><div class="line">fastcgi_index  index.php;</div><div class="line"></div><div class="line">fastcgi_param  REDIRECT_STATUS    200;</div><div class="line">mime_types</div><div class="line"></div><div class="line">types &#123;</div><div class="line">  text/html                             html htm shtml;</div><div class="line">  text/css                              css;</div><div class="line">  text/xml                              xml rss;</div><div class="line">  image/gif                             gif;</div><div class="line">  image/jpeg                            jpeg jpg;</div><div class="line">  application/x-javascript              js;</div><div class="line">  text/plain                            txt;</div><div class="line">  text/x-component                      htc;</div><div class="line">  text/mathml                           mml;</div><div class="line">  image/png                             png;</div><div class="line">  image/x-icon                          ico;</div><div class="line">  image/x-jng                           jng;</div><div class="line">  image/vnd.wap.wbmp                    wbmp;</div><div class="line">  application/java-archive              jar war ear;</div><div class="line">  application/mac-binhex40              hqx;</div><div class="line">  application/pdf                       pdf;</div><div class="line">  application/x-cocoa                   cco;</div><div class="line">  application/x-java-archive-diff       jardiff;</div><div class="line">  application/x-java-jnlp-file          jnlp;</div><div class="line">  application/x-makeself                run;</div><div class="line">  application/x-perl                    pl pm;</div><div class="line">  application/x-pilot                   prc pdb;</div><div class="line">  application/x-rar-compressed          rar;</div><div class="line">  application/x-redhat-package-manager  rpm;</div><div class="line">  application/x-sea                     sea;</div><div class="line">  application/x-shockwave-flash         swf;</div><div class="line">  application/x-stuffit                 sit;</div><div class="line">  application/x-tcl                     tcl tk;</div><div class="line">  application/x-x509-ca-cert            der pem crt;</div><div class="line">  application/x-xpinstall               xpi;</div><div class="line">  application/zip                       zip;</div><div class="line">  application/octet-stream              deb;</div><div class="line">  application/octet-stream              bin exe dll;</div><div class="line">  application/octet-stream              dmg;</div><div class="line">  application/octet-stream              eot;</div><div class="line">  application/octet-stream              iso img;</div><div class="line">  application/octet-stream              msi msp msm;</div><div class="line">  audio/mpeg                            mp3;</div><div class="line">  audio/x-realaudio                     ra;</div><div class="line">  video/mpeg                            mpeg mpg;</div><div class="line">  video/quicktime                       mov;</div><div class="line">  video/x-flv                           flv;</div><div class="line">  video/x-msvideo                       avi;</div><div class="line">  video/x-ms-wmv                        wmv;</div><div class="line">  video/x-ms-asf                        asx asf;</div><div class="line">  video/x-mng                           mng;</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/链表结构小记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/链表结构小记/" itemprop="url">链表结构小记</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:48:15+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="链表的概念"><a href="#链表的概念" class="headerlink" title="链表的概念"></a>链表的概念</h2><blockquote>
+<p>链表是一种递归的数据结构，它或者为空（null），或者是指向一个结点（node）的引用，该节点还有一个元素和一个指向另一条链表的引用。   </p>
+</blockquote>
+<p>  在Java中LinkedList就是一个典型的(单向)链表结构（它的一个实例域保存了指向链表中第一个结点的引用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">  </div><div class="line">class LinkedList&lt;Item&gt;&#123;</div><div class="line"></div><div class="line">     private Node first; //当前节点</div><div class="line"></div><div class="line">     private class  Node&#123;</div><div class="line"></div><div class="line">           Item data; </div><div class="line"></div><div class="line">           Node next; //下一节点</div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">             · · · · · ·</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="单向链表"><a href="#单向链表" class="headerlink" title="单向链表"></a>单向链表</h2><blockquote>
+<p>node包含指向后一个节点的引用</p>
+</blockquote>
+<h2 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h2><blockquote>
+<p>每个node不仅包含指向下后一个结点的引用，还包含着指向前一个结点的引用。</p>
+</blockquote>
+<h4 id="链表的优点"><a href="#链表的优点" class="headerlink" title="链表的优点"></a>链表的优点</h4><ol>
+<li>链表支持<strong><em>插入和删除</em></strong>这两种操作，并且删除/插入链表头部/尾部结点的时间复杂度通常都是常数级别 [  O(1)  ]</li>
+<li>可以动态改变大小。</li>
+</ol>
+<h4 id="链表的缺点"><a href="#链表的缺点" class="headerlink" title="链表的缺点"></a>链表的缺点</h4><ol>
+<li>不支持高效的random access（随机访问）。</li>
+</ol>
+<blockquote>
+<p>由于其链式存储的特性，链表不具备良好的空间局部性，也就是说，链表是一种缓存不友好的数据结构。</p>
+</blockquote>
+<h2 id="链表的实现"><a href="#链表的实现" class="headerlink" title="链表的实现"></a>链表的实现</h2><h4 id="单向链表-1"><a href="#单向链表-1" class="headerlink" title="单向链表"></a>单向链表</h4><p><strong>插入节点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public void insert(Item item) &#123;</div><div class="line"></div><div class="line">    Node oldFirst = first; </div><div class="line"></div><div class="line">    first = new Node(); </div><div class="line"></div><div class="line">    first.item = item; </div><div class="line"></div><div class="line">    first.next = oldFirst; </div><div class="line"></div><div class="line">    itemCount++; </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>删除节点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public Item delete() &#123;</div><div class="line"></div><div class="line">    if (first != null) &#123;</div><div class="line"></div><div class="line">        Item item = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        return item;</div><div class="line"></div><div class="line">    &#125; else &#123;</div><div class="line"></div><div class="line">        throw new NullPointerException(&quot;There&apos;s no Node in the linked list.&quot;);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="双向链表-1"><a href="#双向链表-1" class="headerlink" title="双向链表"></a>双向链表</h2><p>双向链表相比与单链表的优势在于它同时<strong><em>支持高效的正向及反向遍历</em></strong>，<strong><em>并且可以方便的在链表尾部删除结点</em></strong></p>
+<p>Java实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div></pre></td><td class="code"><pre><div class="line">public class DoubleLinkedList&lt;Item&gt; &#123;</div><div class="line"></div><div class="line">    private Node first; </div><div class="line"></div><div class="line">    private Node last;</div><div class="line"></div><div class="line">    private int itemCount;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    private class Node &#123;</div><div class="line"></div><div class="line">        Node prev; </div><div class="line"></div><div class="line">        Node next; </div><div class="line"></div><div class="line">        Item item;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line">    public void addFirst(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldFirst = first;</div><div class="line"></div><div class="line">        first = new Node();</div><div class="line"></div><div class="line">        first.item = item;</div><div class="line"></div><div class="line">        first.next = oldFirst;</div><div class="line"></div><div class="line">        if (oldFirst != null) &#123;</div><div class="line"></div><div class="line">            oldFirst.prev = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            last = first;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addLast(Item item) &#123;</div><div class="line"></div><div class="line">        Node oldLast = last;</div><div class="line"></div><div class="line">        last = new Node();</div><div class="line"></div><div class="line">        last.item = item;</div><div class="line"></div><div class="line">        last.prev = oldLast;</div><div class="line"></div><div class="line">        if (oldLast != null) &#123;</div><div class="line"></div><div class="line">            oldLast.next = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 0) &#123;</div><div class="line"></div><div class="line">            first = last;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount++;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delFirst() &#123;</div><div class="line"></div><div class="line">        if (first == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = first.item;</div><div class="line"></div><div class="line">        first = first.next;</div><div class="line"></div><div class="line">        if (first != null) &#123;</div><div class="line"></div><div class="line">            first.prev = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            last = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public Item delLast() &#123;</div><div class="line"></div><div class="line">        if (last == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Item result = last.item;</div><div class="line"></div><div class="line">        last = last.prev;</div><div class="line"></div><div class="line">        if (last != null) &#123;</div><div class="line"></div><div class="line">            last.next = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (itemCount == 1) &#123;</div><div class="line"></div><div class="line">            first = null;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        itemCount--;</div><div class="line"></div><div class="line">        return result;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addBefore(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        //从头开始遍历寻找目标节点</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            //继续向后寻找目标节点</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //现在target为指向目标结点的引用</div><div class="line"></div><div class="line">        if (target.prev == null) &#123;</div><div class="line"></div><div class="line">            //此时相当于在表头插入结点</div><div class="line"></div><div class="line">            addFirst(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldPrev = target.prev;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.prev = newNode;</div><div class="line"></div><div class="line">            newNode.next = target;</div><div class="line"></div><div class="line">            newNode.prev = oldPrev;</div><div class="line"></div><div class="line">            oldPrev.next = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    public void addAfter(Item targetItem, Item item) &#123;</div><div class="line"></div><div class="line">        Node target = first;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;No node in linked list.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        while (target != null &amp;&amp; target.item != targetItem) &#123;</div><div class="line"></div><div class="line">            target = target.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target == null) &#123;</div><div class="line"></div><div class="line">            throw new NullPointerException(&quot;Can&apos;t find target node.&quot;);</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (target.next == null) &#123;</div><div class="line"></div><div class="line">            addLast(item);</div><div class="line"></div><div class="line">        &#125; else &#123;</div><div class="line"></div><div class="line">            Node oldNext = target.next;</div><div class="line"></div><div class="line">            Node newNode = new Node();</div><div class="line"></div><div class="line">            newNode.item = item;</div><div class="line"></div><div class="line">            target.next = newNode;</div><div class="line"></div><div class="line">            newNode.prev = target;</div><div class="line"></div><div class="line">            newNode.next= oldNext;</div><div class="line"></div><div class="line">            oldNext.prev = newNode;</div><div class="line"></div><div class="line">            itemCount++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注：实现链表使用的是pointer wrapper方式，这种方式的特点是prev/next指针包含在结点中，而数据由结点中的另一个指针（即item）所引用。采取这种方式，在获取结点数据时，我们需要进行double-dereferencing，而且这种方式实现的链表不是一种[局部化结构]，这意味着我们<strong>拿到链表的一个结点数据后，无法直接进行insert/delete操作</strong>。</p>
+<h4 id="常见面试题"><a href="#常见面试题" class="headerlink" title="常见面试题"></a>常见面试题</h4><ol>
+<li>输入一个链表，输出该链表中倒数第k个结点。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public class Solution &#123;</div><div class="line"></div><div class="line">    public ListNode FindKthToTail(ListNode head,int k) &#123;</div><div class="line"></div><div class="line">        //先求得链表的尺寸，赋值给size</div><div class="line"></div><div class="line">        int size = 0;</div><div class="line"></div><div class="line">        ListNode current = head;</div><div class="line"></div><div class="line">        while (current != null) &#123;</div><div class="line"></div><div class="line">            size++;</div><div class="line"></div><div class="line">            current = current.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //获取next实例域size-k次，即可得到倒数第k个结点（从1开始计数）</div><div class="line"></div><div class="line">        for (int i = 0; i &lt; size - k; i++) &#123;</div><div class="line"></div><div class="line">            head = head.next;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return head;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>2.反转链表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public ListNode ReverseList(ListNode head) &#123;</div><div class="line"></div><div class="line">    if (head == null) &#123;</div><div class="line"></div><div class="line">        return null;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ListNode current = head;</div><div class="line"></div><div class="line">    //原head的next node为null</div><div class="line"></div><div class="line">    ListNode prevNode = null;</div><div class="line"></div><div class="line">    ListNode newHead = null;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    while (current != null) &#123;</div><div class="line"></div><div class="line">        ListNode nextNode = current.next;</div><div class="line"></div><div class="line">        current.next = prevNode;</div><div class="line"></div><div class="line">        if (nextNode == null) &#123;</div><div class="line"></div><div class="line">            newHead = current;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        prevNode = current;</div><div class="line"></div><div class="line">        current = nextNode;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return newHead;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://blog.csdn.net/qq_20597479/article/details/59492181" target="_blank" rel="external">LinkedList源码解析</a></p>
+<p>以上转载</p>
+<p><a href="http://www.cnblogs.com/absfree/p/5463372.html" target="_blank" rel="external">http://www.cnblogs.com/absfree/p/5463372.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java链表——LinkedList解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java链表——LinkedList解析/" itemprop="url">Java链表——LinkedList解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:47:34+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>LinkedList类结构</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">LinkedList&lt;E&gt;</div><div class="line">    extends AbstractSequentialList&lt;E&gt;</div><div class="line">    implements List&lt;E&gt;, Deque&lt;E&gt;, Cloneable, java.io.Serializable</div></pre></td></tr></table></figure>
+<p><strong>Node结构</strong><br><strong>双向链表结构（指向前一结点和后一节点的引用）</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Node&lt;E&gt; &#123;</div><div class="line">        E item; </div><div class="line">        Node&lt;E&gt; next; </div><div class="line">        Node&lt;E&gt; prev; </div><div class="line"></div><div class="line">        Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) &#123;</div><div class="line">            this.item = element;</div><div class="line">            this.next = next;</div><div class="line">            this.prev = prev;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>声明变量</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * Pointer to first node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (first.prev == null &amp;&amp; first.item != null)</div><div class="line">    */</div><div class="line">transient Node&lt;E&gt; first;</div><div class="line"></div><div class="line">/**</div><div class="line">    * Pointer to last node.</div><div class="line">    * Invariant: (first == null &amp;&amp; last == null) ||</div><div class="line">    *            (last.next == null &amp;&amp; last.item != null)</div><div class="line">    */</div><div class="line">   transient Node&lt;E&gt; last;</div></pre></td></tr></table></figure></p>
+<p><strong>链表添加首位</strong><br><em>推导–&gt;（链表添加末尾）</em><br><em>同理。可得到添加addBefore()上一元素，根据条件不同</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**private void addLast(E e)&#123;*/</div><div class="line">private void andFirst(E e) &#123;</div><div class="line">        /**final Node&lt;E&gt; l = last;*/</div><div class="line">        final Node&lt;E&gt; f = first; </div><div class="line">        //assert：last.next == null &amp;&amp; first.item != null;</div><div class="line">        /**final Node&lt;E&gt; newNode = new Node&lt;&gt;(l,e,null);*/</div><div class="line">        //assert：first.prev == null &amp;&amp; first.item != null</div><div class="line">        //init newNode</div><div class="line">        final Node&lt;E&gt; newNode = new Node&lt;&gt;(null, e, f);</div><div class="line">        /**last = newNode*/</div><div class="line">        first = newNode; </div><div class="line">        //如果首位结点为空，则直接添加。否则添加到结点元素的上一结点</div><div class="line">        /** if(l == null) first = newNode else l.next = newNode */</div><div class="line">        if (f == null) </div><div class="line">            last = newNode;</div><div class="line">        else</div><div class="line">            f.prev = newNode;</div><div class="line">        size++; // init size=0</div><div class="line">        modCount++;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>添加上一元素</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private void addBefore(E e,Node&lt;E&gt; target)&#123;</div><div class="line">//assert: node.next = target &amp;&amp; node.prev = target.prev != null</div><div class="line">	Node&lt;E&gt; newNode = (target.prev,e,target);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>删除首元素,并且返回</strong><br><em>推导–&gt;删除末尾元素，并且返回下一个元素</em><br><em>如果需要删除任意一个未知结点Node X,需要判断两种极端情况（最末或者最前，然后往后（往前）推，当前位置清空回收</em><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">//private E removeLast(Node&lt;E&gt; f)&#123;</div><div class="line">private E removeFirst(Node&lt;E&gt; f) &#123;</div><div class="line">        //assert f == first &amp;&amp; f != null;</div><div class="line">        final E element = f.item; //得到该元素</div><div class="line">        //final Node&lt;E&gt; prev = f.prev;</div><div class="line">        final Node&lt;E&gt; next = f.next; //得到它下一个引用</div><div class="line">        f.item = null; //清空</div><div class="line">        //f.prev = null;</div><div class="line">        f.next = null; // 回收内存（GC）</div><div class="line">        //last = prev;</div><div class="line">        first = next; //将下一个Node移到首位</div><div class="line">        //if(prev == null) first= null; else prev.next = null</div><div class="line">        //如果为空，则代表List只有一个元素，回收</div><div class="line">        //否则，移除该元素</div><div class="line">        if (next == null) </div><div class="line">            last = null;</div><div class="line">        else</div><div class="line">            next.prev = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">E remove(Node&lt;E&gt; x) &#123;</div><div class="line">        // assert x != null;</div><div class="line">        final E element = x.item;</div><div class="line">        final Node&lt;E&gt; next = x.next;</div><div class="line">        final Node&lt;E&gt; prev = x.prev;</div><div class="line">		</div><div class="line">        if (prev == null) &#123;</div><div class="line">            first = next;</div><div class="line">        &#125; else &#123; //填充在后一元素的位置</div><div class="line">            prev.next = next;</div><div class="line">            x.prev = null; //之前的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if (next == null) &#123; </div><div class="line">            last = prev;</div><div class="line">        &#125; else &#123; //填充在前一元素的位置</div><div class="line">            next.prev = prev;</div><div class="line">            x.next = null; //之后的位置清空回收</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        x.item = null;</div><div class="line">        size--;</div><div class="line">        modCount++;</div><div class="line">        return element;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（二）——-GC策略-内存申请、对象衰老/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/jvm调优笔记（二）——-GC策略-内存申请、对象衰老/" itemprop="url">jvm调优笔记（二）—— GC策略&内存申请、对象衰老</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:47:05+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jvm调优/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm调优</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>JVM里的GC(Garbage Collection)的算法有很多种，如标记清除收集器，压缩收集器，分代收集器等等,详见HotSpot VM GC 的种类</p>
+<h2 id="堆内存GC"><a href="#堆内存GC" class="headerlink" title="堆内存GC"></a>堆内存GC</h2><p>JVM(采用<strong>分代回收</strong>的策略)，<strong>用较高的频率对年轻的对象(young generation)进行YGC，而对老对象(tenured generation)较少(tenured generation 满了后才进行)进行Full GC</strong>。这样就不需要每次GC都将内存中所有对象都检查一遍。</p>
+<h2 id="非堆内存不GC"><a href="#非堆内存不GC" class="headerlink" title="非堆内存不GC"></a>非堆内存不GC</h2><p>GC不会在主程序运行期对PermGen Space进行清理，所以如果你的应用中有很多CLASS(特别是动态生成类，当然permgen space存放的内容不仅限于类)的话,就很可能出现PermGen Space错误。</p>
+<h2 id="内存申请、对象衰老过程"><a href="#内存申请、对象衰老过程" class="headerlink" title="内存申请、对象衰老过程"></a>内存申请、对象衰老过程</h2><p>一、内存申请过程</p>
+<p>JVM会试图为相关Java对象在Eden中<strong>初始化一块内存区域</strong>；</p>
+<p>判断Eden空间（足够时），内存申请结束。否则到下一步；</p>
+<p>JVM试图<strong>释放在Eden中所有不活跃的对象</strong>（minor collection），释放后若Eden空间仍然不足以放入新对象，则<strong>试图将部分Eden中活跃对象放入Survivor区</strong>；</p>
+<p>Survivor区被用来<strong>作为Eden及old的中间交换区域</strong>，当OLD区空间足够时，Survivor区的对象会被移到Old区，否则会被保留在Survivor区；</p>
+<p>当old区空间不够时，JVM会在old区进行major collection；</p>
+<p>完全垃圾收集后，<strong>若Survivor及old区仍然无法存放从Eden复制过来的部分对象，导致JVM无法在Eden区为新对象创建内存区域，则出现”Out of memory错误</strong>“；</p>
+<h2 id="二、对象衰老过程"><a href="#二、对象衰老过程" class="headerlink" title="二、对象衰老过程"></a>二、对象衰老过程</h2><p>新创建的对象的内存都分配自eden。Minor collection的过程就是将eden和在用survivor space中的活对象copy到空闲survivor space中。对象在young generation里经历了一定次数(可以通过参数配置)的minor collection后，就会被移到old generation中，称为tenuring。</p>
+<p>转载</p>
+<p><a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html" target="_blank" rel="external">http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/jvm调优笔记（一）——-基础概念/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1255,675 +1858,11 @@ Direct Bytebuffer JNI Compile GC;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装docker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装docker/" itemprop="url">【Linux】Centos6.8安装docker</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:42+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>检查系统版本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">uname -a</div><div class="line"></div><div class="line">cat /etc/redhat-release</div></pre></td></tr></table></figure>
-<p>安装Epel</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -Uvh http://ftp.riken.jp/Linux/fedora/epel/6Server/x86_64/epel-release-6-8.noarch.rpm</div></pre></td></tr></table></figure>
-<p>安装docker</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install -y docker-io</div></pre></td></tr></table></figure>
-<p>开机自启动与启动Docker</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">service docker start</div><div class="line"></div><div class="line">chkconfig docker on</div><div class="line"></div><div class="line">chkconfig docker --list</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装RabbitMQ/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【Linux】Centos6-8安装RabbitMQ/" itemprop="url">【Linux】Centos6.8安装RabbitMQ</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:42:03+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/" itemprop="url" rel="index">
-                    <span itemprop="name">centos</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>####【步骤一】 安装依赖包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">yum -y install ncurses-devel</div><div class="line"></div><div class="line">yum list | grep ssl     yum install openssl-devel</div><div class="line"></div><div class="line">yum list | grep ODBC  yum install unixODBC-devel</div><div class="line"></div><div class="line">yum install gcc-c++   </div><div class="line"></div><div class="line">yum install perl （自己补充的，不然会报错）</div><div class="line"></div><div class="line">yum install libxslt yum install  rsync yum install  zip</div><div class="line"></div><div class="line">yum -y install xmlto  </div><div class="line"></div><div class="line">yum install gcc glibc-devel make ncurses-devel openssl-devel autoconf</div></pre></td></tr></table></figure>
-<p>####【步骤二】下载erlang</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget   http://www.erlang.org/download/otp_src_19.0.tar.gz</div></pre></td></tr></table></figure>
-<h4 id="【步骤三】解压erlang"><a href="#【步骤三】解压erlang" class="headerlink" title="【步骤三】解压erlang"></a>【步骤三】解压erlang</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">tar zvxf otp_src_19.0.tar.gz  -C /usr/local </div><div class="line"></div><div class="line">mv /user/otp_src_19.0.tar.gz /usr/local/otp (重命名）</div><div class="line"></div><div class="line">cd otp</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/erlang --without-javac  --with-opengl</div><div class="line">--enable-debug --enable-unicode</div><div class="line"></div><div class="line">make &amp;&amp; make install (编译erlang）</div><div class="line"></div><div class="line">vi /etc/profile (设置环境变量）</div><div class="line"></div><div class="line">PATH=$PATH:/usr/local/erlang/bin</div><div class="line">        export PATH</div><div class="line"></div><div class="line">cd /usr/local/erlang/bin</div></pre></td></tr></table></figure>
-<h4 id="【步骤四】测试erl是否安装成功"><a href="#【步骤四】测试erl是否安装成功" class="headerlink" title="【步骤四】测试erl是否安装成功"></a>【步骤四】测试erl是否安装成功</h4><p>8.1 erl</p>
-<p>退出erl命令行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">halt().</div></pre></td></tr></table></figure>
-<h4 id="【步骤五】安装python"><a href="#【步骤五】安装python" class="headerlink" title="【步骤五】安装python"></a>【步骤五】安装python</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz</div><div class="line"></div><div class="line">mv Python-2.7.6.tgz python</div><div class="line"></div><div class="line">cd python</div><div class="line"></div><div class="line">./configure --prefix=/usr/local/python27</div><div class="line"></div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
-<p>检测是否安装成功</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python -v</div></pre></td></tr></table></figure>
-<hr>
-<ol>
-<li>wget 工具安装</li>
-</ol>
-<p><a href="http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm" target="_blank" rel="external">http://mirrors.163.com/centos/6.8/os/x86_64/Packages/wget-1.12-8.el6.x86_64.rpm</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rpm -ivh wget-1.12-8.el6.x86_64.rpm</div></pre></td></tr></table></figure>
-<ol>
-<li>xz工具安装<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">yum install xz</div><div class="line"></div><div class="line">xz -d xxx.tar.xz</div><div class="line"></div><div class="line">tar -xf xxx.tar -C /usr/local</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>#安装rabbitmq</p>
-<p>1.下载</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget  http://www.rabbitmq.com/releases/rabbitmq-server/v3.1.5/rabbitmq-server-unix-3.1.5.tar.gz</div></pre></td></tr></table></figure>
-<p>2.解压</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar xvf rabbitmq-server-unix-3.1.5.tar.gz</div><div class="line"></div><div class="line">mv rabbitmq-server-unix-3.1.5.tar.gz /usr/local/rabbitmq-server</div></pre></td></tr></table></figure>
-<p>#sbin命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">rabbitmqctl add_user admin admin 新增用户</div><div class="line"></div><div class="line">rabbitmqctl set_user_tags admin administrator 设置为管理员</div><div class="line"></div><div class="line">rabbitmqctl set_permissions -p &quot;/&quot; admin &quot;.*&quot; &quot;.*&quot; &quot;.*&quot; 设置权限</div><div class="line"></div><div class="line">rabbitmq-plugins enable rabbitmq_management  配置web插件</div></pre></td></tr></table></figure>
-<p>#远程访问rabbitmq</p>
-<p><strong>iptables -F 关闭防火墙，开放端口</strong></p>
-<p><a href="http://172.16.41.31:15672" target="_blank" rel="external">http://172.16.41.31:15672</a></p>
-<p>#Java访问rabbitmq</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">vi /etc/rabbitmq/rabbitmq.config 中添加</div><div class="line"></div><div class="line">[</div><div class="line"> &#123;rabbit,</div><div class="line"></div><div class="line">  [</div><div class="line">      &#123;tcp_listeners, [5672]&#125;,</div><div class="line">      &#123;loopback_users, [&quot;admin&quot;]&#125;</div><div class="line">  ]&#125;</div><div class="line">].</div></pre></td></tr></table></figure>
-<p>端口</p>
-<p>4369 (epmd)</p>
-<p>5672, 5671 (AMQP 0-9-1 and 1.0 without and with TLS)</p>
-<ol>
-<li>This port used by Erlang distribution for inter-node and CLI tools communication and is allocated from a dynamic range (limited to a single port by default, computed as AMQP port + 20000)</li>
-</ol>
-<p>15672 (if management plugin is enabled)</p>
-<p>61613, 61614 (if STOMP is enabled)</p>
-<p>1883, 8883 (if MQTT is enabled)</p>
-<p>   修改虚拟机ip</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/network-scripts/ifcfg-eth0</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/ActiveMQ学习笔记（一）——-HelloWorld/" itemprop="url">ActiveMQ学习笔记（一）—— HelloWorld</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:39:19+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/activemq/" itemprop="url" rel="index">
-                    <span itemprop="name">activemq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="HelloProducer-class"><a href="#HelloProducer-class" class="headerlink" title="HelloProducer.class"></a>HelloProducer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">// 生产者的主要流程  </div><div class="line"></div><div class="line">Connection conn = null;</div><div class="line"></div><div class="line">//1.初始化连接工厂</div><div class="line"></div><div class="line">ConnectionFactory factory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);</div><div class="line"></div><div class="line">// 2.创建Connection  </div><div class="line"></div><div class="line">conn = factory.createConnection();  </div><div class="line"></div><div class="line"> // 3.打开连接</div><div class="line"></div><div class="line">conn.start();</div><div class="line"></div><div class="line">// 4.创建session，是否支持事务</div><div class="line"></div><div class="line">Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);  </div><div class="line"></div><div class="line"> // 5.创建消息目标  </div><div class="line"></div><div class="line">Destination queue = session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line"> //6.创建生产者  </div><div class="line"></div><div class="line">MessageProducer producer = session.createProducer(queue);</div><div class="line"></div><div class="line">//7.配置消息是否持久化  </div><div class="line"></div><div class="line">/*  DeliverMode有2种方式： </div><div class="line"></div><div class="line"> *  </div><div class="line"></div><div class="line">     public interface DeliveryMode &#123; </div><div class="line"></div><div class="line">                static final int NON_PERSISTENT = 1;//不持久化：服务器重启之后，消息销毁 </div><div class="line"></div><div class="line">                static final int PERSISTENT = 2;//持久化：服务器重启之后，该消息仍存在 </div><div class="line"></div><div class="line">      &#125; </div><div class="line"></div><div class="line"> */  </div><div class="line"></div><div class="line">producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);  </div><div class="line"></div><div class="line"> //8.初始化要发送的消息  </div><div class="line"></div><div class="line">TextMessage message = session.createTextMessage(&quot; Hello World ! from activemq&quot;); </div><div class="line"></div><div class="line">//9.发送消息</div><div class="line"></div><div class="line">producer.send(message);</div><div class="line"></div><div class="line">//10.关闭连接</div><div class="line"></div><div class="line">conn.close();</div></pre></td></tr></table></figure>
-<h3 id="HelloCustomer-class"><a href="#HelloCustomer-class" class="headerlink" title="HelloCustomer.class"></a>HelloCustomer.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line">HelloConsumer implements TextListener</div><div class="line"></div><div class="line">@Override</div><div class="line"></div><div class="line">public void onMessage(Message message) &#123;</div><div class="line"></div><div class="line">        //如果消息是TextMessage  </div><div class="line"></div><div class="line">        if (message instanceof TextMessage) &#123;  </div><div class="line"></div><div class="line">            //强制转换一下  </div><div class="line"></div><div class="line">            TextMessage txtMsg = (TextMessage) message;  </div><div class="line"></div><div class="line">            try &#123;  </div><div class="line"></div><div class="line">                //输出接收到的消息  </div><div class="line"></div><div class="line">                System.out.println(&quot;我爱罗接收到漩涡鸣人的信息 : &quot; + txtMsg.getText());  </div><div class="line"></div><div class="line">            &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">                e.printStackTrace();  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">        &#125;          </div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">public void receive() &#123;  </div><div class="line"></div><div class="line">        // 消费者的主要流程  </div><div class="line"></div><div class="line">        Connection connection = null;  </div><div class="line"></div><div class="line">        try &#123;  </div><div class="line"></div><div class="line">            // 1.初始化connection工厂  </div><div class="line"></div><div class="line">            ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(&quot;tcp://172.16.41.156:61616&quot;);  </div><div class="line"></div><div class="line">            // 2.创建Connection  </div><div class="line"></div><div class="line">            connection = connectionFactory.createConnection();  </div><div class="line"></div><div class="line">            // 3.打开连接  </div><div class="line"></div><div class="line">            connection.start();  </div><div class="line"></div><div class="line">            // 4.创建session  </div><div class="line"></div><div class="line">            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE); </div><div class="line"></div><div class="line">            // 5.创建消息目标  </div><div class="line"></div><div class="line">            Destination queue= session.createQueue(&quot;queue_hello&quot;);  </div><div class="line"></div><div class="line">            //6.创建消费者  </div><div class="line"></div><div class="line">            MessageConsumer consumer = session.createConsumer(queue);          </div><div class="line"></div><div class="line">            //7.配置监听  </div><div class="line"></div><div class="line">            consumer.setMessageListener(this);  </div><div class="line"></div><div class="line">        &#125; catch (JMSException e) &#123;  </div><div class="line"></div><div class="line">            e.printStackTrace();  </div><div class="line"></div><div class="line">        &#125;  </div><div class="line"></div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<h3 id="运行测试"><a href="#运行测试" class="headerlink" title="运行测试"></a>运行测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line"></div><div class="line">        new HelloConsumer().receive();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>ActiveMq如果与Spring配置</p>
-<p>  //有对应所需功能api，其余配置只需要在xml文件里面配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private JmsTemplate jmsTemplate;   </div><div class="line"></div><div class="line">public JmsTemplate getJmsTemplate() &#123;  </div><div class="line"></div><div class="line">   return jmsTemplate;  </div><div class="line"></div><div class="line">&#125;  </div><div class="line"></div><div class="line">public void setJmsTemplate(JmsTemplate jmsTemplate) &#123;  </div><div class="line"></div><div class="line">   this.jmsTemplate = jmsTemplate;  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>spring配置内容</p>
-<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714291" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714291</a></p>
-<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12714739" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12714739</a></p>
-<p>以上转载</p>
-<p><a href="http://blog.csdn.net/yuguiyang1990/article/details/12090505" target="_blank" rel="external">http://blog.csdn.net/yuguiyang1990/article/details/12090505</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（六）——-RPC调用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（六）——-RPC调用/" itemprop="url">RabbitMq学习笔记（六）—— RPC调用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:38:52+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="RpcClient-class"><a href="#RpcClient-class" class="headerlink" title="RpcClient.class"></a>RpcClient.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"> //生成Rpc队列</div><div class="line"></div><div class="line">            channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);  </div><div class="line"></div><div class="line">            channel.basicQos(1);  </div><div class="line"></div><div class="line">            //创建Rpc队列消费者</div><div class="line"></div><div class="line">            QueueingConsumer consumer = new QueueingConsumer(channel);  </div><div class="line"></div><div class="line">            channel.basicConsume(RPC_QUEUE_NAME, false, consumer);  </div><div class="line"></div><div class="line">            System.out.println(&quot;RPCServer [x] Awaiting RPC requests&quot;);  </div><div class="line"></div><div class="line">            while (true) &#123;  </div><div class="line"></div><div class="line">                String response = &quot;&quot;;      //返回RpcClient回调结果</div><div class="line"></div><div class="line">                //获取队列中消息，如果没有则会一直阻塞</div><div class="line"></div><div class="line">                QueueingConsumer.Delivery delivery = consumer.nextDelivery();    </div><div class="line"></div><div class="line">                BasicProperties props = delivery.getProperties();  </div><div class="line"></div><div class="line">                //开启Rpc</div><div class="line"></div><div class="line">                BasicProperties replyProps = new BasicProperties.Builder().correlationId(props.getCorrelationId()).build();  </div><div class="line"></div><div class="line">               try &#123;  </div><div class="line"></div><div class="line">                    //获取消息</div><div class="line"></div><div class="line">                    String message = new String(delivery.getBody(), &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                    int n = Integer.parseInt(message);  </div><div class="line"></div><div class="line">                    System.out.println(&quot;RPCServer [.] fib(&quot; + message + &quot;)&quot;);  </div><div class="line"></div><div class="line">                    response = &quot;&quot; + fib(n);  </div><div class="line"></div><div class="line">                &#125; catch (Exception e) &#123;  </div><div class="line"></div><div class="line">                    System.out.println(&quot; [.] &quot; + e.toString());  </div><div class="line"></div><div class="line">                    response = &quot;&quot;;  </div><div class="line"></div><div class="line">                &#125; finally &#123;  </div><div class="line"></div><div class="line">                    //完成</div><div class="line"></div><div class="line">                    channel.basicPublish(&quot;&quot;, props.getReplyTo(), replyProps, response.getBytes(&quot;UTF-8&quot;));  </div><div class="line"></div><div class="line">                    //传输失败，回退</div><div class="line"></div><div class="line">                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="RpcClient-class-1"><a href="#RpcClient-class-1" class="headerlink" title="RpcClient.class"></a>RpcClient.class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">private Connection connection;  </div><div class="line"></div><div class="line">    private Channel channel;  </div><div class="line"></div><div class="line">    private String requestQueueName = &quot;rpc_queue&quot;;  </div><div class="line"></div><div class="line">    private String replyQueueName;  </div><div class="line"></div><div class="line">    private QueueingConsumer consumer;  </div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    public RpcClient() throws KeyManagementException, NoSuchAlgorithmException, URISyntaxException, IOException, TimeoutException&#123;</div><div class="line"></div><div class="line">         ConnectionFactory factory = new ConnectionFactory();  </div><div class="line"></div><div class="line">         factory.setUri(&quot;amqp://admin:admin@172.16.41.31:5672&quot;);  </div><div class="line"></div><div class="line">         connection = factory.newConnection();  </div><div class="line"></div><div class="line">         channel = connection.createChannel();  </div><div class="line"></div><div class="line">         replyQueueName = channel.queueDeclare().getQueue();  </div><div class="line"></div><div class="line">         consumer = new QueueingConsumer(channel);  </div><div class="line"></div><div class="line">         channel.basicConsume(replyQueueName, true, consumer);  </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    //计算结果，返回给RpcServer</div><div class="line"></div><div class="line">    public String call(String message) throws Exception &#123;  </div><div class="line"></div><div class="line">    String response = null;  </div><div class="line"></div><div class="line">        String corrId = UUID.randomUUID().toString();  </div><div class="line"></div><div class="line">        BasicProperties props = new BasicProperties.Builder().correlationId(corrId).replyTo(replyQueueName).build();  </div><div class="line"></div><div class="line">        channel.basicPublish(&quot;&quot;, requestQueueName, props, message.getBytes(&quot;UTF-8&quot;));  </div><div class="line"></div><div class="line">        while (true) &#123;  </div><div class="line"></div><div class="line">            QueueingConsumer.Delivery delivery = consumer.nextDelivery();  </div><div class="line"></div><div class="line">            if (delivery.getProperties().getCorrelationId().equals(corrId)) &#123;  </div><div class="line"></div><div class="line">                response = new String(delivery.getBody(), &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                break;  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">        &#125;  </div><div class="line"></div><div class="line">        return response;  </div><div class="line"></div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    </div><div class="line"></div><div class="line">    public void close() throws Exception &#123;  </div><div class="line"></div><div class="line">        connection.close();  </div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h3 id="远程方法调用的注意事项"><a href="#远程方法调用的注意事项" class="headerlink" title="远程方法调用的注意事项"></a>远程方法调用的注意事项</h3><pre><code>RPC在软件开发中非常常见，也经常被批评。当一个程序员对代码不熟悉的时候，跟踪RPC的性能问题是出在本地还是远程服务器就非常麻烦，对于RPC的使用，有几点需要特别说明：
-</code></pre><p>使用远程调用时的本地函数最好独立出来</p>
-<p>保证代码组件之间的依赖关系清晰明了，并用日志记录不同的执行过程和时间</p>
-<p>发生客户端运行缓慢或者假死时，先确认RPC服务器是否还活着！</p>
-<p>尽量使用异步队列来处理RPC请求，尽量不要用同步阻塞的方式运行RPC请求</p>
-<h2 id="消息属性"><a href="#消息属性" class="headerlink" title="消息属性"></a>消息属性</h2><p>传输一条消息，AMQP协议预定义了14个属性，下面几个是使用比较频繁的几个属性：</p>
-<p>deliveryMode：配置一个消息是否持久化。（2表示持久化）这个在第二章中有说明。</p>
-<p>contentType ：用来描述编码的MIME类型。与html的MIME类型类似，例如，经常使用JSON编码是将此属性设置为一个很好的做法：application/json。</p>
-<p>replyTo ： 回调队列的名称。</p>
-<p>correlationId：RPC响应请求的相关编号。</p>
-<p>关联编号  Correlation Id</p>
-<blockquote>
-<p>如果一个客户端有很多的计算任务，按照上面的代码，我们会为每个任务创建一个请求，然后等待返回的结果，这种方法貌似很耗时，如果把所有的任务都放到同一个连接中，那么我们又没法分辨出返回的结果是那个任务的？为了解决这个问题，RabbitMQ提供了一个correlationid属性来解决这个问题。RabbitMQ为每个请求提供唯一的编号，然后在返回队列里如果看到了这个编号，就知道我们的任务处理完成了，如果收到的编号不认识，就可以安全的忽略。</p>
-</blockquote>
-<p>你可能会疑问，如果忽略了，那么想知道这个返回结果的客户端是不是就收不到这个结果了？这个基本上不会出现，但是，理论上也可能发生，例如一个RPC服务器，在发送确认消息前挂了，你收到的消息可能就是不完整的。这种情况，RabbitMQ会重新发送任务处理请求。这也是为什么客户端必须处理这些重复请求以及RPC启用幂次模式。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>RPC工作方式</p>
-<p>当客户端启动时，会创建一个匿名的回调队列</p>
-<p>在RPC请求中，定义了两个属性：replyTo，表示回调队列的名称； correlationId，表示请求任务的唯一编号，用来区分不同请求的返回结果。</p>
-<p>将请求发送到rpc_queue队列中</p>
-<p>RPC服务器等待rpc_queue队列的请求，如果有消息，就处理，它将计算结果发送到请求中的回调队列里。</p>
-<p>客户端监听回调队列中的消息，如果有返回消息，它根据回调消息中的correlationid进行匹配计算结果。</p>
-<p>以上转载</p>
-<p><a href="http://blog.csdn.net/chwshuang/article/details/50518570" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50518570</a></p>
-<p>参考RabbitMQ中文文档</p>
-<p><a href="http://rabbitmq.mr-ping.com/tutorials_with_python/[5]Topics.html" target="_blank" rel="external">http://rabbitmq.mr-ping.com/tutorials_with_python/[5]Topics.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1968,7 +1907,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">142</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1979,7 +1918,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">55</span>
+                <span class="site-state-item-count">57</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1990,7 +1929,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">107</span>
+                <span class="site-state-item-count">108</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

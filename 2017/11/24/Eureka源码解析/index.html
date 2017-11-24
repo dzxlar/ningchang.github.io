@@ -1,0 +1,941 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Eureka," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="SpringBoot注册到EurekaServer服务器列表  @EnableDiscoveryClient 激活Eureka中的DiscoveryClient实现 eureka.client.serviceUrl.defaultZone=http://localhost:10010/eureka/ 指定服务器注册中心  @EnableDiscoveryClient实现开启DiscoveryCli">
+<meta name="keywords" content="Eureka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Eureka源码解析">
+<meta property="og:url" content="http://yoursite.com/2017/11/24/Eureka源码解析/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="SpringBoot注册到EurekaServer服务器列表  @EnableDiscoveryClient 激活Eureka中的DiscoveryClient实现 eureka.client.serviceUrl.defaultZone=http://localhost:10010/eureka/ 指定服务器注册中心  @EnableDiscoveryClient实现开启DiscoveryCli">
+<meta property="og:updated_time" content="2017-11-24T08:54:25.602Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Eureka源码解析">
+<meta name="twitter:description" content="SpringBoot注册到EurekaServer服务器列表  @EnableDiscoveryClient 激活Eureka中的DiscoveryClient实现 eureka.client.serviceUrl.defaultZone=http://localhost:10010/eureka/ 指定服务器注册中心  @EnableDiscoveryClient实现开启DiscoveryCli">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/24/Eureka源码解析/"/>
+
+
+
+
+
+  <title>Eureka源码解析 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/Eureka源码解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Eureka源码解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T16:53:44+08:00">
+                2017-11-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SpringBoot注册到EurekaServer服务器列表</p>
+<ol>
+<li><code>@EnableDiscoveryClient</code> 激活Eureka中的DiscoveryClient实现</li>
+<li><code>eureka.client.serviceUrl.defaultZone=http://localhost:10010/eureka/</code> 指定服务器注册中心</li>
+</ol>
+<h3 id="EnableDiscoveryClient实现"><a href="#EnableDiscoveryClient实现" class="headerlink" title="@EnableDiscoveryClient实现"></a>@EnableDiscoveryClient实现</h3><p>开启DiscoveryClient</p>
+<pre><code>/**
+ * Annotation to enable a DiscoveryClient implementation.
+ * @author Spencer Gibb
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Import(EnableDiscoveryClientImportSelector.class)
+public @interface EnableDiscoveryClient {
+
+}
+</code></pre><h3 id="DiscoveryClient"><a href="#DiscoveryClient" class="headerlink" title="DiscoveryClient"></a>DiscoveryClient</h3><p>DiscoveryClient职责</p>
+<ol>
+<li>向EurekaServer注册服务</li>
+<li>向EurekaServer租约续期</li>
+<li>当服务器关闭时，取消租约</li>
+<li>查询EureServer中的服务列表</li>
+<li>EurekaClient需要配置一个EurekaServer URL列表</li>
+</ol>
+<p>根据配置属性<code>eureka.client.serviceUrl.defaultZone</code>从DiscoveryClient中找到serviceUrl</p>
+<pre><code>private final EndpointUtils.ServiceUrlRandomizer urlRandomizer;
+</code></pre><p>EndpointUtils中找到<code>getServiceUrlsFromConfig</code>方法</p>
+<blockquote>
+<p>Get the list of all eureka service urls from properties file for the eureka client to talk to.<br>从配置文件中得到所有eureka的serviceUrl与EurekaClient进行对话</p>
+</blockquote>
+<p>参数</p>
+<ul>
+<li>clientConfig clientConfig中使用</li>
+<li>instanceZone 客户端所在的Zone</li>
+<li>preferSameZone 必须选择与客户端相同的Zone</li>
+</ul>
+<pre><code>     public static List&lt;String&gt; getServiceUrlsFromConfig(EurekaClientConfig clientConfig, String instanceZone, boolean preferSameZone) {
+    List&lt;String&gt; orderedUrls = new ArrayList&lt;String&gt;();
+    String region = getRegion(clientConfig);
+    String[] availZones = clientConfig.getAvailabilityZones(clientConfig.getRegion());
+    if (availZones == null || availZones.length == 0) {
+        availZones = new String[1];
+        availZones[0] = DEFAULT_ZONE;
+    }
+    logger.debug(&quot;The availability zone for the given region {} are {}&quot;, region, availZones);
+    int myZoneOffset = getZoneOffset(instanceZone, preferSameZone, availZones);
+
+    List&lt;String&gt; serviceUrls = clientConfig.getEurekaServerServiceUrls(availZones[myZoneOffset]);
+    if (serviceUrls != null) {
+        orderedUrls.addAll(serviceUrls);
+    }
+    int currentOffset = myZoneOffset == (availZones.length - 1) ? 0 : (myZoneOffset + 1);
+    while (currentOffset != myZoneOffset) {
+        serviceUrls = clientConfig.getEurekaServerServiceUrls(availZones[currentOffset]);
+        if (serviceUrls != null) {
+            orderedUrls.addAll(serviceUrls);
+        }
+        if (currentOffset == (availZones.length - 1)) {
+            currentOffset = 0;
+        } else {
+            currentOffset++;
+        }
+    }
+
+    if (orderedUrls.size() &lt; 1) {
+        throw new IllegalArgumentException(&quot;DiscoveryClient: invalid serviceUrl specified!&quot;);
+    }
+    return orderedUrls;
+}
+</code></pre><p>方法中可以得到两个内容Region、Zone</p>
+<pre><code>String region = getRegion(clientConfig);
+String[] availZones = clientConfig.getAvailabilityZones(clientConfig.getRegion());
+</code></pre><p>tip：<strong>一个微服务只可以属于一个region</strong>，不特别配置，region和zone值就为default，如果需要自定义可以通过<code>eureka.client.region</code>设置</p>
+<pre><code>public static String getRegion(EurekaClientConfig clientConfig) {
+    String region = clientConfig.getRegion();
+    if (region == null) {
+        region = DEFAULT_REGION;
+    }
+    region = region.trim().toLowerCase();
+    return region;
+}
+</code></pre><p>EurekaClientConfigBean是EurekaClientConfig实现类</p>
+<p><code>getAvailabilityZones</code>如果未配置region，会采用默认defaultZone，这就是<code>eureka.client.serviceUrl.defaultZone</code>配置参数的由来</p>
+<p>   public String[] getAvailabilityZones(String region) {<br>        String value = this.availabilityZones.get(region);<br>        if (value == null) {<br>            value = DEFAULT_ZONE;<br>        }<br>        return value.split(“,”);<br>    }</p>
+<p><strong>Region和Zone之间的关系是一对多关系</strong></p>
+<h2 id="ServiceUrls"><a href="#ServiceUrls" class="headerlink" title="ServiceUrls"></a>ServiceUrls</h2><p>具体实现</p>
+<pre><code>public List&lt;String&gt; getEurekaServerServiceUrls(String myZone) {
+    String serviceUrls = this.serviceUrl.get(myZone);
+    if (serviceUrls == null || serviceUrls.isEmpty()) {
+        serviceUrls = this.serviceUrl.get(DEFAULT_ZONE);
+    }
+    if (!StringUtils.isEmpty(serviceUrls)) {
+        final String[] serviceUrlsSplit = StringUtils.commaDelimitedListToStringArray(serviceUrls);
+        List&lt;String&gt; eurekaServiceUrls = new ArrayList&lt;&gt;(serviceUrlsSplit.length);
+        for (String eurekaServiceUrl : serviceUrlsSplit) {
+            if (!endsWithSlash(eurekaServiceUrl)) {
+                eurekaServiceUrl += &quot;/&quot;;
+            }
+            eurekaServiceUrls.add(eurekaServiceUrl);
+        }
+        return eurekaServiceUrls;
+    }
+
+    return new ArrayList&lt;&gt;();
+}
+</code></pre><p>在获取了Region和Zone信息之后，才开始真正加载Eureka Server的具体地址。它根据传入的参数按一定算法确定加载位于哪一个Zone配置的serviceUrls</p>
+<pre><code>int myZoneOffset = getZoneOffset(instanceZone, preferSameZone, availZones);
+List&lt;String&gt; serviceUrls = clientConfig.getEurekaServerServiceUrls(availZones[myZoneOffset]);
+</code></pre><p><strong><code>eureka.client.serviceUrl.defaultZone</code>属性可以配置多个，并且需要通过逗号分隔</strong></p>
+<h2 id="服务注册原理"><a href="#服务注册原理" class="headerlink" title="服务注册原理"></a>服务注册原理</h2><pre><code>public DiscoveryClient(ApplicationInfoManager applicationInfoManager, final EurekaClientConfig config, AbstractDiscoveryClientOptionalArgs args) {
+    this(applicationInfoManager, config, args, new Provider&lt;BackupRegistry&gt;() {
+        private volatile BackupRegistry backupRegistryInstance;
+
+        @Override
+        public synchronized BackupRegistry get() {
+            if (backupRegistryInstance == null) {
+                String backupRegistryClassName = config.getBackupRegistryImpl();
+                if (null != backupRegistryClassName) {
+                    try {
+                        backupRegistryInstance = (BackupRegistry) Class.forName(backupRegistryClassName).newInstance();
+                        logger.info(&quot;Enabled backup registry of type {}&quot;, backupRegistryInstance.getClass());
+                    } catch (InstantiationException e) {
+                        logger.error(&quot;Error instantiating BackupRegistry.&quot;, e);
+                    } catch (IllegalAccessException e) {
+                        logger.error(&quot;Error instantiating BackupRegistry.&quot;, e);
+                    } catch (ClassNotFoundException e) {
+                        logger.error(&quot;Error instantiating BackupRegistry.&quot;, e);
+                    }
+                }
+
+                if (backupRegistryInstance == null) {
+                    logger.warn(&quot;Using default backup registry implementation which does not do anything.&quot;);
+                    backupRegistryInstance = new NotImplementedRegistryImpl();
+                }
+            }
+
+            return backupRegistryInstance;
+        }
+    });
+}
+</code></pre><h2 id="服务注册原理-1"><a href="#服务注册原理-1" class="headerlink" title="服务注册原理"></a>服务注册原理</h2><p><code>initScheduledTasks</code></p>
+<pre><code>//判断是否应该被发现通过Eureka注册的实例
+if (clientConfig.shouldRegisterWithEureka()) {
+    ...
+    //复制因子
+    instanceInfoReplicator = new InstanceInfoReplicator(
+                this,
+                instanceInfo,
+                clientConfig.getInstanceInfoReplicationIntervalSeconds(),
+                2);     
+    ..
+}
+</code></pre><p><code>InstanceInfoReplicator</code> </p>
+<pre><code>public void run() {
+    try {
+        discoveryClient.refreshInstanceInfo();
+
+        Long dirtyTimestamp = instanceInfo.isDirtyWithTime();
+        if (dirtyTimestamp != null) {
+             //真正执行服务注册的地方 
+            discoveryClient.register();
+            instanceInfo.unsetIsDirty(dirtyTimestamp);
+        }
+    } catch (Throwable t) {
+        logger.warn(&quot;There was a problem with the instance info replicator&quot;, t);
+    } finally {
+        Future next = scheduler.schedule(this, replicationIntervalSeconds, TimeUnit.SECONDS);
+        scheduledPeriodicRef.set(next);
+    }
+}
+</code></pre><p><code>register</code></p>
+<p>eureka通过rest服务调用</p>
+<pre><code>boolean register() throws Throwable {
+    logger.info(PREFIX + &quot;{}: registering service...&quot;, appPathIdentifier);
+    EurekaHttpResponse&lt;Void&gt; httpResponse;
+    try {
+        //通过rest进行调用的，同时传入com.netflix.appinfo.InstanceInfo元数据对象
+        httpResponse = eurekaTransport.registrationClient.register(instanceInfo);
+    } catch (Exception e) {
+        logger.warn(PREFIX + &quot;{} - registration failed {}&quot;, appPathIdentifier, e.getMessage(), e);
+        throw e;
+    }
+    if (logger.isInfoEnabled()) {
+        logger.info(PREFIX + &quot;{} - registration status: {}&quot;, appPathIdentifier, httpResponse.getStatusCode());
+    }
+    return httpResponse.getStatusCode() == 204;
+}
+</code></pre><h2 id="服务获取与服务续约"><a href="#服务获取与服务续约" class="headerlink" title="服务获取与服务续约"></a>服务获取与服务续约</h2><pre><code>if (clientConfig.shouldFetchRegistry()) {
+        // registry cache refresh timer
+        int registryFetchIntervalSeconds = clientConfig.getRegistryFetchIntervalSeconds();
+        int expBackOffBound = clientConfig.getCacheRefreshExecutorExponentialBackOffBound();
+        scheduler.schedule(
+                new TimedSupervisorTask(
+                        &quot;cacheRefresh&quot;,
+                        scheduler,
+                        cacheRefreshExecutor,
+                        registryFetchIntervalSeconds,
+                        TimeUnit.SECONDS,
+                        expBackOffBound,
+                        new CacheRefreshThread()
+                ),
+                registryFetchIntervalSeconds, TimeUnit.SECONDS);
+    }
+</code></pre><p>时间控制参数<code>eureka.instance.lease-renewal-interval-in-seconds=30</code><br>和 <code>eureka.instance.lease-expiration-duration-in-seconds=90</code></p>
+<p>服务续约</p>
+<pre><code>    boolean renew() {
+    EurekaHttpResponse&lt;InstanceInfo&gt; httpResponse;
+    try {
+        httpResponse = eurekaTransport.registrationClient.sendHeartBeat(instanceInfo.getAppName(), instanceInfo.getId(), instanceInfo, null);
+        logger.debug(PREFIX + &quot;{} - Heartbeat status: {}&quot;, appPathIdentifier, httpResponse.getStatusCode());
+        if (httpResponse.getStatusCode() == 404) {
+            REREGISTER_COUNTER.increment();
+            logger.info(PREFIX + &quot;{} - Re-registering apps/{}&quot;, appPathIdentifier, instanceInfo.getAppName());
+            long timestamp = instanceInfo.setIsDirtyWithTime();
+            boolean success = register();
+            if (success) {
+                instanceInfo.unsetIsDirty(timestamp);
+            }
+            return success;
+        }
+        return httpResponse.getStatusCode() == 200;
+    } catch (Throwable e) {
+        logger.error(PREFIX + &quot;{} - was unable to send heartbeat!&quot;, appPathIdentifier, e);
+        return false;
+    }
+}
+</code></pre><p><a href="http://blog.didispace.com/springcloud-sourcecode-eureka/" target="_blank" rel="external">Eureka源码分析</a></p>
+<p><a href="http://xujin.org/sc/sc-netflix-eureka/" target="_blank" rel="external">Eureka架构</a></p>
+<p><a href="http://blog.spring-cloud.io/blog/sc-eureka.html" target="_blank" rel="external">Eureka源码排坑处</a></p>
+<p><a href="http://nobodyiam.com/2016/06/25/dive-into-eureka/" target="_blank" rel="external">Eureka内部实现细节</a></p>
+<p><a href="https://github.com/Netflix/eureka/wiki" target="_blank" rel="external">Eureka官方文档</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Eureka/" rel="tag"># Eureka</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/24/Eureka源码解析——项目结构/" rel="next" title="Eureka源码解析——项目结构">
+                <i class="fa fa-chevron-left"></i> Eureka源码解析——项目结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">142</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#EnableDiscoveryClient实现"><span class="nav-number">1.</span> <span class="nav-text">@EnableDiscoveryClient实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DiscoveryClient"><span class="nav-number">2.</span> <span class="nav-text">DiscoveryClient</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ServiceUrls"><span class="nav-number"></span> <span class="nav-text">ServiceUrls</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务注册原理"><span class="nav-number"></span> <span class="nav-text">服务注册原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务注册原理-1"><span class="nav-number"></span> <span class="nav-text">服务注册原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务获取与服务续约"><span class="nav-number"></span> <span class="nav-text">服务获取与服务续约</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
