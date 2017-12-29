@@ -254,6 +254,344 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/08/【消息队列】Kafka学习笔记-三-——Java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/08/【消息队列】Kafka学习笔记-三-——Java/" itemprop="url">【消息队列】Kafka学习笔记(三)——Java</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-08T13:41:23+08:00">
+                2017-06-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="引入pom-xml文件"><a href="#引入pom-xml文件" class="headerlink" title="引入pom.xml文件"></a>引入pom.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;!-- start kafka --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;0.10.2.1&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;!-- kafka end --&gt;</div></pre></td></tr></table></figure>
+<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="ProducerAPI"><a href="#ProducerAPI" class="headerlink" title="ProducerAPI"></a>ProducerAPI</h3><h4 id="ProducerRecord-lt-K-V-gt"><a href="#ProducerRecord-lt-K-V-gt" class="headerlink" title="ProducerRecord&lt; K,V &gt;"></a>ProducerRecord&lt; K,V &gt;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public ProducerRecord(String topic, Integer partition, Long timestamp, K key, V value) &#123;</div><div class="line">        if (topic == null)</div><div class="line">            throw new IllegalArgumentException(&quot;Topic cannot be null.&quot;);</div><div class="line">        if (timestamp != null &amp;&amp; timestamp &lt; 0)</div><div class="line">            throw new IllegalArgumentException(</div><div class="line">                    String.format(&quot;Invalid timestamp: %d. Timestamp should always be non-negative or null.&quot;, timestamp));</div><div class="line">        if (partition != null &amp;&amp; partition &lt; 0)</div><div class="line">            throw new IllegalArgumentException(</div><div class="line">                    String.format(&quot;Invalid partition: %d. Partition number should always be non-negative or null.&quot;, partition));</div><div class="line">        this.topic = topic; </div><div class="line">        this.partition = partition; </div><div class="line">        this.key = key;  </div><div class="line">        this.value = value; </div><div class="line">        this.timestamp = timestamp; </div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p><strong>注意：key是可选的。在没有指定key发送到哪个partition的情况下，producer会计算key的hash值，从而确定这条消息发送到哪个分区。如果partition和key都没有指定，那么producer将会使用round-robin的方式发送消息到分区</strong></p>
+<ul>
+<li>topic参数用于指定消息发送到哪个Topic，必填。</li>
+<li>partition指的是消息发送哪个分区，可以为null </li>
+<li>如果partition指定，那么key将不会起作用。value就是消息的实际内容</li>
+</ul>
+<h4 id="RecordMetadata-lt-K-V-gt"><a href="#RecordMetadata-lt-K-V-gt" class="headerlink" title="RecordMetadata&lt; K,V &gt;"></a>RecordMetadata&lt; K,V &gt;</h4><blockquote>
+<p>表示消息发送后，服务端接收到消息的确认信息。包括这个消息发送到了那个topic下的那个partition，偏移量offset是多少等</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">private RecordMetadata(TopicPartition topicPartition, long offset, long timestamp, long</div><div class="line">        checksum, int serializedKeySize, int serializedValueSize) &#123;</div><div class="line">        super();</div><div class="line">        this.offset = offset;</div><div class="line">        this.timestamp = timestamp;</div><div class="line">        this.checksum = checksum;</div><div class="line">        this.serializedKeySize = serializedKeySize;</div><div class="line">        this.serializedValueSize = serializedValueSize;</div><div class="line">        this.topicPartition = topicPartition; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="Producer-lt-K-V-gt"><a href="#Producer-lt-K-V-gt" class="headerlink" title="Producer&lt; K,V &gt;"></a>Producer&lt; K,V &gt;</h4><blockquote>
+<p>表示消息的发送者。K、V的含义与ProducerRecord&lt; K,V &gt;相同</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public interface Producer&lt;K, V&gt; extends Closeable &#123;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *异步发送一条信息，返回Future对象，其中包含了服务端的响应信息RecordMetadata</div><div class="line">     */</div><div class="line">    public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record);</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 发送一条消息，当服务端确认后，执行指定的回调函数</div><div class="line">     */</div><div class="line">    public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record, Callback callback);</div><div class="line">    </div><div class="line">    /**</div><div class="line">     * 如果producer有很多消息要发送，那么producer可能会产生消息堆积，调用这个方法会发送所有堆积的消息，在这个</div><div class="line">     *方法执行完成之前，线程一直会阻塞</div><div class="line">     */</div><div class="line">    public void flush();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取一个Topic下的所有分区信息，因为分区的数量可能会改变，因此不应该缓存这个分区信息的内容</div><div class="line">     */</div><div class="line">    public List&lt;PartitionInfo&gt; partitionsFor(String topic);</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 监控相关</div><div class="line">     */</div><div class="line">    public Map&lt;MetricName, ? extends Metric&gt; metrics();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 关闭，等待所有消息发送完</div><div class="line">     */</div><div class="line">    public void close();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 指定时间内要关闭完成，如果没有完成，强制关闭，不管有没有消息还没发送</div><div class="line">     */</div><div class="line">    public void close(long timeout, TimeUnit unit);</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="PartitionInfo"><a href="#PartitionInfo" class="headerlink" title="PartitionInfo"></a>PartitionInfo</h4><blockquote>
+<p> 表示一个Topic下面的分区信息</p>
+</blockquote>
+<p><strong>注意： 如果自己实现kafka的监控程序。需要分区这些元数据</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public PartitionInfo(String topic, int partition, Node leader, Node[] replicas, Node[] inSyncReplicas) &#123;</div><div class="line">        this.topic = topic;</div><div class="line">        this.partition = partition;</div><div class="line">        this.leader = leader;</div><div class="line">        this.replicas = replicas;</div><div class="line">        this.inSyncReplicas = inSyncReplicas;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="Serializer类与Deserializer"><a href="#Serializer类与Deserializer" class="headerlink" title="Serializer类与Deserializer"></a>Serializer类与Deserializer</h4><p>序列化实现类</p>
+<ul>
+<li>ByteArraySerializer</li>
+<li>ByteBufferSerializer</li>
+<li>BytesSerializer</li>
+<li>DoubleSerializer</li>
+<li>IntegerSerializer</li>
+<li>LongSerializer</li>
+<li>StringSerializer</li>
+</ul>
+<p><strong>注意：kafka最终都是将消息中的内容变成二进制数据进行存储。需要转换为二进制数组。每种类型转换方式都不一样</strong></p>
+<p>核心方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public byte[] serialize(String topic, T data);</div></pre></td></tr></table></figure>
+<p>StringSerializer的实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">   public void configure(Map&lt;String, ?&gt; configs, boolean isKey) &#123;</div><div class="line">         String propertyName = isKey ? &quot;key.serializer.encoding&quot; : &quot;value.serializer.encoding&quot;;</div><div class="line">         Object encodingValue = configs.get(propertyName);</div><div class="line">         if (encodingValue == null)</div><div class="line">             encodingValue = configs.get(&quot;serializer.encoding&quot;);</div><div class="line">         if (encodingValue != null &amp;&amp; encodingValue instanceof String)</div><div class="line">             encoding = (String) encodingValue;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p>注意：对于每一种Serializer都有一个Deserializer，通常我们是在Producer端指定Serializer，在Consumer端指定Deserializer，相信这个非常容易理解，唯一要注意的是，二者必须是要对应的，否则可能会出现反序列化失败的情况</p>
+<h4 id="生产者代码实例"><a href="#生产者代码实例" class="headerlink" title="生产者代码实例"></a>生产者代码实例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">Properties props = new Properties();</div><div class="line">       props.put(&quot;bootstrap.servers&quot;, &quot;115.28.65.149:2181&quot;);</div><div class="line">       props.put(&quot;acks&quot;, &quot;all&quot;);</div><div class="line">       props.put(&quot;retries&quot;, 0);</div><div class="line">       props.put(&quot;batch.size&quot;, 16384);</div><div class="line">       props.put(&quot;linger.ms&quot;, 1);</div><div class="line">       props.put(&quot;buffer.memory&quot;, 33554432);</div><div class="line">       props.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</div><div class="line">       props.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</div><div class="line">  </div><div class="line">       Producer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);</div><div class="line">       for(int i = 0; i &lt; 100; i++)</div><div class="line">           producer.send(new ProducerRecord&lt;String, String&gt;(&quot;test&quot;, Integer.toString(i), Integer.toString(i)));</div><div class="line"> </div><div class="line">       producer.close();</div></pre></td></tr></table></figure>
+<p><strong>注意： Kafka客户端在初始化的情况下用来连接kafka集群的，而且必须指定，不过也不需要列出集群中所有的broker地址，这个参数只是在启动的时候用一下，获取到连接之后，会自动获取到集群中所有broker的信息</strong></p>
+<hr>
+<h3 id="CosumerAPI"><a href="#CosumerAPI" class="headerlink" title="CosumerAPI"></a>CosumerAPI</h3><h4 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div></pre></td><td class="code"><pre><div class="line">public class KafkaConsumer&lt;K, V&gt; implements Consumer&lt;K, V&gt;  &#123;</div><div class="line">   </div><div class="line">    /**</div><div class="line">     * 获取当前分配到这个consumer的分区信息。如果是通过调用assign(List&lt;TopicPartition&gt; partitions)方式进行订阅，</div><div class="line">     *那么将返回相同的分区信息。</div><div class="line">     *如果调用的是subscribe(List&lt;String&gt; topics,..)方式订阅消息，</div><div class="line">     *那么将会返回当前topic自动分配给这个consumer的分区信息(可能为空)</div><div class="line">     */</div><div class="line">    public Set&lt;TopicPartition&gt; assignment()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 返回当前consumer订阅的Topic(一个Consumer可以订阅多个Topic)</div><div class="line">     */</div><div class="line">    public Set&lt;String&gt; subscription()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *内部调用了subscribe(List&lt;String&gt; topics, ConsumerRebalanceListener callback)</div><div class="line">     */</div><div class="line">    public void subscribe(List&lt;String&gt; topics);</div><div class="line">     /**</div><div class="line">     * 传入要订阅的Topic(可以有多个)，动态分配partition。</div><div class="line">     *注意Topic的订阅是不能累加的，也就是说，如果当前已经订阅了其他的topic，那么调用此方法会替换原来订阅的topic。</div><div class="line">     *这也意味着：assign(List&lt;TopicPartition&gt; partitions)和本方法是不能联合使用的。</div><div class="line">     *如果传入的参数为空，那么相当于unsubscribe()的作用</div><div class="line">     *作为group管理的一部分，将会持续跟踪属于同一个group的consumers，并且在以下事件触发时，引发rebalence操作：</div><div class="line">     * 1、任何一个topic下的分区数量发生变化</div><div class="line">     * 2、Topic创建或者删除</div><div class="line">     * 3、consumer group中的某个consumer instance死掉</div><div class="line">     * 4、一个新的consumer加入当前consumer group(通过join)</div><div class="line">     */</div><div class="line">    public void subscribe(List&lt;String&gt; topics, ConsumerRebalanceListener callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 手工指定订阅的Topic和partition信息</div><div class="line">     */</div><div class="line">    public void assign(List&lt;TopicPartition&gt; partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">    * 支持使用正则表达式的方式订阅Topic</div><div class="line">    */</div><div class="line">    public void subscribe(Pattern pattern, ConsumerRebalanceListener callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 取消订阅(assgin方式和subscribe的订阅都会被取消)</div><div class="line">     */</div><div class="line">    public void unsubscribe()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 从topic中主动拉取消息，如果没有订阅任何topic就调用这个方法，会报错。</div><div class="line">     *从poll名字既可以看出拉取的方式是基于轮询，轮询topic中的每个分区查看有没有最新消息。</div><div class="line">     *在每一次轮询时，consumer都会使用上一次的消费的offset作为本次轮询的start offset。</div><div class="line">     *上一次消费offset可以通过seek(TopicPartition partition, long offset)方法手工设定，或者自动设置</div><div class="line">     */</div><div class="line">    public ConsumerRecords&lt;K, V&gt; poll(long timeout)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *内部调用了commitSync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets)</div><div class="line">     */</div><div class="line">    public void commitSync()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 同步提交上一次poll时，当前consumer订阅的所有topic的所有partition的消费偏移量(offset)信息</div><div class="line">     * 这个消费偏移量信息是存储在kafka集群上的。当consumer每次rebalence或者启动的时候，都会使用到这个偏移量</div><div class="line">     * 例如：lastProcessedMessageOffset + 1.</div><div class="line">     */</div><div class="line">    public void commitSync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 内部调用了commitAsync(OffsetCommitCallback callback)</div><div class="line">     */</div><div class="line">    public void commitAsync()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *异步提交上一次poll时，当前consumer订阅的所有topic的所有partition的消费偏移量(offset)信息</div><div class="line">     */</div><div class="line">    public void commitAsync(OffsetCommitCallback callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 异步提交指定的topic的某些partition的消费偏移量(offset)信息</div><div class="line">     */</div><div class="line">    public void commitAsync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets, OffsetCommitCallback callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 手工指定消费进度，在下一次poll时，将会使用指定的进度进行消费，慎用。</div><div class="line">     */</div><div class="line">    public void seek(TopicPartition partition, long offset)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 从指定分区的开头进行消费，</div><div class="line">     *这个方法不会立即执行，要等到下一次poll(long)或者position(TopicPartition)方法执行时，才会调用。</div><div class="line">     */</div><div class="line">    public void seekToBeginning(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 设置指定分区所有消息已经消费完</div><div class="line">     *这个方法不会立即执行，要等到下一次poll(long)或者position(TopicPartition)方法执行时，才会调用。</div><div class="line">     */</div><div class="line">    public void seekToEnd(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取指定分区中下一次开始消费的偏移量</div><div class="line">     */</div><div class="line">    public long position(TopicPartition partition)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取指定分区最后一次提交的消费进度(不论这个offset是否由当前进程提交)</div><div class="line">     *如果传入的参数代表的分区没有分配给当前consumer，或者consumer没有缓存当前分区的消费进度信息，这个方法可能会阻塞进行远程调用</div><div class="line">     */</div><div class="line">    public OffsetAndMetadata committed(TopicPartition partition)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取由当前Consumer持有的metrics信息</div><div class="line">     */</div><div class="line">    public Map&lt;MetricName, ? extends Metric&gt; metrics()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取一个Topic的所有分区信息，如果本地没有缓存的话，需要进行远程调用</div><div class="line">     */</div><div class="line">    public List&lt;PartitionInfo&gt; partitionsFor(String topic)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取当前用户有权限查看的所有的topic的所有分区信息</div><div class="line">     */</div><div class="line">    public Map&lt;String, List&lt;PartitionInfo&gt;&gt; listTopics()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 暂停对某些分区消息的订阅，当再下一次poll时，不会消费这些分区的消息，直到调用 resume(TopicPartition)后，重新进行消费</div><div class="line">     * 这个方法不会触发rebalence</div><div class="line">     */</div><div class="line">    public void pause(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 恢复对某个partiton消息的订阅，如果这个partition之前没有被pause，这个方法不会执行任何操作</div><div class="line">     */</div><div class="line">    public void resume(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 关闭consumer，等待一些操作完成。例如如果auto-commit是支持的，将会提交当前消费的offset</div><div class="line">     */</div><div class="line">    public void close()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 唤醒操作，如果一个consumer的poll需要消耗很长时间，可以使用这个方法进行终止。</div><div class="line">     */</div><div class="line">    public void wakeup()&#123;..&#125;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="ConsumerRecords与ConsumerRecord"><a href="#ConsumerRecords与ConsumerRecord" class="headerlink" title="ConsumerRecords与ConsumerRecord"></a>ConsumerRecords与ConsumerRecord</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public final class ConsumerRecord&lt;K, V&gt; &#123;</div><div class="line">    private final String topic;</div><div class="line">    private final int partition;</div><div class="line">    private final long offset;</div><div class="line">    private final K key;</div><div class="line">    private final V value;</div><div class="line">     ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public class ConsumerRecords&lt;K, V&gt; implements Iterable&lt;ConsumerRecord&lt;K, V&gt;&gt; &#123;</div><div class="line">    private final Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; records;</div><div class="line">     ...</div><div class="line">     &#125;</div></pre></td></tr></table></figure>
+<h4 id="消费者代码示例"><a href="#消费者代码示例" class="headerlink" title="消费者代码示例"></a>消费者代码示例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">Properties props = new Properties();</div><div class="line">        props.put(&quot;bootstrap.servers&quot;, &quot;115.28.65.149:9092&quot;);</div><div class="line">        props.put(&quot;group.id&quot;, &quot;testConsumer&quot;);</div><div class="line">        props.put(&quot;enable.auto.commit&quot;, &quot;true&quot;);</div><div class="line">        props.put(&quot;auto.commit.interval.ms&quot;, &quot;1000&quot;);</div><div class="line">        props.put(&quot;session.timeout.ms&quot;, &quot;30000&quot;);</div><div class="line">        props.put(&quot;key.deserializer&quot;,</div><div class="line">                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);</div><div class="line">        props.put(&quot;value.deserializer&quot;,</div><div class="line">                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);</div><div class="line">        KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);</div><div class="line">        consumer.subscribe(Arrays.asList(&quot;test&quot;));</div><div class="line">        Runtime.getRuntime().addShutdownHook(new Thread()&#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line">                consumer.close();</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">        &#125;);</div><div class="line">        while (true) &#123;</div><div class="line">            ConsumerRecords&lt;String, String&gt; records = consumer.poll(100);</div><div class="line">            for (ConsumerRecord&lt;String, String&gt; record : records)</div><div class="line">                System.out.printf(&quot;offset = %d, key = %s, value = %s&quot;,</div><div class="line">                        record.offset(), record.key(), record.value());</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/【消息队列】Kafka学习笔记-二-——-安装-使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/07/【消息队列】Kafka学习笔记-二-——-安装-使用/" itemprop="url">【消息队列】Kafka学习笔记(二) —— 安装&使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T15:31:10+08:00">
+                2017-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="http://kafka.apache.org/quickstart" target="_blank" rel="external">官方文档</a></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h4 id="下载tgz文件"><a href="#下载tgz文件" class="headerlink" title="下载tgz文件"></a>下载tgz文件</h4><h4 id="解压tgz"><a href="#解压tgz" class="headerlink" title="解压tgz"></a>解压tgz</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; tar -xzf kafka_2.11-0.10.2.0.tgz</div><div class="line">&gt; cd kafka_2.11-0.10.2.0</div></pre></td></tr></table></figure>
+<h4 id="启动kafka之前，先启动zookeeper"><a href="#启动kafka之前，先启动zookeeper" class="headerlink" title="启动kafka之前，先启动zookeeper"></a>启动kafka之前，先启动zookeeper</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; bin/zookeeper-server-start.sh config/zookeeper.properties</div><div class="line">[2013-04-22 15:01:37,495] INFO Reading configuration from: config/zookeeper.properties (org.apache.zookeeper.server.quorum.QuorumPeerConfig)</div></pre></td></tr></table></figure>
+<h4 id="启动kafka"><a href="#启动kafka" class="headerlink" title="启动kafka"></a>启动kafka</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-server-start.sh config/server.properties</div><div class="line">[2013-04-22 15:01:47,028] INFO Verifying properties (kafka.utils.VerifiableProperties)</div><div class="line">[2013-04-22 15:01:47,051] INFO Property socket.send.buffer.bytes is overridden to 1048576 (kafka.utils.VerifiableProperties)</div></pre></td></tr></table></figure>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><h4 id="创建topic-一个分片-part-一个副本-replica"><a href="#创建topic-一个分片-part-一个副本-replica" class="headerlink" title="创建topic(一个分片(part)一个副本(replica))"></a>创建topic(一个分片(part)一个副本(replica))</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test</div></pre></td></tr></table></figure>
+<h4 id="查看topic"><a href="#查看topic" class="headerlink" title="查看topic"></a>查看topic</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --list --zookeeper localhost:2181</div><div class="line">test</div></pre></td></tr></table></figure>
+<h4 id="生产者发送消息"><a href="#生产者发送消息" class="headerlink" title="生产者发送消息"></a>生产者发送消息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</div><div class="line">This is a message</div><div class="line">This is another message</div></pre></td></tr></table></figure>
+<h4 id="消费者处理消息"><a href="#消费者处理消息" class="headerlink" title="消费者处理消息"></a>消费者处理消息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning</div><div class="line">This is a message</div><div class="line">This is another message</div></pre></td></tr></table></figure>
+<h4 id="设置多个集群-假设1个maser和2个cluster"><a href="#设置多个集群-假设1个maser和2个cluster" class="headerlink" title="设置多个集群(假设1个maser和2个cluster)"></a>设置多个集群(假设1个maser和2个cluster)</h4><h5 id="复制配置文件"><a href="#复制配置文件" class="headerlink" title="复制配置文件"></a>复制配置文件</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; cp config/server.properties config/server-1.properties</div><div class="line">&gt; cp config/server.properties config/server-2.properties</div></pre></td></tr></table></figure>
+<h5 id="编辑配置文件"><a href="#编辑配置文件" class="headerlink" title="编辑配置文件"></a>编辑配置文件</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">config/server-1.properties:</div><div class="line">    broker.id=1</div><div class="line">    listeners=PLAINTEXT://:9093</div><div class="line">    log.dir=/tmp/kafka-logs-1</div><div class="line"></div><div class="line">config/server-2.properties:</div><div class="line">    broker.id=2</div><div class="line">    listeners=PLAINTEXT://:9094</div><div class="line">    log.dir=/tmp/kafka-logs-2</div></pre></td></tr></table></figure>
+<ul>
+<li>broker.id 代表kafka的broker唯一实例名称</li>
+</ul>
+<h6 id="启动另外两个kafka-server"><a href="#启动另外两个kafka-server" class="headerlink" title="启动另外两个kafka server"></a>启动另外两个kafka server</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-server-start.sh config/server-1.properties &amp;</div><div class="line">...</div><div class="line">&gt; bin/kafka-server-start.sh config/server-2.properties &amp;</div><div class="line">...</div></pre></td></tr></table></figure>
+<h5 id="创建3个副本-replica-的topic"><a href="#创建3个副本-replica-的topic" class="headerlink" title="创建3个副本(replica)的topic"></a>创建3个副本(replica)的topic</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic</div></pre></td></tr></table></figure>
+<h5 id="查看kafka的topic"><a href="#查看kafka的topic" class="headerlink" title="查看kafka的topic"></a>查看kafka的topic</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic</div><div class="line">Topic:my-replicated-topic	PartitionCount:1	ReplicationFactor:3	Configs:</div><div class="line">	Topic: my-replicated-topic	Partition: 0	Leader: 1	Replicas: 1,2,0	Isr: 1,2,0</div></pre></td></tr></table></figure>
+<hr>
+<h4 id="杀死kafka服务进程"><a href="#杀死kafka服务进程" class="headerlink" title="杀死kafka服务进程"></a>杀死kafka服务进程</h4><p>linux<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; ps aux | grep server-1.properties</div><div class="line">7564 ttys002    0:15.91 /System/Library/Frameworks/JavaVM.framework/Versions/1.8/Home/bin/java...</div><div class="line">&gt; kill -9 7564</div></pre></td></tr></table></figure></p>
+<p>window<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; wmic process get processid,caption,commandline | find &quot;java.exe&quot; | find &quot;server-1.properties&quot;</div><div class="line">java.exe    java  -Xmx1G -Xms1G -server -XX:+UseG1GC ... build\libs\kafka_2.10-0.10.2.0.jar&quot;  kafka.Kafka config\server-1.properties    644</div><div class="line">&gt; taskkill /pid 644 /f</div></pre></td></tr></table></figure></p>
+<h2 id="使用kafka导入-导出数据"><a href="#使用kafka导入-导出数据" class="headerlink" title="使用kafka导入/导出数据"></a>使用kafka导入/导出数据</h2><h4 id="创建测试数据进行测试"><a href="#创建测试数据进行测试" class="headerlink" title="创建测试数据进行测试"></a>创建测试数据进行测试</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; echo -e &quot;foo\nbar&quot; &gt; test.txt</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; bin/connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties config/connect-file-sink.properties</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; cat test.sink.txt</div><div class="line">foo</div><div class="line">bar</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic connect-test --from-beginning</div><div class="line">&#123;&quot;schema&quot;:&#123;&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false&#125;,&quot;payload&quot;:&quot;foo&quot;&#125;</div><div class="line">&#123;&quot;schema&quot;:&#123;&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false&#125;,&quot;payload&quot;:&quot;bar&quot;&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; echo &quot;Another line&quot; &gt;&gt; test.txt</div></pre></td></tr></table></figure>
+<h2 id="使用kafkaStream处理实时数据"><a href="#使用kafkaStream处理实时数据" class="headerlink" title="使用kafkaStream处理实时数据"></a>使用kafkaStream处理实时数据</h2>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/【消息队列】Kafka学习笔记-一-——-基础/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1792,376 +2130,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-五-——-查询/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-五-——-查询/" itemprop="url">ElasticSearch学习笔记(五) —— 查询</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:30:55+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>es允许执行搜索查询，返回结果匹配（hits)，甚至跨多个index和执行多个type</p>
-</blockquote>
-<h2 id="SearchSourceBuilder"><a href="#SearchSourceBuilder" class="headerlink" title="SearchSourceBuilder"></a>SearchSourceBuilder</h2><ol>
-<li>所有参数都是可选的<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">import org.elasticsearch.action.search.SearchResponse;</div><div class="line">import org.elasticsearch.action.search.SearchType;</div><div class="line">import org.elasticsearch.index.query.QueryBuilders.*;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">SearchResponse response = client.prepareSearch(&quot;index1&quot;, &quot;index2&quot;) //索引</div><div class="line">        .setTypes(&quot;type1&quot;, &quot;type2&quot;) //类型</div><div class="line">        //检索方式</div><div class="line">        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)</div><div class="line">        //查询条件query_string</div><div class="line">        .setQuery(QueryBuilders.termQuery(&quot;multi&quot;, &quot;test&quot;))      </div><div class="line">		//多条件过滤filters            </div><div class="line">        .setPostFilter(</div><div class="line">		  QueryBuilders.rangeQuery(&quot;age&quot;).from(12).to(20)</div><div class="line">		 )</div><div class="line">        .setFrom(0)</div><div class="line">        .setSize(60)</div><div class="line">        .setExplain(true)</div><div class="line">        .get();</div></pre></td></tr></table></figure>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search.html" target="_blank" rel="external">SearchAPI参考</a></p>
-<h2 id="Scrollings-in-Java"><a href="#Scrollings-in-Java" class="headerlink" title="Scrollings in Java"></a>Scrollings in Java</h2><blockquote>
-<p>返回整个”page”, 用来检索大量结果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.index.query.QueryBuilders.*;</div><div class="line">//queryString</div><div class="line">QueryBuilder qb = termQuery(&quot;multi&quot;, &quot;test&quot;);</div><div class="line"></div><div class="line">SearchResponse scrollResp = client.prepareSearch(test)</div><div class="line">        .addSort(FieldSortBuilder.DOC_FIELD_NAME, SortOrder.ASC) //属性排序</div><div class="line">        .setScroll(new TimeValue(60000)) </div><div class="line">        .setQuery(qb) //条件</div><div class="line">        .setSize(100) //每一页返回100条数据</div><div class="line">        .get(); </div><div class="line">//接收scrollResp响应结果</div><div class="line">do &#123;</div><div class="line">    for (SearchHit hit : scrollResp.getHits().getHits()) &#123;</div><div class="line">        //输出结果（封装在hits属性中)</div><div class="line">	&#125;</div><div class="line"> </div><div class="line">    scrollResp = client.</div><div class="line">		  prepareSearchScroll(scrollResp.getScrollId())</div><div class="line">						  .setScroll(new TimeValue(60000))</div><div class="line">						  .execute()</div><div class="line">						  .actionGet();</div><div class="line">&#125; while(scrollResp.getHits().getHits().length != 0);//遍历</div></pre></td></tr></table></figure></p>
-<p>从滚动请求返回的结果反映出当时的状态指数,最初的搜索请求,就像一个快照。索引、更新或删除只会影响以后的搜索请求</p>
-</blockquote>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-request-scroll.html" target="_blank" rel="external">Scroll参考API</a></p>
-<h2 id="MultSearch"><a href="#MultSearch" class="headerlink" title="MultSearch"></a>MultSearch</h2><blockquote>
-<p>多个搜索API允许在相同API下执行多个搜索请求</p>
-</blockquote>
-<p>请求格式大致如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">header\n //包括 index / indices 、 type</div><div class="line">body\n //包括典型搜索查询（查询、聚合、大小等）</div><div class="line">header\n </div><div class="line">body\n</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">SearchRequestBuilder srb1 = client</div><div class="line">			    .prepareSearch().setQuery(QueryBuilders.queryStringQuery(&quot;elasticsearch&quot;)).setSize(1);</div><div class="line">			SearchRequestBuilder srb2 = client</div><div class="line">			    .prepareSearch().setQuery(QueryBuilders.matchQuery(&quot;name&quot;, &quot;kimchy&quot;)).setSize(1);</div><div class="line"></div><div class="line">			MultiSearchResponse sr = client.prepareMultiSearch()</div><div class="line">			        .add(srb1)</div><div class="line">			        .add(srb2)</div><div class="line">			        .get();</div><div class="line"></div><div class="line">			// You will get all individual responses from MultiSearchResponse#getResponses()</div><div class="line">			long nbHits = 0;</div><div class="line">			</div><div class="line">			for (MultiSearchResponse.Item item : sr.getResponses()) &#123;</div><div class="line">			    SearchResponse response = item.getResponse();</div><div class="line">			    nbHits += response.getHits().getTotalHits();</div><div class="line">			    for(SearchHit hit : response.getHits())&#123;</div><div class="line">			    	System.out.println(hit.getSourceAsString());</div><div class="line">			    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-multi-search.html" target="_blank" rel="external">multSearchAPI参考</a></p>
-<h2 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = client.prepareSearch()</div><div class="line">    .setQuery(QueryBuilders.matchAllQuery())</div><div class="line">    .addAggregation(</div><div class="line">            AggregationBuilders.terms(&quot;agg1&quot;).field(&quot;field&quot;)</div><div class="line">    )</div><div class="line">    .addAggregation(</div><div class="line">            AggregationBuilders.dateHistogram(&quot;agg2&quot;)</div><div class="line">                    .field(&quot;birth&quot;)</div><div class="line">                    .dateHistogramInterval(DateHistogramInterval.YEAR)</div><div class="line">    )</div><div class="line">    .get();</div><div class="line"></div><div class="line">// Get your facet results</div><div class="line">Terms agg1 = sr.getAggregations().get(&quot;agg1&quot;);</div><div class="line">DateHistogram agg2 = sr.getAggregations().get(&quot;agg2&quot;);</div></pre></td></tr></table></figure>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-aggs.html" target="_blank" rel="external">AssociateAPI参考</a></p>
-<h2 id="Search-Template"><a href="#Search-Template" class="headerlink" title="Search Template"></a>Search Template</h2><blockquote>
-<p>达到查询最大文档数量，提前终止</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = client.prepareSearch(INDEX)</div><div class="line">    .setTerminateAfter(1000)    </div><div class="line">    .get();</div><div class="line"></div><div class="line">if (sr.isTerminatedEarly()) &#123;</div><div class="line">    // We finished early</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="搜索模板"><a href="#搜索模板" class="headerlink" title="搜索模板"></a>搜索模板</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Map&lt;String, Object&gt; template_params = new HashMap&lt;&gt;();</div><div class="line">template_params.put(&quot;param_gender&quot;, &quot;male&quot;);</div></pre></td></tr></table></figure>
-<h3 id="创建模板请求"><a href="#创建模板请求" class="headerlink" title="创建模板请求"></a>创建模板请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = new SearchTemplateRequestBuilder(client)</div><div class="line">    .setScript(&quot;template_gender&quot;)                 </div><div class="line">    .setScriptType(ScriptService.ScriptType.FILE) </div><div class="line">    .setScriptParams(template_params)             </div><div class="line">    .setRequest(new SearchRequest())              </div><div class="line">    .get()                                        </div><div class="line">    .getResponse();</div></pre></td></tr></table></figure>
-<h3 id="在集群中存储模板状态"><a href="#在集群中存储模板状态" class="headerlink" title="在集群中存储模板状态"></a>在集群中存储模板状态</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">client.admin().cluster().preparePutStoredScript()</div><div class="line">    .setScriptLang(&quot;mustache&quot;)</div><div class="line">    .setId(&quot;template_gender&quot;)</div><div class="line">    .setSource(new BytesArray(</div><div class="line">        &quot;&#123;\n&quot; +</div><div class="line">        &quot;    \&quot;template\&quot; : &#123;\n&quot; +</div><div class="line">        &quot;        \&quot;query\&quot; : &#123;\n&quot; +</div><div class="line">        &quot;            \&quot;match\&quot; : &#123;\n&quot; +</div><div class="line">        &quot;                \&quot;gender\&quot; : \&quot;&#123;&#123;param_gender&#125;&#125;\&quot;\n&quot; +</div><div class="line">        &quot;            &#125;\n&quot; +</div><div class="line">        &quot;        &#125;\n&quot; +</div><div class="line">        &quot;    &#125;\n&quot; +</div><div class="line">        &quot;&#125;&quot;)).get();</div></pre></td></tr></table></figure>
-<h3 id="执行存储模板"><a href="#执行存储模板" class="headerlink" title="执行存储模板"></a>执行存储模板</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SearchResponse sr = new SearchTemplateRequestBuilder(client)</div><div class="line">        .setScript(&quot;template_gender&quot;)                       </div><div class="line">        .setScriptType(ScriptType.STORED)     </div><div class="line">        .setScriptParams(template_params)                   </div><div class="line">        .setRequest(new SearchRequest())                    </div><div class="line">        .get()                                              </div><div class="line">        .getResponse();</div></pre></td></tr></table></figure>
-<h3 id="内联模板"><a href="#内联模板" class="headerlink" title="内联模板"></a>内联模板</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">sr = new SearchTemplateRequestBuilder(client)</div><div class="line">        .setScript(&quot;&#123;\n&quot; +                                  </div><div class="line">                &quot;        \&quot;query\&quot; : &#123;\n&quot; +</div><div class="line">                &quot;            \&quot;match\&quot; : &#123;\n&quot; +</div><div class="line">                &quot;                \&quot;gender\&quot; : \&quot;&#123;&#123;param_gender&#125;&#125;\&quot;\n&quot; +</div><div class="line">                &quot;            &#125;\n&quot; +</div><div class="line">                &quot;        &#125;\n&quot; +</div><div class="line">                &quot;&#125;&quot;)</div><div class="line">        .setScriptType(ScriptType.INLINE)    </div><div class="line">        .setScriptParams(template_params)                  </div><div class="line">        .setRequest(new SearchRequest())                   </div><div class="line">        .get()                                             </div><div class="line">        .getResponse();</div></pre></td></tr></table></figure>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-template.html" target="_blank" rel="external">更多模板参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-四-——-Java-CRUD/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-四-——-Java-CRUD/" itemprop="url">ElasticSearch学习笔记(四) —— Java CRUD</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T14:28:18+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>##启动ElasticSearch</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#linux</div><div class="line">./bin/elasticsearch</div><div class="line">#windows</div><div class="line">bin/elasticsearch.bat</div></pre></td></tr></table></figure>
-<p>注意：为了测试JavaApi所以采用windows方式启动。</p>
-<h3 id="启动成功页面"><a href="#启动成功页面" class="headerlink" title="启动成功页面"></a>启动成功页面</h3><p><img src="http://img.blog.csdn.net/20170310095908283?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170310100346399?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="Maven"><a href="#Maven" class="headerlink" title="Maven"></a>Maven</h3><p><strong>pom.xml</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">  				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.elasticsearch.client&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;transport&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;5.2.2&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;log4j-api&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;2.7&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;log4j-core&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;2.7&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;joda-time&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;joda-time&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;2.9.7&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">				&lt;dependency&gt;</div><div class="line">				    &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;</div><div class="line">				    &lt;artifactId&gt;lucene-core&lt;/artifactId&gt;</div><div class="line">				    &lt;version&gt;6.4.2&lt;/version&gt;</div><div class="line">				&lt;/dependency&gt;</div><div class="line">  &lt;/dependencies&gt;</div><div class="line"></div><div class="line">&lt;plugin&gt;</div><div class="line">    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;maven-shade-plugin&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;2.4.1&lt;/version&gt;</div><div class="line">    &lt;executions&gt;</div><div class="line">        &lt;execution&gt;</div><div class="line">            &lt;phase&gt;package&lt;/phase&gt;</div><div class="line">            &lt;goals&gt;&lt;goal&gt;shade&lt;/goal&gt;&lt;/goals&gt;</div><div class="line">            &lt;configuration&gt;</div><div class="line">                &lt;transformers&gt;</div><div class="line">                    &lt;transformer implementation=&quot;org.apache.maven.plugins.shade.resource.ServicesResourceTransformer&quot;/&gt;</div><div class="line">                    &lt;!-- Main方法自动调用java -jar yourjar.jar --&gt;</div><div class="line">                    &lt;transformer implementation=&quot;org.apache.maven.plugins.shade.resource.ManifestResourceTransformer&quot;&gt;</div><div class="line">    &lt;mainClass&gt;org.elasticsearch.demo.Generate&lt;/mainClass&gt;</div><div class="line">&lt;/transformer&gt;</div><div class="line">                &lt;/transformers&gt;</div><div class="line">            &lt;/configuration&gt;</div><div class="line">        &lt;/execution&gt;</div><div class="line">    &lt;/executions&gt;</div><div class="line">&lt;/plugin&gt;</div></pre></td></tr></table></figure></p>
-<p><strong>src/main/resources/og4j2.properties</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">appender.console.type = Console</div><div class="line">appender.console.name = console</div><div class="line">appender.console.layout.type = PatternLayout</div><div class="line"></div><div class="line">rootLogger.level = info</div><div class="line">rootLogger.appenderRef.console.ref = console</div></pre></td></tr></table></figure>
-<h3 id="创建Java客户端"><a href="#创建Java客户端" class="headerlink" title="创建Java客户端"></a>创建Java客户端</h3><p>最常见的方式客户端是通过创建一个连接到一个clusteTransportClient</p>
-<h3 id="TransportClient"><a href="#TransportClient" class="headerlink" title="TransportClient"></a>TransportClient</h3><blockquote>
-<p>连接远程Elasticsearch集群使用传输模块</p>
-</blockquote>
-<hr>
-<p>es有一个集群”嗅探”功能，当开始”嗅探”，可以知道</p>
-<ol>
-<li>Client允许动态的增加或删除主机地址</li>
-<li>传输客户端将连接到节点的内部节点列表</li>
-<li>客户机将调用内部集群状态API在这些节点发现可用的数据节点上。客户端将被替换的内部节点列表中与数据节点（数据列表5s刷新一次）</li>
-</ol>
-<blockquote>
-<p>注意：如果节点不是一个数据节点，可能不包括原始节点连接。例如：如果开始连接一个主节点，通过”嗅探”后，没有将请求传递给主节点，而是请求到其他数据节点，是为了避免只在主节点上耗费搜索流量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">Settings settings = Settings.builder()</div><div class="line">        .put(&quot;cluster.name&quot;, &quot;myClusterName&quot;)//集群名称</div><div class="line">		.put(&quot;client.transport.sniff&quot;, true) //启动&quot;嗅探&quot;</div><div class="line">		.build();</div><div class="line">//开启连接</div><div class="line">TransportClient client = new PreBuiltTransportClient(Settings.EMPTY) //settings</div><div class="line">        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(&quot;host1&quot;), 9300)) </div><div class="line">        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(&quot;host2&quot;), 9300));</div><div class="line"></div><div class="line"></div><div class="line">//关闭连接</div><div class="line">client.close();</div></pre></td></tr></table></figure></p>
-</blockquote>
-<p>其他参数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//gnore cluster name validation of connected nodes</div><div class="line">client.transport.ignore_cluster_name </div><div class="line">//The time to wait for a ping response from a node（5s）</div><div class="line">client.transport.ping_timeout</div><div class="line">//ping the nodes listed and connected（5s)</div><div class="line">client.transport.nodes_sampler_interval</div></pre></td></tr></table></figure>
-<h3 id="协调节点"><a href="#协调节点" class="headerlink" title="协调节点"></a>协调节点</h3><blockquote>
-<p>在本地一个协调节点,然后简单地创建一个TransportClient在您的应用程序连接到这个协调节点。这样，只有协调节点可以加载任何你所需要的插件</p>
-</blockquote>
-<h2 id="DocumentAPI"><a href="#DocumentAPI" class="headerlink" title="DocumentAPI"></a>DocumentAPI</h2><h3 id="CRUD"><a href="#CRUD" class="headerlink" title="CRUD"></a>CRUD</h3><h4 id="简单的文档API"><a href="#简单的文档API" class="headerlink" title="简单的文档API"></a>简单的文档API</h4><ol>
-<li>Index API</li>
-<li>Get API</li>
-<li>Delete API</li>
-<li>Delete By Query API</li>
-<li>Update API</li>
-</ol>
-<h3 id="多文档API"><a href="#多文档API" class="headerlink" title="多文档API"></a>多文档API</h3><p>1.Multi Get API<br>2.Bulk API</p>
-<hr>
-<h2 id="Generate-JSON-Ways"><a href="#Generate-JSON-Ways" class="headerlink" title="Generate JSON Ways"></a>Generate JSON Ways</h2><blockquote>
-<p>index API 允许将一个索引类型的JSON文档转换成特定的索引，以便于搜索</p>
-<p>生成JSON文档的几种方式</p>
-</blockquote>
-<p>手动字符串拼接</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String json = &quot;&#123;&quot; +</div><div class="line">        &quot;\&quot;user\&quot;:\&quot;kimchy\&quot;,&quot; +</div><div class="line">        &quot;\&quot;postDate\&quot;:\&quot;2013-01-30\&quot;,&quot; +</div><div class="line">        &quot;\&quot;message\&quot;:\&quot;trying out Elasticsearch\&quot;&quot; +</div><div class="line">    &quot;&#125;&quot;;</div></pre></td></tr></table></figure>
-<p>通过map自动转换</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Map&lt;String, Object&gt; json = new HashMap&lt;String, Object&gt;();</div><div class="line">json.put(&quot;user&quot;,&quot;kimchy&quot;);</div><div class="line">json.put(&quot;postDate&quot;,new Date());</div><div class="line">json.put(&quot;message&quot;,&quot;trying out Elasticsearch&quot;);</div></pre></td></tr></table></figure>
-<p>运用第三方工具，例如Jackson等</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">import com.fasterxml.jackson.databind.*;</div><div class="line">// instance a json mapper</div><div class="line">ObjectMapper mapper = new ObjectMapper(); // create once, reuse</div><div class="line">// generate json</div><div class="line">byte[] json = mapper.writeValueAsBytes(yourbeaninstance);</div></pre></td></tr></table></figure>
-<p> 使用 XContentFactory.jsonBuilder()（Es结构化工具）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.common.xcontent.XContentFactory.*;</div><div class="line"></div><div class="line">XContentBuilder builder = jsonBuilder()</div><div class="line">    .startObject()//拼接对象 </div><div class="line">        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">        .field(&quot;postDate&quot;, new Date())</div><div class="line">        .field(&quot;message&quot;, &quot;trying out Elasticsearch&quot;)</div><div class="line">    .endObject();</div><div class="line">    </div><div class="line">String json = builder.string();</div><div class="line">//拼接数组</div><div class="line">startArray(json);</div></pre></td></tr></table></figure>
-<h3 id="Index-API"><a href="#Index-API" class="headerlink" title="Index API"></a>Index API</h3><blockquote>
-<p>需要将拼接的数据填入_source字段<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.common.xcontent.XContentFactory.*;</div><div class="line">//以某网站的用户为例</div><div class="line">//查找tmall商城的编号为1的用户user</div><div class="line">IndexResponse response = </div><div class="line">client.prepareIndex(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .setSource(jsonBuilder()</div><div class="line">                    .startObject()</div><div class="line">                        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">                        .field(&quot;postDate&quot;, new Date())</div><div class="line">                        .field(&quot;message&quot;, &quot;Elasticsearch&quot;)</div><div class="line">                    .endObject()</div><div class="line">        ) //将json文档放入_source字段</div><div class="line">        .get();</div></pre></td></tr></table></figure></p>
-</blockquote>
-<p>如果仅仅是字符串类型，则不需要id<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">String json = &quot;&#123;&quot; +</div><div class="line">        &quot;\&quot;user\&quot;:\&quot;kimchy\&quot;,&quot; +</div><div class="line">        &quot;\&quot;postDate\&quot;:\&quot;2013-01-30\&quot;,&quot; +</div><div class="line">        &quot;\&quot;message\&quot;:\&quot;trying out Elasticsearch\&quot;&quot; +</div><div class="line">    &quot;&#125;&quot;;</div><div class="line"></div><div class="line">IndexResponse response = client.prepareIndex(&quot;twitter&quot;, &quot;tweet&quot;)</div><div class="line">        .setSource(json)</div><div class="line">        .get();</div></pre></td></tr></table></figure></p>
-<h3 id="IndexResponse"><a href="#IndexResponse" class="headerlink" title="IndexResponse"></a>IndexResponse</h3><blockquote>
-<p>可以得到数据报告</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">// Index name</div><div class="line">String _index = response.getIndex();</div><div class="line">// Type name</div><div class="line">String _type = response.getType();</div><div class="line">// Document ID (generated or not)</div><div class="line">String _id = response.getId();</div><div class="line">// Version (if it&apos;s the first time you index this document, you will get: 1)</div><div class="line">long _version = response.getVersion();</div><div class="line">// status has stored current instance statement.</div><div class="line">RestStatus status = response.status();</div></pre></td></tr></table></figure>
-<h3 id="操作线程"><a href="#操作线程" class="headerlink" title="操作线程"></a>操作线程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">setOperationThreaded(boolean)</div></pre></td></tr></table></figure>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/docs-index_.html" target="_blank" rel="external">关于IndexAPI更多请参考</a></p>
-<hr>
-<h2 id="Get-API"><a href="#Get-API" class="headerlink" title="Get API"></a>Get API</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GetResponse response = client.prepareGet(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;).get();</div></pre></td></tr></table></figure>
-<h2 id="Delete-API"><a href="#Delete-API" class="headerlink" title="Delete API"></a>Delete API</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DeleteResponse response = client.prepareDelete(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;).get();</div></pre></td></tr></table></figure>
-<h2 id="Delete-API-Update-API"><a href="#Delete-API-Update-API" class="headerlink" title="Delete API     Update API"></a>Delete API     Update API</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">BulkIndexByScrollResponse response =</div><div class="line">    DeleteByQueryAction.INSTANCE.newRequestBuilder(client)</div><div class="line">        .filter(QueryBuilders.matchQuery(&quot;sex&quot;, &quot;男&quot;))  //条件</div><div class="line">        .source(&quot;persons&quot;)    //索引                            </div><div class="line">        .get();                                             </div><div class="line"></div><div class="line">long deleted = response.getDeleted();</div></pre></td></tr></table></figure>
-<h2 id="异步删除"><a href="#异步删除" class="headerlink" title="异步删除"></a>异步删除</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">DeleteByQueryAction.INSTANCE.newRequestBuilder(client)</div><div class="line">    .filter(QueryBuilders.matchQuery(&quot;sex&quot;, &quot;男&quot;))                  </div><div class="line">    .source(&quot;persons&quot;)                                                   </div><div class="line">    .execute(new ActionListener&lt;BulkIndexByScrollResponse&gt;() &#123;           </div><div class="line">        @Override</div><div class="line">        public void onResponse(BulkIndexByScrollResponse response) &#123;</div><div class="line">            long deleted = response.getDeleted();                        </div><div class="line">        &#125;</div><div class="line">        @Override</div><div class="line">        public void onFailure(Exception e) &#123;</div><div class="line">            // Handle the exception</div><div class="line">        &#125;</div><div class="line">    &#125;);</div></pre></td></tr></table></figure>
-<h2 id="UpdateAPI"><a href="#UpdateAPI" class="headerlink" title="UpdateAPI"></a>UpdateAPI</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest();</div><div class="line">updateRequest.index(&quot;index&quot;);</div><div class="line">updateRequest.type(&quot;type&quot;);</div><div class="line">updateRequest.id(&quot;1&quot;);</div><div class="line">updateRequest.doc(jsonBuilder()</div><div class="line">        .startObject()</div><div class="line">            .field(&quot;sex&quot;, &quot;女&quot;)</div><div class="line">        .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
-<h3 id="Update-By-Script"><a href="#Update-By-Script" class="headerlink" title="Update By Script"></a>Update By Script</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">client.prepareUpdate(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .setScript(new Script(&quot;ctx._source.sex = \&quot;男\&quot;&quot;  , ScriptService.ScriptType.INLINE, null, null))</div><div class="line">        .get();</div><div class="line"></div><div class="line">client.prepareUpdate(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .setDoc(jsonBuilder()               </div><div class="line">            .startObject()</div><div class="line">                .field(&quot;sex&quot;, &quot;女&quot;)</div><div class="line">            .endObject())</div><div class="line">        .get();</div><div class="line">        </div><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;tmall&quot;, &quot;user&quot;, &quot;1&quot;)</div><div class="line">        .script(new Script(&quot;ctx._source.sex = \&quot;男\&quot;&quot;));</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
-<h2 id="更新后，通过部分文档合并到现有文档"><a href="#更新后，通过部分文档合并到现有文档" class="headerlink" title="更新后，通过部分文档合并到现有文档"></a>更新后，通过部分文档合并到现有文档</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;index&quot;, &quot;type&quot;, &quot;1&quot;)</div><div class="line">        .doc(jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;gender&quot;, &quot;male&quot;)</div><div class="line">            .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
-<h2 id="Upsert"><a href="#Upsert" class="headerlink" title="Upsert"></a>Upsert</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">IndexRequest indexRequest = new IndexRequest(&quot;index&quot;, &quot;type&quot;, &quot;1&quot;)</div><div class="line">        .source(jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;name&quot;, &quot;Joe Smith&quot;)</div><div class="line">                .field(&quot;gender&quot;, &quot;male&quot;)</div><div class="line">            .endObject());</div><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;index&quot;, &quot;type&quot;, &quot;1&quot;)</div><div class="line">        .doc(jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;gender&quot;, &quot;male&quot;)</div><div class="line">            .endObject())</div><div class="line">        .upsert(indexRequest);              </div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
-<h2 id="Multi-Get-API-批量查询"><a href="#Multi-Get-API-批量查询" class="headerlink" title="Multi Get API //批量查询"></a>Multi Get API //批量查询</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">MultiGetResponse multiGetItemResponses = client.prepareMultiGet()</div><div class="line">    .add(&quot;twitter&quot;, &quot;tweet&quot;, &quot;1&quot;)           </div><div class="line">    .add(&quot;twitter&quot;, &quot;tweet&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;) </div><div class="line">    .add(&quot;another&quot;, &quot;type&quot;, &quot;foo&quot;)          </div><div class="line">    .get();</div><div class="line"></div><div class="line">for (MultiGetItemResponse itemResponse : multiGetItemResponses) &#123; </div><div class="line">    GetResponse response = itemResponse.getResponse();</div><div class="line">    if (response.isExists()) &#123;                      </div><div class="line">        String json = response.getSourceAsString(); </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.2/docs-multi-get.html" target="_blank" rel="external">更多MultiGetAPI参考</a></p>
-<h2 id="Bulk-API-批量导入"><a href="#Bulk-API-批量导入" class="headerlink" title="Bulk API 批量导入"></a>Bulk API 批量导入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">import static org.elasticsearch.common.xcontent.XContentFactory.*;</div><div class="line"></div><div class="line">BulkRequestBuilder bulkRequest = client.prepareBulk();</div><div class="line"></div><div class="line">// either use client#prepare, or use Requests# to directly build index/delete requests</div><div class="line">bulkRequest.add(client.prepareIndex(&quot;twitter&quot;, &quot;tweet&quot;, &quot;1&quot;)</div><div class="line">        .setSource(jsonBuilder()</div><div class="line">                    .startObject()</div><div class="line">                        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">                        .field(&quot;postDate&quot;, new Date())</div><div class="line">                        .field(&quot;message&quot;, &quot;trying out Elasticsearch&quot;)</div><div class="line">                    .endObject()</div><div class="line">                  )</div><div class="line">        );</div><div class="line"></div><div class="line">bulkRequest.add(client.prepareIndex(&quot;twitter&quot;, &quot;tweet&quot;, &quot;2&quot;)</div><div class="line">        .setSource(jsonBuilder()</div><div class="line">                    .startObject()</div><div class="line">                        .field(&quot;user&quot;, &quot;kimchy&quot;)</div><div class="line">                        .field(&quot;postDate&quot;, new Date())</div><div class="line">                        .field(&quot;message&quot;, &quot;another post&quot;)</div><div class="line">                    .endObject()</div><div class="line">                  )</div><div class="line">        );</div><div class="line"></div><div class="line">BulkResponse bulkResponse = bulkRequest.get();</div><div class="line">if (bulkResponse.hasFailures()) &#123;</div><div class="line">    // process failures by iterating through each bulk response item</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="Bulk-Processer（批处理器）"><a href="#Bulk-Processer（批处理器）" class="headerlink" title="Bulk Processer（批处理器）"></a>Bulk Processer（批处理器）</h3><blockquote>
-<p>在给定的时间段或者请求达到一定的数量之后自动”冲洗”批处理请求<br>The BulkProcessor class offers a simple interface to flush bulk operations automatically based on the number or size of requests, or after a given period<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">import org.elasticsearch.action.bulk.BackoffPolicy;</div><div class="line">import org.elasticsearch.action.bulk.BulkProcessor;</div><div class="line">import org.elasticsearch.common.unit.ByteSizeUnit;</div><div class="line">import org.elasticsearch.common.unit.ByteSizeValue;</div><div class="line">import org.elasticsearch.common.unit.TimeValue;</div><div class="line"></div><div class="line">//添加elasticsearch客户端</div><div class="line">BulkProcessor bulkProcessor = BulkProcessor.builder(</div><div class="line">        client,  </div><div class="line">        new BulkProcessor.Listener() &#123;</div><div class="line">            @Override</div><div class="line">            public void beforeBulk(long executionId,</div><div class="line">                                   BulkRequest request) &#123; </div><div class="line">				//etc.request.numberOfActions()</div><div class="line">			 &#125; </div><div class="line"></div><div class="line">            @Override</div><div class="line">            public void afterBulk(long executionId,</div><div class="line">                                  BulkRequest request,</div><div class="line">                                  BulkResponse response) &#123; </div><div class="line">				//etc.response.hasFailures()</div><div class="line">			&#125; </div><div class="line"></div><div class="line">            @Override</div><div class="line">            public void afterBulk(long executionId,</div><div class="line">                                  BulkRequest request,</div><div class="line">                                  Throwable failure) &#123; </div><div class="line">			   //etc.raise Throwable</div><div class="line">			&#125; </div><div class="line">        &#125;)</div><div class="line">        .setBulkActions(10000) //批量执行请求数目（10000）</div><div class="line">        .setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB))//清洗大小（5Mb) </div><div class="line">        //清洗间隔（5s）</div><div class="line">        .setFlushInterval(TimeValue.timeValueSeconds(5)) </div><div class="line">        //设置并发请求的数量。的值为0意味着只有一个单一的请求将被允许执行。值为1时表示1并发请求允许同时积累新的批量执行请求。</div><div class="line">        .setConcurrentRequests(1) </div><div class="line">        //请求失败最多尝试的次数（3）和时间间隔（100ms）</div><div class="line">        .setBackoffPolicy(</div><div class="line">            BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)) </div><div class="line">        .build();</div></pre></td></tr></table></figure></p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2211,7 +2179,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">142</span>
+                <span class="site-state-item-count">144</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2233,7 +2201,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">109</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

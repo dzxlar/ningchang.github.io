@@ -254,6 +254,410 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/29/untitled-1514532966528/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/29/untitled-1514532966528/" itemprop="url">Java红包算法简单实现</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-29T15:36:06+08:00">
+                2017-12-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="判断红包是否领完"><a href="#判断红包是否领完" class="headerlink" title="判断红包是否领完"></a>判断红包是否领完</h1><pre><code>   //假设每人领取最大200元/最小0.01元 
+ private static final double MIN_MONEY = 0.01;
+ private static final double MAX_MONEY = 200;
+
+   /**
+ * 
+ * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完
+ * @param currentMoney 当前金额
+ * @param currentCount 当前领取红包数
+ * @return
+ */
+public static boolean isFinished(double currentMoney,int currentCount){
+    double avg = currentMoney / currentCount;
+    if(avg &lt; MIN_MONEY){
+        return false;
+    }else if(avg &gt; MAX_MONEY){
+        return false;
+    }
+    return true;
+}
+</code></pre><h1 id="核心算法"><a href="#核心算法" class="headerlink" title="核心算法"></a>核心算法</h1><pre><code>  /**
+ * 
+ * randomRedPacket 核心随机生成红包算法
+ * @param totalMoney 红包金额
+ * @param totalCount 红包数量
+ * @param minMoney 最小红包
+ * @param maxMoney 最大红包
+ * @return
+ */
+public static double randomRedPacket(double totalMoney,int totalCount,double minMoney,double maxMoney){
+    //如果是单发红包，则对方全领
+    if(totalCount == 1){
+        return (double)Math.round(totalMoney*100) / 100;
+    }
+    //如果最小红包和最大红包相等，默认最小红包
+    if(minMoney == maxMoney){
+        return minMoney;
+    }
+    //设置最大值，防止红包溢出
+    double maxMoney_ = maxMoney &gt; totalMoney ? totalMoney :maxMoney;
+    //随机分配红包(生成随机红包范围：minMoney &lt; distributionMoney &lt; maxMoney_)
+    double distributionMoney = (double)Math.round(((double)Math.random() * (maxMoney_ - minMoney) + minMoney )*100) / 100;
+    //得到剩余红包
+    double remainMoney = totalMoney - distributionMoney;
+    //红包是否领完 
+    if(isFinished(remainMoney, totalCount-1)){
+        return distributionMoney;
+    }else{ //剩余红包随机分配
+        double avg = remainMoney / (totalCount -1);
+        if(avg &lt; MIN_MONEY){
+            return randomRedPacket(totalMoney, totalCount, minMoney, distributionMoney);
+        }else if(avg &gt; MAX_MONEY){
+            return randomRedPacket(totalMoney, totalCount, distributionMoney, maxMoney);
+        }
+    }
+    return distributionMoney;
+}
+</code></pre><h1 id="得到用户红包"><a href="#得到用户红包" class="headerlink" title="得到用户红包"></a>得到用户红包</h1><pre><code>private static final float TIMES = 2.1f;
+
+/**
+ * 
+ * openRedPacket 用户红包分配详情
+ * @param totalMoney
+ * @param totalCount
+ * @return
+ */
+public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount){
+    if(!isFinished(totalMoney, totalCount)){
+        return null;
+    }
+    List&lt;Double&gt; distributionMoneyList = new ArrayList&lt;Double&gt;();
+    //如果随机生成的红包大于指定最大值，则默认
+    double max = (double) totalMoney * TIMES / totalCount &gt; MAX_MONEY ? MAX_MONEY : (double) totalMoney * TIMES / totalCount;
+    //将获得的红包放入集合
+    for(int i = 0; i  &lt; totalCount ; i ++){
+        double distributionMoney = randomRedPacket(totalMoney, totalCount - i, MIN_MONEY, max);
+        distributionMoneyList.add(distributionMoney);
+        totalMoney -= distributionMoney;
+    }
+    return distributionMoneyList;
+}
+</code></pre><h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><pre><code>   public static void main(String[] args) {
+    Scanner scan = new Scanner(System.in);
+    System.out.println(&quot;请输入红包金额：&quot;);
+    double money = scan.nextDouble();
+    System.out.println(&quot;请输入红包数量：&quot;);
+    int count = scan.nextInt();
+
+    List&lt;Double&gt; list = openRedPacket(money, count);
+    Double [] redMoney = new Double[count];
+    for(int i = 0; i &lt; list.size(); i ++){
+        redMoney[i] = list.get(i);
+    }
+    for(int i = 0; i &lt; count; i ++){
+        System.out.println(&quot;用户&quot;+i+&quot;得到红包&quot;+redMoney[i]+&quot;元&quot;);
+    }
+
+}
+</code></pre><h1 id="返回结果"><a href="#返回结果" class="headerlink" title="返回结果"></a>返回结果</h1><pre><code>        请输入红包金额：
+11
+请输入红包数量：
+11
+
+用户0得到红包0.16元
+用户1得到红包1.06元
+用户2得到红包1.57元
+用户3得到红包1.28元
+用户4得到红包1.6元
+用户5得到红包0.87元
+用户6得到红包0.19元
+用户7得到红包1.24元
+用户8得到红包1.61元
+用户9得到红包0.77元
+用户10得到红包0.65元
+</code></pre>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/30/RxJava介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/30/RxJava介绍/" itemprop="url">RxJava介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-30T13:47:00+08:00">
+                2017-11-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Rx模式"><a href="#Rx模式" class="headerlink" title="Rx模式"></a>Rx模式</h1><h2 id="使用观察者模式"><a href="#使用观察者模式" class="headerlink" title="使用观察者模式"></a>使用观察者模式</h2><ul>
+<li>创建：Rx可以方便的创建事件流和数据流</li>
+<li>组合：Rx使用查询式的操作符组合和变换数据流</li>
+<li>监听：Rx可以订阅任何可观察的数据流并执行操作</li>
+</ul>
+<h2 id="简化代码"><a href="#简化代码" class="headerlink" title="简化代码"></a>简化代码</h2><ul>
+<li>函数式风格：对可观察数据流使用无副作用的输入输出函数，避免了程序里错综复杂的状态</li>
+<li>简化代码：Rx的操作符通通常可以将复杂的难题简化为很少的几行代码</li>
+<li>异步错误处理：传统的try/catch没办法处理异步计算，Rx提供了合适的错误处理机制</li>
+<li>轻松使用并发：Rx的Observables和Schedulers让开发者可以摆脱底层的线程同步和各种并发问题</li>
+</ul>
+<h2 id="Observable的优势"><a href="#Observable的优势" class="headerlink" title="Observable的优势"></a>Observable的优势</h2><blockquote>
+<p>Rx扩展了观察者模式用于支持数据和事件序列，添加了一些操作符，它让你可以声明式的组合这些序列，而无需关注底层的实现：如线程、同步、线程安全、并发数据结构和非阻塞IO</p>
+</blockquote>
+<h1 id="RxJava介绍"><a href="#RxJava介绍" class="headerlink" title="RxJava介绍"></a>RxJava介绍</h1><h2 id="为什么会有RxJava？"><a href="#为什么会有RxJava？" class="headerlink" title="为什么会有RxJava？"></a>为什么会有RxJava？</h2><blockquote>
+<p>减少REST调用的次数。取代几十次的REST调用，而是让客户端自己处理需要的数据，他们决定基于客户端需求创建一个专门优化过的REST调用。</p>
+</blockquote>
+<h2 id="RxJava主要特性"><a href="#RxJava主要特性" class="headerlink" title="RxJava主要特性"></a>RxJava主要特性</h2><ul>
+<li>易于并发从而更好的利用服务器的能力</li>
+<li>易于有条件的异步执行</li>
+<li>一种更好的方式来避免回调地狱</li>
+<li>一种响应式方法</li>
+</ul>
+<h2 id="RxJava新特性"><a href="#RxJava新特性" class="headerlink" title="RxJava新特性"></a>RxJava新特性</h2><ul>
+<li>生产者在没有更多数据可用时能够发出信号通知：<code>onCompleted()</code>事件</li>
+<li>生产者在发生错误时能够发出信号通知：<code>onError()</code>事件</li>
+<li>RxJava Observables 能够组合而不是嵌套，从而避免开发者陷入回调地狱</li>
+</ul>
+<p>Observables和Iterables共用一个相似的API,在Iterable可以执行的许多操作也都同样可以在Observables上执行，除了remove</p>
+<h2 id="RxJava角色"><a href="#RxJava角色" class="headerlink" title="RxJava角色"></a>RxJava角色</h2><ul>
+<li>Observable</li>
+<li>Observer</li>
+<li>Subscriber</li>
+<li>Subjects</li>
+</ul>
+<p>Observables和Subjects是两个“生产”实体<br>Observers和Subscribers是两个“消费”实体</p>
+<h2 id="热Observables和冷Observables"><a href="#热Observables和冷Observables" class="headerlink" title="热Observables和冷Observables"></a>热Observables和冷Observables</h2><blockquote>
+<p>从发射物的角度来看，有两种不同的Observables:热的和冷的。<strong>一个”热”的Observable典型的只要一创建完就开始发射数据，因此所有后续订阅它的观察者可能从序列中间的某个位置开始接受数据（有一些数据错过了）。一个”冷”的Observable会一直等待，直到有观察者订阅它才开始发射数据，因此这个观察者可以确保会收到整个数据序列。</strong></p>
+</blockquote>
+<ul>
+<li>获取数据 <code>onNext()</code></li>
+<li>异常处理 <code>onError(Exception)</code></li>
+<li>任务完成 <code>onCompleted()</code></li>
+</ul>
+<p><a href="http://dzxlar.cn/2017/06/05/%E3%80%90%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E3%80%91%E8%A1%8C%E4%B8%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F%E2%80%94%E2%80%94-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%EF%BC%88Observer%EF%BC%89/" target="_blank" rel="external">观察者模式</a></p>
+<p><a href="https://www.gitbook.com/book/yuxingxin/rxjava-essentials-cn/details" target="_blank" rel="external">RxJava中文文档</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/Eureka源码解析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1976,456 +2380,6 @@ public HashMap(int initialCapacity)
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/09/【HK】搜索引擎语法——GoogleHack/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/09/【HK】搜索引擎语法——GoogleHack/" itemprop="url">【HK】搜索引擎语法——GoogleHack</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-09T14:00:49+08:00">
-                2017-10-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/黑客/" itemprop="url" rel="index">
-                    <span itemprop="name">黑客</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="intitle"><a href="#intitle" class="headerlink" title="intitle:"></a>intitle:</h1><blockquote>
-<p>搜索指定标题内容的网页</p>
-</blockquote>
-<h1 id="Site"><a href="#Site" class="headerlink" title="Site:"></a>Site:</h1><blockquote>
-<p>显示所有与目标网站有联系的页面（常用来做入侵前的信息试探）</p>
-</blockquote>
-<h1 id="filetype"><a href="#filetype" class="headerlink" title="filetype:"></a>filetype:</h1><blockquote>
-<p>搜索网站的数据库文件</p>
-</blockquote>
-<h1 id="intext"><a href="#intext" class="headerlink" title="intext:"></a>intext:</h1><blockquote>
-<p>搜索目标网页含有特定字符的网页</p>
-</blockquote>
-<h1 id="cache"><a href="#cache" class="headerlink" title="cache:"></a>cache:</h1><blockquote>
-<p>搜索指定内容的缓存</p>
-</blockquote>
-<h1 id="define"><a href="#define" class="headerlink" title="define:"></a>define:</h1><blockquote>
-<p>搜索特定词语的定义</p>
-</blockquote>
-<h1 id="inurl"><a href="#inurl" class="headerlink" title="inurl"></a>inurl</h1><blockquote>
-<p>搜索指定字符是否存在url中</p>
-</blockquote>
-<h1 id="link"><a href="#link" class="headerlink" title="link:"></a>link:</h1><blockquote>
-<p>返回用目标地址作链接的所有网页</p>
-</blockquote>
-<h1 id="过滤"><a href="#过滤" class="headerlink" title="过滤"></a>过滤</h1><h2 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h2><ul>
-<li>+把google可能忽略的字列如查询范围</li>
-<li>-把某个字忽略</li>
-<li>~同意词</li>
-<li>.单一的通配符</li>
-<li>*通配符，可代表多个字母</li>
-<li>“ “精确查询</li>
-</ul>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.williamlong.info/archives/150.html" target="_blank" rel="external">http://www.williamlong.info/archives/150.html</a></p>
-<h1 id="维基百科"><a href="#维基百科" class="headerlink" title="维基百科"></a>维基百科</h1><p><a href="https://en.wikipedia.org/wiki/Google_hacking" target="_blank" rel="external">https://en.wikipedia.org/wiki/Google_hacking</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/20/【代码规范】Google代码规范/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/20/【代码规范】Google代码规范/" itemprop="url">【代码规范】Google代码规范</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-20T10:04:08+08:00">
-                2017-09-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/代码规范/" itemprop="url" rel="index">
-                    <span itemprop="name">代码规范</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="文件名"><a href="#文件名" class="headerlink" title="文件名"></a>文件名</h2><blockquote>
-<p>源文件以其最顶层的类名来命名，大小写敏感。例如：包名为com.bcw.ewms，文件名设置为ewms</p>
-</blockquote>
-<h2 id="统一文件编码UTF-8"><a href="#统一文件编码UTF-8" class="headerlink" title="统一文件编码UTF-8"></a>统一文件编码UTF-8</h2><h2 id="特殊字符"><a href="#特殊字符" class="headerlink" title="特殊字符"></a>特殊字符</h2><pre><code>- **空白字符**:除了行结束符序列，ASCII水平空格字符(0x20，即空格)是源文件中唯一允许出现的空白字符
-- **特殊转义序列**:对于具有特殊转义序列的任何字符(\b, \t, \n, \f, \r, &quot;, &apos;及\)，我们使用它的转义序列，而不是相应的八进制(比如\012)或Unicode(比如\u000a)转义。
-- **非ASCII字符**:对于剩余的非ASCII字符，是使用实际的Unicode字符(比如∞)，还是使用等价的Unicode转义符(比如\u221e)，取决于哪个能让代码更易于阅读和理解。
-</code></pre><p>Tip: 在使用Unicode转义符或是一些实际的Unicode字符时，建议做些注释给出解释</p>
-<pre><code>`
-      String unitAbbrev = &quot;μs&quot;;                                 | 赞，即使没有注释也非常清晰
-      String unitAbbrev = &quot;\u03bcs&quot;; // &quot;μs&quot;                    | 允许，但没有理由要这样做
-      String unitAbbrev = &quot;\u03bcs&quot;; // Greek letter mu, &quot;s&quot;    | 允许，但这样做显得笨拙还容易出错
-          String unitAbbrev = &quot;\u03bcs&quot;;                            | 很糟，读者根本看不出这是什么
-          return &apos;\ufeff&apos; + content; // byte order mark             | Good，对于非打印字符，使用转义，并在必要时写上注释
-`
-</code></pre><h2 id="源文件结构"><a href="#源文件结构" class="headerlink" title="源文件结构"></a>源文件结构</h2><ol>
-<li>许可证或版权信息(如有需要)</li>
-<li>package语句</li>
-<li>import语句<blockquote>
-<p> import不要使用通配符。例如：import java.util.*;</p>
-</blockquote>
-</li>
-<li>一个顶级类(只有一个)</li>
-</ol>
-<h2 id="类声明"><a href="#类声明" class="headerlink" title="类声明"></a>类声明</h2><ol>
-<li>只有一个顶级类声明<blockquote>
-<p>每个顶级类都在一个与它同名的源文件中</p>
-</blockquote>
-</li>
-<li>类成员顺序<blockquote>
-<p>每个类应该以某种逻辑去排序它的成员，维护者应该要能解释这种排序逻辑。</p>
-</blockquote>
-</li>
-<li>重载：永不分离<blockquote>
-<p>当一个类有多个构造函数，或是多个同名方法，这些函数/方法应该按顺序出现在一起，中间不要放进其它函数/方法。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="格式"><a href="#格式" class="headerlink" title="格式"></a>格式</h2><ol>
-<li>大括号<blockquote>
-<p>大括号与if, else, for, do, while语句一起使用，即使只有一条语句(或是空)，也应该把大括号写上。</p>
-</blockquote>
-</li>
-<li><p>非空块：K &amp; R 风格</p>
-<ul>
-<li>左大括号前不换行</li>
-<li>左大括号后换行</li>
-<li>右大括号前换行</li>
-<li>如果右大括号是一个语句、函数体或类的终止，则右大括号后换行; 否则不换行。例如，如果右大括号后面是else或逗号，则不换行。 </li>
-</ul>
-</li>
-<li><p>空块 </p>
-<pre><code>void doNothing() {}
-</code></pre></li>
-<li><p>每个语句后要换行。      </p>
-</li>
-<li><p>列限制：80或100字符</p>
-</li>
-<li><p>断开</p>
-<ol>
-<li>如果在非赋值运算符处断开，那么在该符号前断开(比如+，它将位于下一行)。注意：这一点与Google其它语言的编程风格不同(如C++和JavaScript)。 这条规则也适用于以下“类运算符”符号：点分隔符(.)，类型界限中的&amp;（<t extends="" foo="" &="" bar="">)，catch块中的管道符号(catch (FooException | BarException e)</t></li>
-<li>如果在赋值运算符处断开，通常的做法是在该符号后断开(比如=，它与前面的内容留在同一行)。这条规则也适用于foreach语句中的分号。</li>
-<li>方法名或构造函数名与左括号留在同一行。</li>
-<li>逗号(,)与其前面的内容留在同一行。】</li>
-</ol>
-</li>
-<li><p>自动换行时缩进至少+4个空格</p>
-</li>
-</ol>
-<h2 id="空白"><a href="#空白" class="headerlink" title="空白"></a>空白</h2><ol>
-<li>水平空白</li>
-<li>垂直空白</li>
-<li>水平对齐</li>
-</ol>
-<h2 id="用小括号来限定组"><a href="#用小括号来限定组" class="headerlink" title="用小括号来限定组"></a>用小括号来限定组</h2><h2 id="具体结构"><a href="#具体结构" class="headerlink" title="具体结构"></a>具体结构</h2><ol>
-<li><p>枚举</p>
-<blockquote>
-<p>枚举常量间用逗号隔开，换行可选。</p>
-</blockquote>
-</li>
-<li><p>每次只声明一个变量</p>
-</li>
-<li><p>需要时才声明，并尽快进行初始化</p>
-</li>
-<li><p>数组</p>
-<ol>
-<li>数组初始化：可写成块状结构</li>
-<li>非C风格的数组声明:中括号是类型的一部分：String[] args， 而非String args[]。</li>
-</ol>
-</li>
-<li><p>switch语句<br> 1.switch块中的内容缩进为2个空格。<br> 2.在一个switch块内，每个语句组要么通过break, continue, return或抛出异常来终止，要么通过一条注释来说明程序将继续执行到下一个语句组， 任何能表达这个意思的注释都是OK的(典型的是用// fall through)。这个特殊的注释并不需要在最后一个语句组(一般是default)中出现</p>
-</li>
-<li><p>注解(Annotations)</p>
-<blockquote>
-<p>注解紧跟在文档块后面，应用于类、方法和构造函数，一个注解独占一行。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><ol>
-<li>块注释风格<blockquote>
-<p>块注释与其周围的代码在同一缩进级别。它们可以是/<em> … </em>/风格，也可以是// …风格。对于多行的/<em> … </em>/注释，后续行必须从<em>开始， 并且与前一行的</em>对齐</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="命名约定"><a href="#命名约定" class="headerlink" title="命名约定"></a>命名约定</h2><ol>
-<li><p>对所有标识符都通用的规则</p>
-<blockquote>
-<p>标识符只能使用ASCII字母和数字，因此每个有效的标识符名称都能匹配正则表达式\w+。在Google其它编程语言风格中使用的特殊前缀或后缀，如name_, mName, s_name和kName，在Java编程风格中都不再使用。</p>
-</blockquote>
-</li>
-<li><p>标识符类型的规则</p>
-<pre><code>1. 包名
-&gt; 包名全部小写，连续的单词只是简单地连接起来，不使用下划线。
-</code></pre><ol>
-<li><p>类名</p>
-<blockquote>
-<p>类名都以UpperCamelCase风格编写。</p>
-</blockquote>
-</li>
-<li><p>方法名</p>
-<blockquote>
-<p>方法名都以lowerCamelCase风格编写。</p>
-</blockquote>
-</li>
-<li><p>常量名</p>
-<blockquote>
-<p>常量名命名模式为CONSTANT_CASE，全部字母大写，用下划线分隔单词。</p>
-</blockquote>
-</li>
-<li><p>非常量字段名</p>
-<blockquote>
-<p>非常量字段名以lowerCamelCase风格编写。</p>
-</blockquote>
-</li>
-<li><p>参数名</p>
-<blockquote>
-<p>参数名以lowerCamelCase风格编写。</p>
-</blockquote>
-</li>
-<li><p>局部变量名</p>
-<blockquote>
-<p>局部变量名以lowerCamelCase风格编写，比起其它类型的名称，局部变量名可以有更为宽松的缩写。</p>
-</blockquote>
-<ol>
-<li>类型变量名<br>类型变量可用以下两种风格之一进行命名：<br>  单个的大写字母，后面可以跟一个数字(如：E, T, X, T2)。<br>  以类命名方式(5.2.2节)，后面加个大写的T(如：RequestT, FooBarT)。</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a href="http://www.hawstein.com/posts/google-java-style.html" target="_blank" rel="external">http://www.hawstein.com/posts/google-java-style.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2475,7 +2429,7 @@ public HashMap(int initialCapacity)
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">142</span>
+                <span class="site-state-item-count">144</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2497,7 +2451,7 @@ public HashMap(int initialCapacity)
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">109</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

@@ -254,6 +254,316 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】Lambda表达式实现工厂模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】Lambda表达式实现工厂模式/" itemprop="url">【设计模式】Lambda表达式实现工厂模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:35:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="简单原始例子"><a href="#简单原始例子" class="headerlink" title="简单原始例子"></a>简单原始例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public interface Shape &#123;</div><div class="line">	void draw();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public class Rectangle implements Shape &#123;</div><div class="line">	@Override</div><div class="line">	public void draw() &#123;</div><div class="line">		System.out.println(&quot;Inside Rectangle::draw() method.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">public class Circle implements Shape &#123;</div><div class="line">	@Override</div><div class="line">	public void draw() &#123;</div><div class="line">		System.out.println(&quot;Inside Circle::draw() method.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ShapeFactory &#123;</div><div class="line">	//use getShape method to get object of type shape</div><div class="line">	public Shape getShape(String shapeType)&#123;</div><div class="line">		if(shapeType == null)&#123;</div><div class="line">		return null;</div><div class="line">		&#125;</div><div class="line">		if(shapeType.equalsIgnoreCase(&quot;CIRCLE&quot;))&#123;</div><div class="line">		return new Circle();</div><div class="line">		&#125; else if(shapeType.equalsIgnoreCase(&quot;RECTANGLE&quot;))&#123;</div><div class="line">		return new Rectangle();</div><div class="line">		&#125;</div><div class="line">		return null;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="使用Lambada实现工厂模式"><a href="#使用Lambada实现工厂模式" class="headerlink" title="使用Lambada实现工厂模式"></a>使用Lambada实现工厂模式</h3><p><strong>Lambda表达式允许我们定义一个匿名方法，并允许我们以函数式接口的方式使用它</strong></p>
+<p>方法引用和lambda表达式拥有相同的特性（例如，它们都需要一个目标类型，并需要被转化为函数式接口的实例），不过我们并不需要为方法引用提供方法体，我们可以直接通过方法名称引用已有方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Supplier&lt;Shape&gt; circleSupplier = Circle::new;</div><div class="line">Circle circle = circleSupplier.get();</div></pre></td></tr></table></figure>
+<hr>
+<p>根据构造方法引用的原理，我们可以重写之前的代码，定义一个Map来保存shape name 和它对应的构造方法引用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">final static Map&lt;String, Supplier&lt;Shape&gt;&gt; map = new HashMap&lt;&gt;();</div><div class="line">static &#123;</div><div class="line">	map.put(&quot;CIRCLE&quot;, Circle::new);</div><div class="line">	map.put(&quot;RECTANGLE&quot;, Rectangle::new);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="使用这个map来实例化不同的shapes"><a href="#使用这个map来实例化不同的shapes" class="headerlink" title="使用这个map来实例化不同的shapes"></a>使用这个map来实例化不同的shapes</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ShapeFactory &#123;</div><div class="line">final static Map&lt;String, Supplier&lt;Shape&gt;&gt; map = new HashMap&lt;&gt;();</div><div class="line">	static &#123;</div><div class="line">		map.put(&quot;CIRCLE&quot;, Circle::new);</div><div class="line">		map.put(&quot;RECTANGLE&quot;, Rectangle::new);</div><div class="line">	&#125;</div><div class="line">	public Shape getShape(String shapeType)&#123;</div><div class="line">		Supplier&lt;Shape&gt; shape = map.get(shapeType.toUpperCase());</div><div class="line">		if(shape != null) &#123;</div><div class="line">			return shape.get();</div><div class="line">		&#125;</div><div class="line">		throw new IllegalArgumentException(&quot;No such shape &quot; + shapeType.toUpperCase());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<p>使用lambada表达式实现的工厂方法来创建shape对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">	Supplier&lt;ShapeFactory&gt; shapeFactory = ShapeFactory::new;</div><div class="line">	//call draw method of circle</div><div class="line">	shapeFactory.get().getShape(&quot;circle&quot;).draw();</div><div class="line">	//call draw method of Rectangle</div><div class="line">	shapeFactory.get().getShape(&quot;rectangle&quot;).draw();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里的 Shape::new可以被看作为lambda表达式的简写形式。尽管方法引用不一定会把语法变的更紧凑，但它拥有更明确的语义——如果我们想要调用的方法拥有一个名字，我们就可以通过它的名字直接调用它。</p>
+<p>如果 Shape 构造函数需要多个参数，那么你就需要重新实现自己的Supplier</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">() -&gt; new Circe(args)</div></pre></td></tr></table></figure>
+<p><a href="https://blog.maxleap.cn/archives/1300" target="_blank" rel="external">原文转载</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构型模式——组合模式（Composite-Pattern）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】结构型模式——组合模式（Composite-Pattern）/" itemprop="url">【设计模式】结构型模式——组合模式（Composite Pattern）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:35:15+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="组合模式定义"><a href="#组合模式定义" class="headerlink" title="组合模式定义"></a>组合模式定义</h3><blockquote>
+<p><strong>组合多个对象形成树形结构以表示具有“整体—部分”关系的层次结构。组合模式对单个对象（即叶子对象）和组合对象（即容器对象）的使用具有一致性，组合模式又可以称为“整体—部分”(Part-Whole)模式，它是一种对象结构型模式。</strong></p>
+</blockquote>
+<hr>
+<blockquote>
+<p>组合模式为处理树形结构提供了一种较为完美的解决方案，它描述了如何将容器和叶子进行递归组合，使得用户在使用时无须对它们进行区分，可以一致地对待容器和叶子。</p>
+</blockquote>
+<h3 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h3><ul>
+<li>组合模式可以清楚地定义分层次的复杂对象，表示对象的全部或部分层次，它让客户端忽略了层次的差异，方便对整个层次结构进行控制。</li>
+<li>客户端可以一致地使用一个组合结构或其中单个对象，不必关心处理的是单个对象还是整个组合结构，简化了客户端代码。</li>
+<li>在组合模式中增加新的容器构件和叶子构件都很方便，无须对现有类库进行任何修改，符合“开闭原则”。</li>
+<li>组合模式为树形结构的面向对象实现提供了一种灵活的解决方案，通过叶子对象和容器对象的递归组合，可以形成复杂的树形结构，但对树形结构的控制却非常简单。<h3 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h3></li>
+<li>在增加新构件时很难对容器中的构件类型进行限制。有时候我们希望一个容器中只能有某些特定类型的对象，例如在某个文件夹中只能包含文本文件，使用组合模式时，不能依赖类型系统来施加这些约束，因为它们都来自于相同的抽象层，在这种情况下，必须通过在运行时进行类型检查来实现，这个实现过程较为复杂。</li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>在具有整体和部分的层次结构中，希望通过一种方式忽略整体与部分的差异，客户端可以一致地对待它们。</li>
+<li>在一个使用面向对象语言开发的系统中需要处理一个树形结构。</li>
+<li>在一个系统中能够分离出叶子对象和容器对象，而且它们的类型不固定，需要增加一些新的类型。</li>
+</ul>
+<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170405112743406?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><strong>组合模式的关键是定义了一个抽象构件类，它既可以代表叶子，又可以代表容器，而客户端针对该抽象构件类进行编程，无须知道它到底表示的是叶子还是容器，可以对其进行统一处理</strong></p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">abstract class Component &#123;  </div><div class="line">    public abstract void add(Component c); //增加成员  </div><div class="line">    public abstract void remove(Component c); //删除成员  </div><div class="line">    public abstract Component getChild(int i); //获取成员  </div><div class="line">    public abstract void operation();  //业务方法  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Leaf extends Component &#123;  </div><div class="line">    public void add(Component c) &#123;   </div><div class="line">        //异常处理或错误提示   </div><div class="line">    &#125;     </div><div class="line">          </div><div class="line">    public void remove(Component c) &#123;   </div><div class="line">        //异常处理或错误提示   </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public Component getChild(int i) &#123;   </div><div class="line">        //异常处理或错误提示  </div><div class="line">        return null;   </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void operation() &#123;  </div><div class="line">        //叶子构件具体业务方法的实现  </div><div class="line">    &#125;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">class Composite extends Component &#123;  </div><div class="line">    private ArrayList&lt;Component&gt; list = new ArrayList&lt;Component&gt;();  </div><div class="line">      </div><div class="line">    public void add(Component c) &#123;  </div><div class="line">        list.add(c);  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void remove(Component c) &#123;  </div><div class="line">        list.remove(c);  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public Component getChild(int i) &#123;  </div><div class="line">        return (Component)list.get(i);  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    public void operation() &#123;  </div><div class="line">        //容器构件具体业务方法的实现  </div><div class="line">        //递归调用成员构件的业务方法  </div><div class="line">        for(Object obj:list) &#123;  </div><div class="line">            ((Component)obj).operation();  </div><div class="line">        &#125;  </div><div class="line">    &#125;     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——策略模式-Strategy-Pattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -970,173 +1280,6 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/" itemprop="url">【设计模式】结构性模式—— 代理模式（Proxy Pattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="代理模式定义"><a href="#代理模式定义" class="headerlink" title="代理模式定义"></a>代理模式定义</h3><blockquote>
-<p><strong>给某一个对象提供一个代理，并由代理对象控制对原对象的引用。它是一种对象结构型模式</strong></p>
-</blockquote>
-<h3 id="代理模式的优点"><a href="#代理模式的优点" class="headerlink" title="代理模式的优点"></a>代理模式的优点</h3><ul>
-<li>代理模式能够协调调用者和被调用者，在一定程度上降低了系统的耦合度。</li>
-<li>远程代理使得客户端可以访问在远程机器上的对象，远程机器 可能具有更好的计算性能与处理速度，可以快速响应并处理客户端请求。</li>
-<li>虚拟代理通过使用一个小对象来代表一个大对象，可以减少系 统资源的消耗，对系统进行优化并提高运行速度。</li>
-<li>保护代理可以控制对真实对象的使用权限。</li>
-</ul>
-<h3 id="代理模式缺点"><a href="#代理模式缺点" class="headerlink" title="代理模式缺点"></a>代理模式缺点</h3><ul>
-<li>由于在客户端和真实主题之间增加了代理对象，因此 有些类型的代理模式可能会造成请求的处理速度变慢。</li>
-<li>实现代理模式需要额外的工作，有些代理模式的实现 非常复杂。</li>
-</ul>
-<h3 id="代理模式结构"><a href="#代理模式结构" class="headerlink" title="代理模式结构"></a>代理模式结构</h3><p><img src="http://img.blog.csdn.net/20170331105829488?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class Subject  </div><div class="line">&#123;  </div><div class="line">    public abstract void doRequest();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class RealSubject extend Subject  </div><div class="line">&#123;  </div><div class="line">	@Override</div><div class="line">    public void doRequest()  </div><div class="line">    &#123;  </div><div class="line">        //业务方法具体实现代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Proxy extend Subject  </div><div class="line">&#123;  </div><div class="line">    private RealSubject realSubject = new RealSubject(); //维持一个对真实主题对象的引用  </div><div class="line">  </div><div class="line">    public void beforeRequest()   </div><div class="line">    &#123;  </div><div class="line">        …...  </div><div class="line">    &#125;  </div><div class="line">    @Override</div><div class="line">    public void doRequest()   </div><div class="line">    &#123;  </div><div class="line">        beforeRequest();  </div><div class="line">        realSubject.doRequest(); //调用真实主题对象的方法  </div><div class="line">        afterRequest();  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    public void afterRequest()   </div><div class="line">    &#123;  </div><div class="line">        ……  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p>代理类型</p>
-<ul>
-<li>远程(Remote)代理：为一个位于不同的地址空间的对象提供一个本地 的代理对象，这个不同的地址空间可以是在同一台主机中，也可是在 另一台主机中，远程代理又叫做大使(Ambassador)。</li>
-<li>虚拟(Virtual)代理：如果需要创建一个资源消耗较大的对象，先创建一个消耗相对较小的对象来表示，真实对象只在需要时才会被真正创建。</li>
-<li>Copy-on-Write代理：它是虚拟代理的一种，把复制（克隆）操作延迟 到只有在客户端真正需要时才执行。一般来说，对象的深克隆是一个 开销较大的操作，Copy-on-Write代理可以让这个操作延迟，只有对象被用到的时候才被克隆。</li>
-<li>保护(Protect or Access)代理：控制对一个对象的访问，可以给不同的用户提供不同级别的使用权限。</li>
-<li>缓冲(Cache)代理：为某一个目标操作的结果提供临时的存储空间，以便多个客户端可以共享这些结果。</li>
-<li>防火墙(Firewall)代理：保护目标不让恶意用户接近。<br>同步化(Synchronization)代理：使几个用户能够同时使用一个对象而没有冲突。</li>
-<li>智能引用(Smart Reference)代理：当一个对象被引用时，提供一些额外的操作，如将此对象被调用的次数记录下来等。</li>
-</ul>
-<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ul>
-<li>动态代理是一种较为高级的代理模式，它的典型应用就是Spring AOP。</li>
-<li>在传统的代理模式中，客户端通过Proxy调用RealSubject类的doRequest()方法，同时还在代理类中封装了其他方法(如beforeRequest()和afterRequest())，可以处理一些其他问题。</li>
-<li>如果按照这种方法使用代理模式，那么真实主题角色必须是事先已经存在的，并将其作为代理对象的内部成员属性。如果一个真实主题角色必须对应一个代理主题角色，这将导致系统中的类个数急剧增加，因此需要想办法减少系统中类的个数，此外，如何在事先不知道真实主题角色的情况下使用代理主题角色，这都是动态代理需要解决的问题。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1336,6 +1479,173 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryA extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductA1 createProductA1() &#123;  </div><div class="line">    return new ProductA1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductA2 createProductA2() &#123;  </div><div class="line">    return new ProductA2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <hr>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryB extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductB1 createProductB1() &#123;  </div><div class="line">    return new ProductB1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductB2 createProductB2() &#123;  </div><div class="line">    return new ProductB2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】结构性模式——-代理模式（Proxy-Pattern/" itemprop="url">【设计模式】结构性模式—— 代理模式（Proxy Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="代理模式定义"><a href="#代理模式定义" class="headerlink" title="代理模式定义"></a>代理模式定义</h3><blockquote>
+<p><strong>给某一个对象提供一个代理，并由代理对象控制对原对象的引用。它是一种对象结构型模式</strong></p>
+</blockquote>
+<h3 id="代理模式的优点"><a href="#代理模式的优点" class="headerlink" title="代理模式的优点"></a>代理模式的优点</h3><ul>
+<li>代理模式能够协调调用者和被调用者，在一定程度上降低了系统的耦合度。</li>
+<li>远程代理使得客户端可以访问在远程机器上的对象，远程机器 可能具有更好的计算性能与处理速度，可以快速响应并处理客户端请求。</li>
+<li>虚拟代理通过使用一个小对象来代表一个大对象，可以减少系 统资源的消耗，对系统进行优化并提高运行速度。</li>
+<li>保护代理可以控制对真实对象的使用权限。</li>
+</ul>
+<h3 id="代理模式缺点"><a href="#代理模式缺点" class="headerlink" title="代理模式缺点"></a>代理模式缺点</h3><ul>
+<li>由于在客户端和真实主题之间增加了代理对象，因此 有些类型的代理模式可能会造成请求的处理速度变慢。</li>
+<li>实现代理模式需要额外的工作，有些代理模式的实现 非常复杂。</li>
+</ul>
+<h3 id="代理模式结构"><a href="#代理模式结构" class="headerlink" title="代理模式结构"></a>代理模式结构</h3><p><img src="http://img.blog.csdn.net/20170331105829488?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class Subject  </div><div class="line">&#123;  </div><div class="line">    public abstract void doRequest();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class RealSubject extend Subject  </div><div class="line">&#123;  </div><div class="line">	@Override</div><div class="line">    public void doRequest()  </div><div class="line">    &#123;  </div><div class="line">        //业务方法具体实现代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Proxy extend Subject  </div><div class="line">&#123;  </div><div class="line">    private RealSubject realSubject = new RealSubject(); //维持一个对真实主题对象的引用  </div><div class="line">  </div><div class="line">    public void beforeRequest()   </div><div class="line">    &#123;  </div><div class="line">        …...  </div><div class="line">    &#125;  </div><div class="line">    @Override</div><div class="line">    public void doRequest()   </div><div class="line">    &#123;  </div><div class="line">        beforeRequest();  </div><div class="line">        realSubject.doRequest(); //调用真实主题对象的方法  </div><div class="line">        afterRequest();  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    public void afterRequest()   </div><div class="line">    &#123;  </div><div class="line">        ……  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><p>代理类型</p>
+<ul>
+<li>远程(Remote)代理：为一个位于不同的地址空间的对象提供一个本地 的代理对象，这个不同的地址空间可以是在同一台主机中，也可是在 另一台主机中，远程代理又叫做大使(Ambassador)。</li>
+<li>虚拟(Virtual)代理：如果需要创建一个资源消耗较大的对象，先创建一个消耗相对较小的对象来表示，真实对象只在需要时才会被真正创建。</li>
+<li>Copy-on-Write代理：它是虚拟代理的一种，把复制（克隆）操作延迟 到只有在客户端真正需要时才执行。一般来说，对象的深克隆是一个 开销较大的操作，Copy-on-Write代理可以让这个操作延迟，只有对象被用到的时候才被克隆。</li>
+<li>保护(Protect or Access)代理：控制对一个对象的访问，可以给不同的用户提供不同级别的使用权限。</li>
+<li>缓冲(Cache)代理：为某一个目标操作的结果提供临时的存储空间，以便多个客户端可以共享这些结果。</li>
+<li>防火墙(Firewall)代理：保护目标不让恶意用户接近。<br>同步化(Synchronization)代理：使几个用户能够同时使用一个对象而没有冲突。</li>
+<li>智能引用(Smart Reference)代理：当一个对象被引用时，提供一些额外的操作，如将此对象被调用的次数记录下来等。</li>
+</ul>
+<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ul>
+<li>动态代理是一种较为高级的代理模式，它的典型应用就是Spring AOP。</li>
+<li>在传统的代理模式中，客户端通过Proxy调用RealSubject类的doRequest()方法，同时还在代理类中封装了其他方法(如beforeRequest()和afterRequest())，可以处理一些其他问题。</li>
+<li>如果按照这种方法使用代理模式，那么真实主题角色必须是事先已经存在的，并将其作为代理对象的内部成员属性。如果一个真实主题角色必须对应一个代理主题角色，这将导致系统中的类个数急剧增加，因此需要想办法减少系统中类的个数，此外，如何在事先不知道真实主题角色的情况下使用代理主题角色，这都是动态代理需要解决的问题。</li>
+</ul>
+
           
         
       
@@ -1748,356 +2058,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——单例模式-Single-Pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——单例模式-Single-Pattern/" itemprop="url">【设计模式】创建型模式——单例模式(Single Pattern)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:20:49+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="单例模式定义"><a href="#单例模式定义" class="headerlink" title="单例模式定义"></a>单例模式定义</h3><blockquote>
-<p>确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例，这个类称为单例类，它提供全局访问的方法。单例模式是一种对象创建型模式。</p>
-</blockquote>
-<hr>
-<h3 id="单例模式优点"><a href="#单例模式优点" class="headerlink" title="单例模式优点"></a>单例模式优点</h3><ol>
-<li>对于频繁使用的对象，可以<strong>省略创建对象所花费的时间</strong>。</li>
-<li>由于 new 操作的次数减少，因而<strong>降低系统内存使用频率</strong>，减轻 GC 压力，缩短 GC 停顿时间。</li>
-<li><strong>允许可变数目的实例</strong>。使用与单例控制相似的方法来获得指定个数的对象实例，既节省系统资源，又解决了<strong>单例单例对象共享过多有损性能的问题</strong></li>
-</ol>
-<h3 id="单例模式缺点"><a href="#单例模式缺点" class="headerlink" title="单例模式缺点"></a>单例模式缺点</h3><ol>
-<li>由于单例模式中没有抽象层，因此单例类的<strong>难以扩展</strong>。</li>
-<li><strong>单例类的职责过重，在一定程度上违背了“单一职责原则”。</strong>因为单例类既充当了工厂角色，提供了工厂方法，同时又充当了产品角色，包含一些业务方法，<strong>耦合度过高</strong>。</li>
-<li>实例化的共享对象长时间不被利用，系统会认为它是垃圾，会自动销毁并回收资源，下次利用时又将重新实例化，这将<strong>导致共享的单例对象状态的丢失。</strong></li>
-</ol>
-<h3 id="创建单例模式核心要点"><a href="#创建单例模式核心要点" class="headerlink" title="创建单例模式核心要点"></a>创建单例模式核心要点</h3><blockquote>
-<p>单例模式的核心在于通过一个接口返回唯一的对象实例。首要的问题就是要把创建实例的权限收回来，<strong>让类自身来负责自己类的实例的创建工作，然后由这个类来提供外部可以访问这个类实例的一个全局访问方法</strong></p>
-</blockquote>
-<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ol>
-<li>系统只需要一个实例对象，如系统要求提供一个唯一的序列号生成器或资源管理器，或者需要考虑资源消耗太大而只允许创建一个对象。</li>
-<li>客户调用类的单个实例只允许使用一个公共访问点，除了该公共访问点，不能通过其他途径访问该实例。</li>
-</ol>
-<h3 id="单例模式结构"><a href="#单例模式结构" class="headerlink" title="单例模式结构"></a>单例模式结构</h3><p><img src="http://img.blog.csdn.net/20170329151401401?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<h3 id="单例模式简单结构"><a href="#单例模式简单结构" class="headerlink" title="单例模式简单结构"></a>单例模式简单结构</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class Singleton &#123;</div><div class="line"></div><div class="line"> private Singleton()&#123;</div><div class="line">	</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> private static Singleton instance = null;</div><div class="line"> </div><div class="line"> public static Singleton getInsatnce()&#123;</div><div class="line">	 if(instance == null)&#123;</div><div class="line">	     instance = new Singleton();</div><div class="line">	 &#125;</div><div class="line">	 return instance;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="饿汉式单例与懒汉式单例"><a href="#饿汉式单例与懒汉式单例" class="headerlink" title="饿汉式单例与懒汉式单例"></a>饿汉式单例与懒汉式单例</h2><h3 id="饿汉式单例"><a href="#饿汉式单例" class="headerlink" title="饿汉式单例"></a>饿汉式单例</h3><p>结构图<br><img src="http://img.blog.csdn.net/20170329152903148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<blockquote>
-<p>在定义静态变量的时候实例化单例类，因此在类加载的时候就已经创建了单例对象</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class EagerSingleton &#123;   </div><div class="line">    private static final EagerSingleton instance = new EagerSingleton();   </div><div class="line">    private EagerSingleton() &#123; &#125;   </div><div class="line">  </div><div class="line">    public static EagerSingleton getInstance() &#123;  </div><div class="line">        return instance;   </div><div class="line">    &#125;     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="懒汉式单例类"><a href="#懒汉式单例类" class="headerlink" title="懒汉式单例类"></a>懒汉式单例类</h3><p>结构图<br><img src="http://img.blog.csdn.net/20170329153358270?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class LazySingleton &#123;</div><div class="line"></div><div class="line"> private LazySingleton()&#123;</div><div class="line">	</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> private static LazySingletoninstance = null;</div><div class="line"> </div><div class="line"> public static synchronized LazySingleton getInsatnce()&#123;</div><div class="line">	 if(instance == null)&#123;</div><div class="line">	     instance = new LazySingleton();</div><div class="line">	 &#125;</div><div class="line">	 return instance;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>懒汉式单例在第一次调用getInstance()方法时实例化，在类加载时并不自行实例化，这种技术又称为<strong>延迟加载(Lazy Load)技术</strong>，即需要的时候再加载实例，为了避免多个线程同时创建instance对象，可以使用<strong>关键字synchronized</strong></p>
-</blockquote>
-<p>由于上述在getInstance()方法前增加同步锁，解决了性能安全问题，但是每次调用getInstance()时都需要进行线程锁定判断，在多线程高并发访问环境中，将会导致系统性能大大降低。将方法锁改为方法块锁</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">private static byte[] lock = new byte[0];</div><div class="line">public static LazySingleton getInstance() &#123;   </div><div class="line">    if (instance == null) &#123;  </div><div class="line">        synchronized (lock) &#123;  </div><div class="line">            instance = new LazySingleton();   </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">    return instance;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>改为方法块锁，虽然解决了性能问题，但是在某一时刻线程A和线程B同时访问该对象，线程A进入synchronized锁定的代码中执行实例。线程B处于排队等待状态，必须等待线程A执行完毕后才可以进入synchronized锁定代码。但是线程B并不知道实例已经创建，将继续创建新的实例。所以可能导致创建多个单例对象。违背了单例模式的设计初衷。需要进入代码块锁的时候再做一次判断instance == null。这种称为双重检查锁定（DSL）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class LazySingleton &#123;   </div><div class="line">    //被volatile修饰的成员变量可以确保多个线程都能够正确处理</div><div class="line">    private volatile static LazySingleton instance = null;   </div><div class="line">  </div><div class="line">    private LazySingleton() &#123; &#125;   </div><div class="line">  </div><div class="line">    public static LazySingleton getInstance() &#123;   </div><div class="line">        //第一重判断  </div><div class="line">        if (instance == null) &#123;  </div><div class="line">            //锁定代码块  </div><div class="line">            synchronized (LazySingleton.class) &#123;  </div><div class="line">                //第二重判断  </div><div class="line">                if (instance == null) &#123;  </div><div class="line">                    instance = new LazySingleton(); //创建单例实例  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">        return instance;   </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>由于volatile关键字会屏蔽Java虚拟机所做的一些代码优化，可能会导致系统运行效率降低，因此即使使用双重检查锁定来实现单例模式也不是一种完美的实现方式</p>
-<h3 id="饿汉式单例类与懒汉式单例类比较"><a href="#饿汉式单例类与懒汉式单例类比较" class="headerlink" title="饿汉式单例类与懒汉式单例类比较"></a>饿汉式单例类与懒汉式单例类比较</h3><ol>
-<li>饿汉式单例类在<strong>类被加载时就将自己实例化</strong>，它的优点在于无须考虑多线程访问问题，可以确保实例的唯一性。</li>
-<li>懒汉式单例类在<strong>第一次使用时创建，无须一直占用系统资源，实现了延迟加载</strong>。但是必须处理<strong>多线程访问问题</strong>。在实例化时必然涉及资源初始化，而资源初始化很有可能耗费大量时间，这意味着出现多线程同时首次引用此类的机率变得较大，需要通过双重检查锁定等机制进行控制，这将导致系统性能受到一定影响</li>
-</ol>
-<hr>
-<h3 id="Initialization-Demand-Holder-IoDH"><a href="#Initialization-Demand-Holder-IoDH" class="headerlink" title="Initialization Demand Holder (IoDH)"></a>Initialization Demand Holder (IoDH)</h3><blockquote>
-<p>静态内部类:在该内部类中创建单例对象，再将该单例对象通过getInstance()方法返回给外部使用</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public class StaticSingleton &#123;</div><div class="line">	  private StaticSingleton()&#123;</div><div class="line"> </div><div class="line">	  &#125;</div><div class="line">	  private static class SingletonHolder&#123;</div><div class="line">	  private static StaticSingleton instance = </div><div class="line">									  new StaticSingleton();</div><div class="line">	  </div><div class="line">	 &#125;</div><div class="line">	 public static StaticSingleton getInstance()&#123;</div><div class="line">		 return SingletonHolder.instance;</div><div class="line">	 &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>StaticSingleton 被加载时，其内部类并不会被初始化，故可以确保当 StaticSingleton 类被载入 JVM 时，不会初始化单例类，而当 getInstance() 方法调用时，才会加载 SingletonHolder，从而初始化 instance。同时，由于实例的建立是时在类加载时完成，故天生对多线程友好，getInstance() 方法也无需使用同步关键字</p>
-</blockquote>
-<p><strong>通过使用IoDH，我们既可以实现延迟加载，又可以保证线程安全，不影响系统性能，不失为一种最好的Java语言单例模式实现方式</strong></p>
-<p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-Singleton/" target="_blank" rel="external">ibm单例模式参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】面向对象原则/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】面向对象原则/" itemprop="url">【设计模式】面向对象原则</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:18:17+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>对于面向对象语言设计的软件，<strong>如何同时提高一个软件系统的可维护性和可复用性是面向对象设计需要解决的核心问题之一</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p>面向对象设计原则为支持可维护性复用而诞生，这些原则蕴含在很多设计模式中，它们是从许多设计方案中总结出的指导性原则</p>
-</blockquote>
-<h3 id="7种常用的面向对象设计原则"><a href="#7种常用的面向对象设计原则" class="headerlink" title="7种常用的面向对象设计原则"></a>7种常用的面向对象设计原则</h3><h4 id="单一职责原则-Single-Responsibility-Principle-SRP"><a href="#单一职责原则-Single-Responsibility-Principle-SRP" class="headerlink" title="单一职责原则(Single Responsibility Principle, SRP)"></a>单一职责原则(Single Responsibility Principle, SRP)</h4><blockquote>
-<p>一个类只负责一个功能领域中的相应职责(<strong>换句话说，一个类而言，应该只有一个引起它变化的原因</strong>)<br>单一职责原则是实现<strong>高内聚、低耦合</strong>的指导方针，它是最简单但又最难运用的原则</p>
-</blockquote>
-<h4 id="开闭原则-Open-Closed-Principle-OCP"><a href="#开闭原则-Open-Closed-Principle-OCP" class="headerlink" title="开闭原则(Open-Closed Principle, OCP)"></a>开闭原则(Open-Closed Principle, OCP)</h4><blockquote>
-<p>软件实体应对扩展开放，而对修改关闭(<strong>即软件实体应尽量在不修改原有代码的情况下进行扩展</strong>)<br>软件实体可以指一个软件模块、一个由多个类组成的局部结构或一个独立的类<br>面向对象编程，可以通过系统定义的抽象类或者接口，再通过具体实现进行扩展<br><strong>抽象化是开闭原则的关键</strong><br>注意：如果一个系统只是针对xml或者properties文件进行修改，无须进行编译，原则上，认为是一个符合开闭原则的系统</p>
-</blockquote>
-<h4 id="里氏代换原则-Liskov-Substitution-Principle-LSP"><a href="#里氏代换原则-Liskov-Substitution-Principle-LSP" class="headerlink" title="里氏代换原则(Liskov Substitution Principle, LSP)"></a>里氏代换原则(Liskov Substitution Principle, LSP)</h4><blockquote>
-<p>所有引用基类对象的地方能够透明地使用其子类的对象<br>在软件中将一个基类对象替换成它的子类对象，程序将不会产生任何错误和异常，反过来则不成立，如果一个软件实体使用的是一个子类对象的话，那么它不一定能够使用基类对象<br>里氏代换原则是实现开闭原则的重要方式之一，<strong>由于使用基类对象的地方都可以使用子类对象，因此在程序中尽量使用基类类型来对对象进行定义，而在运行时再确定其子类类型，用子类对象来替换父类对象</strong><br>注意<br>①<strong>子类的所有方法必须在父类中声明，或子类必须实现父类中声明的所有方法</strong><br>②尽量把父类设计为抽象类或者接口，让子类继承父类或实现父接口，并实现在父类中声明的方法，运行时，子类实例替换父类实例，我们可以很方便地扩展系统的功能，同时无须修改原有子类的代码，增加新的功能可以通过增加一个新的子类来实现（里氏代换原则是开闭原则的具体实现手段之一）<br>③ Java语言中，在编译阶段，Java编译器会检查一个程序是否符合里氏代换原则，这是一个与实现无关的、纯语法意义上的检查，但Java编译器的检查是有局限的</p>
-</blockquote>
-<h4 id="依赖倒转原则-Dependence-Inversion-Principle-DIP"><a href="#依赖倒转原则-Dependence-Inversion-Principle-DIP" class="headerlink" title="依赖倒转原则(Dependence  Inversion Principle, DIP)"></a>依赖倒转原则(Dependence  Inversion Principle, DIP)</h4><blockquote>
-<p><strong>抽象不应该依赖于细节，细节应该依赖于抽象</strong>（换言之，要针对接口编程，而不是针对实现编程）<br>依赖倒转原则要求我们在程序代码中传递参数时或在关联关系中，尽量引用层次高的抽象层类，<strong>即使用接口和抽象类进行变量类型声明、参数类型声明、方法返回类型声明，以及数据类型的转换等，而不要用具体类来做这些事情</strong><br>在实现依赖倒转原则时，我们需要针对抽象层编程，而将具体类的对象通过<strong>依赖注入(DependencyInjection, DI)</strong>的方式注入到其他对象中<br><strong>依赖注入是指当一个对象要与其他对象发生依赖关系时，通过抽象来注入所依赖的对象</strong><br>1.构造注入 2.设值注入（Setter注入）3.接口注入</p>
-</blockquote>
-<p><strong>开闭原则是目标，里氏代换原则是基础，依赖倒转原则是手段</strong></p>
-<blockquote>
-<p>开闭原则是目的：一个已有的代码模块，需要很容易增加新的扩展功能（可扩展性），这个已有模块需要是对外开放的；为了使已有模块可以复用（可复用性），已有模块需要是独立的（单一职责，高内聚，不与其他模块耦合在一起），同时为了方便维护（可维护性），已有模块最好不要对原有代码进行修改，也就是需要是对内封闭的；实现了开闭原则的设计，就达到面向对象设计可扩展可复用可维护性的目的，所以说开闭原则是目的！<br>里氏代换原则是基础：通过针对抽象基类编程（业务逻辑关系的建立），具体运行时代换具体子类对象执行，可以达到开闭原则的目的，该实现过程就是里氏代换原则定义本身，所以说里氏代换原则是理论基础！<br>依赖倒转原则是手段：牛人们总结了实现里氏代换原则的方法，抽象不依赖于细节，细节应该依赖于抽象的依赖倒转原则。具体就是变量、参数、方法返回、数据类型转换等都要用抽象定义声明，再通过依赖注入（构造注入、设值注入和接口注入）的方式将具体对象注入到有依赖关系的对象中。所以说依赖倒转原则是实现目的手段！</p>
-</blockquote>
-<h4 id="接口隔离原则-Interface-Segregation-Principle-ISP"><a href="#接口隔离原则-Interface-Segregation-Principle-ISP" class="headerlink" title="接口隔离原则(Interface Segregation Principle, ISP)"></a>接口隔离原则(Interface Segregation Principle, ISP)</h4><blockquote>
-<p>使用多个专门的接口，而不使用单一的总接口<br><strong>每一个接口应该承担一种相对独立的角色，不干不该干的事，该干的事都要干</strong><br>这里的“接口”往往有两种不同的含义：<strong>一种是指一个类型所具有的方法特征的集合，仅仅是一种逻辑上的抽象；另外一种是指某种语言具体的“接口”定义，有严格的定义和结构，比如Java语言中的interface</strong><br>(1) 当把“接口”理解成一个类型所提供的所有方法特征的集合的时候，这就是一种逻辑上的概念，接口的划分将直接带来类型的划分。可以把接口理解成角色，一个接口只能代表一个角色，每个角色都有它特定的一个接口，此时，<strong>这个原则可以叫做“角色隔离原则</strong>”。<br>(2)如果把“接口”理解成狭义的特定语言的接口，那么ISP表达的意思是指接口仅仅提供客户端需要的行为<br><strong>注意：  在使用接口隔离原则时，我们需要注意控制接口的粒度，接口不能太小，如果太小会导致系统中接口泛滥，不利于维护；接口也不能太大，太大的接口将违背接口隔离原则，灵活性较差</strong></p>
-<h4 id="合成复用原则-Composite-Reuse-Principle-CRP"><a href="#合成复用原则-Composite-Reuse-Principle-CRP" class="headerlink" title="合成复用原则(Composite Reuse Principle, CRP)"></a>合成复用原则(Composite Reuse Principle, CRP)</h4><p><strong>尽量使用对象组合，而不是继承来达到复用的目的</strong><br> 一般而言，<strong>如果两个类之间是“Has-A”的关系应使用组合或聚合，如果是“Is-A”关系可使用继承</strong>。”Is-A”是严格的分类学意义上的定义，意思是一个类是另一个类的”一种”；而”Has-A”则不同，它表示某一个角色具有某一项责任。</p>
-</blockquote>
-<h4 id="迪米特法则-Law-of-Demeter-LoD"><a href="#迪米特法则-Law-of-Demeter-LoD" class="headerlink" title="迪米特法则(Law of Demeter, LoD)"></a>迪米特法则(Law of Demeter, LoD)</h4><blockquote>
-<p>一个软件实体应当尽[可能少地与其他实体发生相互作用<br>如果一个系统符合迪米特法则，那么当其中某一个模块发生修改时，就会尽量少地影响其他模块，扩展会相对容易，这是对软件实体之间通信的限制，<strong>迪米特法则要求限制软件实体之间通信的宽度和深度</strong>。<strong>迪米特法则可降低系统的耦合度，使类与类之间保持松散的耦合关系。</strong><br>在迪米特法则中，对于一个对象，其朋友包括以下几类<br>      (1) 当前对象本身(this)<br>      (2) 以参数形式传入到当前对象方法中的对象<br>      (3) 当前对象的成员对象<br>      (4) 如果当前对象的成员对象是一个集合，那么集合中的元素也都是朋友<br>      (5) 当前对象所创建的对象。<br><strong>应该尽量减少对象之间的交互，如果两个对象之间不必彼此直接通信，那么这两个对象就不应当发生任何直接的相互作用，如果其中的一个对象需要调用另一个对象的某一个方法的话，可以通过第三者转发这个调用。简言之，就是通过引入一个合理的第三者来降低现有对象之间的耦合度</strong></p>
-</blockquote>
-<p><a href="http://blog.csdn.net/lovelion" target="_blank" rel="external">博客转载</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2147,7 +2107,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">142</span>
+                <span class="site-state-item-count">144</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2169,7 +2129,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">109</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

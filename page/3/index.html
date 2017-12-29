@@ -254,6 +254,558 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/10/PHP学习笔记-一-——-入门环境搭建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/10/PHP学习笔记-一-——-入门环境搭建/" itemprop="url">PHP学习笔记(一) —— 入门环境搭建</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-10T10:52:31+08:00">
+                2017-07-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/php/" itemprop="url" rel="index">
+                    <span itemprop="name">php</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>题外话:由于公司DMS管理系统是第三方php写的，现在需要进行二次开发。所以了解了一下一些基本php搭建环境、基本框架语法等知识点</p>
+</blockquote>
+<h1 id="搭建准备环境"><a href="#搭建准备环境" class="headerlink" title="搭建准备环境"></a>搭建准备环境</h1><blockquote>
+<p>独立安装各模块顺序按照Apache—&gt;PHP—&gt;MySQL进行。集成安装环境则不用</p>
+</blockquote>
+<ul>
+<li><a href="http://httpd.apache.org/docs/current/platform/windows.html#down" target="_blank" rel="external">Apache</a></li>
+<li><a href="https://www.mysql.com/" target="_blank" rel="external">MySQL</a></li>
+<li><a href="http://windows.php.net/download#php-5.6" target="_blank" rel="external">PHP</a></li>
+<li><a href="http://www.wampserver.com/" target="_blank" rel="external">集成安装环境-wampsever</a></li>
+</ul>
+<h1 id="安装Httpd"><a href="#安装Httpd" class="headerlink" title="安装Httpd"></a>安装Httpd</h1><ol>
+<li>下载ApacheHaus并且解压</li>
+<li>管理员身份运行命令行进入 ${ApachePath}/bin</li>
+<li>运行httpd -k install安装</li>
+</ol>
+<p>安装过程报错问题</p>
+<ol>
+<li><p>项目路径失效。解决方案：打开conf/httpd.conf，修改</p>
+<pre><code>Define SRVROOT &quot;G:\php\httpd\Apache24&quot;
+ServerRoot &quot;${SRVROOT}&quot;
+</code></pre><ol>
+<li>80端口和443端口冲突。解决方案：打开conf/extra/httpd-ssl或者…/httpd-ahssl文件将Listen端口号更改为其他。这里改为8180和442</li>
+</ol>
+<h2 id="卸载Httpd"><a href="#卸载Httpd" class="headerlink" title="卸载Httpd"></a>卸载Httpd</h2><pre><code>httpd -k uninstall
+</code></pre><h2 id="重新安装。运行不报错"><a href="#重新安装。运行不报错" class="headerlink" title="重新安装。运行不报错"></a>重新安装。运行不报错</h2><pre><code>httpd -k install
+</code></pre><h2 id="启动Apache"><a href="#启动Apache" class="headerlink" title="启动Apache"></a>启动Apache</h2><pre><code>httpd -k start
+</code></pre><h2 id="访问http-localhost-8180"><a href="#访问http-localhost-8180" class="headerlink" title="访问http://localhost:8180"></a>访问<a href="http://localhost:8180" target="_blank" rel="external">http://localhost:8180</a></h2><h2 id="向apcache添加php依赖-httpd-conf"><a href="#向apcache添加php依赖-httpd-conf" class="headerlink" title="向apcache添加php依赖(httpd.conf)"></a>向apcache添加php依赖(httpd.conf)</h2><pre><code> # 如下为PHP环境添加模块
+LoadModule php5_module &quot;G:/php/php56/php5apache2_4.dll&quot;
+PHPIniDir &quot;G:/php/php56/php.ini&quot; # php.ini-production重命名
+
+# 添加PHP支持
+AddType application/x-httpd-php .php
+</code></pre>   <ifmodule dir_module=""><br>        DirectoryIndex index.html index.htm index.php<br>    </ifmodule>
+
+</li>
+</ol>
+<h2 id="修改php-ini"><a href="#修改php-ini" class="headerlink" title="修改php.ini"></a>修改php.ini</h2><pre><code>doc_root = G:\php\httpd\Apache24\htdocs
+</code></pre><h2 id="全局搜索"><a href="#全局搜索" class="headerlink" title="全局搜索"></a>全局搜索</h2><pre><code>; extension_dir = &quot;./&quot;
+</code></pre><h2 id="添加"><a href="#添加" class="headerlink" title="添加"></a>添加</h2><pre><code>extension_dir = &quot;G:\php\php56\ext&quot;
+</code></pre><h2 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h2><pre><code>;extension=php_bz2.dll
+extension=php_curl.dll
+;extension=php_fileinfo.dll
+extension=php_gd2.dll
+;extension=php_gettext.dll
+;extension=php_gmp.dll
+;extension=php_intl.dll
+extension=php_imap.dll
+;extension=php_interbase.dll
+;extension=php_ldap.dll
+extension=php_mbstring.dll
+;extension=php_exif.dll      ; Must be after mbstring as it depends on it
+extension=php_mysql.dll
+extension=php_mysqli.dll
+;extension=php_oci8_12c.dll  ; Use with Oracle Database 12c Instant Client
+;extension=php_openssl.dll
+;extension=php_pdo_firebird.dll
+extension=php_pdo_mysql.dll
+;extension=php_pdo_oci.dll
+;extension=php_pdo_odbc.dll
+;extension=php_pdo_pgsql.dll
+;extension=php_pdo_sqlite.dll
+;extension=php_pgsql.dll
+;extension=php_shmop.dll
+
+; The MIBS data available in the PHP distribution must be installed. 
+; See http://www.php.net/manual/en/snmp.installation.php 
+extension=php_snmp.dll
+
+extension=php_soap.dll
+extension=php_sockets.dll
+;extension=php_sqlite3.dll
+;extension=php_sybase_ct.dll
+;extension=php_tidy.dll
+;extension=php_xmlrpc.dll
+;extension=php_xsl.dll
+</code></pre><h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>${apachePath}/htdocs 新建phpinfo.php，添加内容</p>
+<pre><code>&lt;?php phpinfo();?&gt;
+</code></pre><h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a href="https://segmentfault.com/a/1190000003409708" target="_blank" rel="external">https://segmentfault.com/a/1190000003409708</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/07/hive学习笔记-一-——-基础入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/07/hive学习笔记-一-——-基础入门/" itemprop="url">hive学习笔记(一) —— 基础入门</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-07T15:26:13+08:00">
+                2017-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Hive学习笔记（一）"><a href="#Hive学习笔记（一）" class="headerlink" title="Hive学习笔记（一）"></a>Hive学习笔记（一）</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><blockquote>
+<p>Hive是一个基于Apache Hadoop的数据仓库。对于数据存储与处理，Hadoop提供了主要的扩展和容错能力。</p>
+</blockquote>
+<p>对于大量的数据，使得数据汇总，查询和分析更加简单。它提供了SQL，允许用户更加简单地进行查询，汇总和数据分析。</p>
+<p>同时，Hive的SQL给予了用户多种方式来集成自己的功能，然后做定制化的查询，例如用户自定义函数</p>
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><ul>
+<li>数据库<ul>
+<li>相当于命名空间，避免表，视图，分区，列等等的命名冲突</li>
+</ul>
+</li>
+<li>表<ul>
+<li>相同数据库的同类数据单元</li>
+</ul>
+</li>
+<li>分区<ul>
+<li>每个表可以有一个或多个用于决定数据如何存储的分区键</li>
+</ul>
+</li>
+<li>桶<ul>
+<li>每个分区的数据，基于表的一些列的哈希函数值，又被分割成桶</li>
+</ul>
+</li>
+</ul>
+<h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><ul>
+<li>Integer<ul>
+<li>tinyint、smallint、int、bigint</li>
+</ul>
+</li>
+<li>布尔<ul>
+<li>boolean</li>
+</ul>
+</li>
+<li>浮点数<ul>
+<li>float</li>
+<li>double</li>
+</ul>
+</li>
+<li>定点数<ul>
+<li>decimal</li>
+</ul>
+</li>
+<li>字符串<ul>
+<li>string</li>
+<li>varchar</li>
+<li>char</li>
+</ul>
+</li>
+<li>日期和时间<ul>
+<li>timestemp</li>
+<li>date</li>
+</ul>
+</li>
+<li>二进制<ul>
+<li>binary</li>
+</ul>
+</li>
+<li>复杂类型<ul>
+<li>结构体类型(Stuct)<ul>
+<li>列a{b int,c,int},通过列.属性访问(例如：a.b,a.c）</li>
+</ul>
+</li>
+<li>Map键值对类型<ul>
+<li>通过[‘colName’]访问</li>
+</ul>
+</li>
+<li>数组<ul>
+<li>通过[‘n’]访问数组</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="内置运算和函数"><a href="#内置运算和函数" class="headerlink" title="内置运算和函数"></a>内置运算和函数</h2><p><a href="https://strongyoung.gitbooks.io/hive/content/built-in-operators-and-functions.html" target="_blank" rel="external">参考文档</a></p>
+<ul>
+<li>关系运算</li>
+<li>数学运算</li>
+<li>逻辑运算</li>
+<li>复杂类型运算</li>
+</ul>
+<h2 id="提供基本SQL"><a href="#提供基本SQL" class="headerlink" title="提供基本SQL"></a>提供基本SQL</h2><ul>
+<li>where筛选条件</li>
+<li>select查询指定列</li>
+<li>2表join查询</li>
+<li>多个group by列上使用聚合</li>
+<li>可以存储擦讯结构到另一个表</li>
+<li>可以下载表内容到本地</li>
+<li>可以存储查询结果到hadoop分布式文件系统目录</li>
+<li>可以管理表和分区</li>
+<li>可以使用自定义脚本</li>
+</ul>
+<h2 id="创建表"><a href="#创建表" class="headerlink" title="创建表"></a>创建表</h2><ul>
+<li>PARTITIONED：指定分区列</li>
+</ul>
+<pre><code>CREATE TABLE page_view(viewTime INT, userid BIGINT,
+        page_url STRING, referrer_url STRING,
+        ip STRING COMMENT &apos;IP Address of the User&apos;)
+COMMENT &apos;This is the page view table&apos;
+PARTITIONED BY(dt STRING, country STRING)
+STORED AS SEQUENCEFILE;
+</code></pre><ul>
+<li>指定分隔符</li>
+</ul>
+<pre><code>CREATE TABLE page_view(viewTime INT, userid BIGINT,
+        page_url STRING, referrer_url STRING,
+        ip STRING COMMENT &apos;IP Address of the User&apos;)
+COMMENT &apos;This is the page view table&apos;
+PARTITIONED BY(dt STRING, country STRING)
+ROW FORMAT DELIMITED
+        FIELDS TERMINATED BY &apos;1&apos;
+STORED AS SEQUENCEFILE;
+</code></pre><ul>
+<li><p>分桶</p>
+<pre><code>CREATE TABLE page_view(viewTime INT, userid BIGINT,
+        page_url STRING, referrer_url STRING,
+        ip STRING COMMENT &apos;IP Address of the User&apos;)
+COMMENT &apos;This is the page view table&apos;
+PARTITIONED BY(dt STRING, country STRING)
+CLUSTERED BY(userid) SORTED BY(viewTime) INTO 32 BUCKETS
+ROW FORMAT DELIMITED
+        FIELDS TERMINATED BY &apos;1&apos;
+        COLLECTION ITEMS TERMINATED BY &apos;2&apos;
+        MAP KEYS TERMINATED BY &apos;3&apos;
+STORED AS SEQUENCEFILE;
+</code></pre></li>
+</ul>
+<h3 id="浏览表分区"><a href="#浏览表分区" class="headerlink" title="浏览表分区"></a>浏览表分区</h3><pre><code>show tables
+</code></pre><h3 id="列出数据库里所有表"><a href="#列出数据库里所有表" class="headerlink" title="列出数据库里所有表"></a>列出数据库里所有表</h3><p><strong>遵循Java正则表达式</strong><br>        show tables ‘page.*’;</p>
+<h3 id="列出表的分区"><a href="#列出表的分区" class="headerlink" title="列出表的分区"></a>列出表的分区</h3><pre><code>describe page_view;
+</code></pre><h3 id="列出表列和类型"><a href="#列出表列和类型" class="headerlink" title="列出表列和类型"></a>列出表列和类型</h3><pre><code>describe extended page_view;
+</code></pre><h3 id="列出表列和其他属性（通常用作调试"><a href="#列出表列和其他属性（通常用作调试" class="headerlink" title="列出表列和其他属性（通常用作调试)"></a>列出表列和其他属性（通常用作调试)</h3><pre><code>DESCRIBE EXTENDED page_view PARTITION (ds=&apos;2016-08-08&apos;);
+</code></pre><h3 id="修改表"><a href="#修改表" class="headerlink" title="修改表"></a>修改表</h3><pre><code>ALTER TABLE old_table_name RENAME TO new_table_name;
+</code></pre><h3 id="增加列"><a href="#增加列" class="headerlink" title="增加列"></a>增加列</h3><pre><code>ALTER TABLE tab1 ADD COLUMNS (c1 INT COMMENT &apos;a new int column&apos;, c2 STRING DEFAULT &apos;def val&apos;);
+</code></pre><h3 id="删除表和分区"><a href="#删除表和分区" class="headerlink" title="删除表和分区"></a>删除表和分区</h3><pre><code>DROP TABLE pv_users;
+ALTER TABLE pv_users DROP PARTITION (ds=&apos;2016-08-08&apos;)
+</code></pre><h2 id="加载数据"><a href="#加载数据" class="headerlink" title="加载数据"></a>加载数据</h2><blockquote>
+<p>用户可以创建一个“外部表”来指向一个特定的HDFS路径。用这种方法，用户可以使用HDFSput或copy命令，复制一个文件到指定的位置，并且附上相应的行格式信息创建一个表指定这个位置</p>
+</blockquote>
+<p>例如，如果文件/tmp/pv_2016-06-08.txt包含逗号分隔的页面访问记录。这需要以合适的分区加载到表page_view</p>
+<pre><code>CREATE EXTERNAL TABLE page_view_stg(viewTime INT, userid BIGINT,
+        page_url STRING, referrer_url STRING,
+        ip STRING COMMENT &apos;IP Address of the User&apos;,
+        country STRING COMMENT &apos;country of origination&apos;)
+COMMENT &apos;This is the staging page view table&apos;
+ROW FORMAT DELIMITED FIELDS TERMINATED BY &apos;44&apos; LINES TERMINATED BY &apos;12&apos;
+STORED AS TEXTFILE
+LOCATION &apos;/user/data/staging/page_view&apos;;
+
+hadoop dfs -put /tmp/pv_2016-06-08.txt /user/data/staging/page_view
+
+FROM page_view_stg pvs
+INSERT OVERWRITE TABLE page_view PARTITION(dt=&apos;2016-06-08&apos;, country=&apos;US&apos;)
+SELECT pvs.viewTime, pvs.userid, pvs.page_url, pvs.referrer_url, null, null, pvs.ip
+WHERE pvs.country = &apos;US&apos;;
+</code></pre><h3 id="本地文件系统加载"><a href="#本地文件系统加载" class="headerlink" title="本地文件系统加载"></a>本地文件系统加载</h3><pre><code>LOAD DATA LOCAL INPATH /tmp/pv_2016-06-08_us.txt INTO TABLE page_view PARTITION(date=&apos;2016-06-08&apos;, country=&apos;US&apos;)
+</code></pre><h3 id="简单的查询"><a href="#简单的查询" class="headerlink" title="简单的查询"></a>简单的查询</h3><pre><code>INSERT OVERWRITE TABLE user_active
+SELECT user.*
+FROM user
+WHERE user.active = 1;
+
+SELECT user.*
+FROM user
+WHERE user.active = 1;
+</code></pre><h3 id="基于查询分区"><a href="#基于查询分区" class="headerlink" title="基于查询分区"></a>基于查询分区</h3><pre><code>INSERT OVERWRITE TABLE xyz_com_page_views
+SELECT page_views.*
+FROM page_views
+WHERE page_views.date &gt;= &apos;2008-03-01&apos; AND page_views.date &lt;= &apos;2008-03-31&apos; AND
+      page_views.referrer_url like &apos;%xyz.com&apos;;
+</code></pre><h3 id="联结查询"><a href="#联结查询" class="headerlink" title="联结查询"></a>联结查询</h3><p><strong>LEFT OUTER,RIGHT OUTER或FULL OUTER</strong><br>        INSERT OVERWRITE TABLE pv_users<br>        SELECT pv.*, u.gender, u.age<br>        FROM user u JOIN page_view pv ON (pv.userid = u.id)<br>        WHERE pv.date = ‘2008-03-03’;</p>
+<h3 id="为了检查key在另外一个表中是否存在，用户可以使用LEFT-SEMI-JOIN"><a href="#为了检查key在另外一个表中是否存在，用户可以使用LEFT-SEMI-JOIN" class="headerlink" title="为了检查key在另外一个表中是否存在，用户可以使用LEFT SEMI JOIN"></a>为了检查key在另外一个表中是否存在，用户可以使用LEFT SEMI JOIN</h3><pre><code>INSERT OVERWRITE TABLE pv_users
+SELECT u.*
+FROM user u LEFT SEMI JOIN page_view pv ON (pv.userid = u.id)
+WHERE pv.date = &apos;2008-03-03&apos;;
+</code></pre><h3 id="多表联结"><a href="#多表联结" class="headerlink" title="多表联结"></a>多表联结</h3><pre><code>INSERT OVERWRITE TABLE pv_friends
+SELECT pv.*, u.gender, u.age, f.friends
+FROM page_view pv JOIN user u ON (pv.userid = u.id) JOIN friend_list f ON (u.id = f.uid)
+WHERE pv.date = &apos;2008-03-03&apos;;
+</code></pre><h3 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h3><pre><code>INSERT OVERWRITE TABLE pv_gender_sum
+SELECT pv_users.gender, count (DISTINCT pv_users.userid)
+FROM pv_users
+GROUP BY pv_users.gender;
+</code></pre><h3 id="两个聚合函数不能同时用DISTINCT作用于不同的列，以下情况是可以的（DISTINCT作用于相同列）"><a href="#两个聚合函数不能同时用DISTINCT作用于不同的列，以下情况是可以的（DISTINCT作用于相同列）" class="headerlink" title="两个聚合函数不能同时用DISTINCT作用于不同的列，以下情况是可以的（DISTINCT作用于相同列）"></a>两个聚合函数不能同时用DISTINCT作用于不同的列，以下情况是可以的（DISTINCT作用于相同列）</h3><pre><code>INSERT OVERWRITE TABLE pv_gender_agg
+SELECT pv_users.gender, count(DISTINCT pv_users.userid), count(*), sum(DISTINCT pv_users.userid)
+FROM pv_users
+GROUP BY pv_users.gender;
+</code></pre><h3 id="多表文件插入"><a href="#多表文件插入" class="headerlink" title="多表文件插入"></a>多表文件插入</h3><p>第一个插入语句将结果插入到Hive表中，而第二个插入语句是将结果写到HDFS文件。<br>        FROM pv_users<br>        INSERT OVERWRITE TABLE pv_gender_sum<br>            SELECT pv_users.gender, count_distinct(pv_users.userid)<br>            GROUP BY pv_users.gender</p>
+<pre><code>INSERT OVERWRITE DIRECTORY &apos;/user/data/tmp/pv_age_sum&apos;
+    SELECT pv_users.age, count_distinct(pv_users.userid)
+    GROUP BY pv_users.age;
+</code></pre><h3 id="动态分区插入"><a href="#动态分区插入" class="headerlink" title="动态分区插入"></a>动态分区插入</h3><pre><code>FROM page_view_stg pvs
+INSERT OVERWRITE TABLE page_view PARTITION(dt=&apos;2008-06-08&apos;, country=&apos;US&apos;)
+       SELECT pvs.viewTime, pvs.userid, pvs.page_url, pvs.referrer_url, null, null, pvs.ip WHERE pvs.country = &apos;US&apos;
+INSERT OVERWRITE TABLE page_view PARTITION(dt=&apos;2008-06-08&apos;, country=&apos;CA&apos;)
+       SELECT pvs.viewTime, pvs.userid, pvs.page_url, pvs.referrer_url, null, null, pvs.ip WHERE pvs.country = &apos;CA&apos;
+INSERT OVERWRITE TABLE page_view PARTITION(dt=&apos;2008-06-08&apos;, country=&apos;UK&apos;)
+       SELECT pvs.viewTime, pvs.userid, pvs.page_url, pvs.referrer_url, null, null, pvs.ip WHERE pvs.country = &apos;UK&apos;;
+</code></pre><h3 id="插入到本地文件"><a href="#插入到本地文件" class="headerlink" title="插入到本地文件"></a>插入到本地文件</h3><pre><code>INSERT OVERWRITE LOCAL DIRECTORY &apos;/tmp/pv_gender_sum&apos;
+SELECT pv_gender_sum.*
+FROM pv_gender_sum;
+</code></pre><h3 id="抽样"><a href="#抽样" class="headerlink" title="抽样"></a>抽样</h3><p>抽样语句允许用户对数据抽样查询，而不是全表查询。<br>抽样是对那些在CREATE TABLE语句的CLUSTERED BY修饰的列上。</p>
+<pre><code>INSERT OVERWRITE TABLE pv_gender_sum_sample
+SELECT pv_gender_sum.*
+FROM pv_gender_sum TABLESAMPLE(BUCKET 3 OUT OF 32);
+</code></pre><h3 id="union-all"><a href="#union-all" class="headerlink" title="union all"></a>union all</h3><pre><code>INSERT OVERWRITE TABLE actions_users
+SELECT u.id, actions.date
+FROM (
+    SELECT av.uid AS uid
+    FROM action_video av
+    WHERE av.date = &apos;2008-06-03&apos;
+
+    UNION ALL
+
+    SELECT ac.uid AS uid
+    FROM action_comment ac
+    WHERE ac.date = &apos;2008-06-03&apos;
+    ) actions JOIN users u ON(u.id = actions.uid);
+</code></pre><h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><pre><code>CREATE TABLE array_table (int_array_column ARRAY&lt;INT&gt;);
+
+SELECT pv.friends[2]
+FROM page_views pv;
+
+SELECT pv.userid, size(pv.friends)
+FROM page_view pv;
+</code></pre><h3 id="Map（关联数组）"><a href="#Map（关联数组）" class="headerlink" title="Map（关联数组）"></a>Map（关联数组）</h3><pre><code>INSERT OVERWRITE page_views_map
+SELECT pv.userid, pv.properties[&apos;page type&apos;]
+FROM page_views pv;
+
+SELECT size(pv.properties)
+FROM page_view pv;
+</code></pre><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a><a href="https://strongyoung.gitbooks.io/hive/content/" target="_blank" rel="external">参考文档</a></h3>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/06/技术网站/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1884,344 +2436,6 @@ public Map&lt;String, Object&gt; consumerConfigs() {
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/08/【消息队列】Kafka学习笔记-三-——Java/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/08/【消息队列】Kafka学习笔记-三-——Java/" itemprop="url">【消息队列】Kafka学习笔记(三)——Java</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-08T13:41:23+08:00">
-                2017-06-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="引入pom-xml文件"><a href="#引入pom-xml文件" class="headerlink" title="引入pom.xml文件"></a>引入pom.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;!-- start kafka --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;0.10.2.1&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;!-- kafka end --&gt;</div></pre></td></tr></table></figure>
-<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="ProducerAPI"><a href="#ProducerAPI" class="headerlink" title="ProducerAPI"></a>ProducerAPI</h3><h4 id="ProducerRecord-lt-K-V-gt"><a href="#ProducerRecord-lt-K-V-gt" class="headerlink" title="ProducerRecord&lt; K,V &gt;"></a>ProducerRecord&lt; K,V &gt;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public ProducerRecord(String topic, Integer partition, Long timestamp, K key, V value) &#123;</div><div class="line">        if (topic == null)</div><div class="line">            throw new IllegalArgumentException(&quot;Topic cannot be null.&quot;);</div><div class="line">        if (timestamp != null &amp;&amp; timestamp &lt; 0)</div><div class="line">            throw new IllegalArgumentException(</div><div class="line">                    String.format(&quot;Invalid timestamp: %d. Timestamp should always be non-negative or null.&quot;, timestamp));</div><div class="line">        if (partition != null &amp;&amp; partition &lt; 0)</div><div class="line">            throw new IllegalArgumentException(</div><div class="line">                    String.format(&quot;Invalid partition: %d. Partition number should always be non-negative or null.&quot;, partition));</div><div class="line">        this.topic = topic; </div><div class="line">        this.partition = partition; </div><div class="line">        this.key = key;  </div><div class="line">        this.value = value; </div><div class="line">        this.timestamp = timestamp; </div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p><strong>注意：key是可选的。在没有指定key发送到哪个partition的情况下，producer会计算key的hash值，从而确定这条消息发送到哪个分区。如果partition和key都没有指定，那么producer将会使用round-robin的方式发送消息到分区</strong></p>
-<ul>
-<li>topic参数用于指定消息发送到哪个Topic，必填。</li>
-<li>partition指的是消息发送哪个分区，可以为null </li>
-<li>如果partition指定，那么key将不会起作用。value就是消息的实际内容</li>
-</ul>
-<h4 id="RecordMetadata-lt-K-V-gt"><a href="#RecordMetadata-lt-K-V-gt" class="headerlink" title="RecordMetadata&lt; K,V &gt;"></a>RecordMetadata&lt; K,V &gt;</h4><blockquote>
-<p>表示消息发送后，服务端接收到消息的确认信息。包括这个消息发送到了那个topic下的那个partition，偏移量offset是多少等</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">private RecordMetadata(TopicPartition topicPartition, long offset, long timestamp, long</div><div class="line">        checksum, int serializedKeySize, int serializedValueSize) &#123;</div><div class="line">        super();</div><div class="line">        this.offset = offset;</div><div class="line">        this.timestamp = timestamp;</div><div class="line">        this.checksum = checksum;</div><div class="line">        this.serializedKeySize = serializedKeySize;</div><div class="line">        this.serializedValueSize = serializedValueSize;</div><div class="line">        this.topicPartition = topicPartition; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="Producer-lt-K-V-gt"><a href="#Producer-lt-K-V-gt" class="headerlink" title="Producer&lt; K,V &gt;"></a>Producer&lt; K,V &gt;</h4><blockquote>
-<p>表示消息的发送者。K、V的含义与ProducerRecord&lt; K,V &gt;相同</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">public interface Producer&lt;K, V&gt; extends Closeable &#123;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *异步发送一条信息，返回Future对象，其中包含了服务端的响应信息RecordMetadata</div><div class="line">     */</div><div class="line">    public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record);</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 发送一条消息，当服务端确认后，执行指定的回调函数</div><div class="line">     */</div><div class="line">    public Future&lt;RecordMetadata&gt; send(ProducerRecord&lt;K, V&gt; record, Callback callback);</div><div class="line">    </div><div class="line">    /**</div><div class="line">     * 如果producer有很多消息要发送，那么producer可能会产生消息堆积，调用这个方法会发送所有堆积的消息，在这个</div><div class="line">     *方法执行完成之前，线程一直会阻塞</div><div class="line">     */</div><div class="line">    public void flush();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取一个Topic下的所有分区信息，因为分区的数量可能会改变，因此不应该缓存这个分区信息的内容</div><div class="line">     */</div><div class="line">    public List&lt;PartitionInfo&gt; partitionsFor(String topic);</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 监控相关</div><div class="line">     */</div><div class="line">    public Map&lt;MetricName, ? extends Metric&gt; metrics();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 关闭，等待所有消息发送完</div><div class="line">     */</div><div class="line">    public void close();</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 指定时间内要关闭完成，如果没有完成，强制关闭，不管有没有消息还没发送</div><div class="line">     */</div><div class="line">    public void close(long timeout, TimeUnit unit);</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="PartitionInfo"><a href="#PartitionInfo" class="headerlink" title="PartitionInfo"></a>PartitionInfo</h4><blockquote>
-<p> 表示一个Topic下面的分区信息</p>
-</blockquote>
-<p><strong>注意： 如果自己实现kafka的监控程序。需要分区这些元数据</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public PartitionInfo(String topic, int partition, Node leader, Node[] replicas, Node[] inSyncReplicas) &#123;</div><div class="line">        this.topic = topic;</div><div class="line">        this.partition = partition;</div><div class="line">        this.leader = leader;</div><div class="line">        this.replicas = replicas;</div><div class="line">        this.inSyncReplicas = inSyncReplicas;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="Serializer类与Deserializer"><a href="#Serializer类与Deserializer" class="headerlink" title="Serializer类与Deserializer"></a>Serializer类与Deserializer</h4><p>序列化实现类</p>
-<ul>
-<li>ByteArraySerializer</li>
-<li>ByteBufferSerializer</li>
-<li>BytesSerializer</li>
-<li>DoubleSerializer</li>
-<li>IntegerSerializer</li>
-<li>LongSerializer</li>
-<li>StringSerializer</li>
-</ul>
-<p><strong>注意：kafka最终都是将消息中的内容变成二进制数据进行存储。需要转换为二进制数组。每种类型转换方式都不一样</strong></p>
-<p>核心方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public byte[] serialize(String topic, T data);</div></pre></td></tr></table></figure>
-<p>StringSerializer的实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">   public void configure(Map&lt;String, ?&gt; configs, boolean isKey) &#123;</div><div class="line">         String propertyName = isKey ? &quot;key.serializer.encoding&quot; : &quot;value.serializer.encoding&quot;;</div><div class="line">         Object encodingValue = configs.get(propertyName);</div><div class="line">         if (encodingValue == null)</div><div class="line">             encodingValue = configs.get(&quot;serializer.encoding&quot;);</div><div class="line">         if (encodingValue != null &amp;&amp; encodingValue instanceof String)</div><div class="line">             encoding = (String) encodingValue;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
-<p>注意：对于每一种Serializer都有一个Deserializer，通常我们是在Producer端指定Serializer，在Consumer端指定Deserializer，相信这个非常容易理解，唯一要注意的是，二者必须是要对应的，否则可能会出现反序列化失败的情况</p>
-<h4 id="生产者代码实例"><a href="#生产者代码实例" class="headerlink" title="生产者代码实例"></a>生产者代码实例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">Properties props = new Properties();</div><div class="line">       props.put(&quot;bootstrap.servers&quot;, &quot;115.28.65.149:2181&quot;);</div><div class="line">       props.put(&quot;acks&quot;, &quot;all&quot;);</div><div class="line">       props.put(&quot;retries&quot;, 0);</div><div class="line">       props.put(&quot;batch.size&quot;, 16384);</div><div class="line">       props.put(&quot;linger.ms&quot;, 1);</div><div class="line">       props.put(&quot;buffer.memory&quot;, 33554432);</div><div class="line">       props.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</div><div class="line">       props.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</div><div class="line">  </div><div class="line">       Producer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);</div><div class="line">       for(int i = 0; i &lt; 100; i++)</div><div class="line">           producer.send(new ProducerRecord&lt;String, String&gt;(&quot;test&quot;, Integer.toString(i), Integer.toString(i)));</div><div class="line"> </div><div class="line">       producer.close();</div></pre></td></tr></table></figure>
-<p><strong>注意： Kafka客户端在初始化的情况下用来连接kafka集群的，而且必须指定，不过也不需要列出集群中所有的broker地址，这个参数只是在启动的时候用一下，获取到连接之后，会自动获取到集群中所有broker的信息</strong></p>
-<hr>
-<h3 id="CosumerAPI"><a href="#CosumerAPI" class="headerlink" title="CosumerAPI"></a>CosumerAPI</h3><h4 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div></pre></td><td class="code"><pre><div class="line">public class KafkaConsumer&lt;K, V&gt; implements Consumer&lt;K, V&gt;  &#123;</div><div class="line">   </div><div class="line">    /**</div><div class="line">     * 获取当前分配到这个consumer的分区信息。如果是通过调用assign(List&lt;TopicPartition&gt; partitions)方式进行订阅，</div><div class="line">     *那么将返回相同的分区信息。</div><div class="line">     *如果调用的是subscribe(List&lt;String&gt; topics,..)方式订阅消息，</div><div class="line">     *那么将会返回当前topic自动分配给这个consumer的分区信息(可能为空)</div><div class="line">     */</div><div class="line">    public Set&lt;TopicPartition&gt; assignment()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 返回当前consumer订阅的Topic(一个Consumer可以订阅多个Topic)</div><div class="line">     */</div><div class="line">    public Set&lt;String&gt; subscription()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *内部调用了subscribe(List&lt;String&gt; topics, ConsumerRebalanceListener callback)</div><div class="line">     */</div><div class="line">    public void subscribe(List&lt;String&gt; topics);</div><div class="line">     /**</div><div class="line">     * 传入要订阅的Topic(可以有多个)，动态分配partition。</div><div class="line">     *注意Topic的订阅是不能累加的，也就是说，如果当前已经订阅了其他的topic，那么调用此方法会替换原来订阅的topic。</div><div class="line">     *这也意味着：assign(List&lt;TopicPartition&gt; partitions)和本方法是不能联合使用的。</div><div class="line">     *如果传入的参数为空，那么相当于unsubscribe()的作用</div><div class="line">     *作为group管理的一部分，将会持续跟踪属于同一个group的consumers，并且在以下事件触发时，引发rebalence操作：</div><div class="line">     * 1、任何一个topic下的分区数量发生变化</div><div class="line">     * 2、Topic创建或者删除</div><div class="line">     * 3、consumer group中的某个consumer instance死掉</div><div class="line">     * 4、一个新的consumer加入当前consumer group(通过join)</div><div class="line">     */</div><div class="line">    public void subscribe(List&lt;String&gt; topics, ConsumerRebalanceListener callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 手工指定订阅的Topic和partition信息</div><div class="line">     */</div><div class="line">    public void assign(List&lt;TopicPartition&gt; partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">    * 支持使用正则表达式的方式订阅Topic</div><div class="line">    */</div><div class="line">    public void subscribe(Pattern pattern, ConsumerRebalanceListener callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 取消订阅(assgin方式和subscribe的订阅都会被取消)</div><div class="line">     */</div><div class="line">    public void unsubscribe()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 从topic中主动拉取消息，如果没有订阅任何topic就调用这个方法，会报错。</div><div class="line">     *从poll名字既可以看出拉取的方式是基于轮询，轮询topic中的每个分区查看有没有最新消息。</div><div class="line">     *在每一次轮询时，consumer都会使用上一次的消费的offset作为本次轮询的start offset。</div><div class="line">     *上一次消费offset可以通过seek(TopicPartition partition, long offset)方法手工设定，或者自动设置</div><div class="line">     */</div><div class="line">    public ConsumerRecords&lt;K, V&gt; poll(long timeout)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *内部调用了commitSync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets)</div><div class="line">     */</div><div class="line">    public void commitSync()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 同步提交上一次poll时，当前consumer订阅的所有topic的所有partition的消费偏移量(offset)信息</div><div class="line">     * 这个消费偏移量信息是存储在kafka集群上的。当consumer每次rebalence或者启动的时候，都会使用到这个偏移量</div><div class="line">     * 例如：lastProcessedMessageOffset + 1.</div><div class="line">     */</div><div class="line">    public void commitSync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 内部调用了commitAsync(OffsetCommitCallback callback)</div><div class="line">     */</div><div class="line">    public void commitAsync()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     *异步提交上一次poll时，当前consumer订阅的所有topic的所有partition的消费偏移量(offset)信息</div><div class="line">     */</div><div class="line">    public void commitAsync(OffsetCommitCallback callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 异步提交指定的topic的某些partition的消费偏移量(offset)信息</div><div class="line">     */</div><div class="line">    public void commitAsync(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets, OffsetCommitCallback callback)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 手工指定消费进度，在下一次poll时，将会使用指定的进度进行消费，慎用。</div><div class="line">     */</div><div class="line">    public void seek(TopicPartition partition, long offset)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 从指定分区的开头进行消费，</div><div class="line">     *这个方法不会立即执行，要等到下一次poll(long)或者position(TopicPartition)方法执行时，才会调用。</div><div class="line">     */</div><div class="line">    public void seekToBeginning(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 设置指定分区所有消息已经消费完</div><div class="line">     *这个方法不会立即执行，要等到下一次poll(long)或者position(TopicPartition)方法执行时，才会调用。</div><div class="line">     */</div><div class="line">    public void seekToEnd(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取指定分区中下一次开始消费的偏移量</div><div class="line">     */</div><div class="line">    public long position(TopicPartition partition)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取指定分区最后一次提交的消费进度(不论这个offset是否由当前进程提交)</div><div class="line">     *如果传入的参数代表的分区没有分配给当前consumer，或者consumer没有缓存当前分区的消费进度信息，这个方法可能会阻塞进行远程调用</div><div class="line">     */</div><div class="line">    public OffsetAndMetadata committed(TopicPartition partition)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取由当前Consumer持有的metrics信息</div><div class="line">     */</div><div class="line">    public Map&lt;MetricName, ? extends Metric&gt; metrics()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取一个Topic的所有分区信息，如果本地没有缓存的话，需要进行远程调用</div><div class="line">     */</div><div class="line">    public List&lt;PartitionInfo&gt; partitionsFor(String topic)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 获取当前用户有权限查看的所有的topic的所有分区信息</div><div class="line">     */</div><div class="line">    public Map&lt;String, List&lt;PartitionInfo&gt;&gt; listTopics()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 暂停对某些分区消息的订阅，当再下一次poll时，不会消费这些分区的消息，直到调用 resume(TopicPartition)后，重新进行消费</div><div class="line">     * 这个方法不会触发rebalence</div><div class="line">     */</div><div class="line">    public void pause(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 恢复对某个partiton消息的订阅，如果这个partition之前没有被pause，这个方法不会执行任何操作</div><div class="line">     */</div><div class="line">    public void resume(TopicPartition... partitions)&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 关闭consumer，等待一些操作完成。例如如果auto-commit是支持的，将会提交当前消费的offset</div><div class="line">     */</div><div class="line">    public void close()&#123;..&#125;</div><div class="line"> </div><div class="line">    /**</div><div class="line">     * 唤醒操作，如果一个consumer的poll需要消耗很长时间，可以使用这个方法进行终止。</div><div class="line">     */</div><div class="line">    public void wakeup()&#123;..&#125;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="ConsumerRecords与ConsumerRecord"><a href="#ConsumerRecords与ConsumerRecord" class="headerlink" title="ConsumerRecords与ConsumerRecord"></a>ConsumerRecords与ConsumerRecord</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public final class ConsumerRecord&lt;K, V&gt; &#123;</div><div class="line">    private final String topic;</div><div class="line">    private final int partition;</div><div class="line">    private final long offset;</div><div class="line">    private final K key;</div><div class="line">    private final V value;</div><div class="line">     ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public class ConsumerRecords&lt;K, V&gt; implements Iterable&lt;ConsumerRecord&lt;K, V&gt;&gt; &#123;</div><div class="line">    private final Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; records;</div><div class="line">     ...</div><div class="line">     &#125;</div></pre></td></tr></table></figure>
-<h4 id="消费者代码示例"><a href="#消费者代码示例" class="headerlink" title="消费者代码示例"></a>消费者代码示例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">Properties props = new Properties();</div><div class="line">        props.put(&quot;bootstrap.servers&quot;, &quot;115.28.65.149:9092&quot;);</div><div class="line">        props.put(&quot;group.id&quot;, &quot;testConsumer&quot;);</div><div class="line">        props.put(&quot;enable.auto.commit&quot;, &quot;true&quot;);</div><div class="line">        props.put(&quot;auto.commit.interval.ms&quot;, &quot;1000&quot;);</div><div class="line">        props.put(&quot;session.timeout.ms&quot;, &quot;30000&quot;);</div><div class="line">        props.put(&quot;key.deserializer&quot;,</div><div class="line">                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);</div><div class="line">        props.put(&quot;value.deserializer&quot;,</div><div class="line">                &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);</div><div class="line">        KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);</div><div class="line">        consumer.subscribe(Arrays.asList(&quot;test&quot;));</div><div class="line">        Runtime.getRuntime().addShutdownHook(new Thread()&#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line">                consumer.close();</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">        &#125;);</div><div class="line">        while (true) &#123;</div><div class="line">            ConsumerRecords&lt;String, String&gt; records = consumer.poll(100);</div><div class="line">            for (ConsumerRecord&lt;String, String&gt; record : records)</div><div class="line">                System.out.printf(&quot;offset = %d, key = %s, value = %s&quot;,</div><div class="line">                        record.offset(), record.key(), record.value());</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/07/【消息队列】Kafka学习笔记-二-——-安装-使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/07/【消息队列】Kafka学习笔记-二-——-安装-使用/" itemprop="url">【消息队列】Kafka学习笔记(二) —— 安装&使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T15:31:10+08:00">
-                2017-06-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="http://kafka.apache.org/quickstart" target="_blank" rel="external">官方文档</a></p>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h4 id="下载tgz文件"><a href="#下载tgz文件" class="headerlink" title="下载tgz文件"></a>下载tgz文件</h4><h4 id="解压tgz"><a href="#解压tgz" class="headerlink" title="解压tgz"></a>解压tgz</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; tar -xzf kafka_2.11-0.10.2.0.tgz</div><div class="line">&gt; cd kafka_2.11-0.10.2.0</div></pre></td></tr></table></figure>
-<h4 id="启动kafka之前，先启动zookeeper"><a href="#启动kafka之前，先启动zookeeper" class="headerlink" title="启动kafka之前，先启动zookeeper"></a>启动kafka之前，先启动zookeeper</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; bin/zookeeper-server-start.sh config/zookeeper.properties</div><div class="line">[2013-04-22 15:01:37,495] INFO Reading configuration from: config/zookeeper.properties (org.apache.zookeeper.server.quorum.QuorumPeerConfig)</div></pre></td></tr></table></figure>
-<h4 id="启动kafka"><a href="#启动kafka" class="headerlink" title="启动kafka"></a>启动kafka</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-server-start.sh config/server.properties</div><div class="line">[2013-04-22 15:01:47,028] INFO Verifying properties (kafka.utils.VerifiableProperties)</div><div class="line">[2013-04-22 15:01:47,051] INFO Property socket.send.buffer.bytes is overridden to 1048576 (kafka.utils.VerifiableProperties)</div></pre></td></tr></table></figure>
-<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><h4 id="创建topic-一个分片-part-一个副本-replica"><a href="#创建topic-一个分片-part-一个副本-replica" class="headerlink" title="创建topic(一个分片(part)一个副本(replica))"></a>创建topic(一个分片(part)一个副本(replica))</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test</div></pre></td></tr></table></figure>
-<h4 id="查看topic"><a href="#查看topic" class="headerlink" title="查看topic"></a>查看topic</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --list --zookeeper localhost:2181</div><div class="line">test</div></pre></td></tr></table></figure>
-<h4 id="生产者发送消息"><a href="#生产者发送消息" class="headerlink" title="生产者发送消息"></a>生产者发送消息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</div><div class="line">This is a message</div><div class="line">This is another message</div></pre></td></tr></table></figure>
-<h4 id="消费者处理消息"><a href="#消费者处理消息" class="headerlink" title="消费者处理消息"></a>消费者处理消息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning</div><div class="line">This is a message</div><div class="line">This is another message</div></pre></td></tr></table></figure>
-<h4 id="设置多个集群-假设1个maser和2个cluster"><a href="#设置多个集群-假设1个maser和2个cluster" class="headerlink" title="设置多个集群(假设1个maser和2个cluster)"></a>设置多个集群(假设1个maser和2个cluster)</h4><h5 id="复制配置文件"><a href="#复制配置文件" class="headerlink" title="复制配置文件"></a>复制配置文件</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; cp config/server.properties config/server-1.properties</div><div class="line">&gt; cp config/server.properties config/server-2.properties</div></pre></td></tr></table></figure>
-<h5 id="编辑配置文件"><a href="#编辑配置文件" class="headerlink" title="编辑配置文件"></a>编辑配置文件</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">config/server-1.properties:</div><div class="line">    broker.id=1</div><div class="line">    listeners=PLAINTEXT://:9093</div><div class="line">    log.dir=/tmp/kafka-logs-1</div><div class="line"></div><div class="line">config/server-2.properties:</div><div class="line">    broker.id=2</div><div class="line">    listeners=PLAINTEXT://:9094</div><div class="line">    log.dir=/tmp/kafka-logs-2</div></pre></td></tr></table></figure>
-<ul>
-<li>broker.id 代表kafka的broker唯一实例名称</li>
-</ul>
-<h6 id="启动另外两个kafka-server"><a href="#启动另外两个kafka-server" class="headerlink" title="启动另外两个kafka server"></a>启动另外两个kafka server</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-server-start.sh config/server-1.properties &amp;</div><div class="line">...</div><div class="line">&gt; bin/kafka-server-start.sh config/server-2.properties &amp;</div><div class="line">...</div></pre></td></tr></table></figure>
-<h5 id="创建3个副本-replica-的topic"><a href="#创建3个副本-replica-的topic" class="headerlink" title="创建3个副本(replica)的topic"></a>创建3个副本(replica)的topic</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic</div></pre></td></tr></table></figure>
-<h5 id="查看kafka的topic"><a href="#查看kafka的topic" class="headerlink" title="查看kafka的topic"></a>查看kafka的topic</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic</div><div class="line">Topic:my-replicated-topic	PartitionCount:1	ReplicationFactor:3	Configs:</div><div class="line">	Topic: my-replicated-topic	Partition: 0	Leader: 1	Replicas: 1,2,0	Isr: 1,2,0</div></pre></td></tr></table></figure>
-<hr>
-<h4 id="杀死kafka服务进程"><a href="#杀死kafka服务进程" class="headerlink" title="杀死kafka服务进程"></a>杀死kafka服务进程</h4><p>linux<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; ps aux | grep server-1.properties</div><div class="line">7564 ttys002    0:15.91 /System/Library/Frameworks/JavaVM.framework/Versions/1.8/Home/bin/java...</div><div class="line">&gt; kill -9 7564</div></pre></td></tr></table></figure></p>
-<p>window<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; wmic process get processid,caption,commandline | find &quot;java.exe&quot; | find &quot;server-1.properties&quot;</div><div class="line">java.exe    java  -Xmx1G -Xms1G -server -XX:+UseG1GC ... build\libs\kafka_2.10-0.10.2.0.jar&quot;  kafka.Kafka config\server-1.properties    644</div><div class="line">&gt; taskkill /pid 644 /f</div></pre></td></tr></table></figure></p>
-<h2 id="使用kafka导入-导出数据"><a href="#使用kafka导入-导出数据" class="headerlink" title="使用kafka导入/导出数据"></a>使用kafka导入/导出数据</h2><h4 id="创建测试数据进行测试"><a href="#创建测试数据进行测试" class="headerlink" title="创建测试数据进行测试"></a>创建测试数据进行测试</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; echo -e &quot;foo\nbar&quot; &gt; test.txt</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; bin/connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties config/connect-file-sink.properties</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; cat test.sink.txt</div><div class="line">foo</div><div class="line">bar</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic connect-test --from-beginning</div><div class="line">&#123;&quot;schema&quot;:&#123;&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false&#125;,&quot;payload&quot;:&quot;foo&quot;&#125;</div><div class="line">&#123;&quot;schema&quot;:&#123;&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false&#125;,&quot;payload&quot;:&quot;bar&quot;&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; echo &quot;Another line&quot; &gt;&gt; test.txt</div></pre></td></tr></table></figure>
-<h2 id="使用kafkaStream处理实时数据"><a href="#使用kafkaStream处理实时数据" class="headerlink" title="使用kafkaStream处理实时数据"></a>使用kafkaStream处理实时数据</h2>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2271,7 +2485,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">142</span>
+                <span class="site-state-item-count">144</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2293,7 +2507,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">109</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
