@@ -1,0 +1,956 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="ThreadLocal的成员变量     //ThreadLocal通过threadLocalHashCode来标识每一个ThreadLocal的唯一性 private final int threadLocalHashCode = nextHashCode();  /**  * The next hash code to be given out. Updated atomically. Sta">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ThreadLocal源码分析">
+<meta property="og:url" content="http://yoursite.com/2018/01/05/ThreadLocal源码解析/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="ThreadLocal的成员变量     //ThreadLocal通过threadLocalHashCode来标识每一个ThreadLocal的唯一性 private final int threadLocalHashCode = nextHashCode();  /**  * The next hash code to be given out. Updated atomically. Sta">
+<meta property="og:updated_time" content="2018-01-05T07:12:56.312Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ThreadLocal源码分析">
+<meta name="twitter:description" content="ThreadLocal的成员变量     //ThreadLocal通过threadLocalHashCode来标识每一个ThreadLocal的唯一性 private final int threadLocalHashCode = nextHashCode();  /**  * The next hash code to be given out. Updated atomically. Sta">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/05/ThreadLocal源码解析/"/>
+
+
+
+
+
+  <title>ThreadLocal源码分析 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/05/ThreadLocal源码解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ThreadLocal源码分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T14:07:07+08:00">
+                2018-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ThreadLocal的成员变量</p>
+<pre><code>    //ThreadLocal通过threadLocalHashCode来标识每一个ThreadLocal的唯一性
+private final int threadLocalHashCode = nextHashCode();
+
+/**
+ * The next hash code to be given out. Updated atomically. Starts at
+ * zero.
+ */
+private static AtomicInteger nextHashCode = new AtomicInteger();
+
+/**
+ * threadLocalHashCode通过CAS操作进行更新，每次hash操作的增量为0x61c88647
+ */
+private static final int HASH_INCREMENT = 0x61c88647;
+
+/**
+ * Returns the next hash code.
+ */
+private static int nextHashCode() {
+    return nextHashCode.getAndAdd(HASH_INCREMENT);
+}
+</code></pre><h2 id="SET方法"><a href="#SET方法" class="headerlink" title="SET方法"></a>SET方法</h2><pre><code>public void set(T value) {
+    Thread t = Thread.currentThread();
+    //将当前线程引用传给ThreadLocalMap对象
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+        map.set(this, value);
+    else
+        createMap(t, value);
+}
+</code></pre><h2 id="getMap"><a href="#getMap" class="headerlink" title="getMap"></a>getMap</h2><pre><code>  //每个线程通过ThreadLocal.ThreadLocalMap与ThreadLocal相绑定。确保每个线程访问到的thread-local variable都是本线程的
+ ThreadLocalMap getMap(Thread t) {
+   return t.threadLocals;
+ }
+
+ /* ThreadLocal values pertaining to this thread. This map is maintained
+* by the ThreadLocal class. */
+ ThreadLocal.ThreadLocalMap threadLocals = null;
+</code></pre><h2 id="createMap"><a href="#createMap" class="headerlink" title="createMap"></a>createMap</h2><p>如果ThreadLocalMap不为空则调用ThreadLocalMap.ThreadLocalMap#set方法设值；</p>
+<p>若为空则调用ThreadLocal#createMap方法new一个ThreadLocalMap实例并赋给Thread.threadLocals</p>
+<pre><code>    /**
+ * Create the map associated with a ThreadLocal. Overridden in
+ * InheritableThreadLocal.
+ *
+ * @param t the current thread
+ * @param firstValue value for the initial entry of the map
+ */
+void createMap(Thread t, T firstValue) {
+    t.threadLocals = new ThreadLocalMap(this, firstValue);
+}
+</code></pre><h2 id="ThreadLocalMap"><a href="#ThreadLocalMap" class="headerlink" title="ThreadLocalMap"></a>ThreadLocalMap</h2><p>ThreadLocalMap是ThreadLocal的静态内部类</p>
+<h3 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h3><pre><code>/**
+ * 代表Map的初始容量
+ */
+private static final int INITIAL_CAPACITY = 16;
+
+/**
+ * 是一个Entry类型的数组，用于存储数据
+ */
+private Entry[] table;
+
+/**
+ * size代表表中的存储数目
+ */
+private int size = 0;
+
+/**
+ * threshold代表需要扩容时对应size的阈值
+ */
+private int threshold; // Default to 0
+
+private void setThreshold(int len) {
+    threshold = len * 2 / 3;
+}
+</code></pre><h2 id="Entry是ThreadLocalMap的静态内部类。存储数据"><a href="#Entry是ThreadLocalMap的静态内部类。存储数据" class="headerlink" title="Entry是ThreadLocalMap的静态内部类。存储数据"></a>Entry是ThreadLocalMap的静态内部类。存储数据</h2><pre><code>/**
+ * 每个Entry对象都有一个ThreadLocal的弱引用（作为key），这是为了防止内存泄露。一旦线程结束，key变为一个不可达的对象，这个Entry就可以被GC了
+ */
+static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; {
+     Entry(ThreadLocal&lt;?&gt; k, Object v) {
+         super(k);
+         value = v;
+     }
+ }
+</code></pre><h2 id="ThreadLocalMap构造函数"><a href="#ThreadLocalMap构造函数" class="headerlink" title="ThreadLocalMap构造函数"></a>ThreadLocalMap构造函数</h2><pre><code>//构造函数的第一个参数就是本ThreadLocal实例(this)，第二个参数就是要保存的线程本地变量
+ThreadLocalMap(ThreadLocal&lt;?&gt; firstKey, Object firstValue) {
+     //构造函数首先创建一个长度为16的Entry数组，然后计算出firstKey对应的哈希值，然后存储到table中，并设置size和threshold
+     table = new Entry[INITIAL_CAPACITY];
+     int i = firstKey.threadLocalHashCode &amp; (INITIAL_CAPACITY - 1);
+     table[i] = new Entry(firstKey, firstValue);
+     size = 1;
+     setThreshold(INITIAL_CAPACITY);
+ }
+</code></pre><p> <strong>计算hash的时候里面采用了hashCode &amp; (size - 1)的算法，这相当于取模运算hashCode % size的一个更高效的实现（和HashMap中的思路相同）。正是因为这种算法，我们要求size必须是2的指数，因为这可以使得hash发生冲突的次数减小</strong></p>
+<h2 id="ThreadLocalMap-set"><a href="#ThreadLocalMap-set" class="headerlink" title="ThreadLocalMap#set"></a>ThreadLocalMap#set</h2><pre><code>private void set(ThreadLocal&lt;?&gt; key, Object value) {
+
+     // We don&apos;t use a fast path as with get() because it is at
+     // least as common to use set() to create new entries as
+     // it is to replace existing ones, in which case, a fast
+     // path would fail more often than not.
+
+     Entry[] tab = table;
+     int len = tab.length;
+     int i = key.threadLocalHashCode &amp; (len-1);
+
+     for (Entry e = tab[i];
+          e != null;
+          e = tab[i = nextIndex(i, len)]) {
+         ThreadLocal&lt;?&gt; k = e.get();
+
+         if (k == key) {
+             e.value = value;
+             return;
+         }
+
+         if (k == null) {
+             replaceStaleEntry(key, value, i);
+             return;
+         }
+     }
+
+     tab[i] = new Entry(key, value);
+     int sz = ++size;
+     if (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)
+         rehash();
+ }
+</code></pre><p>  如果hash碰撞 nextIndex重新计算hash值。ThreadLocalMap解决冲突的方法是线性探测法（不断加1），而不是HashMap的链地址法，这一点也能从Entry的结构上推断出来</p>
+<pre><code>private static int nextIndex(int i, int len) {
+     return ((i + 1 &lt; len) ? i + 1 : 0);
+ }
+</code></pre><hr>
+<pre><code>private void set(ThreadLocal&lt;?&gt; key, Object value) {
+
+     // We don&apos;t use a fast path as with get() because it is at
+     // least as common to use set() to create new entries as
+     // it is to replace existing ones, in which case, a fast
+     // path would fail more often than not.
+
+     Entry[] tab = table;
+     int len = tab.length;
+     int i = key.threadLocalHashCode &amp; (len-1);
+
+     for (Entry e = tab[i];
+          e != null;
+          e = tab[i = nextIndex(i, len)]) {
+         ThreadLocal&lt;?&gt; k = e.get();
+
+         if (k == key) {
+             e.value = value;
+             return;
+         }
+
+         if (k == null) {
+             replaceStaleEntry(key, value, i);
+             return;
+         }
+     }
+
+     tab[i] = new Entry(key, value);
+     int sz = ++size;
+     if (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)
+         rehash();
+ }
+</code></pre><p>若是经历了上面步骤没有命中hash，也没有发现无用的Entry，set方法就会创建一个新的Entry，并会进行启发式的垃圾清理，用于清理无用的Entry。主要通过cleanSomeSlots方法进行清理</p>
+<pre><code>private Entry getEntry(ThreadLocal&lt;?&gt; key) {
+    int i = key.threadLocalHashCode &amp; (table.length - 1);
+    Entry e = table[i];
+    if (e != null &amp;&amp; e.get() == key)
+        return e;
+    else
+        return getEntryAfterMiss(key, i, e);
+}
+
+/**
+ * Version of getEntry method for use when key is not found in
+ * its direct hash slot.
+ *
+ * @param  key the thread local object
+ * @param  i the table index for key&apos;s hash code
+ * @param  e the entry at table[i]
+ * @return the entry associated with key, or null if no such
+ */
+private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
+    Entry[] tab = table;
+    int len = tab.length;
+
+    while (e != null) {
+        ThreadLocal&lt;?&gt; k = e.get();
+        if (k == key)
+            return e;
+        if (k == null)
+            expungeStaleEntry(i);
+        else
+            i = nextIndex(i, len);
+        e = tab[i];
+    }
+    return null;
+}
+</code></pre><p><strong>rehash操作会执行一次全表的扫描清理工作，并在size大于等于threshold的四分之三时进行resize，即扩容一倍。因此ThreadLocalMap的加载因子一样为0.75。</strong></p>
+<pre><code>private void resize() {
+     Entry[] oldTab = table;
+     int oldLen = oldTab.length;
+     int newLen = oldLen * 2;
+     Entry[] newTab = new Entry[newLen];
+     int count = 0;
+
+     for (int j = 0; j &lt; oldLen; ++j) {
+         Entry e = oldTab[j];
+         if (e != null) {
+             ThreadLocal&lt;?&gt; k = e.get();
+             if (k == null) {
+                 e.value = null; // Help the GC
+             } else {
+                 int h = k.threadLocalHashCode &amp; (newLen - 1);
+                 while (newTab[h] != null)
+                     h = nextIndex(h, newLen);
+                 newTab[h] = e;
+                 count++;
+             }
+         }
+     }
+
+     setThreshold(newLen);
+     size = count;
+     table = newTab;
+ }
+</code></pre><h2 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h2><p>ThreadLocal的get方法就是调用了ThreadLocalMap的getEntry方法</p>
+<pre><code>   public T get() {
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null) {
+        ThreadLocalMap.Entry e = map.getEntry(this);
+        if (e != null) {
+            @SuppressWarnings(&quot;unchecked&quot;)
+            T result = (T)e.value;
+            return result;
+        }
+    }
+    return setInitialValue();
+}
+</code></pre><h2 id="Remove"><a href="#Remove" class="headerlink" title="Remove"></a>Remove</h2><pre><code>private void remove(ThreadLocal&lt;?&gt; key) {
+         Entry[] tab = table;
+         int len = tab.length;
+         int i = key.threadLocalHashCode &amp; (len-1);
+         for (Entry e = tab[i];
+              e != null;
+              e = tab[i = nextIndex(i, len)]) {
+             if (e.get() == key) {
+                 e.clear();
+                 expungeStaleEntry(i);
+                 return;
+             }
+         }
+     }
+
+[参考](http://www.sczyh30.com/posts/Java/java-concurrent-threadlocal/)
+</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/29/untitled-1514532966528/" rel="next" title="Java红包算法简单实现">
+                <i class="fa fa-chevron-left"></i> Java红包算法简单实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">145</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SET方法"><span class="nav-number">1.</span> <span class="nav-text">SET方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#getMap"><span class="nav-number">2.</span> <span class="nav-text">getMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#createMap"><span class="nav-number">3.</span> <span class="nav-text">createMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ThreadLocalMap"><span class="nav-number">4.</span> <span class="nav-text">ThreadLocalMap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#成员变量"><span class="nav-number">4.1.</span> <span class="nav-text">成员变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Entry是ThreadLocalMap的静态内部类。存储数据"><span class="nav-number">5.</span> <span class="nav-text">Entry是ThreadLocalMap的静态内部类。存储数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ThreadLocalMap构造函数"><span class="nav-number">6.</span> <span class="nav-text">ThreadLocalMap构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ThreadLocalMap-set"><span class="nav-number">7.</span> <span class="nav-text">ThreadLocalMap#set</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GET"><span class="nav-number">8.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Remove"><span class="nav-number">9.</span> <span class="nav-text">Remove</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
