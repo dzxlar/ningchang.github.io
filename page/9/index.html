@@ -254,6 +254,373 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java序列化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java序列化/" itemprop="url">Java序列化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:51+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>什么是序列化</p>
+<blockquote>
+<p>序列化 (Serialization)是指将对象的状态信息转换为可以存储或传输的形式的过程。</p>
+</blockquote>
+<p>在序列化期间，<strong>对象将其当前状态写入到临时或持久性存储区。以后，可以通过从存储区中读取或反序列化对象的状态，重新创建该对象</strong>。</p>
+<p>简而言之</p>
+<p>序列化<br><strong>将数据结构或对象转换成二进制串的过程</strong></p>
+<p>反序列化<br><strong>将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程</strong></p>
+<p>具体例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public static void main(String args[]) throws Exception &#123;</div><div class="line"></div><div class="line">    String obj = “hello world!”;</div><div class="line"></div><div class="line">    // 将序列化对象写入文件object.txt中</div><div class="line"></div><div class="line">    FileOutputStream fos = new FileOutputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectOutputStream os = new ObjectOutputStream(fos);</div><div class="line"></div><div class="line">    os.writeObject(obj);</div><div class="line"></div><div class="line">    os.close();</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // 从文件object.txt中读取数据</div><div class="line">    FileInputStream fis = new FileInputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectInputStream ois = new ObjectInputStream(fis);</div><div class="line"></div><div class="line">    // 通过反序列化恢复对象obj</div><div class="line"></div><div class="line">    String obj2 = (String)ois.readObject();</div><div class="line"></div><div class="line">    ois.close();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>反序列化漏洞原理</p>
+<blockquote>
+<p>反序列化漏洞的本质就是反序列化机制打破了数据和对象的边界，导致攻击者注入的恶意序列化数据在反序列化过程中被还原成对象，控制了对象就可能在目标系统上面执行攻击代码。Java序列化应用于RMI JMX JMS 技术中。</p>
+</blockquote>
+<p>以上转载</p>
+<p><a href="http://techshow.ctrip.com/archives/1414.html" target="_blank" rel="external">http://techshow.ctrip.com/archives/1414.html</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java反射/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java反射/" itemprop="url">Java反射</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:12+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Java反射机制作用</p>
+<p>1.<strong>编译期(Compile Time)之外的运行期(Runtime)</strong>检查类，接口，变量以及方法的信息。<br>2.运行期实例化对象，调用方法，通过调用 get/set 方法获取变量的值。（常用）</p>
+<p>Java6的反射机制例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//得到MyObject所有方法</div><div class="line">   Method[] methods = MyObject.class.getMethods();</div><div class="line"></div><div class="line">       for(Method method : methods)&#123;    </div><div class="line"></div><div class="line">           System.out.println(&quot;method = &quot; + method.getName()); </div><div class="line"></div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<p>Java反射可以获取类的如下内容</p>
+<p>①   编译期获得对象（已知类名）：MyObject.class //获取MyObject对象</p>
+<p>运行期获得对象(编译期未知类名，运行期获得类名字符串)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Class.forName(&quot;packageName.className&quot;);</div></pre></td></tr></table></figure>
+<p>②   cls.getName()  返回类的全限定类名（包含包名）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cls.getSimpleName()  //仅返回类的名称（不包含包名）</div></pre></td></tr></table></figure></p>
+<p>③   cls.getModifiers()    获得修饰符（public…)</p>
+<p>④   cls.getPackage()  获取包名</p>
+<p>⑤   cls.getSuperclass()  获取父类</p>
+<p>⑥   cls.getInterfaces()  获取实现接口集合</p>
+<p>⑦   cls.getConstructors()   获取所有构造方法</p>
+<p>⑧   cls.getMethods()  获取一个类的所有方法</p>
+<p>⑨   cls.getFields()  获取一个类的所有成员变量</p>
+<p>⑩   cls..getAnnotations()  获取一个类的所有注解</p>
+<p>Java构造器</p>
+<p>①Constructor constructor =  cls.getConstructor(new Class[]{String.class}); //获取指定构造器</p>
+<p>②<strong>Class[] constructor.getParameterTypes()</strong>  //获取指定构造方法的方法参数</p>
+<p>③ 利用 Constructor 对象实例化一个类</p>
+<pre><code>constructor.newInstance()方法的方法参数是一个可变参数列表，但是当你调用构造方法的时候你必须提供精确的参数，即形参与实参必须一一对应。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Constructor constructor </div><div class="line">=MyObject.class.getConstructor(String.class);</div><div class="line"></div><div class="line">MyObject myObject = (MyObject) </div><div class="line">constructor.newInstance(&quot;args1&quot;);</div></pre></td></tr></table></figure>
+<p>Java变量</p>
+<p>① Field[]  cls.getFields();    //获取所有成员变量</p>
+<p>② Field cls.getField(“someField”)  //获取指定成员变量</p>
+<p>③ field.getName() //得到变量名称</p>
+<p>④ field.getType() //获取变量类型</p>
+<p>⑤ Class  aClass = MyObject.class</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Field field = aClass.getField(&quot;someField&quot;);</div><div class="line"></div><div class="line">MyObject objectInstance = new MyObject();</div><div class="line"></div><div class="line">Object value = field.get(objectInstance);</div><div class="line"></div><div class="line">field.set(objetInstance, value);</div></pre></td></tr></table></figure>
+<p>传入 Field.get()/Field.set()方法的参数 objetInstance 应该是拥有指定变量的类的实例。在上述的例子中传入的参数是 MyObjec t类的实例，是因为 someField 是 MyObject 类的实例。 如果变量是静态变量的话(public static)那么在调用 Field.get()/Field.set()方法的时候传入 null 做为参数而不用传递拥有该变量的类的实例。</p>
+<p>Java方法</p>
+<p>①  cls.getMethods(); //获取所有方法集合</p>
+<p>②  cls.getMethod(“doFunction”, new Class[]{String.class}); //获取制定方法，并且参数是String类型，若没有参数设置为null</p>
+<p>③ Class[] method.getParameterTypes();  //获取指定方法的参数</p>
+<p>④ Class method.getReturnType();  //获取指定方法的返回类型</p>
+<p>⑤ 通过Method调用方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//获取一个方法名为doSomesthing，参数类型为String的方法</div><div class="line"></div><div class="line"> Method method = MyObject.class.getMethod(&quot;doSomething&quot;, String.class);</div><div class="line"></div><div class="line"> Object returnValue = method.invoke(null, &quot;parameter-value1&quot;);</div></pre></td></tr></table></figure>
+<p>Java访问器</p>
+<p>Getter</p>
+<p>  Getter 方法的名字以 get 开头，没有方法参数，返回一个值。</p>
+<p>Setter<br>    Setter 方法的名字以 set 开头，有一个方法参数。</p>
+<pre><code>setters 方法有可能会有返回值也有可能没有，一些 Setter 方法返回 void，一些用来设置值，有一些对象的 setter 方法在方法链中被调用（译者注：这类的 setter 方法必须要有返回值），因此你不应该妄自假设 setter 方法的返回值，一切应该视情况而定。
+</code></pre><p>//判断getter/setter方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public static boolean isGetter(Method method)</div><div class="line"></div><div class="line">&#123; </div><div class="line"></div><div class="line">     if(!method.getName().startsWith(&quot;get&quot;))  return false; </div><div class="line"></div><div class="line">     if(method.getParameterTypes().length != 0)   return false; </div><div class="line"></div><div class="line">     if(void.class.equals(method.getReturnType()) return false;  </div><div class="line"></div><div class="line">    return true;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">public static boolean isSetter(Method method)</div><div class="line"></div><div class="line">&#123;  </div><div class="line"></div><div class="line">        if(!method.getName().startsWith(&quot;set&quot;)) return false;  </div><div class="line"></div><div class="line">        if(method.getParameterTypes().length != 1) return false;  </div><div class="line"></div><div class="line">        return true;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Java泛型</p>
+<p>两个典型的使用泛型的场景：</p>
+<p>1、声明一个需要被参数化（parameterizable）的类/接口。</p>
+<p>2、使用一个参数化类。</p>
+<p>① 泛型方法返回类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Method method = MyClass.class.getMethod(&quot;getStringList&quot;, null);</div><div class="line"></div><div class="line">Type returnType = method.getGenericReturnType(); </div><div class="line"></div><div class="line">if(returnType instanceof ParameterizedType)&#123;   </div><div class="line"></div><div class="line">         ParameterizedType type = (ParameterizedType) returnType;    </div><div class="line"></div><div class="line">         Type[] typeArguments = type.getActualTypeArguments();   </div><div class="line"></div><div class="line">         //打印出 “typeArgClass = java.lang.String”，Type[]数组typeArguments 只有一个             结果 – 一个代表 java.lang.String 的 Class 类的实例。Class 类实现了 Type 接口。</div><div class="line"></div><div class="line">         for(Type typeArgument : typeArguments)&#123;       </div><div class="line"></div><div class="line">                 Class typeArgClass = (Class) typeArgument;     </div><div class="line"></div><div class="line">                   System.out.println(&quot;typeArgClass = &quot; + typeArgClass);    </div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>②泛型方法参数类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">method = Myclass.class.getMethod(&quot;setStringList&quot;, List.class);</div><div class="line"></div><div class="line">Type[] genericParameterTypes = method.getGenericParameterTypes();</div><div class="line"></div><div class="line">for(Type genericParameterType : genericParameterTypes)&#123; </div><div class="line"></div><div class="line">    if(genericParameterType instanceof ParameterizedType)&#123;       </div><div class="line"></div><div class="line">         ParameterizedType aType = (ParameterizedType) genericParameterType;        </div><div class="line"></div><div class="line">         Type[] parameterArgTypes = aType.getActualTypeArguments();        </div><div class="line"></div><div class="line">         for(Type parameterArgType : parameterArgTypes)&#123;            </div><div class="line"></div><div class="line">                 Class parameterArgClass = (Class) parameterArgType;           </div><div class="line"></div><div class="line">                 System.out.println(&quot;parameterArgClass = &quot; + parameterArgClass);       </div><div class="line"></div><div class="line">         &#125;    </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>③ 泛型变量类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">Field field = MyClass.class.getField(&quot;stringList&quot;);</div><div class="line"></div><div class="line">Type genericFieldType = field.getGenericType();</div><div class="line"></div><div class="line">if(genericFieldType instanceof ParameterizedType)&#123;    </div><div class="line"></div><div class="line">     ParameterizedType aType = (ParameterizedType) genericFieldType;   </div><div class="line"></div><div class="line">     Type[] fieldArgTypes = aType.getActualTypeArguments();   </div><div class="line"></div><div class="line">     for(Type fieldArgType : fieldArgTypes)&#123;        </div><div class="line"></div><div class="line">         Class fieldArgClass = (Class) fieldArgType;      </div><div class="line"></div><div class="line">         System.out.println(&quot;fieldArgClass = &quot; + fieldArgClass);   </div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Java 动态代理</p>
+<p>常见用例</p>
+<p>数据库连接以及事物管理</p>
+<p>单元测试中的动态 Mock 对象</p>
+<p>自定义工厂与依赖注入（DI）容器之间的适配器</p>
+<p>类似 AOP 的方法拦截器</p>
+<p>利用Java反射机制你可以在运行期动态的创建接口的实现。 java.lang.reflect.Proxy 类就可以实现这一功能。</p>
+<p>①创建代理</p>
+<p>Proxy.newProxyInstance()方法创建动态代理</p>
+<p>newProxyInstance()方法有三个参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">InvocationHandler handler = new MyInvocationHandler();</div><div class="line"></div><div class="line">MyInterface proxy = (MyInterface) Proxy.newProxyInstance(                            </div><div class="line"></div><div class="line">MyInterface.class.getClassLoader(), //1、类加载器（ClassLoader）用来加载动态代理类。new Class[] &#123; MyInterface.class &#125;, //2、一个要实现的接口的数组。handler); //3、一个 InvocationHandler 把所有方法的调用都转到代理上。</div></pre></td></tr></table></figure>
+<p>InvocationHandler 接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface InvocationHandler&#123;  </div><div class="line"></div><div class="line">    Object invoke(Object proxy, Method method, Object[] args)  throws Throwable;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class MyInvocationHandler implements InvocationHandler&#123;  </div><div class="line"></div><div class="line">     Object invoke(Object proxy, Method method, Object[] args)  throws Throwable &#123; &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>传入 invoke()方法中的 proxy 参数是实现要代理接口的动态代理对象。通常你是不需要他的。</p>
+<p>invoke()方法中的 Method 对象参数代表了被动态代理的接口中要调用的方法，从这个 method 对象中你可以获取到这个方法名字，方法的参数，参数类型等等信息。关于这部分内容可以查阅之前有关 Method 的文章。</p>
+<p>Object 数组参数包含了被动态代理的方法需要的方法参数。注意：原生数据类型（如int，long等等）方法参数传入等价的包装对象（如Integer， Long等等）。</p>
+<p>Java 动态类加载与重载</p>
+<p>①类加载器</p>
+<p> 所有 Java 应用中的类都是被 java.lang.ClassLoader 类的一系列子类加载的。因此要想动态加载类的话也必须使用 java.lang.ClassLoader 的子类。</p>
+<p>   <strong>一个类一旦被加载时，这个类引用的所有类也同时会被加载。类加载过程是一个递归的模式，所有相关的类都会被加载。但并不一定是一个应用里面所有类都会被加载，与这个被加载类的引用链无关的类是不会被加载的，</strong>直到有引用关系的时候它们才会被加载。</p>
+<p>②类加载体系<br>    在 Java 中类加载是一个有序的体系。当你新创建一个标准的 Java 类加载器时你必须提供它的父加载器。<strong>当一个类加载器被调用来加载一个类的时候，首先会调用这个加载器的父加载器来加载。如果父加载器无法找到这个类，这时候这个加载器才会尝试去加载这个类。</strong></p>
+<p>③类加载<br>    类加载器加载类的顺序如下： <strong>1、检查这个类是否已经被加载。 2、如果没有被加载，则首先调用父加载器加载。 3、如果父加载器不能加载这个类，则尝试加载这个类。</strong></p>
+<p>动态类加载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ClassLoader classLoader = MainClass.class.getClassLoader();   </div><div class="line"></div><div class="line">try &#123;      </div><div class="line"></div><div class="line">        Class aClass = classLoader.loadClass(&quot;com.jenkov.MyClass&quot;);        </div><div class="line"></div><div class="line">        System.out.println(&quot;aClass.getName() = &quot; + aClass.getName());  </div><div class="line"></div><div class="line">  &#125; catch (ClassNotFoundException e) &#123;       </div><div class="line"></div><div class="line">         e.printStackTrace();  </div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>④动态类重载</p>
+<p>动态类重载有一点复杂。Java 内置的类加载器在加载一个类之前会检查它是否已经被加载。<strong>因此重载一个类是无法使用 Java 内置的类加载器的，如果想要重载一个类你需要手动继承 ClassLoader。</strong></p>
+<p>在你定制 ClassLoader 的子类之后，你还有一些事需要做。所有被加载的类都需要被链接。这个过程是通过 ClassLoader.resolve()方法来完成的。由于这是一个 final 方法，因此这个方法在 ClassLoader 的子类中是无法被重写的。resolve()方法是不会允许给定的 ClassLoader 实例链接一个类两次。所以每当你想要重载一个类的时候你都需要使用一个新的 ClassLoader 的子类。你在设计类重载功能的时候这是必要的条件。</p>
+<p>⑤自定义类重载<br>在前面已经说过你不能使用已经加载过类的类加载器来重载一个类。因此你需要其他的 ClassLoader 实例来重载这个类。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Linux】Centos6-8安装Redis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1561,325 +1928,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（四）——-消息路由（Routing）/" itemprop="url">RabbitMq学习笔记（四）—— 消息路由（Routing）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:37:53+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">//声明直连交换器</div><div class="line"></div><div class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;direct&quot;);  </div><div class="line"></div><div class="line">// 获取匿名队列名称  </div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">根据路由关键字进行多重绑定 </div><div class="line"></div><div class="line">for(String severity :routingKeys)&#123;  </div><div class="line"></div><div class="line">        channel.queueBind(queueName, EXCHANGE_NAME, severity);  </div><div class="line"></div><div class="line">&#125; </div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//消费数据</div><div class="line"></div><div class="line">Consumer consumer = new DefaultConsumer(channel) &#123;  </div><div class="line"></div><div class="line">            @Override  </div><div class="line"></div><div class="line">            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException &#123;  </div><div class="line"></div><div class="line">                String message = new String(body, &quot;UTF-8&quot;);  </div><div class="line"></div><div class="line">                System.out.println(&quot; [x] Received &apos;&quot; + envelope.getRoutingKey() + &quot;&apos;:&apos;&quot; + message + &quot;&apos;&quot;);  </div><div class="line"></div><div class="line">            &#125;  </div><div class="line"></div><div class="line">  &#125;;  </div><div class="line"></div><div class="line">        channel.basicConsume(queueName, true, consumer);</div></pre></td></tr></table></figure>
-<h4 id="直连类型交换器"><a href="#直连类型交换器" class="headerlink" title="直连类型交换器"></a>直连类型交换器</h4><blockquote>
-<p>上一章的例子是通过分发【fanout】类型的交换器【logs】广播日志信息，现在我们将日志分debug、info、warn、error这几种基本的级别，实际在生产环境中，避免磁盘空间浪费，应用只会将error级别的日志打印出来。而分发【fanout】类型的交换器会将所有基本的日志都发送出来，如果我们想只接收某一级别的日志信息，就需要使用直连【direct】类型的交换器了, 下面的图中，队列1通过ERROR这个routingkey绑定到E交换器，队列2通过WARN和INFO绑定到E交换器，E交换器的类型是直连【direct】的，如果生产者【P】发出ERROR的日志，只会有队列1会收到，如果生产者【P】发出INFO和WARN的日志，只有队列2会收到，如果生产者【P】发出DEBUG级别的日志，队列1和队列2都会忽略它。</p>
-</blockquote>
-<h4 id="多重绑定"><a href="#多重绑定" class="headerlink" title="多重绑定"></a>多重绑定</h4><blockquote>
-<p>我们允许多个队列以相同的路由关键字绑定到同一个交换器中，可以看到，交换器虽然是直连类型，但是绑定后的效果却跟分发类型的交换器类似，相同的是队列1和队列2都会收到同一条来自交换器的消息。</p>
-</blockquote>
-<p>他们的区别：分发模式下，队列1、队列2会收到所有级别（除ERROR级别以外）的消息，而直连模式下，他们仅仅只会收到ERROR关键字类型的消息。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/RabbitMq学习笔记（三）——-交换器（Pub-Topic）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/RabbitMq学习笔记（三）——-交换器（Pub-Topic）/" itemprop="url">RabbitMq学习笔记（三）—— 交换器（Pub/Topic）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:37:25+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/消息队列/rabbitmq/" itemprop="url" rel="index">
-                    <span itemprop="name">rabbitmq</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//声明交换器（fanout：分发）rabbitmqctl list_exchanges 查看交换器规则</div><div class="line"></div><div class="line">channel.exchangeDeclare(&quot;logs&quot;, &quot;fanout&quot;);</div><div class="line"></div><div class="line">//创建临时队列</div><div class="line"></div><div class="line">String queueName = channel.queueDeclare().getQueue();</div><div class="line"></div><div class="line">String message = &quot;this is message in the fanout&apos;exchange &quot;;</div><div class="line"></div><div class="line">//发送消息到交换器中</div><div class="line"></div><div class="line">channel.basicPublish( &quot;logs&quot;, &quot;&quot;, null, message.getBytes());</div><div class="line"></div><div class="line">//交换器绑定队列</div><div class="line"></div><div class="line">channel.queueBind(queueName, &quot;logs&quot;, &quot;&quot;);</div></pre></td></tr></table></figure>
-<blockquote>
-<p>RabbitMQ中消息传递模型的核心思想是：生产者不直接发送消息到队列。实际的运行环境中，生产者是不知道消息会发送到那个队列上，她只会将消息发送到一个交换器，交换器也像一个生产线，她一边接收生产者发来的消息，另外一边则根据交换规则，将消息放到队列中。</p>
-</blockquote>
-<h3 id="交换器的规则有："><a href="#交换器的规则有：" class="headerlink" title="交换器的规则有："></a>交换器的规则有：</h3><ol>
-<li><p>direct （直连）</p>
-</li>
-<li><p>topic （主题）</p>
-</li>
-<li><p>headers （标题）</p>
-</li>
-<li><p>fanout （分发）</p>
-</li>
-</ol>
-<h3 id="匿名交换器"><a href="#匿名交换器" class="headerlink" title="匿名交换器"></a>匿名交换器</h3><blockquote>
-<p>在之前的教程中，我们知道，发送消息到队列时根本没有使用交换器，但是消息也能发送到队列。这是因为RabbitMQ选择了一个空“”字符串的默认交换器。</p>
-</blockquote>
-<p>第一个参数就是交换器的名称。如果输入“”空字符串，表示使用默认的匿名交换器。<br>第二个参数是【routingKey】路由线索<br>匿名交换器规则：<br>发送到routingKey名称对应的队列。</p>
-<h3 id="临时队列"><a href="#临时队列" class="headerlink" title="临时队列"></a>临时队列</h3><p>如果要在生产者和消费者之间创建一个新的队列，又不想使用原来的队列，临时队列就是为这个场景而生的：</p>
-<p>首先，每当我们连接到RabbitMQ，我们需要一个新的空队列，我们可以用一个随机名称来创建，或者说让服务器选择一个随机队列名称给我们。</p>
-<p>一旦我们断开消费者，队列应该立即被删除。</p>
-<p>以上转载</p>
-<p><a href="http://blog.csdn.net/chwshuang/article/details/50512057" target="_blank" rel="external">http://blog.csdn.net/chwshuang/article/details/50512057</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1929,7 +1977,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">145</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1940,7 +1988,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-count">59</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1951,7 +1999,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">113</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

@@ -1,0 +1,826 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="红包简单实现," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="判断红包是否领完   //假设每人领取最大200元/最小0.01元   private static final double MIN_MONEY = 0.01;  private static final double MAX_MONEY = 200;     /**  *   * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完  * @param curre">
+<meta name="keywords" content="红包简单实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java红包算法简单实现">
+<meta property="og:url" content="http://yoursite.com/2017/12/29/Java红包算法简单实现/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="判断红包是否领完   //假设每人领取最大200元/最小0.01元   private static final double MIN_MONEY = 0.01;  private static final double MAX_MONEY = 200;     /**  *   * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完  * @param curre">
+<meta property="og:updated_time" content="2018-01-19T02:03:48.154Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java红包算法简单实现">
+<meta name="twitter:description" content="判断红包是否领完   //假设每人领取最大200元/最小0.01元   private static final double MIN_MONEY = 0.01;  private static final double MAX_MONEY = 200;     /**  *   * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完  * @param curre">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/29/Java红包算法简单实现/"/>
+
+
+
+
+
+  <title>Java红包算法简单实现 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/29/Java红包算法简单实现/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java红包算法简单实现</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-29T15:36:06+08:00">
+                2017-12-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="判断红包是否领完"><a href="#判断红包是否领完" class="headerlink" title="判断红包是否领完"></a>判断红包是否领完</h1><pre><code>   //假设每人领取最大200元/最小0.01元 
+ private static final double MIN_MONEY = 0.01;
+ private static final double MAX_MONEY = 200;
+
+   /**
+ * 
+ * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完
+ * @param currentMoney 当前金额
+ * @param currentCount 当前领取红包数
+ * @return
+ */
+public static boolean isFinished(double currentMoney,int currentCount){
+    double avg = currentMoney / currentCount;
+    if(avg &lt; MIN_MONEY){
+        return false;
+    }else if(avg &gt; MAX_MONEY){
+        return false;
+    }
+    return true;
+}
+</code></pre><h1 id="核心算法"><a href="#核心算法" class="headerlink" title="核心算法"></a>核心算法</h1><pre><code>  /**
+ * 
+ * randomRedPacket 核心随机生成红包算法
+ * @param totalMoney 红包金额
+ * @param totalCount 红包数量
+ * @param minMoney 最小红包
+ * @param maxMoney 最大红包
+ * @return
+ */
+public static double randomRedPacket(double totalMoney,int totalCount,double minMoney,double maxMoney){
+    //如果是单发红包，则对方全领
+    if(totalCount == 1){
+        return (double)Math.round(totalMoney*100) / 100;
+    }
+    //如果最小红包和最大红包相等，默认最小红包
+    if(minMoney == maxMoney){
+        return minMoney;
+    }
+    //设置最大值，防止红包溢出
+    double maxMoney_ = maxMoney &gt; totalMoney ? totalMoney :maxMoney;
+    //随机分配红包(生成随机红包范围：minMoney &lt; distributionMoney &lt; maxMoney_)
+    double distributionMoney = (double)Math.round(((double)Math.random() * (maxMoney_ - minMoney) + minMoney )*100) / 100;
+    //得到剩余红包
+    double remainMoney = totalMoney - distributionMoney;
+    //红包是否领完 
+    if(isFinished(remainMoney, totalCount-1)){
+        return distributionMoney;
+    }else{ //剩余红包随机分配
+        double avg = remainMoney / (totalCount -1);
+        if(avg &lt; MIN_MONEY){
+            return randomRedPacket(totalMoney, totalCount, minMoney, distributionMoney);
+        }else if(avg &gt; MAX_MONEY){
+            return randomRedPacket(totalMoney, totalCount, distributionMoney, maxMoney);
+        }
+    }
+    return distributionMoney;
+}
+</code></pre><h1 id="得到用户红包"><a href="#得到用户红包" class="headerlink" title="得到用户红包"></a>得到用户红包</h1><pre><code>private static final float TIMES = 2.1f;
+
+/**
+ * 
+ * openRedPacket 用户红包分配详情
+ * @param totalMoney
+ * @param totalCount
+ * @return
+ */
+public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount){
+    if(!isFinished(totalMoney, totalCount)){
+        return null;
+    }
+    List&lt;Double&gt; distributionMoneyList = new ArrayList&lt;Double&gt;();
+    //如果随机生成的红包大于指定最大值，则默认
+    double max = (double) totalMoney * TIMES / totalCount &gt; MAX_MONEY ? MAX_MONEY : (double) totalMoney * TIMES / totalCount;
+    //将获得的红包放入集合
+    for(int i = 0; i  &lt; totalCount ; i ++){
+        double distributionMoney = randomRedPacket(totalMoney, totalCount - i, MIN_MONEY, max);
+        distributionMoneyList.add(distributionMoney);
+        totalMoney -= distributionMoney;
+    }
+    return distributionMoneyList;
+}
+</code></pre><h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><pre><code>   public static void main(String[] args) {
+    Scanner scan = new Scanner(System.in);
+    System.out.println(&quot;请输入红包金额：&quot;);
+    double money = scan.nextDouble();
+    System.out.println(&quot;请输入红包数量：&quot;);
+    int count = scan.nextInt();
+
+    List&lt;Double&gt; list = openRedPacket(money, count);
+    Double [] redMoney = new Double[count];
+    for(int i = 0; i &lt; list.size(); i ++){
+        redMoney[i] = list.get(i);
+    }
+    for(int i = 0; i &lt; count; i ++){
+        System.out.println(&quot;用户&quot;+i+&quot;得到红包&quot;+redMoney[i]+&quot;元&quot;);
+    }
+
+}
+</code></pre><h1 id="返回结果"><a href="#返回结果" class="headerlink" title="返回结果"></a>返回结果</h1><pre><code>        请输入红包金额：
+11
+请输入红包数量：
+11
+
+用户0得到红包0.16元
+用户1得到红包1.06元
+用户2得到红包1.57元
+用户3得到红包1.28元
+用户4得到红包1.6元
+用户5得到红包0.87元
+用户6得到红包0.19元
+用户7得到红包1.24元
+用户8得到红包1.61元
+用户9得到红包0.77元
+用户10得到红包0.65元
+</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/红包简单实现/" rel="tag"># 红包简单实现</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/30/RxJava介绍/" rel="next" title="RxJava介绍">
+                <i class="fa fa-chevron-left"></i> RxJava介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/05/ThreadLocal源码解析/" rel="prev" title="ThreadLocal源码分析">
+                ThreadLocal源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">59</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">113</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#判断红包是否领完"><span class="nav-number">1.</span> <span class="nav-text">判断红包是否领完</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心算法"><span class="nav-number">2.</span> <span class="nav-text">核心算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#得到用户红包"><span class="nav-number">3.</span> <span class="nav-text">得到用户红包</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试"><span class="nav-number">4.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#返回结果"><span class="nav-number">5.</span> <span class="nav-text">返回结果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

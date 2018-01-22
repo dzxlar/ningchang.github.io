@@ -99,7 +99,7 @@
 <meta property="og:url" content="http://yoursite.com/2018/01/05/ThreadLocal源码解析/index.html">
 <meta property="og:site_name" content="dzxblog">
 <meta property="og:description" content="ThreadLocal的成员变量     //ThreadLocal通过threadLocalHashCode来标识每一个ThreadLocal的唯一性 private final int threadLocalHashCode = nextHashCode();  /**  * The next hash code to be given out. Updated atomically. Sta">
-<meta property="og:updated_time" content="2018-01-05T07:12:56.312Z">
+<meta property="og:updated_time" content="2018-01-19T02:07:10.340Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ThreadLocal源码分析">
 <meta name="twitter:description" content="ThreadLocal的成员变量     //ThreadLocal通过threadLocalHashCode来标识每一个ThreadLocal的唯一性 private final int threadLocalHashCode = nextHashCode();  /**  * The next hash code to be given out. Updated atomically. Sta">
@@ -595,9 +595,8 @@ private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
              }
          }
      }
+</code></pre><p> <a href="http://www.sczyh30.com/posts/Java/java-concurrent-threadlocal/" target="_blank" rel="external">参考</a></p>
 
-[参考](http://www.sczyh30.com/posts/Java/java-concurrent-threadlocal/)
-</code></pre>
       
     </div>
 
@@ -633,7 +632,7 @@ private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/12/29/untitled-1514532966528/" rel="next" title="Java红包算法简单实现">
+              <a href="/2017/12/29/Java红包算法简单实现/" rel="next" title="Java红包算法简单实现">
                 <i class="fa fa-chevron-left"></i> Java红包算法简单实现
               </a>
             
@@ -642,6 +641,10 @@ private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/22/JDK8原子操作类——LongAdder/" rel="prev" title="JDK8原子操作类——LongAdder">
+                JDK8原子操作类——LongAdder <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -713,7 +716,7 @@ private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">145</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -724,7 +727,7 @@ private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-count">59</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -735,7 +738,7 @@ private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">113</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

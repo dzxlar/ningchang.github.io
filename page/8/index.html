@@ -254,6 +254,451 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】创建型模式——-工厂模式-Factory-Pattern/" itemprop="url">【设计模式】创建型模式—— 工厂模式(Factory Pattern)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:43+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ol>
+<li>简单工厂</li>
+<li>工厂方法</li>
+<li>抽象工厂</li>
+</ol>
+<h3 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h3><blockquote>
+<p><strong>根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。在简单工厂模式中用于创建实例的方法是静态方法，因此简单工厂模式又被称为静态工厂方法(StaticFactoryMethod)模式，属于类创建型模式</strong></p>
+</blockquote>
+<h3 id="简单工厂模式优点"><a href="#简单工厂模式优点" class="headerlink" title="简单工厂模式优点"></a>简单工厂模式优点</h3><ul>
+<li>工厂类含有必要的判断逻辑，可以决定在什么时候创建哪一个产品类的实例，客户端可以免除直接创建产品对象的责任，而仅仅“消费”产品；简单工厂模式通过这种做法实现了对责任的分割，它提供了专门的工厂类用于创建对象。</li>
+<li>客户端无须知道所创建的具体产品类的类名，只需要知道具体产品类所对应的参数即可，对于一些复杂的类名，通过简单工厂模式可以减少使用者的记忆量。</li>
+<li>通过引入配置文件，可以在不修改任何客户端代码的情况下更换和增加新的具体产品类，在一定程度上提高了系统的灵活性。</li>
+</ul>
+<h3 id="简单工厂模式缺点"><a href="#简单工厂模式缺点" class="headerlink" title="简单工厂模式缺点"></a>简单工厂模式缺点</h3><ul>
+<li>由于工厂类集中了所有产品创建逻辑，一旦不能正常工作，整个系统都要受到影响。</li>
+<li>使用简单工厂模式将会增加系统中类的个数，在一定程序上增加了系统的复杂度和理解难度。</li>
+<li>系统扩展困难，一旦添加新产品就不得不修改工厂逻辑，在产品类型较多时，有可能造成工厂逻辑过于复杂，不利于系统的扩展和维护。</li>
+<li>简单工厂模式由于使用了静态工厂方法，造成工厂角色无法形成基于继承的等级结构。</li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ol>
+<li>工厂类负责创建的对象比较少，由于创建的对象较少，不会造成工厂方法中的业务逻辑太过复杂。</li>
+<li>客户端只知道传入工厂类的参数，对于如何创建对象并不关心。</li>
+</ol>
+<h3 id="简单工厂结构"><a href="#简单工厂结构" class="headerlink" title="简单工厂结构"></a>简单工厂结构</h3><p><img src="http://img.blog.csdn.net/20170330163156608?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ul>
+<li>Factory（工厂角色）：工厂角色即工厂类，它是简单工厂模式的核心，负责实现创建所有产品实例的内部逻辑；工厂类可以被外界直接调用，创建所需的产品对象</li>
+<li>Product（抽象产品角色）：它是工厂类所创建的所有对象的父类，封装了各种产品对象的公有方法</li>
+<li>ConcreteProduct（具体产品角色）：它是简单工厂模式的创建目标，所有被创建的对象都充当这个角色的某个具体类的实例</li>
+</ul>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">abstract class Product &#123;  </div><div class="line">    //所有产品类的公共业务方法  </div><div class="line">    public void methodSame() &#123;  </div><div class="line">        //公共方法的实现  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    //声明抽象业务方法  </div><div class="line">    public abstract void methodDiff();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class ConcreteProduct extends Product &#123;  </div><div class="line">    //实现业务方法  </div><div class="line">    public void methodDiff() &#123;  </div><div class="line">        //业务方法的实现  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class StaticFactory &#123;  </div><div class="line">    //静态工厂方法  </div><div class="line">    public static Product createFactory(String type) &#123;  </div><div class="line">        Product product = null;  </div><div class="line">        if (type.equalsIgnoreCase(&quot;A&quot;)) &#123;  </div><div class="line">            product = new ConcreteProductA();  </div><div class="line">            //初始化设置product  </div><div class="line">        &#125;  </div><div class="line">        else if (type.equalsIgnoreCase(&quot;B&quot;)) &#123;  </div><div class="line">            product = new ConcreteProductB();  </div><div class="line">            //初始化设置product  </div><div class="line">        &#125;  </div><div class="line">        return product;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class Client &#123;  </div><div class="line">    public static void main(String args[]) &#123;  </div><div class="line">        Product product;   </div><div class="line">        product = StaticFactory.createFactory(&quot;A&quot;); //通过工厂类创建产品对象  </div><div class="line">        product.methodSame();  </div><div class="line">        product.methodDiff();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>总结：当系统中需要引入新产品时，由于静态工厂方法通过所传入参数的不同来创建不同的产品，这必定要修改工厂类的源代码，将违背“开闭原则”，如何实现增加新产品而不影响已有代码？工厂方法模式应运而生</p>
+</blockquote>
+<hr>
+<h3 id="工厂方法模式定义"><a href="#工厂方法模式定义" class="headerlink" title="工厂方法模式定义"></a>工厂方法模式定义</h3><blockquote>
+<p><strong>定义一个用于创建对象的接口，让子类决定将哪一个类实例化。工厂方法模式让一个类的实例化延迟到其子类</strong>。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>工厂方法模式又简称为工厂模式(Factory Pattern)，又可称作虚拟构造器模式(Virtual Constructor Pattern)或多态工厂模式(Polymorphic Factory Pattern)。工厂方法模式是一种类创建型模式。</p>
+</blockquote>
+<h3 id="工厂方法优点"><a href="#工厂方法优点" class="headerlink" title="工厂方法优点"></a>工厂方法优点</h3><ul>
+<li>在工厂方法模式中，工厂方法用来创建客户所需要的产品，同时还向客户隐藏了哪种具体产品类将被实例化这一细节，用户只需要关心所需产品对应的工厂，无须关心创建细节，甚至无须知道具体产品类的类名。</li>
+<li>基于工厂角色和产品角色的多态性设计是工厂方法模式的关键。它能够使工厂可以自主确定创建何种产品对象，而如何创建这个对象的细节则完全封装在具体工厂内部。工厂方法模式之所以又被称为多态工厂模式，是因为所有的具体工厂类都具有同一抽象父类。</li>
+<li>使用工厂方法模式的另一个优点是在系统中加入新产品时，无须修改抽象工厂和抽象产品提供的接口，无须修改客户端，也无须修改其他的具体工厂和具体产品，而只要添加一个具体工厂和具体产品就可以了。这样，系统的可扩展性也就变得非常好，完全符合“开闭原则”。</li>
+</ul>
+<h3 id="工厂方法缺点"><a href="#工厂方法缺点" class="headerlink" title="工厂方法缺点"></a>工厂方法缺点</h3><ul>
+<li>在添加新产品时，需要编写新的具体产品类，而且还要提供与之对应的具体工厂类，系统中类的个数将成对增加，在一定程度上增加了系统的复杂度，有更多的类需要编译和运行，会给系统带来一些额外的开销。</li>
+<li>由于考虑到系统的可扩展性，需要引入抽象层，在客户端代码中均使用抽象层进行定义，增加了系统的抽象性和理解难度，且在实现时可能需要用到DOM、反射等技术，增加了系统的实现难度。</li>
+</ul>
+<h3 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>一个类不知道它所需要的对象的类：在工厂方法模式中，客户端不需要知道具体产品类的类名，只需要知道所对应的工厂即可，具体的产品对象由具体工厂类创建；客户端需要知道创建具体产品的工厂类。</li>
+<li>一个类通过其子类来指定创建哪个对象：在工厂方法模式中，对于抽象工厂类只需要提供一个创建产品的接口，而由其子类来确定具体要创建的对象，利用面向对象的多态性和里氏代换原则，在程序运行时，子类对象将覆盖父类对象，从而使得系统更容易扩展。</li>
+<li>将创建对象的任务委托给多个工厂子类中的某一个，客户端在使用时可以无须关心是哪一个工厂子类创建产品子类，需要时再动态指定，可将具体工厂类的类名存储在配置文件或数据库中。</li>
+</ul>
+<h3 id="工厂方法结构"><a href="#工厂方法结构" class="headerlink" title="工厂方法结构"></a>工厂方法结构</h3><p><img src="http://img.blog.csdn.net/20170330170347737?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ol>
+<li><p>工厂方法的重载</p>
+<blockquote>
+<p>在抽象工厂中定义多个重载的工厂方法，在具体工厂中实现了这些工厂方法，这些方法可以包含不同的业务逻辑，以满足对不同产品对象的需求</p>
+</blockquote>
+</li>
+<li><p>工厂方法的隐藏</p>
+<blockquote>
+<p>客户端无须调用工厂方法创建产品，直接通过工厂即可使用所创建的对象中的业务方法</p>
+</blockquote>
+</li>
+</ol>
+<blockquote>
+<p> <strong>工厂方法模式是简单工厂模式的延伸，它继承了简单工厂模式的优点，同时还弥补了简单工厂模式的不足。工厂方法模式是使用频率最高的设计模式之一，是很多开源框架和API类库的核心模式</strong></p>
+</blockquote>
+<h3 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">interface Factory &#123;  </div><div class="line">    public Product factoryMethod();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactory implements Factory &#123;  </div><div class="line">    public Product factoryMethod() &#123;  </div><div class="line">        return new ConcreteProduct();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Factory factory;  </div><div class="line">factory = new ConcreteFactory(); //可通过配置文件实现  </div><div class="line">Product product;  </div><div class="line">product = factory.factoryMethod();</div></pre></td></tr></table></figure>
+<ul>
+<li>可以通过配置文件来存储具体工厂类ConcreteFactory的类名，更换新的具体工厂时无须修改源代码，系统扩展更为方便</li>
+<li>在实际使用时，具体工厂类在实现工厂方法时除了创建具体产品对象之外，还可以负责产品对象的初始化工作以及一些资源和环境配置工作，例如连接数据库、创建文件</li>
+</ul>
+<blockquote>
+<p>总结：  工厂方法模式通过引入工厂等级结构，解决了简单工厂模式中工厂类职责太重的问题，但由于工厂方法模式中的每个工厂只生产一类产品，可能会导致系统中存在大量的工厂类，势必会增加系统的开销。此时，我们可以考虑将一些相关的产品组成一个“产品族”，由同一个工厂来统一生产</p>
+</blockquote>
+<hr>
+<h3 id="抽象工厂模式定义"><a href="#抽象工厂模式定义" class="headerlink" title="抽象工厂模式定义"></a>抽象工厂模式定义</h3><blockquote>
+<p><strong>提供一个创建一系列相关或相互依赖对象的接口，而无须指定它们具体的类。抽象工厂模式又称为Kit模式，属于对象创建型模式</strong></p>
+</blockquote>
+<h2 id="抽象工厂模式优点"><a href="#抽象工厂模式优点" class="headerlink" title="抽象工厂模式优点"></a>抽象工厂模式优点</h2><ul>
+<li>抽象工厂模式隔离了具体类的生成，使得客户并不需要知道什么被创建。由于这种隔离，更换一个具体工厂就变得相对容易。所有的具体工厂都实现了抽象工厂中定义的那些公共接口，因此只需改变具体工厂的实例，就可以在某种程度上改变整个软件系统的行为</li>
+<li>当一个产品族中的多个对象被设计成一起工作时，它能够保证客户端始终只使用同一个产品族中的对象。这对一些需要根据当前环境来决定其行为的软件系统来说，是一种非常实用的设计模式。</li>
+<li>增加新的具体工厂和产品族很方便，无须修改已有系统，符合“开闭原则”。<h2 id="抽象工厂模式缺点"><a href="#抽象工厂模式缺点" class="headerlink" title="抽象工厂模式缺点"></a>抽象工厂模式缺点</h2></li>
+<li>在添加新的产品对象时，难以扩展抽象工厂来生产新种类的产品，这是因为在抽象工厂角色中规定了所有可能被创建的产品集合，要支持新种类的产品就意味着要对该接口进行扩展，而这将涉及到对抽象工厂角色及其所有子类的修改，显然会带来较大的不便。</li>
+<li>开闭原则的倾斜性（增加新的工厂和产品族容易，增加新的产品等级结构麻烦）。<h2 id="适用场景-2"><a href="#适用场景-2" class="headerlink" title="适用场景"></a>适用场景</h2></li>
+<li>一个系统不应当依赖于产品类实例如何被创建、组合和表达的细节，这对于所有类型的工厂模式都是重要的。</li>
+<li>系统中有多于一个的产品族，而每次只使用其中某一产品族。</li>
+<li>属于同一个产品族的产品将在一起使用，这一约束必须在系统的设计中体现出来。</li>
+<li>系统提供一个产品类的库，所有的产品以同样的接口出现，从而使客户端不依赖于具体实现。<h2 id="抽象模式结构"><a href="#抽象模式结构" class="headerlink" title="抽象模式结构"></a>抽象模式结构</h2><img src="http://img.blog.csdn.net/20170330174255240?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></li>
+</ul>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">abstract class AbstractFactory &#123;  </div><div class="line">public abstract AbstractProductA createProductA(); //工厂方法一  </div><div class="line">public abstract AbstractProductB createProductB(); //工厂方法二  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryA extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductA1 createProductA1() &#123;  </div><div class="line">    return new ProductA1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductA2 createProductA2() &#123;  </div><div class="line">    return new ProductA2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ConcreteFactoryB extends AbstractFactory &#123;  </div><div class="line">    //工厂方法一  </div><div class="line">public AbstractProductB1 createProductB1() &#123;  </div><div class="line">    return new ProductB1();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">//工厂方法二  </div><div class="line">public AbstractProductB2 createProductB2() &#123;  </div><div class="line">    return new ProductB2();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line">……  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——-观察者模式（Observer）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【设计模式】行为型模式——-观察者模式（Observer）/" itemprop="url">【设计模式】行为型模式—— 观察者模式（Observer）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:24:13+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="观察者模式定义"><a href="#观察者模式定义" class="headerlink" title="观察者模式定义"></a>观察者模式定义</h3><blockquote>
+<p><strong>定义对象间的一种一对多依赖关系，使得每当一个对象状态发生改变时，其相关依赖对象皆得到通知并被自动更新</strong>。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>观察者模式又叫做发布-订阅（Publish/Subscribe）模式、模型-视图（Model/View）模式、源-监听器（Source/Listener）模式或从属者（Dependents）模式。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>举个例子：完农药开黑的时候。5人一队，推塔游戏。当其中防御塔或者水晶有一方遭受其他攻击的时候。会发出一个遭受攻击的指令通知所有队友。进而队友前往支援。</p>
+<p>总结如下：水晶遭受攻击（观察目标） –&gt; 通知队友（观察者） –&gt; 队友响应</p>
+</blockquote>
+<hr>
+<h3 id="模式动机"><a href="#模式动机" class="headerlink" title="模式动机"></a>模式动机</h3><blockquote>
+<p>一个观察目标可以对应多个观察者，而且这些观察者之间没有相互联系，可以根据需要增加和删除观察者，使得系统更易于扩展，这就是观察者模式的模式动机</p>
+</blockquote>
+<h3 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h3><ul>
+<li>观察者模式可以实<strong>现表示层和数据逻辑层的分离</strong>，并定义了稳定的消息更新传递机制，抽象了更新接口，使得可以有各种各样不同的表示层作为具体观察者角色。</li>
+<li>观察者模式在<strong>观察目标和观察者之间建立一个抽象的耦合</strong>。</li>
+<li>观察者模式<strong>支持广播通信</strong>。</li>
+<li>观察者模式<strong>符合“开闭原则”的要求</strong>。</li>
+</ul>
+<h3 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h3><ul>
+<li>如果一个观察目标对象有<strong>很多直接和间接的观察者的话，将所有的观察者都通知到会花费很多时间</strong>。</li>
+<li>如果在<strong>观察者和观察目标之间有循环依赖</strong>的话，观察目标会触发它们之间进行循环调用，可能导致系统崩溃。</li>
+<li>观察者模式<strong>没有相应的机制让观察者知道所观察的目标对象是怎么发生变化的，而仅仅只是知道观察目标发生了变化</strong>。</li>
+</ul>
+<h3 id="具体应用"><a href="#具体应用" class="headerlink" title="具体应用"></a>具体应用</h3><ul>
+<li>一个抽象模型有两个方面，其中一个方面依赖于另一个方面。将这些方面封装在独立的对象中使它们可以各自独立地改变和复用。</li>
+<li>一个对象的改变将导致其他一个或多个对象也发生改变，而不知道具体有多少对象将发生改变，可以降低对象之间的耦合度。</li>
+<li>一个对象必须通知其他对象，而并不知道这些对象是谁。</li>
+<li>需要在系统中创建一个触发链，A对象的行为将影响B对象，B对象的行为将影响C对象……，可以使用观察者模式创建一种链式触发机制。</li>
+</ul>
+<h3 id="实际场景"><a href="#实际场景" class="headerlink" title="实际场景"></a>实际场景</h3><p>如某电子商务网站可以在执行发送操作后给用户多个发送商品打折信息，某团队战斗游戏中某队友牺牲将给所有成员提示等等，凡是涉及到一对一或者一对多的对象交互场景都可以使用观察者模式</p>
+<h3 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h3><p><img src="http://img.blog.csdn.net/20170330105651030?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h4 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h4><p><img src="http://img.blog.csdn.net/20170330111712540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* 抽象观察目标</div><div class="line">*/</div><div class="line">abstract class Subject &#123;  </div><div class="line">    //定义一个观察者集合用于存储所有观察者对象  </div><div class="line">    protected List&lt;Observer&gt; observers = Lists.newArrayList();</div><div class="line">    //注册方法，用于向观察者集合中增加一个观察者  </div><div class="line">    public void attach(Observer observer) &#123;  </div><div class="line">	    observers.add(observer);  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">    //注销方法，用于在观察者集合中删除一个观察者  </div><div class="line">    public void detach(Observer observer) &#123;  </div><div class="line">	    observers.remove(observer);  </div><div class="line">	&#125;  </div><div class="line">  </div><div class="line">    //声明抽象通知方法  </div><div class="line">    public abstract void notify();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">class ConcreteSubject extends Subject &#123;  </div><div class="line">    //实现通知方法  </div><div class="line">    public void notify() &#123;  </div><div class="line">        //遍历观察者集合，调用每一个观察者的响应方法  </div><div class="line">        observers.foreach(observer -&gt; observer.update());</div><div class="line">    &#125;     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">interface Observer &#123;  </div><div class="line">    //声明响应方法  </div><div class="line">    public void update();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class ConcreteObserver implements Observer &#123;  </div><div class="line">    //实现响应方法  </div><div class="line">    public void update() &#123;  </div><div class="line">        //具体响应代码  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>在有些更加复杂的情况下，具体观察者类ConcreteObserver的update()方法在执行时需要使用到具体目标类ConcreteSubject中的状态（属性）</strong></p>
+<p>如果ConcreteObserver的update()方法不需要使用到ConcreteSubject中的状态属性，则可以对观察者模式的标准结构进行简化，在具体观察者ConcreteObserver和具体目标ConcreteSubject之间无须维持对象引用</p>
+</blockquote>
+<p><strong>如果在具体层具有关联关系，系统的扩展性将受到一定的影响，增加新的具体目标类有时候需要修改原有观察者的代码，在一定程度上违反了“开闭原则”，但是如果原有观察者类无须关联新增的具体目标，则系统扩展性不受影响。</strong></p>
+<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><h4 id="jdk对观察者模式支持"><a href="#jdk对观察者模式支持" class="headerlink" title="jdk对观察者模式支持"></a>jdk对观察者模式支持</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">java.util.Observable</div></pre></td></tr></table></figure>
+<p><img src="http://img.blog.csdn.net/20170330113456344?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<ol>
+<li>changed 改变状态标志 相当于 state</li>
+<li>clearChanged() 将状态变为false</li>
+<li>hasChanged() 检测状态是否改变</li>
+<li>countObservers() 用于返回队列中观察者的数量。</li>
+</ol>
+<p><img src="http://img.blog.csdn.net/20170330113534407?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>  当观察目标的状态发生变化时，该方法将会被调用，在Observer的子类中将实现update()方法，即具体观察者可以根据需要具有不同的更新行为。当调用观察目标类Observable的notifyObservers()方法时，将执行观察者类中的update()方法</p>
+<h3 id="观察者模式和Java事件处理"><a href="#观察者模式和Java事件处理" class="headerlink" title="观察者模式和Java事件处理"></a>观察者模式和Java事件处理</h3><blockquote>
+<p>在JDK 1.1及以后的各个版本中，<strong>事件处理模型采用基于观察者模式的委派事件模型(DEM)</strong>，即<strong>一个Java组件所引发的事件并不由引发事件的对象自己来负责处理，而是委派给独立的事件处理对象负责。</strong></p>
+</blockquote>
+<p>在DEM模型中，目标角色（如界面组件）负责发布事件，而观察者角色（事件处理者）可以向目标订阅它所感兴趣的事件。当一个具体目标产生一个事件时，它将通知所有订阅者。</p>
+<blockquote>
+<p>事件的发布者称为<strong>事件源(Event Source)</strong>，而订阅者称为<strong>事件监听器(Event Listener)。</strong>在这个过程中还可以通过<strong>事件对象(Event Object)</strong>来传递与事件相关的信息</p>
+</blockquote>
+<p><strong>事件源对象、事件监听对象（事件处理对象）和事件对象构成了Java事件处理模型的三要素</strong></p>
+<p><strong>在Java事件处理中，通常使用的是一对一的观察者模式，而不是一对多的观察者模式</strong></p>
+<p>###MVC模式</p>
+<blockquote>
+<p>它包含三个角色：模型(Model)，视图(View)和控制器(Controller)。观察者模式可以用来实现MVC模式，<strong>观察者模式中的观察目标就是MVC模式中的模型(Model)，而观察者就是MVC中的视图(View)</strong>，控制器(Controller)充当两者之间的中介者(Mediator)。当模型层的数据发生改变时，视图层将自动改变其显示内容</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】结构性模式——装饰模式-Decorator-Pattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1525,373 +1970,6 @@ Direct Bytebuffer JNI Compile GC;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java序列化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Java序列化/" itemprop="url">Java序列化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:51+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>什么是序列化</p>
-<blockquote>
-<p>序列化 (Serialization)是指将对象的状态信息转换为可以存储或传输的形式的过程。</p>
-</blockquote>
-<p>在序列化期间，<strong>对象将其当前状态写入到临时或持久性存储区。以后，可以通过从存储区中读取或反序列化对象的状态，重新创建该对象</strong>。</p>
-<p>简而言之</p>
-<p>序列化<br><strong>将数据结构或对象转换成二进制串的过程</strong></p>
-<p>反序列化<br><strong>将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程</strong></p>
-<p>具体例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public static void main(String args[]) throws Exception &#123;</div><div class="line"></div><div class="line">    String obj = “hello world!”;</div><div class="line"></div><div class="line">    // 将序列化对象写入文件object.txt中</div><div class="line"></div><div class="line">    FileOutputStream fos = new FileOutputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectOutputStream os = new ObjectOutputStream(fos);</div><div class="line"></div><div class="line">    os.writeObject(obj);</div><div class="line"></div><div class="line">    os.close();</div><div class="line"></div><div class="line">     </div><div class="line"></div><div class="line">    // 从文件object.txt中读取数据</div><div class="line">    FileInputStream fis = new FileInputStream(“object.txt”);</div><div class="line"></div><div class="line">    ObjectInputStream ois = new ObjectInputStream(fis);</div><div class="line"></div><div class="line">    // 通过反序列化恢复对象obj</div><div class="line"></div><div class="line">    String obj2 = (String)ois.readObject();</div><div class="line"></div><div class="line">    ois.close();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>反序列化漏洞原理</p>
-<blockquote>
-<p>反序列化漏洞的本质就是反序列化机制打破了数据和对象的边界，导致攻击者注入的恶意序列化数据在反序列化过程中被还原成对象，控制了对象就可能在目标系统上面执行攻击代码。Java序列化应用于RMI JMX JMS 技术中。</p>
-</blockquote>
-<p>以上转载</p>
-<p><a href="http://techshow.ctrip.com/archives/1414.html" target="_blank" rel="external">http://techshow.ctrip.com/archives/1414.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java反射/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Java反射/" itemprop="url">Java反射</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:45:12+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Java反射机制作用</p>
-<p>1.<strong>编译期(Compile Time)之外的运行期(Runtime)</strong>检查类，接口，变量以及方法的信息。<br>2.运行期实例化对象，调用方法，通过调用 get/set 方法获取变量的值。（常用）</p>
-<p>Java6的反射机制例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//得到MyObject所有方法</div><div class="line">   Method[] methods = MyObject.class.getMethods();</div><div class="line"></div><div class="line">       for(Method method : methods)&#123;    </div><div class="line"></div><div class="line">           System.out.println(&quot;method = &quot; + method.getName()); </div><div class="line"></div><div class="line">       &#125;</div></pre></td></tr></table></figure>
-<p>Java反射可以获取类的如下内容</p>
-<p>①   编译期获得对象（已知类名）：MyObject.class //获取MyObject对象</p>
-<p>运行期获得对象(编译期未知类名，运行期获得类名字符串)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Class.forName(&quot;packageName.className&quot;);</div></pre></td></tr></table></figure>
-<p>②   cls.getName()  返回类的全限定类名（包含包名）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cls.getSimpleName()  //仅返回类的名称（不包含包名）</div></pre></td></tr></table></figure></p>
-<p>③   cls.getModifiers()    获得修饰符（public…)</p>
-<p>④   cls.getPackage()  获取包名</p>
-<p>⑤   cls.getSuperclass()  获取父类</p>
-<p>⑥   cls.getInterfaces()  获取实现接口集合</p>
-<p>⑦   cls.getConstructors()   获取所有构造方法</p>
-<p>⑧   cls.getMethods()  获取一个类的所有方法</p>
-<p>⑨   cls.getFields()  获取一个类的所有成员变量</p>
-<p>⑩   cls..getAnnotations()  获取一个类的所有注解</p>
-<p>Java构造器</p>
-<p>①Constructor constructor =  cls.getConstructor(new Class[]{String.class}); //获取指定构造器</p>
-<p>②<strong>Class[] constructor.getParameterTypes()</strong>  //获取指定构造方法的方法参数</p>
-<p>③ 利用 Constructor 对象实例化一个类</p>
-<pre><code>constructor.newInstance()方法的方法参数是一个可变参数列表，但是当你调用构造方法的时候你必须提供精确的参数，即形参与实参必须一一对应。
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Constructor constructor </div><div class="line">=MyObject.class.getConstructor(String.class);</div><div class="line"></div><div class="line">MyObject myObject = (MyObject) </div><div class="line">constructor.newInstance(&quot;args1&quot;);</div></pre></td></tr></table></figure>
-<p>Java变量</p>
-<p>① Field[]  cls.getFields();    //获取所有成员变量</p>
-<p>② Field cls.getField(“someField”)  //获取指定成员变量</p>
-<p>③ field.getName() //得到变量名称</p>
-<p>④ field.getType() //获取变量类型</p>
-<p>⑤ Class  aClass = MyObject.class</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Field field = aClass.getField(&quot;someField&quot;);</div><div class="line"></div><div class="line">MyObject objectInstance = new MyObject();</div><div class="line"></div><div class="line">Object value = field.get(objectInstance);</div><div class="line"></div><div class="line">field.set(objetInstance, value);</div></pre></td></tr></table></figure>
-<p>传入 Field.get()/Field.set()方法的参数 objetInstance 应该是拥有指定变量的类的实例。在上述的例子中传入的参数是 MyObjec t类的实例，是因为 someField 是 MyObject 类的实例。 如果变量是静态变量的话(public static)那么在调用 Field.get()/Field.set()方法的时候传入 null 做为参数而不用传递拥有该变量的类的实例。</p>
-<p>Java方法</p>
-<p>①  cls.getMethods(); //获取所有方法集合</p>
-<p>②  cls.getMethod(“doFunction”, new Class[]{String.class}); //获取制定方法，并且参数是String类型，若没有参数设置为null</p>
-<p>③ Class[] method.getParameterTypes();  //获取指定方法的参数</p>
-<p>④ Class method.getReturnType();  //获取指定方法的返回类型</p>
-<p>⑤ 通过Method调用方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//获取一个方法名为doSomesthing，参数类型为String的方法</div><div class="line"></div><div class="line"> Method method = MyObject.class.getMethod(&quot;doSomething&quot;, String.class);</div><div class="line"></div><div class="line"> Object returnValue = method.invoke(null, &quot;parameter-value1&quot;);</div></pre></td></tr></table></figure>
-<p>Java访问器</p>
-<p>Getter</p>
-<p>  Getter 方法的名字以 get 开头，没有方法参数，返回一个值。</p>
-<p>Setter<br>    Setter 方法的名字以 set 开头，有一个方法参数。</p>
-<pre><code>setters 方法有可能会有返回值也有可能没有，一些 Setter 方法返回 void，一些用来设置值，有一些对象的 setter 方法在方法链中被调用（译者注：这类的 setter 方法必须要有返回值），因此你不应该妄自假设 setter 方法的返回值，一切应该视情况而定。
-</code></pre><p>//判断getter/setter方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public static boolean isGetter(Method method)</div><div class="line"></div><div class="line">&#123; </div><div class="line"></div><div class="line">     if(!method.getName().startsWith(&quot;get&quot;))  return false; </div><div class="line"></div><div class="line">     if(method.getParameterTypes().length != 0)   return false; </div><div class="line"></div><div class="line">     if(void.class.equals(method.getReturnType()) return false;  </div><div class="line"></div><div class="line">    return true;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">public static boolean isSetter(Method method)</div><div class="line"></div><div class="line">&#123;  </div><div class="line"></div><div class="line">        if(!method.getName().startsWith(&quot;set&quot;)) return false;  </div><div class="line"></div><div class="line">        if(method.getParameterTypes().length != 1) return false;  </div><div class="line"></div><div class="line">        return true;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Java泛型</p>
-<p>两个典型的使用泛型的场景：</p>
-<p>1、声明一个需要被参数化（parameterizable）的类/接口。</p>
-<p>2、使用一个参数化类。</p>
-<p>① 泛型方法返回类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Method method = MyClass.class.getMethod(&quot;getStringList&quot;, null);</div><div class="line"></div><div class="line">Type returnType = method.getGenericReturnType(); </div><div class="line"></div><div class="line">if(returnType instanceof ParameterizedType)&#123;   </div><div class="line"></div><div class="line">         ParameterizedType type = (ParameterizedType) returnType;    </div><div class="line"></div><div class="line">         Type[] typeArguments = type.getActualTypeArguments();   </div><div class="line"></div><div class="line">         //打印出 “typeArgClass = java.lang.String”，Type[]数组typeArguments 只有一个             结果 – 一个代表 java.lang.String 的 Class 类的实例。Class 类实现了 Type 接口。</div><div class="line"></div><div class="line">         for(Type typeArgument : typeArguments)&#123;       </div><div class="line"></div><div class="line">                 Class typeArgClass = (Class) typeArgument;     </div><div class="line"></div><div class="line">                   System.out.println(&quot;typeArgClass = &quot; + typeArgClass);    </div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>②泛型方法参数类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">method = Myclass.class.getMethod(&quot;setStringList&quot;, List.class);</div><div class="line"></div><div class="line">Type[] genericParameterTypes = method.getGenericParameterTypes();</div><div class="line"></div><div class="line">for(Type genericParameterType : genericParameterTypes)&#123; </div><div class="line"></div><div class="line">    if(genericParameterType instanceof ParameterizedType)&#123;       </div><div class="line"></div><div class="line">         ParameterizedType aType = (ParameterizedType) genericParameterType;        </div><div class="line"></div><div class="line">         Type[] parameterArgTypes = aType.getActualTypeArguments();        </div><div class="line"></div><div class="line">         for(Type parameterArgType : parameterArgTypes)&#123;            </div><div class="line"></div><div class="line">                 Class parameterArgClass = (Class) parameterArgType;           </div><div class="line"></div><div class="line">                 System.out.println(&quot;parameterArgClass = &quot; + parameterArgClass);       </div><div class="line"></div><div class="line">         &#125;    </div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>③ 泛型变量类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">Field field = MyClass.class.getField(&quot;stringList&quot;);</div><div class="line"></div><div class="line">Type genericFieldType = field.getGenericType();</div><div class="line"></div><div class="line">if(genericFieldType instanceof ParameterizedType)&#123;    </div><div class="line"></div><div class="line">     ParameterizedType aType = (ParameterizedType) genericFieldType;   </div><div class="line"></div><div class="line">     Type[] fieldArgTypes = aType.getActualTypeArguments();   </div><div class="line"></div><div class="line">     for(Type fieldArgType : fieldArgTypes)&#123;        </div><div class="line"></div><div class="line">         Class fieldArgClass = (Class) fieldArgType;      </div><div class="line"></div><div class="line">         System.out.println(&quot;fieldArgClass = &quot; + fieldArgClass);   </div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Java 动态代理</p>
-<p>常见用例</p>
-<p>数据库连接以及事物管理</p>
-<p>单元测试中的动态 Mock 对象</p>
-<p>自定义工厂与依赖注入（DI）容器之间的适配器</p>
-<p>类似 AOP 的方法拦截器</p>
-<p>利用Java反射机制你可以在运行期动态的创建接口的实现。 java.lang.reflect.Proxy 类就可以实现这一功能。</p>
-<p>①创建代理</p>
-<p>Proxy.newProxyInstance()方法创建动态代理</p>
-<p>newProxyInstance()方法有三个参数：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">InvocationHandler handler = new MyInvocationHandler();</div><div class="line"></div><div class="line">MyInterface proxy = (MyInterface) Proxy.newProxyInstance(                            </div><div class="line"></div><div class="line">MyInterface.class.getClassLoader(), //1、类加载器（ClassLoader）用来加载动态代理类。new Class[] &#123; MyInterface.class &#125;, //2、一个要实现的接口的数组。handler); //3、一个 InvocationHandler 把所有方法的调用都转到代理上。</div></pre></td></tr></table></figure>
-<p>InvocationHandler 接口</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface InvocationHandler&#123;  </div><div class="line"></div><div class="line">    Object invoke(Object proxy, Method method, Object[] args)  throws Throwable;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>实现类</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public class MyInvocationHandler implements InvocationHandler&#123;  </div><div class="line"></div><div class="line">     Object invoke(Object proxy, Method method, Object[] args)  throws Throwable &#123; &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>传入 invoke()方法中的 proxy 参数是实现要代理接口的动态代理对象。通常你是不需要他的。</p>
-<p>invoke()方法中的 Method 对象参数代表了被动态代理的接口中要调用的方法，从这个 method 对象中你可以获取到这个方法名字，方法的参数，参数类型等等信息。关于这部分内容可以查阅之前有关 Method 的文章。</p>
-<p>Object 数组参数包含了被动态代理的方法需要的方法参数。注意：原生数据类型（如int，long等等）方法参数传入等价的包装对象（如Integer， Long等等）。</p>
-<p>Java 动态类加载与重载</p>
-<p>①类加载器</p>
-<p> 所有 Java 应用中的类都是被 java.lang.ClassLoader 类的一系列子类加载的。因此要想动态加载类的话也必须使用 java.lang.ClassLoader 的子类。</p>
-<p>   <strong>一个类一旦被加载时，这个类引用的所有类也同时会被加载。类加载过程是一个递归的模式，所有相关的类都会被加载。但并不一定是一个应用里面所有类都会被加载，与这个被加载类的引用链无关的类是不会被加载的，</strong>直到有引用关系的时候它们才会被加载。</p>
-<p>②类加载体系<br>    在 Java 中类加载是一个有序的体系。当你新创建一个标准的 Java 类加载器时你必须提供它的父加载器。<strong>当一个类加载器被调用来加载一个类的时候，首先会调用这个加载器的父加载器来加载。如果父加载器无法找到这个类，这时候这个加载器才会尝试去加载这个类。</strong></p>
-<p>③类加载<br>    类加载器加载类的顺序如下： <strong>1、检查这个类是否已经被加载。 2、如果没有被加载，则首先调用父加载器加载。 3、如果父加载器不能加载这个类，则尝试加载这个类。</strong></p>
-<p>动态类加载</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ClassLoader classLoader = MainClass.class.getClassLoader();   </div><div class="line"></div><div class="line">try &#123;      </div><div class="line"></div><div class="line">        Class aClass = classLoader.loadClass(&quot;com.jenkov.MyClass&quot;);        </div><div class="line"></div><div class="line">        System.out.println(&quot;aClass.getName() = &quot; + aClass.getName());  </div><div class="line"></div><div class="line">  &#125; catch (ClassNotFoundException e) &#123;       </div><div class="line"></div><div class="line">         e.printStackTrace();  </div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-<p>④动态类重载</p>
-<p>动态类重载有一点复杂。Java 内置的类加载器在加载一个类之前会检查它是否已经被加载。<strong>因此重载一个类是无法使用 Java 内置的类加载器的，如果想要重载一个类你需要手动继承 ClassLoader。</strong></p>
-<p>在你定制 ClassLoader 的子类之后，你还有一些事需要做。所有被加载的类都需要被链接。这个过程是通过 ClassLoader.resolve()方法来完成的。由于这是一个 final 方法，因此这个方法在 ClassLoader 的子类中是无法被重写的。resolve()方法是不会允许给定的 ClassLoader 实例链接一个类两次。所以每当你想要重载一个类的时候你都需要使用一个新的 ClassLoader 的子类。你在设计类重载功能的时候这是必要的条件。</p>
-<p>⑤自定义类重载<br>在前面已经说过你不能使用已经加载过类的类加载器来重载一个类。因此你需要其他的 ClassLoader 实例来重载这个类。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1941,7 +2019,7 @@ Direct Bytebuffer JNI Compile GC;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">145</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1952,7 +2030,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-count">59</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1963,7 +2041,7 @@ Direct Bytebuffer JNI Compile GC;
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">113</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

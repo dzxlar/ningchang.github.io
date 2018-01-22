@@ -254,6 +254,321 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/tomcat性能调优/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/tomcat性能调优/" itemprop="url">tomcat性能调优</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:20:58+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/调优笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">调优笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="tomcat性能调优"><a href="#tomcat性能调优" class="headerlink" title="tomcat性能调优"></a>tomcat性能调优</h2><p>【一】内存溢出（out of memory）     </p>
+<p>通过配置Tomcat的配置文件(Windows 下的catalina.bat或Linux下的catalina.sh)可以解决(原理： 增加JVM的栈内存实现）</p>
+<p>catalina.bat 文件内容（更改配置后，需重启才生效）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">JAVA_OPTS=&quot;-Djava.awt.headless=true-Dfile.encoding=UTF-8</div><div class="line"></div><div class="line">-server-Xms1024m-Xmx1024m</div><div class="line"></div><div class="line">-XX:NewSize=512m-XX:MaxNewSize=512m</div><div class="line"></div><div class="line">-XX:PermSize=512m-XX:MaxPermSize=512m</div><div class="line"></div><div class="line">-XX:+DisableExplicitGC&quot;</div></pre></td></tr></table></figure>
+<p>-Xms – 指定初始化时化的栈内存</p>
+<p>-Xmx – 指定最大栈内存</p>
+<p>【二】解决JRE内存泄露<br>始终使用最新的tomcat服务器以获得更好的性能和可伸缩性。如果我们使用最新的tomcat版本6.0.26及以上就可以解决这个错误，因为它包含了一个监听器来处理JRE和PermGen的内存泄漏</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;Listener className=&quot;org.apache.catalina.core.JreMemoryLeakPreventionListener&quot; /&gt;</div></pre></td></tr></table></figure>
+<p>【三】线程池设置</p>
+<p>线程池指定Web请求负载的数量</p>
+<p>maxThreads的值应该根据流量的大小，如果值过低，将有没有足够的线程来处理所有的请求，请求将进入等待状态，只有当一个的处理线程释放后才被处理；如果设置的太大，Tomcat的启动将花费更多时间。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;Connector port=&quot;8080&quot; address=&quot;localhost&quot;</div><div class="line">maxThreads=&quot;250&quot; maxHttpHeaderSize=&quot;8192&quot;</div><div class="line">emptySessionPath=&quot;true&quot; protocol=&quot;HTTP/1.1&quot;</div><div class="line">enableLookups=&quot;false&quot; redirectPort=&quot;8181&quot; acceptCount=&quot;100&quot;</div><div class="line">connectionTimeout=&quot;20000&quot; disableUploadTimeout=&quot;true&quot; /&gt;</div></pre></td></tr></table></figure>
+<p>在上述配置中，maxThreads值设定为“250”，这指定可以由服务器处理的并发请求的最大数量。</p>
+<p>如果没有指定，这个属性的默认值为“200”。任何多出的并发请求将收到“拒绝连接”的错误提示，直到另一个处理请求进程被释放</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">org.apache.tomcat.util.threads.ThreadPool logFull SEVERE: All threads (250) are</div><div class="line">currently busy, waiting. Increase maxThreads (250) or check the servlet status</div></pre></td></tr></table></figure>
+<p>如果应用提示上述错误，务必检查上述错误是否是由于单个请求花费太长时间造成的</p>
+<p><strong>注意：如果请求的数量超过了“750”，这将不是意味着将maxThreads属性值设置为“750”，它意外着最好使用“Tomcat集群”的多个实例。也就是说，如果有“1000”请求，两个Tomcat实例设置“maxThreads= 500”，而不在单Tomcat实例的情况下设置maxThreads=1000</strong></p>
+<p>【四】压缩</p>
+<p>Tomcat有一个通过在server.xml配置文件中设置压缩的选项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;</div><div class="line">connectionTimeout=&quot;20000&quot;</div><div class="line">redirectPort=&quot;8181&quot; compression=&quot;500&quot;</div><div class="line">compressableMimeType=&quot;text/html,text/xml,text/plain,application/octet-stream&quot; /&gt;</div></pre></td></tr></table></figure>
+<p>当文件的大小大于等于500bytes时才会压缩。如果当文件达到了大小但是却没有被压缩，那么设置属性compression=”on”。否则Tomcat默认设置是“off”</p>
+<p>【五】数据库性能调优</p>
+<p>Tomcat性能在等待数据库查询被执行期间会降低。</p>
+<p>Tomcat会在启动时默认加载命名查询，这个可能会提升性能。</p>
+<p>另一件重要事是确保所有数据库连接正确地关闭。</p>
+<p>给数据库连接池设置正确值也是十分重要的。我所说的值是指Resource要素的最大空闲数（maxIdle），最大连接数（maxActive）,最大建立连接等待时间（maxWait）属性的值</p>
+<p>【六】Tomcat原生库</p>
+<p>【七】其他</p>
+<ul>
+<li>开启浏览器的缓存，这样读取存放在webapps文件夹里的静态内容会更快，大大推动整体性能。</li>
+<li>每当开机时，Tomcat服务器应当自动地重启。</li>
+<li>一般情况下HTTPS请求会比HTTP请求慢。如果你想要更好的安全性，即使慢一点我们还是要选择HTTPS。 </li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【算法】归并排序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【算法】归并排序/" itemprop="url">【算法】归并排序</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:13:28+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><p>归并排序的概念</p>
+<blockquote>
+<p> 归并排序是建立在归并操作上的一种有效的排序算法。该算法是采用分治法（Divide and Conquer）的一个非常典型的应用，归并排序将两个已排序的表合并成一个表。</p>
+</blockquote>
+<p>归并排序基本原理</p>
+<blockquote>
+<p>通过对若干个有序结点序列的归并来实现排序。<br>所谓归并是指将若干个已排好序的部分合并成一个有序的部分。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>【优点】 任意长度为N的数组排序所需时间与NlogN成正比<br>【缺点】它所需额外空间与N成正比</strong></p>
+</blockquote>
+<p><a href="http://www.cnblogs.com/jingmoxukong/p/4308823.html" target="_blank" rel="external">归并排序</a></p>
+<p>Java实现</p>
+<p>归并排序思路<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public static void mergeSort(int[] data) &#123;  </div><div class="line">        sort(data, 0, data.length - 1);  </div><div class="line">&#125;  </div><div class="line">public static void sort(int[] data, int left, int right) &#123;  </div><div class="line">        if (left &gt;= right)  </div><div class="line">            return;  </div><div class="line">        // 找出中间索引  </div><div class="line">        int center = (left + right) / 2;  </div><div class="line">        // 对左边数组进行递归  </div><div class="line">        sort(data, left, center);  </div><div class="line">        // 对右边数组进行递归  </div><div class="line">        sort(data, center + 1, right);  </div><div class="line">        // 合并结果</div><div class="line">        merge(data, left, center, right);  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>归并排序具体实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">public static void merge(int[] data, int left, int center, int right) &#123;  </div><div class="line">        //复制数组</div><div class="line">        int[] tmpArr = new int[data.length];  </div><div class="line">        //找出右边第一个元素的索引（中间位置）</div><div class="line">        int mid = center + 1;  </div><div class="line">        //新数组开始索引</div><div class="line">        int tempIndex = left;  </div><div class="line">        //存放之前的索引</div><div class="line">        int tmp = left;  </div><div class="line">        //可考虑用for和if-else结构优化算法</div><div class="line">        while (left &lt;= center &amp;&amp; mid &lt;= right) &#123;  </div><div class="line">            if (data[left] &lt;= data[mid]) &#123;  //左边排序</div><div class="line">                tmpArr[tempIndex++] = data[left++];  </div><div class="line">            &#125; else &#123;  //右边数组</div><div class="line">                tmpArr[tempIndex++] = data[mid++];  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        while (mid &lt;= right) &#123;  //右边排序</div><div class="line">            tmpArr[tempIndex++] = data[mid++];  </div><div class="line">        &#125;  </div><div class="line">        while (left &lt;= center) &#123;   //左边排序</div><div class="line">            tmpArr[tempIndex++] = data[left++];  </div><div class="line">        &#125;  </div><div class="line">        //归并完成</div><div class="line">        while (tmp &lt;= right) &#123;  </div><div class="line">            data[tmp] = tmpArr[tmp++];  </div><div class="line">        &#125;  </div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【算法】简单排序算法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2046,491 +2361,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:01:30+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则"><a href="#《亿级流量网站架构核心技术》学习笔记-（一-——-基本原则" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则"></a>《亿级流量网站架构核心技术》学习笔记 （一 ) —— 基本原则</h2><ul>
-<li>设计系统参考<strong>墨菲定律</strong><ol>
-<li>凡是可能出错的事必定会出错</li>
-<li>任何事情都没有表面看起来那么简单</li>
-<li>所有事情都比预想更长</li>
-<li>如果担心某种情况发生，这个事情可能发生</li>
-</ol>
-</li>
-<li>系统划分参考<strong>康威定律</strong><ol>
-<li><a href="https://yq.aliyun.com/articles/8611" target="_blank" rel="external">微服务基础-康威定律</a></li>
-<li>系统架构是公司组织架构的反映</li>
-<li>应该按照业务闭环对系统/组织架构划分，实现闭环/高内聚/低耦合</li>
-<li>如果沟通出现问题，应该考虑进行系统和组织架构调整</li>
-<li>在合适的时机进行系统拆分</li>
-</ol>
-</li>
-<li>合理利用资源参考<strong>二八定律(帕雷托法则)</strong><ol>
-<li>80%的结果取决于20%的原因</li>
-</ol>
-</li>
-</ul>
-<h3 id="高并发原则"><a href="#高并发原则" class="headerlink" title="高并发原则"></a>高并发原则</h3><ul>
-<li><strong>无状态</strong><blockquote>
-<ol>
-<li>应用是无状态的，比较容易进行水平扩展</li>
-<li>实际生产环境: 应用无状态;配置文件有状态;</li>
-<li>比如: 不同机房读取不同数据源，通过配置文件或者配置中心指定</li>
-</ol>
-</blockquote>
-</li>
-<li><strong>拆分</strong><blockquote>
-<p>根据业务环境考虑采取”单一系统”还是”按功能拆封模块”<br>拆分情况</p>
-<ul>
-<li>系统维度：系统功能/模块拆分<ul>
-<li>商品系统、购物车、结算、订单系统等</li>
-</ul>
-</li>
-<li>功能维度：功能再拆分<ul>
-<li>优惠券系统拆分:创建券、领券、用券系统</li>
-</ul>
-</li>
-<li>读写维度：根据读写比例特征进行拆分<ul>
-<li>读服务，可考虑缓存</li>
-<li>写服务，可考虑分库分表</li>
-<li>聚合读取，可考虑异构拆分系统</li>
-</ul>
-</li>
-<li>AOP维度：根据访问特征，进行AOP拆分<ul>
-<li>商品详情页分为CDN和页面渲染系统</li>
-</ul>
-</li>
-<li>模块维度：基础和代码维护特征进行拆分<ul>
-<li>Service、Dao、Web三层结构</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>服务化</strong></p>
-<blockquote>
-<p>总结: 进程内调用 -&gt; 单机远程调用 -&gt;<br>集群手动注册 -&gt; 自动注册和发现 -&gt;<br>服务分组/隔离/路由 -&gt; 服务治理(限流/白名单)</p>
-</blockquote>
-</li>
-<li><p><strong>消息队列</strong></p>
-<blockquote>
-<ul>
-<li>处理不需要同步调用的服务或者订阅一些系统关心<br>的变化从而达到服务解耦(一对多消费)、异步处理<br>、流量削峰/缓冲等</li>
-<li>比如:订单系统、定期送系统、订单风控系统等</li>
-<li>如果订阅者太多，那么订阅单个消息队列会成为瓶颈。考虑对消息队列进行镜像复制</li>
-<li>注意事项：处理生产消息失败、消息重复接收等问题<ul>
-<li>数据重复接收<ul>
-<li>大流量缓冲:牺牲强一致性、保证最终一致性<ul>
-<li>比如: 扣减库存: Redis扣减 -&gt; 记录日志<br>-&gt; 同步Worker -&gt; 库存DB</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>同步Worker设计时，须考虑并发处理和重复处理<br>比如使用扫描处理(部分表) 还是 集群处理(Map-Reduce).考虑是否对订单列表增加字段:处理人、处理状态、处理时间、失败次数等<ul>
-<li>数据校对<ul>
-<li>通过消息异步机制，可能存在数据丢失情况<br>通过数据校对保证数据一致和完整性（比如.<br>通过Worker定期扫描原始表，对业务数据进行校对</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>数据异构</strong></p>
-</li>
-<li><p><strong>数据闭环</strong></p>
-<blockquote>
-<p>例如商品详情页. 由于数据来源过多，影响服务器稳定,最好的办法是将数据进行异构存储,形成数据闭环</p>
-<ol>
-<li>数据异构<ul>
-<li>通过MQ接收数据变更、然后原子化存储到合适引擎，如Redis或者KV存储</li>
-</ul>
-</li>
-<li>数据聚合<ul>
-<li>&lt;可选&gt; 数据从多个数据源拿出，然后前端进行聚合</li>
-</ul>
-</li>
-<li>前端展示<ul>
-<li>通过一次或者少量次数拿到所需数据</li>
-</ul>
-</li>
-</ol>
-</blockquote>
-</li>
-</ul>
-<p><strong>总结：数据异构和数据闭环是同一个概念，目的实现数据的自我控制，当其他系统出问题时不影响自己系统。或者自己出问题不影响其他系统。一般通过消息队列进行数据分发</strong></p>
-<ul>
-<li><p>缓存银弹</p>
-<ul>
-<li>客户端缓存<ul>
-<li>浏览器缓存/客户端应用缓存<ul>
-<li>设置Expires/Cache-Control进行控制</li>
-<li>针对实时性不高的数据</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>客户端网络<ul>
-<li>代理服务器开启缓存<ul>
-<li>APP缓存静态资源文件</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>广域网<ul>
-<li>代理服务器/镜像服务器/p2p</li>
-</ul>
-</li>
-<li><p>源站及源站网络</p>
-<ul>
-<li>接入层缓存/应用层缓存/分布式缓存/静态化、伪静态化/服务器操作系统提供的缓存<ul>
-<li>接入式缓存：Nginx搭建接入层:URL重写、一致性hash、proxy_cache、proxy_cache_lock、shared_dict(Nginx+Lua)</li>
-<li>应用层缓存：使用Tomcat:使用堆内缓存和堆外缓存。local redis cache（多机使用主从机制同步数据)</li>
-<li>分布式缓存：常见分片规则一致性hash</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>并发化</p>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="高可用原则"><a href="#高可用原则" class="headerlink" title="高可用原则"></a>高可用原则</h2><ul>
-<li>降级<ul>
-<li>对于一个高可用服务，很重要的设计是降级开关。<ol>
-<li>开关集中化管理</li>
-<li>可降级的多级读服务</li>
-<li>开关前置化</li>
-<li>业务降级</li>
-</ol>
-</li>
-</ul>
-</li>
-<li>限流<ul>
-<li>限流的目的：防止恶意请求流量、恶意攻击或者防止流量超出峰值<ol>
-<li>恶意请求流量只到cache</li>
-<li>对于穿透到后端应用的流量，通过Nginx的limit模块进行处理</li>
-<li>对于恶意Ip通过Nginx deny屏蔽</li>
-</ol>
-</li>
-</ul>
-</li>
-<li><p>切流量</p>
-<ul>
-<li><p>比如：多机房某个机房挂了、某个服务器挂了、某个机架挂了都需要切流量。</p>
-<ol>
-<li>DNS：切换机房入口</li>
-<li>HttpDNS：主要APP环境下，客户端分配流量入口，绕过运营商LocalDNS实现精准流量调度</li>
-<li>LVS：切换故障Nginx接入层</li>
-<li>Nginx：切换故障应用层</li>
-</ol>
-</li>
-<li><p>可回滚<br>通过版本号实现追溯回滚。比如：数据回滚、事务回滚、部署版本回滚、静态资源回滚等</p>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="业务设计原则"><a href="#业务设计原则" class="headerlink" title="业务设计原则"></a>业务设计原则</h2><ul>
-<li>防重设计<blockquote>
-<p>考虑防重key或者防重表</p>
-</blockquote>
-</li>
-<li>幂等设计</li>
-<li>流程可定义</li>
-<li>状态与状态机</li>
-<li>后台操作系统可反馈</li>
-<li>后台系统审批化</li>
-<li>文档和注释</li>
-<li>备份</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/【设计模式】行为型模式——命令模式（Command-Pattern）/" itemprop="url">【设计模式】行为型模式——命令模式（Command Pattern）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T13:37:15+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="模式定义"><a href="#模式定义" class="headerlink" title="模式定义"></a>模式定义</h2><blockquote>
-<p><strong>将一个请求封装为一个对象，从而让我们可用不同的请求对客户进行参数化；对请求排队或者记录请求日志，以及支持可撤销的操作。命令模式是一种对象行为型模式，其别名为动作(Action)模式或事务(Transaction)模式。</strong></p>
-</blockquote>
-<p> <strong>命令模式可以将请求发送者和接收者完全解耦，发送者与接收者之间没有直接引用关系，发送请求的对象只需要知道如何发送请求，而不必知道如何完成请求。</strong></p>
-<h2 id="模式优点"><a href="#模式优点" class="headerlink" title="模式优点"></a>模式优点</h2><p>(1) 降低系统的耦合度。由于请求者与接收者之间不存在直接引用，因此请求者与接收者之间实现完全解耦，相同的请求者可以对应不同的接收者，同样，相同的接收者也可以供不同的请求者使用，两者之间具有良好的独立性。<br>       (2) 新的命令可以很容易地加入到系统中。由于增加新的具体命令类不会影响到其他类，因此增加新的具体命令类很容易，无须修改原有系统源代码，甚至客户类代码，满足“开闭原则”的要求。<br>       (3) 可以比较容易地设计一个命令队列或宏命令（组合命令）。<br>       (4) 为请求的撤销(Undo)和恢复(Redo)操作提供了一种设计和实现方案。</p>
-<h2 id="模式缺点"><a href="#模式缺点" class="headerlink" title="模式缺点"></a>模式缺点</h2><p> <strong>使用命令模式可能会导致某些系统有过多的具体命令类。</strong>因为针对每一个对请求接收者的调用操作都需要设计一个具体命令类，因此在某些系统中可能需要提供大量的具体命令类，这将影响命令模式的使用。</p>
-<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p> (1) 系统需要将请求调用者和请求接收者解耦，使得调用者和接收者不直接交互。请求调用者无须知道接收者的存在，也无须知道接收者是谁，接收者也无须关心何时被调用。<br>       (2) 系统需要在不同的时间指定请求、将请求排队和执行请求。一个命令对象和请求的初始调用者可以有不同的生命期，换言之，最初的请求发出者可能已经不在了，而命令对象本身仍然是活动的，可以通过该命令对象去调用请求接收者，而无须关心请求调用者的存在性，可以通过请求日志文件等机制来具体实现。<br>       (3) 系统需要支持命令的撤销(Undo)操作和恢复(Redo)操作。<br>       (4) 系统需要将一组操作组合在一起形成宏命令。</p>
-<h2 id="模式应用"><a href="#模式应用" class="headerlink" title="模式应用"></a>模式应用</h2><blockquote>
-<p><strong>Hystrix</strong></p>
-</blockquote>
-<h2 id="模式结构"><a href="#模式结构" class="headerlink" title="模式结构"></a>模式结构</h2><p><img src="http://img.blog.csdn.net/20170418143436113?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<blockquote>
-<p><strong>命令模式的本质是对请求进行封装，一个请求对应于一个命令，将发出命令的责任和执行命令的责任分割开。</strong>每一个命令都是一个操作：请求的一方发出请求要求执行一个操作；接收的一方收到请求，并执行相应的操作。命令模式允许请求的一方和接收的一方独立开来，使得请求的一方不必知道接收请求的一方的接口，更不必知道请求如何被接收、操作是否被执行、何时被执行，以及是怎么被执行的。<br>       <strong>命令模式的关键在于引入了抽象命令类，请求发送者针对抽象命令类编程，只有实现了抽象命令类的具体命令才与请求接收者相关联。</strong></p>
-</blockquote>
-<h2 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">abstract class Command &#123;  </div><div class="line">    public abstract void execute();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Invoker &#123;  </div><div class="line">    private Command command;  </div><div class="line">      </div><div class="line">    //构造注入  </div><div class="line">    public Invoker(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //设值注入  </div><div class="line">    public void setCommand(Command command) &#123;  </div><div class="line">        this.command = command;  </div><div class="line">    &#125;  </div><div class="line">      </div><div class="line">    //业务方法，用于调用命令类的execute()方法  </div><div class="line">    public void call() &#123;  </div><div class="line">        command.execute();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">class ConcreteCommand extends Command &#123;  </div><div class="line">    private Receiver receiver; //维持一个对请求接收者对象的引用  </div><div class="line">  </div><div class="line">    public void execute() &#123;  </div><div class="line">        receiver.action(); //调用请求接收者的业务处理方法action()  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class Receiver &#123;  </div><div class="line">    public void action() &#123;  </div><div class="line">        //具体操作  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>每一个具体命令类对应一个请求的处理者（接收者），通过向请求发送者注入不同的具体命令对象可以使得相同的发送者对应不同的接收者，从而实现“将一个请求封装为一个对象，用不同的请求对客户进行参数化”</strong></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2580,7 +2410,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">145</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2591,7 +2421,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-count">59</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2602,7 +2432,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">113</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

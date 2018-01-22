@@ -254,6 +254,447 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/21/【SpringBoot】SpringBoot集成Mybatis多数据源配置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/21/【SpringBoot】SpringBoot集成Mybatis多数据源配置/" itemprop="url">【SpringBoot】SpringBoot集成Mybatis多数据源配置</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-21T09:40:19+08:00">
+                2017-06-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/Mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">Mybatis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="引入POM文件"><a href="#引入POM文件" class="headerlink" title="引入POM文件"></a>引入POM文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h2 id="配置数据源"><a href="#配置数据源" class="headerlink" title="配置数据源"></a>配置数据源</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">test1:</div><div class="line">  url: jdbc:mysql://localhost:3306/test1?characterEncoding=UTF-8</div><div class="line">  username: root</div><div class="line">  password: root</div><div class="line">  driverClassName: com.mysql.jdbc.Driver</div><div class="line">test2:</div><div class="line">  url: jdbc:mysql://localhost:3306/test2?characterEncoding=UTF-8</div><div class="line">  username: root</div><div class="line">  password: root</div><div class="line">  driverClassName: com.mysql.jdbc.Driver</div></pre></td></tr></table></figure>
+<h2 id="配置test1"><a href="#配置test1" class="headerlink" title="配置test1"></a>配置test1</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@MapperScan(basePackages = &quot;com.datasource.mapper.test1&quot;, sqlSessionTemplateRef  = &quot;test1SqlSessionTemplate&quot;)</div><div class="line">public class DataSource1Config &#123;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test1DataSource&quot;)</div><div class="line">    @ConfigurationProperties(prefix = &quot;test1&quot;)</div><div class="line">    @Primary</div><div class="line">    public DataSource testDataSource() &#123;</div><div class="line">        return DataSourceBuilder.create().build();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test1SqlSessionFactory&quot;)</div><div class="line">    @Primary //主数据源</div><div class="line">    public SqlSessionFactory testSqlSessionFactory(@Qualifier(&quot;test1DataSource&quot;) DataSource dataSource) throws Exception &#123;</div><div class="line">        SqlSessionFactoryBean bean = new SqlSessionFactoryBean();</div><div class="line">        bean.setDataSource(dataSource);</div><div class="line">        return bean.getObject();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test1TransactionManager&quot;)</div><div class="line">    @Primary</div><div class="line">    public DataSourceTransactionManager testTransactionManager(@Qualifier(&quot;test1DataSource&quot;) DataSource dataSource) &#123;</div><div class="line">        return new DataSourceTransactionManager(dataSource);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test1SqlSessionTemplate&quot;)</div><div class="line">    @Primary</div><div class="line">    public SqlSessionTemplate testSqlSessionTemplate(@Qualifier(&quot;test1SqlSessionFactory&quot;) SqlSessionFactory sqlSessionFactory) throws Exception &#123;</div><div class="line">        return new SqlSessionTemplate(sqlSessionFactory);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="配置test2"><a href="#配置test2" class="headerlink" title="配置test2"></a>配置test2</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@MapperScan(basePackages = &quot;com.datasource.mapper.test2&quot;, sqlSessionTemplateRef  = &quot;test2SqlSessionTemplate&quot;)</div><div class="line">public class DataSource2Config &#123;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test2DataSource&quot;)</div><div class="line">    @ConfigurationProperties(prefix = &quot;test2&quot;)</div><div class="line">    public DataSource testDataSource() &#123;</div><div class="line">        return DataSourceBuilder.create().build();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test2SqlSessionFactory&quot;)</div><div class="line">    public SqlSessionFactory testSqlSessionFactory(@Qualifier(&quot;test2DataSource&quot;) DataSource dataSource) throws Exception &#123;</div><div class="line">        SqlSessionFactoryBean bean = new SqlSessionFactoryBean();</div><div class="line">        bean.setDataSource(dataSource);</div><div class="line">        return bean.getObject();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test2TransactionManager&quot;)</div><div class="line">    public DataSourceTransactionManager testTransactionManager(@Qualifier(&quot;test2DataSource&quot;) DataSource dataSource) &#123;</div><div class="line">        return new DataSourceTransactionManager(dataSource);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean(name = &quot;test2SqlSessionTemplate&quot;)</div><div class="line">    public SqlSessionTemplate testSqlSessionTemplate(@Qualifier(&quot;test2SqlSessionFactory&quot;) SqlSessionFactory sqlSessionFactory) throws Exception &#123;</div><div class="line">        return new SqlSessionTemplate(sqlSessionFactory);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="对应的-mapper"><a href="#对应的-mapper" class="headerlink" title="对应的 mapper"></a>对应的 mapper</h2><p>在 com/datasource/mapper/test1 下的 mapper 会走数据源 test1。<br>在 com/datasource/mapper/test2 下的 mapper 会走数据源 test2。<br>其他位置的 mapper 会走主数据源 test1。</p>
+<h2 id="文章转载"><a href="#文章转载" class="headerlink" title="文章转载"></a>文章转载</h2><p><a href="https://mp.weixin.qq.com/s?__biz=MzIxMjY2NjY2Mg==&amp;mid=2247483670&amp;idx=1&amp;sn=1b832a5f7a743043b444197dd7fd19a7&amp;chksm=9743d15fa034584925fce31bd79f86e5c902cbf62cee5d8047d0a1509f366c60d87138ed1e10&amp;mpshare=1&amp;scene=1&amp;srcid=0310PBPKYMDxCRMX3vDcr4Zd#rd" target="_blank" rel="external">原文出处</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/13/Hadoop学习笔记-——-单节点安装/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/13/Hadoop学习笔记-——-单节点安装/" itemprop="url">Hadoop学习笔记(一) —— 单节点安装</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-13T17:48:22+08:00">
+                2017-06-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">Hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Hadoop学习笔记-——-单节点安装-伪分布式和本地安装"><a href="#Hadoop学习笔记-——-单节点安装-伪分布式和本地安装" class="headerlink" title="Hadoop学习笔记 —— 单节点安装(伪分布式和本地安装)"></a>Hadoop学习笔记 —— 单节点安装(伪分布式和本地安装)</h1><h2 id="Hadoop概念"><a href="#Hadoop概念" class="headerlink" title="Hadoop概念"></a>Hadoop概念</h2><blockquote>
+<p>是一款可靠的、可扩展、分布式计算的开源的软件</p>
+</blockquote>
+<h2 id="Hadoop主要模块"><a href="#Hadoop主要模块" class="headerlink" title="Hadoop主要模块"></a>Hadoop主要模块</h2><ol>
+<li>Hadoop Common(公共模块):支持其他Hadoop模块的常见运用程序</li>
+<li>Hadoop Distributed File System(HDFS)：分布式文件系统</li>
+<li>Hadoop YARN：统一管理调度和资源管理的框架</li>
+<li>Hadoop MapReduce：YARN-based系统并行处理大型数据集</li>
+</ol>
+<h2 id="Hadoop其他常用模块-列举部分"><a href="#Hadoop其他常用模块-列举部分" class="headerlink" title="Hadoop其他常用模块(列举部分)"></a>Hadoop其他常用模块(列举部分)</h2><ol>
+<li>HBase</li>
+<li>Hive</li>
+<li>Pig</li>
+<li>Spark</li>
+<li>Zookeeper  </li>
+</ol>
+<h2 id="Hadoop下载"><a href="#Hadoop下载" class="headerlink" title="Hadoop下载"></a>Hadoop下载</h2><p><a href="http://apache.fayea.com/hadoop/common/" target="_blank" rel="external">Hadoop Download</a></p>
+<h2 id="Hadoop-安装"><a href="#Hadoop-安装" class="headerlink" title="Hadoop 安装"></a>Hadoop 安装</h2><p><a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SingleCluster.html" target="_blank" rel="external">Hadoop 单节点安装</a></p>
+<p><a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html" target="_blank" rel="external">Hadoop 多节点安装</a></p>
+<p><a href="http://www.cnblogs.com/woshimrf/p/5906084.html" target="_blank" rel="external">centos添加新用户授权</a></p>
+<h2 id="Hadoop安装前提"><a href="#Hadoop安装前提" class="headerlink" title="Hadoop安装前提"></a>Hadoop安装前提</h2><ol>
+<li>Java环境(Java7或者Java8)<br><a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank" rel="external">jdk下载</a></li>
+<li>ssh / pdsh<br><a href="http://blog.csdn.net/apple9005/article/details/52915844" target="_blank" rel="external">centos6安装ssh</a></li>
+</ol>
+<h2 id="Hadoop启动集群"><a href="#Hadoop启动集群" class="headerlink" title="Hadoop启动集群"></a>Hadoop启动集群</h2><ol>
+<li>解压hadoop.tar.gz</li>
+<li><p>hadoop配置java环境</p>
+<pre><code>vi  etc/hadoop/hadoop-env.sh
+
+# set to the root of your Java installation
+export JAVA_HOME=/usr/java
+</code></pre></li>
+<li><p>启动文档脚本</p>
+<pre><code>bin/hadoop
+</code></pre></li>
+</ol>
+<h2 id="Hadoop集群支持3种模式"><a href="#Hadoop集群支持3种模式" class="headerlink" title="Hadoop集群支持3种模式"></a>Hadoop集群支持3种模式</h2><ol>
+<li>本地模式</li>
+<li>伪分布式模式</li>
+<li>分布式集群模式</li>
+</ol>
+<h2 id="本地模式"><a href="#本地模式" class="headerlink" title="本地模式"></a>本地模式</h2><p>为了方便调试，hadoop默认是一个单一节点(non-distributed)模式。</p>
+<ol>
+<li><p>复制hadoop配置文件作为输入流</p>
+<pre><code>hadoop&gt; mkdir input
+hadoop&gt; cp etc/hadoop/*.xml input
+</code></pre></li>
+<li><p>输出写入到输入模式</p>
+<pre><code>hadoop&gt; bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-x.x.x.jar grep input output &apos;dfs[a-z.]+&apos;
+hadoop&gt; cat output/*
+</code></pre></li>
+</ol>
+<h2 id="伪分布式"><a href="#伪分布式" class="headerlink" title="伪分布式"></a>伪分布式</h2><h3 id="etc-hadoop-core-site-xml"><a href="#etc-hadoop-core-site-xml" class="headerlink" title="etc/hadoop/core-site.xml"></a>etc/hadoop/core-site.xml</h3><pre><code>&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;fs.defaultFS&lt;/name&gt;
+        &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><h3 id="etc-hadoop-hdfs-site-xml"><a href="#etc-hadoop-hdfs-site-xml" class="headerlink" title="etc/hadoop/hdfs-site.xml"></a>etc/hadoop/hdfs-site.xml</h3><pre><code>&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;dfs.replication&lt;/name&gt;
+        &lt;value&gt;1&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><h3 id="设置ssh不需要密码"><a href="#设置ssh不需要密码" class="headerlink" title="设置ssh不需要密码"></a>设置ssh不需要密码</h3><ol>
+<li><p>首先判断localhost是否需要密码</p>
+<pre><code>ssh localhost
+</code></pre></li>
+<li><p>如果需要密码输入以下命令</p>
+<pre><code>ssh-keygen -t rsa -P &apos;&apos; -f ~/.ssh/id_rsa
+  cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys
+  chmod 0600 ~/.ssh/authorized_keys
+</code></pre></li>
+</ol>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><h4 id="本地运行"><a href="#本地运行" class="headerlink" title="本地运行"></a>本地运行</h4><ol>
+<li><p>格式化文件系统</p>
+<pre><code>bin/hdfs namenode -format
+</code></pre></li>
+<li><p>设置NameNode为守护进程</p>
+<pre><code>sbin/start-dfs.sh
+</code></pre><p>hadoop守护进程日志目录($HADOOP_LOG_DIR目录 (默认为$HADOOP_HOME/logs)</p>
+</li>
+<li><p>访问NameNode（默认情况是可访问的)</p>
+<ul>
+<li>NameNode - <a href="http://localhost:9870/" target="_blank" rel="external">http://localhost:9870/</a></li>
+</ul>
+</li>
+</ol>
+<ol>
+<li><p>使所需的HDFS目录执行MapReduce工作</p>
+<pre><code>bin/hdfs dfs -mkdir /user
+  bin/hdfs dfs -mkdir /user/&lt;username&gt;
+</code></pre></li>
+<li><p>将输入文件复制到分布式系统</p>
+<pre><code>bin/hdfs dfs -mkdir input
+  bin/hdfs dfs -put etc/hadoop/*.xml input
+</code></pre></li>
+<li><p>运行实例</p>
+<pre><code>bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-x.x.x.jar grep input output &apos;dfs[a-z.]+&apos;
+</code></pre></li>
+</ol>
+<ol>
+<li><p>检查输出文件</p>
+<p> 7.1. 将分布式文件系统的输出文件复制到本地文件系统</p>
+<pre><code>bin/hdfs dfs -get output output
+  cat output/*
+</code></pre><p> 7.2. 分布式系统查看输出文件</p>
+<pre><code>bin/hdfs dfs -cat output/*
+</code></pre></li>
+<li><p>停止守护进程</p>
+<pre><code>sbin/stop-dfs.sh
+</code></pre></li>
+</ol>
+<h4 id="YARN运行"><a href="#YARN运行" class="headerlink" title="YARN运行"></a>YARN运行</h4><h5 id="etc-hadoop-mapred-site-xml"><a href="#etc-hadoop-mapred-site-xml" class="headerlink" title="etc/hadoop/mapred-site.xml"></a>etc/hadoop/mapred-site.xml</h5><pre><code>&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;
+        &lt;value&gt;yarn&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><h5 id="etc-hadoop-yarn-site-xml"><a href="#etc-hadoop-yarn-site-xml" class="headerlink" title="etc/hadoop/yarn-site.xml"></a>etc/hadoop/yarn-site.xml</h5><pre><code>&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;
+        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;
+    &lt;/property&gt;
+    &lt;property&gt;
+        &lt;name&gt;yarn.nodemanager.env-whitelist&lt;/name&gt;
+        &lt;value&gt;JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><ol>
+<li><p>设置ResourceManager和NodeManager为守护进程</p>
+<pre><code>sbin/start-yarn.sh
+</code></pre></li>
+<li><p>浏览器访问</p>
+<ul>
+<li>ResourceManager - <a href="http://localhost:8088/" target="_blank" rel="external">http://localhost:8088/</a></li>
+</ul>
+</li>
+</ol>
+<ol>
+<li>运行MapReduce</li>
+</ol>
+<ol>
+<li><p>停止守护进程</p>
+<pre><code>sbin/stop-yarn.sh
+</code></pre></li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/08/【SpringBoot】Spring集成Kafka/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1694,525 +2135,6 @@ public Map&lt;String, Object&gt; consumerConfigs() {
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-八-——-语法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-八-——-语法/" itemprop="url">ElasticSearch学习笔记(八) —— 语法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T15:16:10+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h3><blockquote>
-<p>程序中大多的实体或对象能够被序列化为包含键值对的JSON对象，键(key)是字段(field)或属性(property)的名字，值(value)可以是字符串、数字、布尔类型、另一个对象、值数组或者其他特殊类型，比如表示日期的字符串或者表示地理位置的对象</p>
-</blockquote>
-<h3 id="文档元数据"><a href="#文档元数据" class="headerlink" title="文档元数据"></a>文档元数据</h3><blockquote>
-<p>一个文档不只有数据。它还包含了元数据(metadata)——关于文档的信息。三个必须的元数据节点</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">_index	//文档存储的地方</div><div class="line">_type	//文档代表的对象的类</div><div class="line">_id	    //文档的唯一标识</div></pre></td></tr></table></figure>
-<p>_index</p>
-<p>索引(index)类似于关系型数据库里的“数据库”——它是我们存储和索引关联数据的地方</p>
-<blockquote>
-<p>事实上，我们的数据被存储和索引在分片(shards)中，索引只是一个把一个或多个分片分组在一起的逻辑空间。然而，这只是一些内部细节——我们的程序完全不用关心分片。对于我们的程序而言，文档存储在索引(index)中</p>
-</blockquote>
-<p>_type</p>
-<blockquote>
-<p>在应用中，我们使用对象表示一些“事物”，例如一个用户、一篇博客、一个评论，或者一封邮件。每个对象都属于一个类(class)，这个类定义了属性或与对象关联的数据。user类的对象可能包含姓名、性别、年龄和Email地址</p>
-<p>每个类型(type)都有自己的映射(mapping)或者结构定义，就像传统数据库表中的列一样。所有类型下的文档被存储在同一个索引下，但是类型的映射(mapping)会告诉Elasticsearch不同的文档如何被索引</p>
-</blockquote>
-<p><strong>_type的名字可以是大写或小写，不能包含下划线或逗号。我们将使用blog做为类型名。</strong></p>
-<p>_id</p>
-<blockquote>
-<p>id仅仅是一个字符串，它与_index和_type组合时，就可以在Elasticsearch中唯一标识一个文档。当创建一个文档，你可以自定义_id，也可以让Elasticsearch帮你自动生成</p>
-</blockquote>
-<h3 id="索引一个文档"><a href="#索引一个文档" class="headerlink" title="索引一个文档"></a>索引一个文档</h3><p>文档通过index API被索引——使数据可以被存储和搜索</p>
-<p>使用自定义ID</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Just trying this out...&quot;,</div><div class="line">  &quot;date&quot;:  &quot;2014/01/01&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>响应</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot;:    &quot;website&quot;,</div><div class="line">   &quot;_type&quot;:     &quot;blog&quot;,</div><div class="line">   &quot;_id&quot;:       &quot;123&quot;,</div><div class="line">   &quot;_version&quot;:  1,</div><div class="line">   &quot;created&quot;:   true </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>1.Elasticsearch中每个文档都有版本号，每当文档变化（包括删除）都会使_version增加<br>2.响应指出请求的索引已经被成功创建create:true</p>
-<p>自增ID</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My second blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Still trying this out...&quot;,</div><div class="line">  &quot;date&quot;:  &quot;2014/01/01&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>响应</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot;:    &quot;website&quot;,</div><div class="line">   &quot;_type&quot;:     &quot;blog&quot;,</div><div class="line">   &quot;_id&quot;:       &quot;wM0OSFhDQXGZAWDf0-drSA&quot;,</div><div class="line">   &quot;_version&quot;:  1,</div><div class="line">   &quot;created&quot;:   true</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>1.自动生成的ID有22个字符长，URL-safe, Base64-encoded string universally unique identifiers, 或者叫 UUIDs</p>
-<h3 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /website/blog/123?pretty</div></pre></td></tr></table></figure>
-<p>响应</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 1,</div><div class="line">  &quot;found&quot; :    true,</div><div class="line">  &quot;_source&quot; :  &#123; //得到的数据通过_source封装</div><div class="line">      &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">      &quot;text&quot;:  &quot;Just trying this out...&quot;,</div><div class="line">      &quot;date&quot;:  &quot;2014/01/01&quot;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>1.pretty在任意的查询字符串中增加pretty参数，类似于上面的例子。会让Elasticsearch美化输出(pretty-print)JSON响应以便更加容易阅读。_source字段不会被美化，它的样子与我们输入的一致。<br>2.如果我们请求一个不存在的文档，依旧会得到一个JSON，不过found值变成了false</p>
-<p>查看响应头</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XGET http://localhost:9200/website/blog/124?pretty</div></pre></td></tr></table></figure>
-<p>未找到的数据类似</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 404 Not Found</div><div class="line">Content-Type: application/json; charset=UTF-8</div><div class="line">Content-Length: 83</div><div class="line"></div><div class="line">&#123;</div><div class="line">  &quot;_index&quot; : &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :  &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :    &quot;124&quot;,</div><div class="line">  &quot;found&quot; :  false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="检索文档的一部分"><a href="#检索文档的一部分" class="headerlink" title="检索文档的一部分"></a>检索文档的一部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /website/blog/123?_source=title,text</div></pre></td></tr></table></figure>
-<h4 id="只得到-source字段"><a href="#只得到-source字段" class="headerlink" title="只得到_source字段"></a>只得到_source字段</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /website/blog/123/_source</div></pre></td></tr></table></figure>
-<h4 id="检查文档是否存在"><a href="#检查文档是否存在" class="headerlink" title="检查文档是否存在"></a>检查文档是否存在</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -XHEAD http://localhost:9200/website/blog/123</div></pre></td></tr></table></figure>
-<p>响应</p>
-<p>存在返回200<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 200 OK</div><div class="line">Content-Type: text/plain; charset=UTF-8</div><div class="line">Content-Length: 0</div></pre></td></tr></table></figure></p>
-<p>不存在返回404</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 404 Not Found</div><div class="line">Content-Type: text/plain; charset=UTF-8</div><div class="line">Content-Length: 0</div></pre></td></tr></table></figure>
-<p><strong>注意：当然，这只表示你在查询的那一刻文档不存在，但并不表示几毫秒后依旧不存在。另一个进程在这期间可能创建新文档</strong></p>
-<h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><h4 id="更新整个文档"><a href="#更新整个文档" class="headerlink" title="更新整个文档"></a>更新整个文档</h4><blockquote>
-<p>文档在Elasticsearch中是不可变的——我们不能修改他们。如果需要更新已存在的文档，我们可以使用《索引文档》章节提到的index API 重建索引(reindex) 或者替换掉它</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;I am starting to get the hang of this...&quot;,</div><div class="line">  &quot;date&quot;:  &quot;2014/01/02&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>响应</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 2, //版本增加</div><div class="line">  &quot;created&quot;:   false  //同索引、同类型下已经存在同ID的文档</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在内部，Elasticsearch已经标记旧文档为删除并添加了一个完整的新文档。旧版本文档不会立即消失，但你也不能去访问它。Elasticsearch会在你继续索引更多数据时清理被删除的文档</p>
-<p>updateAPI 允许你修改文档的局部，但事实上Elasticsearch遵循与之前所说完全相同的过程，这个过程如下：<br>1.从旧文档中检索JSON<br>2.修改它<br>3.删除旧文档<br>4.索引新文档</p>
-<p><strong>唯一的不同是update API完成这一过程只需要一个客户端请求既可，不再需要get和index请求了</strong></p>
-<h3 id="创建一个新文档"><a href="#创建一个新文档" class="headerlink" title="创建一个新文档"></a>创建一个新文档</h3><p>如果想使用自定义的_id，我们必须告诉Elasticsearch应该在_index、_type、_id三者都不同时才接受请求。为了做到这点有两种方法</p>
-<p>第一种方法使用op_type查询参数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123?op_type=create</div><div class="line">&#123; ... &#125;</div></pre></td></tr></table></figure>
-<p>第二种方法是在URL后加/_create做为端点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/123/_create</div><div class="line">&#123; ... &#125;</div></pre></td></tr></table></figure>
-<p>如果请求成功的创建了一个新文档，Elasticsearch将返回正常的元数据且响应状态码是201 Created。</p>
-<p>另一方面，如果包含相同的_index、_type和_id的文档已经存在，Elasticsearch将返回409 Conflict响应状态码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;error&quot; : &quot;DocumentAlreadyExistsException[[website][4] [blog][123]:</div><div class="line">             document already exists]&quot;,</div><div class="line">  &quot;status&quot; : 409</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DELETE /website/blog/123</div></pre></td></tr></table></figure>
-<p>文档被找到</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;found&quot; :    true,</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 3</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>文档未找到</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;found&quot; :    false,</div><div class="line">  &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">  &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">  &quot;_id&quot; :      &quot;123&quot;,</div><div class="line">  &quot;_version&quot; : 4</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>注意：尽管文档不存在——“found”的值是false——_version依旧增加了。这是内部记录的一部分，它确保在多节点间不同操作可以有正确的顺序</strong></p>
-<h3 id="处理冲突"><a href="#处理冲突" class="headerlink" title="处理冲突"></a>处理冲突</h3><blockquote>
-<p>当使用index API更新文档的时候，我们读取原始文档，做修改，然后将整个文档(whole document)一次性重新索引。最近的索引请求会生效——Elasticsearch中只存储最后被索引的任何文档。如果其他人同时也修改了这个文档，他们的修改将会丢失</p>
-</blockquote>
-<p><strong>悲观并发控制（Pessimistic concurrency control）</strong></p>
-<p>这在关系型数据库中被广泛的使用，假设冲突的更改经常发生，为了解决冲突我们把访问区块化。典型的例子是在读一行数据前锁定这行，然后确保只有加锁的那个线程可以修改这行数据。</p>
-<p><strong>乐观并发控制（Optimistic concurrency control）：</strong></p>
-<p>被Elasticsearch使用，假设冲突不经常发生，也不区块化访问，然而，如果在读写过程中数据发生了变化，更新操作将失败。这时候由程序决定在失败后如何解决冲突。实际情况中，可以重新尝试更新，刷新数据（重新读取）或者直接反馈给用户。</p>
-<h4 id="乐观并发控制"><a href="#乐观并发控制" class="headerlink" title="乐观并发控制"></a>乐观并发控制</h4><p>lasticsearch是分布式的。当文档被创建、更新或删除，文档的新版本会被复制到集群的其它节点。Elasticsearch即是同步的又是异步的，意思是这些复制请求都是平行发送的，并无序(out of sequence)的到达目的地。这就需要一种方法确保老版本的文档永远不会覆盖新的版本。</p>
-<p>上文我们提到index、get、delete请求时，我们指出每个文档都有一个_version号码，这个号码在文档被改变时加一。Elasticsearch使用这个_version保证所有修改都被正确排序。当一个旧版本出现在新版本之后，它会被简单的忽略。</p>
-<p>我们利用_version的这一优点确保数据不会因为修改冲突而丢失。我们可以指定文档的version来做想要的更改。如果那个版本号不是现在的，我们的请求就失败了</p>
-<p>创建一个新文档</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/1/_create</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Just trying this out...&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>指定version参数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//只希望文档的_version是1时更新才生效</div><div class="line">PUT /website/blog/1?version=1 </div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Starting to get the hang of this...&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="使用外部版本控制系统"><a href="#使用外部版本控制系统" class="headerlink" title="使用外部版本控制系统"></a>使用外部版本控制系统</h4><blockquote>
-<p>一种常见的结构是使用一些其他的数据库做为主数据库，然后使用Elasticsearch搜索数据，这意味着所有主数据库发生变化，就要将其拷贝到Elasticsearch中。如果有多个进程负责这些数据的同步，就会遇到上面提到的并发问题</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>如果主数据库有版本字段——或一些类似于timestamp等可以用于版本控制的字段——是你就可以在Elasticsearch的查询字符串后面添加version_type=external来使用这些版本号。版本号必须是整数，大于零小于9.2e+18——Java中的正的long</p>
-</blockquote>
-<p><strong>外部版本号不仅在索引和删除请求中指定，也可以在创建(create)新文档中指定</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PUT /website/blog/2?version=5&amp;version_type=external</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;My first external blog entry&quot;,</div><div class="line">  &quot;text&quot;:  &quot;Starting to get the hang of this...&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="局部更新"><a href="#局部更新" class="headerlink" title="局部更新"></a>局部更新</h3><blockquote>
-<p>通过检索，修改，然后重建整文档的索引方法来更新文档。这是对的。然而，使用update API，我们可以使用一个请求来实现局部更新</p>
-</blockquote>
-<p>文档是不可变的——它们不能被更改，只能被替换。update API必须遵循相同的规则。表面看来，我们似乎是局部更新了文档的位置，内部却是像我们之前说的一样简单的使用update API处理相同的检索-修改-重建索引流程，我们也减少了其他进程可能导致冲突的修改</p>
-<p>最简单的update请求表单接受一个局部文档参数doc，它会合并到现有文档中——对象合并在一起，存在的标量字段被覆盖，新字段被添加。举个例子，我们可以使用以下请求为博客添加一个tags字段和一个views字段</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line">   &quot;doc&quot; : &#123;</div><div class="line">      &quot;tags&quot; : [ &quot;testing&quot; ],</div><div class="line">      &quot;views&quot;: 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>请求响应</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">   &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">   &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">   &quot;_version&quot; : 3</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>检索文档文档显示被更新的_source字段</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;_index&quot;:    &quot;website&quot;,</div><div class="line">   &quot;_type&quot;:     &quot;blog&quot;,</div><div class="line">   &quot;_id&quot;:       &quot;1&quot;,</div><div class="line">   &quot;_version&quot;:  3,</div><div class="line">   &quot;found&quot;:     true,</div><div class="line">   &quot;_source&quot;: &#123;</div><div class="line">      &quot;title&quot;:  &quot;My first blog entry&quot;,</div><div class="line">      &quot;text&quot;:   &quot;Starting to get the hang of this...&quot;,</div><div class="line">      &quot;tags&quot;: [ &quot;testing&quot; ], &lt;1&gt;</div><div class="line">      &quot;views&quot;:  0 &lt;1&gt;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="更新可能不存在的文档"><a href="#更新可能不存在的文档" class="headerlink" title="更新可能不存在的文档"></a>更新可能不存在的文档</h4><blockquote>
-<p>想象我们要在Elasticsearch中存储浏览量计数器。每当有用户访问页面，我们增加这个页面的浏览量。但如果这是个新页面，我们并不确定这个计数器存在与否。当我们试图更新一个不存在的文档，更新将失败。<br>在这种情况下，我们可以使用upsert参数定义文档来使其不存在时被创建</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/pageviews/1/_update</div><div class="line">&#123;</div><div class="line">   &quot;script&quot; : &quot;ctx._source.views+=1&quot;,</div><div class="line">   &quot;upsert&quot;: &#123;</div><div class="line">       &quot;views&quot;: 1</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>第一次执行这个请求，upsert值被索引为一个新文档，初始化views字段为1.接下来文档已经存在，所以script被更新代替，增加views数量</p>
-<h4 id="更新和冲突"><a href="#更新和冲突" class="headerlink" title="更新和冲突"></a>更新和冲突</h4><p>如何在检索(retrieve)和重建索引(reindex)中保持更小的窗口，如何减少冲突性变更发生的概率，不过这些无法被完全避免，像一个其他进程在update进行重建索引时修改了文档这种情况依旧可能发生。</p>
-<p>为了避免丢失数据，update API在检索(retrieve)阶段检索文档的当前_version，然后在重建索引(reindex)阶段通过index请求提交。如果其他进程在检索(retrieve)和重建索引(reindex)阶段修改了文档，_version将不能被匹配，然后更新失败。</p>
-<p>对于多用户的局部更新，文档被修改了并不要紧。例如，两个进程都要增加页面浏览量，增加的顺序我们并不关心——如果冲突发生，我们唯一要做的仅仅是重新尝试更新既可。</p>
-<p>这些可以通过retry_on_conflict参数设置重试次数来自动完成，这样update操作将会在发生错误前重试——这个值默认为0</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//在错误发生前重试更新5次</div><div class="line">POST /website/pageviews/1/_update?retry_on_conflict=5 </div><div class="line">&#123;</div><div class="line">   &quot;script&quot; : &quot;ctx._source.views+=1&quot;,</div><div class="line">   &quot;upsert&quot;: &#123;</div><div class="line">       &quot;views&quot;: 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这适用于像增加计数这种顺序无关的操作，但是还有一种顺序非常重要的情况。例如index API，使用“保留最后更新(last-write-wins)”的update API，但它依旧接受一个version参数以允许你使用乐观并发控制(optimistic concurrency control)来指定你要更细文档的版本</p>
-<h3 id="检索多个文档"><a href="#检索多个文档" class="headerlink" title="检索多个文档"></a>检索多个文档</h3><blockquote>
-<p>像Elasticsearch一样，检索多个文档依旧非常快。合并多个请求可以避免每个请求单独的网络开销。如果你需要从Elasticsearch中检索多个文档，相对于一个一个的检索，更快的方式是在一个请求中使用multi-get或者mget API</p>
-</blockquote>
-<p><strong>mget API参数是一个docs数组，数组的每个节点定义一个文档的_index、_type、_id元数据。如果你只想检索一个或几个确定的字段，也可以定义一个_source参数</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">POST /_mget</div><div class="line">&#123;</div><div class="line">   &quot;docs&quot; : [</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; : &quot;website&quot;,</div><div class="line">         &quot;_type&quot; :  &quot;blog&quot;,</div><div class="line">         &quot;_id&quot; :    2</div><div class="line">      &#125;,</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; : &quot;website&quot;,</div><div class="line">         &quot;_type&quot; :  &quot;pageviews&quot;,</div><div class="line">         &quot;_id&quot; :    1,</div><div class="line">         &quot;_source&quot;: &quot;views&quot;</div><div class="line">      &#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>响应体也包含一个docs数组，每个文档还包含一个响应，它们按照请求定义的顺序排列。每个这样的响应与单独使用get request响应体相同</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;docs&quot; : [</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">         &quot;_id&quot; :      &quot;2&quot;,</div><div class="line">         &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">         &quot;found&quot; :    true,</div><div class="line">         &quot;_source&quot; : &#123;</div><div class="line">            &quot;text&quot; :  &quot;This is a piece of cake...&quot;,</div><div class="line">            &quot;title&quot; : &quot;My first external blog entry&quot;</div><div class="line">         &#125;,</div><div class="line">         &quot;_version&quot; : 10</div><div class="line">      &#125;,</div><div class="line">      &#123;</div><div class="line">         &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">         &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">         &quot;_type&quot; :    &quot;pageviews&quot;,</div><div class="line">         &quot;found&quot; :    true,</div><div class="line">         &quot;_version&quot; : 2,</div><div class="line">         &quot;_source&quot; : &#123;</div><div class="line">            &quot;views&quot; : 2</div><div class="line">         &#125;</div><div class="line">      &#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如果你想检索的文档在同一个_index中（甚至在同一个_type中），你就可以在URL中定义一个默认的/_index或者/_index/_type</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/_mget</div><div class="line">&#123;</div><div class="line">   &quot;docs&quot; : [</div><div class="line">      &#123; &quot;_id&quot; : 2 &#125;,</div><div class="line">      &#123; &quot;_type&quot; : &quot;pageviews&quot;, &quot;_id&quot; :   1 &#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>事实上，如果所有文档具有相同_index和_type，你可以通过简单的ids数组来代替完整的docs数组</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">POST /website/blog/_mget</div><div class="line">&#123;</div><div class="line">   &quot;ids&quot; : [ &quot;2&quot;, &quot;1&quot; ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>注意到我们请求的第二个文档并不存在。我们定义了类型为blog，但是ID为1的文档类型为pageviews。这个不存在的文档会在响应体中被告知</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;docs&quot; : [</div><div class="line">    &#123;</div><div class="line">      &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">      &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">      &quot;_id&quot; :      &quot;2&quot;,</div><div class="line">      &quot;_version&quot; : 10,</div><div class="line">      &quot;found&quot; :    true,</div><div class="line">      &quot;_source&quot; : &#123;</div><div class="line">        &quot;title&quot;:   &quot;My first external blog entry&quot;,</div><div class="line">        &quot;text&quot;:    &quot;This is a piece of cake...&quot;</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      &quot;_index&quot; :   &quot;website&quot;,</div><div class="line">      &quot;_type&quot; :    &quot;blog&quot;,</div><div class="line">      &quot;_id&quot; :      &quot;1&quot;,</div><div class="line">      &quot;found&quot; :    false  //id为2的文档不存在</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h3><blockquote>
-<p>就像mget允许我们一次性检索多个文档一样，bulk API允许我们使用单一请求来实现多个文档的create、index、update或delete。这对索引类似于日志活动这样的数据流非常有用，它们可以以成百上千的数据为一个批次按序进行索引</p>
-</blockquote>
-<p>bulk请求体如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body        &#125;\n</div><div class="line">&#123; action: &#123; metadata &#125;&#125;\n</div><div class="line">&#123; request body        &#125;\n</div></pre></td></tr></table></figure>
-<p>这种格式类似于用”\n”符号连接起来的一行一行的JSON文档流(stream)。两个重要的点需要注意</p>
-<ul>
-<li><strong>每行必须以”\n”符号结尾，包括最后一行。这些都是作为每行有效的分离而做的标记。</strong></li>
-<li><strong>每一行的数据不能包含未被转义的换行符，它们会干扰分析——这意味着JSON不能被美化打印。</strong></li>
-</ul>
-<p><strong>action/metadata这一行定义了文档行为(what action)发生在哪个文档(which document)之上</strong></p>
-<p>action行为：<br>create、update、delete、index</p>
-<p>例如删除请求的格式如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123; &quot;delete&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div></pre></td></tr></table></figure>
-<p>请求体(request body)由文档的_source组成——文档所包含的一些字段以及其值。它被index和create操作所必须，这是有道理的：你必须提供文档用来索引。</p>
-<p>这些还被update操作所必需，而且请求体的组成应该与update API（doc, upsert, script等等）一致。</p>
-<p>删除操作不需要请求体(request body)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123; &quot;create&quot;:  &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My first blog post&quot; &#125;</div></pre></td></tr></table></figure>
-<p>如果定义ID</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123; &quot;index&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My second blog post&quot; &#125;</div></pre></td></tr></table></figure>
-<p>bulk请求表单</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; &quot;delete&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125; </div><div class="line">&#123; &quot;create&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My first blog post&quot; &#125;</div><div class="line">&#123; &quot;index&quot;:  &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;My second blog post&quot; &#125;</div><div class="line">&#123; &quot;update&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot;, &quot;_retry_on_conflict&quot; : 3&#125; &#125;</div><div class="line">&#123; &quot;doc&quot; : &#123;&quot;title&quot; : &quot;My updated blog post&quot;&#125; &#125;</div></pre></td></tr></table></figure>
-<p>注意delete行为(action)没有请求体，它紧接着另一个行为(action)<br>记得最后加一个换行符</p>
-<p>Elasticsearch响应包含一个items数组，它罗列了每一个请求的结果，结果的顺序与我们请求的顺序相同</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;took&quot;: 4,</div><div class="line">   &quot;errors&quot;: false, //所有请求成功</div><div class="line">   &quot;items&quot;: [</div><div class="line">      &#123;  &quot;delete&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 2,</div><div class="line">            &quot;status&quot;:   200,</div><div class="line">            &quot;found&quot;:    true</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;create&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 3,</div><div class="line">            &quot;status&quot;:   201</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;create&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;EiwfApScQiiy7TIKFxRCTw&quot;,</div><div class="line">            &quot;_version&quot;: 1,</div><div class="line">            &quot;status&quot;:   201</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;update&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 4,</div><div class="line">            &quot;status&quot;:   200</div><div class="line">      &#125;&#125;</div><div class="line">   ]</div><div class="line">&#125;&#125;</div></pre></td></tr></table></figure>
-<p>每个子请求都被独立的执行，所以一个子请求的错误并不影响其它请求。如果任何一个请求失败，顶层的error标记将被设置为true，然后错误的细节将在相应的请求中被报告</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">POST /_bulk</div><div class="line">&#123; &quot;create&quot;: &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;Cannot create - it already exists&quot; &#125;</div><div class="line">&#123; &quot;index&quot;:  &#123; &quot;_index&quot;: &quot;website&quot;, &quot;_type&quot;: &quot;blog&quot;, &quot;_id&quot;: &quot;123&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;:    &quot;But we can update it&quot; &#125;</div></pre></td></tr></table></figure>
-<p>响应中我们将看到create文档123失败了，因为文档已经存在，但是后来的在123上执行的index请求成功了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;took&quot;: 3,</div><div class="line">   &quot;errors&quot;: true, &lt;1&gt;</div><div class="line">   &quot;items&quot;: [</div><div class="line">      &#123;  &quot;create&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;status&quot;:   409, &lt;2&gt;</div><div class="line">            &quot;error&quot;:    &quot;DocumentAlreadyExistsException &lt;3&gt;</div><div class="line">                        [[website][4] [blog][123]:</div><div class="line">                        document already exists]&quot;</div><div class="line">      &#125;&#125;,</div><div class="line">      &#123;  &quot;index&quot;: &#123;</div><div class="line">            &quot;_index&quot;:   &quot;website&quot;,</div><div class="line">            &quot;_type&quot;:    &quot;blog&quot;,</div><div class="line">            &quot;_id&quot;:      &quot;123&quot;,</div><div class="line">            &quot;_version&quot;: 5,</div><div class="line">            &quot;status&quot;:   200 &lt;4&gt;</div><div class="line">      &#125;&#125;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><1> 一个或多个请求失败。</1></p>
-<p><2> 这个请求的HTTP状态码被报告为409 CONFLICT。</2></p>
-<p><3> 错误消息说明了什么请求错误。</3></p>
-<p><4> 第二个请求成功了，状态码是200 OK。</4></p>
-<h4 id="不要重复"><a href="#不要重复" class="headerlink" title="不要重复"></a>不要重复</h4><p>你可能在同一个index下的同一个type里批量索引日志数据。为每个文档指定相同的元数据是多余的。就像mget API，bulk请求也可以在URL中使用/_index或/_index/_type</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">POST /website/_bulk</div><div class="line">&#123; &quot;index&quot;: &#123; &quot;_type&quot;: &quot;log&quot; &#125;&#125;</div><div class="line">&#123; &quot;event&quot;: &quot;User logged in&quot; &#125;</div></pre></td></tr></table></figure>
-<p>你依旧可以覆盖元数据行的_index和_type，在没有覆盖时它会使用URL中的值作为默认值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">POST /website/log/_bulk</div><div class="line">&#123; &quot;index&quot;: &#123;&#125;&#125;</div><div class="line">&#123; &quot;event&quot;: &quot;User logged in&quot; &#125;</div><div class="line">&#123; &quot;index&quot;: &#123; &quot;_type&quot;: &quot;blog&quot; &#125;&#125;</div><div class="line">&#123; &quot;title&quot;: &quot;Overriding the default type&quot; &#125;</div></pre></td></tr></table></figure>
-<h3 id="多大才算太大？"><a href="#多大才算太大？" class="headerlink" title="多大才算太大？"></a>多大才算太大？</h3><p>整个批量请求需要被加载到接受我们请求节点的内存里，所以请求越大，给其它请求可用的内存就越小。有一个最佳的bulk请求大小。超过这个大小，性能不再提升而且可能降低。</p>
-<p>最佳大小，当然并不是一个固定的数字。它完全取决于你的硬件、你文档的大小和复杂度以及索引和搜索的负载。幸运的是，这个最佳点(sweetspot)还是容易找到的：</p>
-<p>试着批量索引标准的文档，随着大小的增长，当性能开始降低，说明你每个批次的大小太大了。开始的数量可以在1000~5000个文档之间，如果你的文档非常大，可以使用较小的批次。</p>
-<p>通常着眼于你请求批次的物理大小是非常有用的。一千个1kB的文档和一千个1MB的文档大不相同。一个好的批次最好保持在5-15MB大小间</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/ElasticSearch学习笔记-七-——-集群/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/06/ElasticSearch学习笔记-七-——-集群/" itemprop="url">ElasticSearch学习笔记(七) —— 集群</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T15:11:26+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
-                    <span itemprop="name">ElasticSearch</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>i&gt; 术语解释 <strong>集群(cluster)、节点(node)和分片(shard)</strong></p>
-<h2 id="空集群"><a href="#空集群" class="headerlink" title="空集群"></a>空集群</h2><p>启动一个单独的节点，还没有数据和索引。看起来如下<br><img src="https://raw.githubusercontent.com/looly/elasticsearch-definitive-guide-cn/master/images/elas_0201.png" alt="这里写图片描述"></p>
-<blockquote>
-<p>一个节点(node)就是一个Elasticsearch实例，而一个集群(cluster)由一个或多个节点组成，它们具有相同的cluster.name，它们协同工作，分享数据和负载。当加入新的节点或者删除一个节点时，集群就会感知到并平衡数据。</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>1.集群中一个节点会被选举为主节点(master),它将临时管理集群级别的一些变更，例如新建或删除索引、增加或移除节点等。<br>2.主节点不参与文档级别的变更或搜索，这意味着在流量增长的时候，该主节点不会成为集群的瓶颈。<br>3.任何节点都可以成为主节点</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>做为用户，我们能够与集群中的任何节点通信，包括主节点。每一个节点都知道文档存在于哪个节点上，它们可以转发请求到相应的节点上。我们访问的节点负责收集各节点返回的数据，最后一起返回给客户端</p>
-</blockquote>
-<h2 id="集群健康"><a href="#集群健康" class="headerlink" title="集群健康"></a>集群健康</h2><blockquote>
-<p>在Elasticsearch集群中可以监控统计很多信息，但是只有一个是最重要的：集群健康(cluster health)。集群健康有三种状态：green、yellow或red</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /_cluster/health</div></pre></td></tr></table></figure>
-<p>在一个没有索引的空集群中运行如上查询，将返回:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;cluster_name&quot;:          &quot;elasticsearch&quot;,</div><div class="line">   &quot;status&quot;:                &quot;green&quot;, &lt;1&gt;</div><div class="line">   &quot;timed_out&quot;:             false,</div><div class="line">   &quot;number_of_nodes&quot;:       1,</div><div class="line">   &quot;number_of_data_nodes&quot;:  1,</div><div class="line">   &quot;active_primary_shards&quot;: 0,</div><div class="line">   &quot;active_shards&quot;:         0,</div><div class="line">   &quot;relocating_shards&quot;:     0,</div><div class="line">   &quot;initializing_shards&quot;:   0,</div><div class="line">   &quot;unassigned_shards&quot;:     0</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">颜色	意义</div><div class="line">green	所有主要分片和复制分片都可用</div><div class="line">yellow	所有主要分片可用，但不是所有复制分片都可用</div><div class="line">red	不是所有的主要分片都可用</div></pre></td></tr></table></figure>
-<p><strong>主要分片(primary shard)和复制分片(replica shard)，并说明这些颜色（状态）在实际环境中的意义？</strong></p>
-<hr>
-<h3 id="添加索引"><a href="#添加索引" class="headerlink" title="添加索引"></a>添加索引</h3><blockquote>
-<p>为了将数据添加到Elasticsearch，我们需要索引(index)——一个<strong>存储关联数据</strong>的地方。实际上，<strong>索引只是一个用来指向一个或多个分片(shards)的“逻辑命名空间(logical namespace)”</strong></p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>一个分片(shard)是一个最小级别“工作单元(worker unit)”</strong>,它只是保存了索引中所有数据的一部分</p>
-</blockquote>
-<p>现在我们只要知道分片就是一个Lucene实例，并且它本身就是一个完整的搜索引擎。我们的文档存储在分片中，并且在分片中被索引，但是我们的应用程序不会直接与它们通信，取而代之的是，直接与索引通信</p>
-<p>分片是Elasticsearch在集群中分发数据的关键。把分片想象成数据的容器。文档存储在分片中，然后分片分配到你集群中的节点上。当你的集群扩容或缩小，Elasticsearch将会自动在你的节点间迁移分片，以使集群保持平衡。</p>
-<p>分片可以是<strong>主分片(primary shard)或者是复制分片(replica shard)</strong>。你索引中的每个文档属于一个单独的主分片，所以<strong>主分片的数量决定了索引最多能存储多少数据。</strong></p>
-<blockquote>
-<p>理论上主分片能存储的数据大小是没有限制的，限制取决于你实际的使用情况。分片的最大容量完全取决于你的使用状况：硬件存储的大小、文档的大小和复杂度、如何索引和查询你的文档，以及你期望的响应时间。</p>
-</blockquote>
-<p>复制分片只是主分片的一个副本，它可以防止硬件故障导致的数据丢失，同时可以提供读请求，比如搜索或者从别的shard取回文档</p>
-<p>当索引创建完成的时候，主分片的数量就固定了，但是复制分片的数量可以随时调整。</p>
-<p>让我们在集群中唯一一个空节点上创建一个叫做blogs的索引。默认情况下，一个索引被分配5个主分片，但是为了演示的目的，我们只分配3个主分片和一个复制分片（每个主分片都有一个复制分片）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">PUT /blogs</div><div class="line">&#123;</div><div class="line">   &quot;settings&quot; : &#123;</div><div class="line">      &quot;number_of_shards&quot; : 3, //主分片</div><div class="line">      &quot;number_of_replicas&quot; : 1 //复制分片</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>索引的单一节点集群</p>
-<p><img src="https://raw.githubusercontent.com/looly/elasticsearch-definitive-guide-cn/master/images/elas_0202.png" alt="这里写图片描述"></p>
-<p>现在相当于3个主分片分配到了Node1，检查集群健康，如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;cluster_name&quot;:          &quot;elasticsearch&quot;,</div><div class="line">   &quot;status&quot;:                &quot;yellow&quot;, &lt;1&gt;</div><div class="line">   &quot;timed_out&quot;:             false,</div><div class="line">   &quot;number_of_nodes&quot;:       1,</div><div class="line">   &quot;number_of_data_nodes&quot;:  1,</div><div class="line">   &quot;active_primary_shards&quot;: 3,</div><div class="line">   &quot;active_shards&quot;:         3,</div><div class="line">   &quot;relocating_shards&quot;:     0,</div><div class="line">   &quot;initializing_shards&quot;:   0,</div><div class="line">   &quot;unassigned_shards&quot;:     3 &lt;2&gt;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><1> 集群的状态现在是 yellow</1></li>
-<li><2> 我们的三个复制分片还没有被分配到节点上</2></li>
-</ul>
-<p><strong>集群的健康状态yellow表示所有的主分片(primary shards)启动并且正常运行了——集群已经可以正常处理任何请求——但是复制分片(replica shards)还没有全部可用</strong>。事实上所有的三个复制分片现在都是unassigned状态——它们还未被分配给节点。在同一个节点上保存相同的数据副本是没有必要的，如果这个节点故障了，那所有的数据副本也会丢失。</p>
-<hr>
-<h2 id="故障转移"><a href="#故障转移" class="headerlink" title="故障转移"></a>故障转移</h2><blockquote>
-<p>在单一节点上运行意味着有单点故障的风险——没有数据备份。幸运的是，要防止单点故障，我们唯一需要做的就是启动另一个节点。</p>
-</blockquote>
-<h4 id="启动第二个节点"><a href="#启动第二个节点" class="headerlink" title="启动第二个节点"></a>启动第二个节点</h4><blockquote>
-<p>为了测试在增加第二个节点后发生了什么，你可以使用与第一个节点相同的方式启动第二个节点，而且命令行在同一个目录——一个节点可以启动多个Elasticsearch实例。<br>只要第二个节点与第一个节点有相同的cluster.name（请看./config/elasticsearch.yml文件），它就能自动发现并加入第一个节点所在的集群。如果没有，检查日志找出哪里出了问题。这可能是网络广播被禁用，或者防火墙阻止了节点通信。</p>
-</blockquote>
-<p>如果我们启动了第二个节点，这个集群看起来就像下图。<br>双节点集群——所有的主分片和复制分片都已分配:<br><img src="https://raw.githubusercontent.com/looly/elasticsearch-definitive-guide-cn/master/images/elas_0203.png" alt="这里写图片描述"></p>
-<p>第二个节点已经加入集群，三个复制分片(replica shards)也已经被分配了——分别对应三个主分片，这意味着在丢失任意一个节点的情况下依旧可以保证数据的完整性。</p>
-<p>文档的索引将首先被存储在主分片中，然后并发复制到对应的复制节点上。这可以确保我们的数据在主节点和复制节点上都可以被检索。</p>
-<p>cluster-health现在的状态是green，这意味着所有的6个分片（三个主分片和三个复制分片）都已可用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">   &quot;cluster_name&quot;:          &quot;elasticsearch&quot;,</div><div class="line">   &quot;status&quot;:                &quot;green&quot;, &lt;1&gt;</div><div class="line">   &quot;timed_out&quot;:             false,</div><div class="line">   &quot;number_of_nodes&quot;:       2,</div><div class="line">   &quot;number_of_data_nodes&quot;:  2,</div><div class="line">   &quot;active_primary_shards&quot;: 3,</div><div class="line">   &quot;active_shards&quot;:         6,</div><div class="line">   &quot;relocating_shards&quot;:     0,</div><div class="line">   &quot;initializing_shards&quot;:   0,</div><div class="line">   &quot;unassigned_shards&quot;:     0</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><1> 集群的状态是green.</1></li>
-</ul>
-<hr>
-<h2 id="横向扩展"><a href="#横向扩展" class="headerlink" title="横向扩展"></a>横向扩展</h2><blockquote>
-<p>随着应用需求的增长，我们该如何扩展？如果我们启动第三个节点，我们的集群会重新组织自己，就像：<br><img src="https://raw.githubusercontent.com/looly/elasticsearch-definitive-guide-cn/master/images/elas_0204.png" alt="这里写图片描述"></p>
-</blockquote>
-<p>Node3包含了分别来自Node 1和Node 2的一个分片，这样每个节点就有两个分片，和之前相比少了一个，这意味着每个节点上的分片将获得更多的硬件资源（CPU、RAM、I/O）。</p>
-<p>分片本身就是一个完整的搜索引擎，它可以使用单一节点的所有资源。我们拥有6个分片（3个主分片和三个复制分片），最多可以扩展到6个节点，每个节点上有一个分片，每个分片可以100%使用这个节点的资源</p>
-<h2 id="继续扩展"><a href="#继续扩展" class="headerlink" title="继续扩展"></a>继续扩展</h2><p>如果我们要扩展到6个以上的节点，要怎么做？</p>
-<p>主分片的数量在创建索引时已经确定。实际上，这个数量定义了能存储到索引里数据的最大数量（实际的数量取决于你的数据、硬件和应用场景）。然而，主分片或者复制分片都可以处理读请求——搜索或文档检索，所以数据的冗余越多，我们能处理的搜索吞吐量就越大。</p>
-<p>复制分片的数量可以在运行中的集群中动态地变更，这允许我们可以根据需求扩大或者缩小规模。让我们把复制分片的数量从原来的1增加到2：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PUT /blogs/_settings</div><div class="line">&#123;</div><div class="line">   &quot;number_of_replicas&quot; : 2</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/looly/elasticsearch-definitive-guide-cn/master/images/elas_0205.png" alt="这里写图片描述"></p>
-<p>从图中可以看出，blogs索引现在有9个分片：3个主分片和6个复制分片。这意味着我们能够扩展到9个节点，再次变成每个节点一个分片。这样使我们的搜索性能相比原始的三节点集群增加三倍</p>
-<blockquote>
-<p>当然，在同样数量的节点上增加更多的复制分片并不能提高性能，因为这样做的话平均每个分片的所占有的硬件资源就减少了（译者注：大部分请求都聚集到了分片少的节点，导致一个节点吞吐量太大，反而降低性能），你需要增加硬件来提高吞吐量。不过这些额外的复制节点使我们有更多的冗余：通过以上对节点的设置，我们能够承受两个节点故障而不丢失数据。</p>
-</blockquote>
-<h2 id="应对故障"><a href="#应对故障" class="headerlink" title="应对故障"></a>应对故障</h2><p>我们已经说过Elasticsearch可以应对节点失效，所以让我们继续尝试。如果我们杀掉第一个节点的进程（以下简称杀掉节点），我们的集群看起来就像这样：<br><img src="https://raw.githubusercontent.com/looly/elasticsearch-definitive-guide-cn/master/images/elas_0206.png" alt="这里写图片描述"></p>
-<p>我们杀掉的节点是一个主节点。一个集群必须要有一个主节点才能使其功能正常，所以集群做的第一件事就是各节点选举了一个新的主节点：Node 2。</p>
-<p>主分片1和2在我们杀掉Node 1时已经丢失，我们的索引在丢失主分片时不能正常工作。如果此时我们检查集群健康，我们将看到状态red：不是所有主分片都可用！</p>
-<p>幸运的是丢失的两个主分片的完整拷贝存在于其他节点上，所以新主节点做的第一件事是把这些在Node 2和Node 3上的复制分片升级为主分片，这时集群健康回到yellow状态。这个提升是瞬间完成的，就好像按了一下开关。</p>
-<p>为什么集群健康状态是yellow而不是green？我们有三个主分片，但是我们指定了每个主分片对应两个复制分片，当前却只有一个复制分片被分配，这就是集群状态无法达到green的原因，不过不用太担心这个：当我们杀掉Node 2，我们的程序依然可以在没有丢失数据的情况下继续运行，因为Node 3还有每个分片的拷贝。</p>
-<p>如果我们重启Node 1，集群将能够重新分配丢失的复制分片，集群状况与上一节的 图5：增加number_of_replicas到2 类似。如果Node 1依旧有旧分片的拷贝，它将会尝试再利用它们，它只会从主分片上复制在故障期间有数据变更的那一部分。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2262,7 +2184,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">145</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2273,7 +2195,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-count">59</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2284,7 +2206,7 @@ public Map&lt;String, Object&gt; consumerConfigs() {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">113</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

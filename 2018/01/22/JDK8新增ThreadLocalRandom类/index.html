@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="红包简单实现," />
+  <meta name="keywords" content="JDK8," />
 
 
 
@@ -93,17 +93,17 @@
 
 
 
-<meta name="description" content="判断红包是否领完   //假设每人领取最大200元/最小0.01元   private static final double MIN_MONEY = 0.01;  private static final double MAX_MONEY = 200;     /**  *   * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完  * @param curre">
-<meta name="keywords" content="红包简单实现">
+<meta name="description" content="Random使用  //使用默认随机数生成器（会生成一个默认的值seedUniquifier() ^ System.nanoTime()） Random rand = new Random(); for(int i = 0; i &amp;lt; 10; i ++){     System.out.println(rand.nextInt(5) ); } 和Random类的区别为了解决多线程高并发下Ran">
+<meta name="keywords" content="JDK8">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java红包算法简单实现">
-<meta property="og:url" content="http://yoursite.com/2017/12/29/untitled-1514532966528/index.html">
+<meta property="og:title" content="JDK8新增ThreadLocalRandom类">
+<meta property="og:url" content="http://yoursite.com/2018/01/22/JDK8新增ThreadLocalRandom类/index.html">
 <meta property="og:site_name" content="dzxblog">
-<meta property="og:description" content="判断红包是否领完   //假设每人领取最大200元/最小0.01元   private static final double MIN_MONEY = 0.01;  private static final double MAX_MONEY = 200;     /**  *   * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完  * @param curre">
-<meta property="og:updated_time" content="2017-12-29T08:13:32.860Z">
+<meta property="og:description" content="Random使用  //使用默认随机数生成器（会生成一个默认的值seedUniquifier() ^ System.nanoTime()） Random rand = new Random(); for(int i = 0; i &amp;lt; 10; i ++){     System.out.println(rand.nextInt(5) ); } 和Random类的区别为了解决多线程高并发下Ran">
+<meta property="og:updated_time" content="2018-01-22T08:57:19.145Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Java红包算法简单实现">
-<meta name="twitter:description" content="判断红包是否领完   //假设每人领取最大200元/最小0.01元   private static final double MIN_MONEY = 0.01;  private static final double MAX_MONEY = 200;     /**  *   * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完  * @param curre">
+<meta name="twitter:title" content="JDK8新增ThreadLocalRandom类">
+<meta name="twitter:description" content="Random使用  //使用默认随机数生成器（会生成一个默认的值seedUniquifier() ^ System.nanoTime()） Random rand = new Random(); for(int i = 0; i &amp;lt; 10; i ++){     System.out.println(rand.nextInt(5) ); } 和Random类的区别为了解决多线程高并发下Ran">
 
 
 
@@ -131,13 +131,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/12/29/untitled-1514532966528/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/01/22/JDK8新增ThreadLocalRandom类/"/>
 
 
 
 
 
-  <title>Java红包算法简单实现 | dzxblog</title>
+  <title>JDK8新增ThreadLocalRandom类 | dzxblog</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -257,7 +257,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/29/untitled-1514532966528/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/JDK8新增ThreadLocalRandom类/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dzx">
@@ -274,7 +274,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Java红包算法简单实现</h1>
+          <h1 class="post-title" itemprop="name headline">JDK8新增ThreadLocalRandom类</h1>
         
 
         <div class="post-meta">
@@ -286,8 +286,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-29T15:36:06+08:00">
-                2017-12-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T15:39:07+08:00">
+                2018-01-22
               </time>
             
 
@@ -309,8 +309,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
+                  <a href="/categories/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
                   </a>
                 </span>
 
@@ -343,121 +343,52 @@
       
 
       
-        <h1 id="判断红包是否领完"><a href="#判断红包是否领完" class="headerlink" title="判断红包是否领完"></a>判断红包是否领完</h1><pre><code>   //假设每人领取最大200元/最小0.01元 
- private static final double MIN_MONEY = 0.01;
- private static final double MAX_MONEY = 200;
-
-   /**
- * 
- * isFinished 判断红包是否领取完  根据平均金额判断红包内的金钱是否发放完
- * @param currentMoney 当前金额
- * @param currentCount 当前领取红包数
- * @return
- */
-public static boolean isFinished(double currentMoney,int currentCount){
-    double avg = currentMoney / currentCount;
-    if(avg &lt; MIN_MONEY){
-        return false;
-    }else if(avg &gt; MAX_MONEY){
-        return false;
-    }
-    return true;
+        <h2 id="Random使用"><a href="#Random使用" class="headerlink" title="Random使用"></a>Random使用</h2><pre><code>  //使用默认随机数生成器（会生成一个默认的值seedUniquifier() ^ System.nanoTime()）
+Random rand = new Random();
+for(int i = 0; i &lt; 10; i ++){
+    System.out.println(rand.nextInt(5) );
 }
-</code></pre><h1 id="核心算法"><a href="#核心算法" class="headerlink" title="核心算法"></a>核心算法</h1><pre><code>  /**
- * 
- * randomRedPacket 核心随机生成红包算法
- * @param totalMoney 红包金额
- * @param totalCount 红包数量
- * @param minMoney 最小红包
- * @param maxMoney 最大红包
- * @return
- */
-public static double randomRedPacket(double totalMoney,int totalCount,double minMoney,double maxMoney){
-    //如果是单发红包，则对方全领
-    if(totalCount == 1){
-        return (double)Math.round(totalMoney*100) / 100;
+</code></pre><h2 id="和Random类的区别"><a href="#和Random类的区别" class="headerlink" title="和Random类的区别"></a>和Random类的区别</h2><p>为了解决多线程高并发下Random的缺陷，JUC包下新增了ThreadLocalRandom类。ThreadLocalRandom继承Random类。</p>
+<h4 id="如何生成随机数？"><a href="#如何生成随机数？" class="headerlink" title="如何生成随机数？"></a>如何生成随机数？</h4><pre><code>public int nextInt(int bound) {
+    //参数检查
+    if (bound &lt;= 0)
+        throw new IllegalArgumentException(BadBound);
+    //*根据老种子生成新种子
+    int r = next(31);
+    //*根据新种子计算新随机数
+    int m = bound - 1;
+    if ((bound &amp; m) == 0)  // i.e., bound is a power of 2
+        r = (int)((bound * (long)r) &gt;&gt; 31);
+    else {
+        for (int u = r;
+             u - (r = u % bound) + m &lt; 0;
+             u = next(31))
+            ;
     }
-    //如果最小红包和最大红包相等，默认最小红包
-    if(minMoney == maxMoney){
-        return minMoney;
-    }
-    //设置最大值，防止红包溢出
-    double maxMoney_ = maxMoney &gt; totalMoney ? totalMoney :maxMoney;
-    //随机分配红包(生成随机红包范围：minMoney &lt; distributionMoney &lt; maxMoney_)
-    double distributionMoney = (double)Math.round(((double)Math.random() * (maxMoney_ - minMoney) + minMoney )*100) / 100;
-    //得到剩余红包
-    double remainMoney = totalMoney - distributionMoney;
-    //红包是否领完 
-    if(isFinished(remainMoney, totalCount-1)){
-        return distributionMoney;
-    }else{ //剩余红包随机分配
-        double avg = remainMoney / (totalCount -1);
-        if(avg &lt; MIN_MONEY){
-            return randomRedPacket(totalMoney, totalCount, minMoney, distributionMoney);
-        }else if(avg &gt; MAX_MONEY){
-            return randomRedPacket(totalMoney, totalCount, distributionMoney, maxMoney);
-        }
-    }
-    return distributionMoney;
+    return r;
 }
-</code></pre><h1 id="得到用户红包"><a href="#得到用户红包" class="headerlink" title="得到用户红包"></a>得到用户红包</h1><pre><code>private static final float TIMES = 2.1f;
-
-/**
- * 
- * openRedPacket 用户红包分配详情
- * @param totalMoney
- * @param totalCount
- * @return
- */
-public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount){
-    if(!isFinished(totalMoney, totalCount)){
-        return null;
-    }
-    List&lt;Double&gt; distributionMoneyList = new ArrayList&lt;Double&gt;();
-    //如果随机生成的红包大于指定最大值，则默认
-    double max = (double) totalMoney * TIMES / totalCount &gt; MAX_MONEY ? MAX_MONEY : (double) totalMoney * TIMES / totalCount;
-    //将获得的红包放入集合
-    for(int i = 0; i  &lt; totalCount ; i ++){
-        double distributionMoney = randomRedPacket(totalMoney, totalCount - i, MIN_MONEY, max);
-        distributionMoneyList.add(distributionMoney);
-        totalMoney -= distributionMoney;
-    }
-    return distributionMoneyList;
+</code></pre><p>在单线程情况下每次调用nextInt都是根据老的种子计算出来新的种子，这是可以保证随机数产生的随机性的。在多线程下多个线程可能都拿同一个老的种子去计算新的种子，这会导致多个线程产生的新种子是一样的，会导致多个线程产生相同的随机值。为了保证多线程下产生的随机数是随机的，在创建Random对象时候初始化的种子就保存到了种子原子变量里面</p>
+<pre><code>  protected int next(int bits) {
+    long oldseed, nextseed;
+    AtomicLong seed = this.seed;
+    do {
+        //获取当前原子变量种子的值
+        oldseed = seed.get();
+        //根据当前种子值计算新的种子
+        nextseed = (oldseed * multiplier + addend) &amp; mask;
+        //CAS操作会保证只有一个线程可以更新老的种子为新的，失败的线程会通过循环从新获取更新后的种子作为当前种子去计算老的种子,保证了随机数的随机性
+    } while (!seed.compareAndSet(oldseed, nextseed));
+   //使用固定算法根据新的种子计算随机数
+    return (int)(nextseed &gt;&gt;&gt; (48 - bits));
 }
-</code></pre><h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><pre><code>   public static void main(String[] args) {
-    Scanner scan = new Scanner(System.in);
-    System.out.println(&quot;请输入红包金额：&quot;);
-    double money = scan.nextDouble();
-    System.out.println(&quot;请输入红包数量：&quot;);
-    int count = scan.nextInt();
-
-    List&lt;Double&gt; list = openRedPacket(money, count);
-    Double [] redMoney = new Double[count];
-    for(int i = 0; i &lt; list.size(); i ++){
-        redMoney[i] = list.get(i);
-    }
-    for(int i = 0; i &lt; count; i ++){
-        System.out.println(&quot;用户&quot;+i+&quot;得到红包&quot;+redMoney[i]+&quot;元&quot;);
-    }
-
+</code></pre><p> 多个线程同时计算随机数计算新的种子时候多个线程会竞争同一个原子变量的更新操作，由于原子变量的更新是CAS操作，同时只有一个线程会成功，所以会造成大量线程进行自旋重试，这是会降低并发性能。ThreadLocalRandom解决这个问题</p>
+<h2 id="ThreadLocalRandom基本使用"><a href="#ThreadLocalRandom基本使用" class="headerlink" title="ThreadLocalRandom基本使用"></a>ThreadLocalRandom基本使用</h2><pre><code>//获取当前线程的随机数生成器
+ThreadLocalRandom rand = ThreadLocalRandom.current();
+for(int i = 0; i &lt; 10; i ++){
+    System.out.println(rand.nextInt(5) );
 }
-</code></pre><h1 id="返回结果"><a href="#返回结果" class="headerlink" title="返回结果"></a>返回结果</h1><pre><code>        请输入红包金额：
-11
-请输入红包数量：
-11
+</code></pre><p>  ThreadLocal的出现就是为了解决多线程访问一个变量时候需要进行同步的问题，让每一个线程拷贝一份变量，每个线程对变量进行操作时候实际是操作自己本地内存里面的拷贝，从而避免了对共享变量进行同步。Random的缺点是多个线程会使用原子性种子变量，会导致对原子变量更新的竞争。ThreadLocalRandom 让每个线程维护自己的一个种子变量，每个线程生成随机数时候根据自己老的种子计算新的种子，并使用新种子更新老的种子，然后根据新种子计算随机数，就不会存在竞争问题，这会大大提高并发性能</p>
 
-用户0得到红包0.16元
-用户1得到红包1.06元
-用户2得到红包1.57元
-用户3得到红包1.28元
-用户4得到红包1.6元
-用户5得到红包0.87元
-用户6得到红包0.19元
-用户7得到红包1.24元
-用户8得到红包1.61元
-用户9得到红包0.77元
-用户10得到红包0.65元
-</code></pre>
       
     </div>
 
@@ -486,7 +417,7 @@ public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount)
       
         <div class="post-tags">
           
-            <a href="/tags/红包简单实现/" rel="tag"># 红包简单实现</a>
+            <a href="/tags/JDK8/" rel="tag"># JDK8</a>
           
         </div>
       
@@ -499,8 +430,8 @@ public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount)
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/30/RxJava介绍/" rel="next" title="RxJava介绍">
-                <i class="fa fa-chevron-left"></i> RxJava介绍
+              <a href="/2018/01/22/JDK8原子操作类——LongAdder/" rel="next" title="JDK8原子操作类——LongAdder">
+                <i class="fa fa-chevron-left"></i> JDK8原子操作类——LongAdder
               </a>
             
           </div>
@@ -508,10 +439,6 @@ public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount)
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/01/05/ThreadLocal源码解析/" rel="prev" title="ThreadLocal源码分析">
-                ThreadLocal源码分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -583,7 +510,7 @@ public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount)
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">145</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -594,7 +521,7 @@ public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount)
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">57</span>
+                <span class="site-state-item-count">59</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -605,7 +532,7 @@ public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount)
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">109</span>
+                <span class="site-state-item-count">113</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
@@ -640,7 +567,7 @@ public static List&lt;Double&gt; openRedPacket(double totalMoney,int totalCount)
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#判断红包是否领完"><span class="nav-number">1.</span> <span class="nav-text">判断红包是否领完</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心算法"><span class="nav-number">2.</span> <span class="nav-text">核心算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#得到用户红包"><span class="nav-number">3.</span> <span class="nav-text">得到用户红包</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试"><span class="nav-number">4.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#返回结果"><span class="nav-number">5.</span> <span class="nav-text">返回结果</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Random使用"><span class="nav-number">1.</span> <span class="nav-text">Random使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#和Random类的区别"><span class="nav-number">2.</span> <span class="nav-text">和Random类的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何生成随机数？"><span class="nav-number">2.0.1.</span> <span class="nav-text">如何生成随机数？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ThreadLocalRandom基本使用"><span class="nav-number">3.</span> <span class="nav-text">ThreadLocalRandom基本使用</span></a></li></ol></div>
             
 
           </div>
