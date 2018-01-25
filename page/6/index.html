@@ -254,6 +254,316 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/【SpringBoot】-SpringBoot整合Mybatis/" itemprop="url">【SpringBoot】 SpringBoot整合Mybatis</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T13:47:40+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/Mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">Mybatis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="1-创建SpringBoot项目"><a href="#1-创建SpringBoot项目" class="headerlink" title="1. 创建SpringBoot项目"></a>1. 创建SpringBoot项目</h2><blockquote>
+<p><a href="https://start.spring.io/" target="_blank" rel="external">https://start.spring.io/</a></p>
+</blockquote>
+<h2 id="2-pom-xml文件"><a href="#2-pom-xml文件" class="headerlink" title="2.pom.xml文件"></a>2.pom.xml文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.5.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/parent&gt;</div><div class="line"> </div><div class="line">&lt;properties&gt;</div><div class="line">    &lt;mybatis-spring-boot&gt;1.2.0&lt;/mybatis-spring-boot&gt;</div><div class="line">    &lt;mysql-connector&gt;5.1.39&lt;/mysql-connector&gt;</div><div class="line">&lt;/properties&gt;</div><div class="line"> </div><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;test&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line"> </div><div class="line">    &lt;!-- start mybatis --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mybatis-spring-boot&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- mybatis end --&gt;</div><div class="line">   </div><div class="line">    &lt;!-- start mysql --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;mysql&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;mysql-connector&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;!-- mysql end --&gt;</div><div class="line">     </div><div class="line">    &lt;!-- start junit --&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;junit&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;junit&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;4.12&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- junit end --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
+<h2 id="3-application-yml"><a href="#3-application-yml" class="headerlink" title="3.application.yml"></a>3.application.yml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">     typeAliasesPackage: com.alex.spring.domain </div><div class="line">     mapperLocations: classpath:mapper/*.xml</div></pre></td></tr></table></figure>
+<ul>
+<li>typeAliasesPackage: 指向实体类包路径</li>
+<li>mapperLocations: classpath 路径下 mapper 包下，* 代表会扫描所有 xml 文件</li>
+</ul>
+<p>其他配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mybatis:</div><div class="line">    config: #配置文件名称</div><div class="line">    typeHandlersPackage: #处理器包路径</div><div class="line">    check-config-location: #检查 mybatis 配置是否存在，一般命名为 mybatis-config.xml</div><div class="line">    executorType: #执行模式。默认是 SIMPLE3.在 Application 应用启动类添加注解 MapperScan</div></pre></td></tr></table></figure>
+<h2 id="3-启动文件添加注解"><a href="#3-启动文件添加注解" class="headerlink" title="3. 启动文件添加注解"></a>3. 启动文件添加注解</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">@MapperScan(&quot;com.alex.spring.dao&quot;) //扫描mapper接口</div><div class="line">public class SpringMybatisApplication&#123;</div><div class="line">		public static void main(String[] args) &#123;</div><div class="line">       		 SpringApplication.run(SpringMybatisApplication.class,args);</div><div class="line">  	    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="4-创建实体"><a href="#4-创建实体" class="headerlink" title="4.创建实体"></a>4.创建实体</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class User&#123;</div><div class="line">      private String userId;</div><div class="line">      private String userName;</div><div class="line">      private String userPass;</div><div class="line">      private String userImage;</div><div class="line">      //省略getter/setter方法</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="5-创建Mapper接口"><a href="#5-创建Mapper接口" class="headerlink" title="5.创建Mapper接口"></a>5.创建Mapper接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public interface UserDao&#123;</div><div class="line">     </div><div class="line">     User findById(@Param(&quot;userId&quot;) String userId);</div><div class="line">     </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h2><p><a href="http://www.bysocket.com/?p=1610" target="_blank" rel="external">原文参考</a><br><a href="https://segmentfault.com/a/1190000004316491" target="_blank" rel="external">application.properties属性详解</a><br><a href="https://git.oschina.net/baomidou/mybatis-plus" target="_blank" rel="external">mybatis增强工具包</a><br><a href="https://git.oschina.net/free/Mybatis_PageHelper" target="_blank" rel="external">mybatis分页助手</a><br><a href="https://git.oschina.net/ht896632/mybatis-generator-core" target="_blank" rel="external">mybatis自动生成工具</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/06/【Spring5】WebFlux-and-JDBC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/06/【Spring5】WebFlux-and-JDBC/" itemprop="url">【Spring5】WebFlux and JDBC</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T13:32:48+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring5/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring5</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://dzone.com/articles/spring-5-webflux-and-jdbc-to-block-or-not-to-block" target="_blank" rel="external">英文原文地址</a></p>
+<blockquote>
+<p>翻译渣。看看就好。</p>
+</blockquote>
+<h1 id="Spring5"><a href="#Spring5" class="headerlink" title="Spring5"></a>Spring5</h1><ul>
+<li>Spring5新增对Functional和Reactive编程的支持</li>
+<li>Spring5提供轻量级WebFunctions和WebFlux支持</li>
+</ul>
+<h2 id="JDBC-线程池"><a href="#JDBC-线程池" class="headerlink" title="JDBC 线程池"></a>JDBC 线程池</h2><p>UserRepository.java<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public interface UserRepository extends CrudRepository&lt;User, Long&gt; &#123;&#125;</div></pre></td></tr></table></figure></p>
+<p>阻止阻塞调用和非阻塞调用。<br><strong>将其执行异步分派到专门线程池</strong><br>UserService.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">@Service</div><div class="line">public class UserService &#123;</div><div class="line">    private final UserRepository repository;</div><div class="line">	</div><div class="line">	private final Scheduler scheduler;</div><div class="line"></div><div class="line">	public UseRouter(UserRepository repository, @Qualifier(&quot;jdbcScheduler&quot;) Scheduler scheduler) &#123;</div><div class="line">	    this.repository = repository;</div><div class="line">	    this.scheduler = scheduler;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public Mono&lt;Iterable&lt;User&gt;&gt; findAll() &#123;</div><div class="line">    	return async(() -&gt; repository.findAll());</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	private &lt;T&gt; Mono&lt;T&gt; async(Callable&lt;T&gt; callable) &#123;</div><div class="line">    	return Mono.fromCallable(callable).publishOn	(scheduler);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="配置JDBC调度器设置线程池相关参数"><a href="#配置JDBC调度器设置线程池相关参数" class="headerlink" title="配置JDBC调度器设置线程池相关参数"></a>配置JDBC调度器设置线程池相关参数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">public class SchedulerConfiguration &#123;</div><div class="line">       //设置连接的数量</div><div class="line">    private final Integer connectionPoolSize;</div><div class="line">    public SchedulerConfiguration(@Value(&quot;$&#123;spring.datasource.maximum-pool-size&#125;&quot;) Integer connectionPoolSize) &#123;</div><div class="line">        this.connectionPoolSize = connectionPoolSize;</div><div class="line">    &#125;</div><div class="line">    @Bean</div><div class="line">    public Scheduler jdbcScheduler() &#123;</div><div class="line">        return Schedulers.fromExecutor(Executors.newFixedThreadPool(connectionPoolSize));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="WebFlux的JDBC的缺点"><a href="#WebFlux的JDBC的缺点" class="headerlink" title="WebFlux的JDBC的缺点"></a>WebFlux的JDBC的缺点</h3><ul>
+<li>事务管理(同时几个操作在一个事务中处理，共享一个连接。如果需要进行其他计算，需要用数量有限并且闲置的连接处理操作。这样处理影响效率)</li>
+</ul>
+<h3 id="Async-JDBC"><a href="#Async-JDBC" class="headerlink" title="Async JDBC"></a>Async JDBC</h3><ul>
+<li>在 Slick3 中已经出现异步JDBC的概念。非阻塞JDBC早前在2016.9月出现。预计Java10可能实现异步JDBC功能</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/tomcat性能调优/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1912,455 +2222,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术/" itemprop="url">## 《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:03:31+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术"><a href="#《亿级流量网站架构核心技术》学习笔记-（三）-——-隔离术" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术"></a>《亿级流量网站架构核心技术》学习笔记 （三） —— 隔离术</h2><blockquote>
-<p><strong>系统隔离</strong>是为了在系统发生故障时，能限定传播范围和影响范围，即发生故障时不会产生滚雪球效应，从而保证只能故障服务不可用，其他服务仍然可用</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong>资源隔离</strong>是通过隔离减少资源竞争，保证服务间的相互不影响和可用性</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>其他常见隔离手段：线程隔离、进程隔离、集群隔离、机房隔离、读写隔离、快慢隔离、动静隔离、爬虫隔离、环境隔离（测试、预发布/灰度、正式环境）、AB测试（版本测试）、缓存隔离、压测隔离（真实/压测数据）、查询隔离（简单/批量/复杂查询条件分别路由到不同集群）</p>
-</blockquote>
-<hr>
-<blockquote>
-<p>常用解决手段：负载均衡路由、自动/手动切换分组、降级等保障程序可用性</p>
-</blockquote>
-<hr>
-<h2 id="线程隔离"><a href="#线程隔离" class="headerlink" title="线程隔离"></a>线程隔离</h2><blockquote>
-<p>主要指线程池分离，在实际使用中，会将不同的请求分类，交给不同线程池处理。当一种业务的请求处理发生故障时，不会扩散到其他线程池，从而保障服务可用</p>
-</blockquote>
-<hr>
-<h2 id="进程隔离"><a href="#进程隔离" class="headerlink" title="进程隔离"></a>进程隔离</h2><blockquote>
-<p>通过系统拆分多个子系统来实现物理隔离，通过进程隔离使得某一个子系统出现问题而不会影响其他子系统</p>
-</blockquote>
-<hr>
-<h2 id="集群隔离"><a href="#集群隔离" class="headerlink" title="集群隔离"></a>集群隔离</h2><blockquote>
-<p>通过部署多个服务形成服务集群，从而提升系统容量。随着调用方增多，当某个服务影响其他服务的稳定性，应考虑为某个服务提供单个的服务集群（服务分组）</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;jsf:provider id=&quot;myService&quot; interface=&quot;com.test.MyService&quot; alias=&quot;$&#123;服务分组名&#125;&quot; ref=&quot;myServiceImpl&quot;/&gt;</div></pre></td></tr></table></figure>
-<h2 id="机房隔离"><a href="#机房隔离" class="headerlink" title="机房隔离"></a>机房隔离</h2><blockquote>
-<p>对系统可用性要求，会进行多机房部署，每个机房都有服务器组。本机房的服务只调用本机服务，不进行跨机房调用，其中一个机房出现问题时，可以通过DNS负载均衡将请求切换到另外一个机房，或许考虑服务能自动重试其他机房服务。一种方法是根据ip自动分组，还有一种方法在分组名中加上机房名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;jsf:provider id=&quot;myService&quot; interface=&quot;com.test.MyService&quot; alias=&quot;$&#123;服务分组名&#125;-$&#123;机房名&#125;&quot; ref=&quot;myServiceImpl&quot;/&gt;</div></pre></td></tr></table></figure></p>
-</blockquote>
-<hr>
-<h2 id="读写隔离"><a href="#读写隔离" class="headerlink" title="读写隔离"></a>读写隔离</h2><blockquote>
-<p>通过主从模式将读和写集群分离，读服务只从redis集群获取数据，当主Redis集群出错时，从Redis集群仍然可用。而当从Redis出现问题时，可以进行其他集群重试</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">--先读取从</div><div class="line">status , resp = slave_get(key)</div><div class="line">if status == STATUS_OK then</div><div class="line">   return status ,value</div><div class="line">end</div><div class="line">--失败之后，在读取主</div><div class="line">status , resp = master_get(key)</div></pre></td></tr></table></figure>
-<p>–</p>
-<h2 id="动静隔离"><a href="#动静隔离" class="headerlink" title="动静隔离"></a>动静隔离</h2><blockquote>
-<p>如果用户访问结算页，JS/CSS等静态资源出现在系统中，很可能由于访问量太大，导致带宽满，从而出现不可用。一般静态资源放在CDN上</p>
-</blockquote>
-<hr>
-<h2 id="爬虫隔离"><a href="#爬虫隔离" class="headerlink" title="爬虫隔离"></a>爬虫隔离</h2><blockquote>
-<p>在实际业务中，爬虫比例远高于正常流量。而爬虫访问量太大可能导致服务不可用。一种通过限流解决。另一种通过负载均衡层面将爬虫路由到单独集群，从而保证正常服务可用，爬虫流量尽量可用</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Nginx.conf</div><div class="line">set $flag = 0;</div><div class="line">if($http_user_agent ~* &quot;splider&quot;)&#123;</div><div class="line">    set $flag &quot;1&quot;;</div><div class="line">&#125;</div><div class="line">if($flag = &quot;0&quot;)&#123;</div><div class="line">    //代理到正常集群</div><div class="line">&#125;</div><div class="line">if($flag = &quot;1&quot;)&#123;</div><div class="line">    //代理到爬虫集群</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="热点隔离"><a href="#热点隔离" class="headerlink" title="热点隔离"></a>热点隔离</h2><blockquote>
-<p>秒杀、抢购就属于热点例子。做成独立系统或服务隔离从而保证热点服务出问题，不会影响主服务。还有一些热点可能由于价格或者突发事件，对于读热点，可以采取多级缓存搞定（缓存+队列进行削峰）</p>
-</blockquote>
-<hr>
-<h2 id="资源隔离"><a href="#资源隔离" class="headerlink" title="资源隔离"></a>资源隔离</h2><blockquote>
-<p>磁盘、CPU、网络等外界存在竞争关系的因素</p>
-</blockquote>
-<hr>
-<h2 id="Hystrix隔离"><a href="#Hystrix隔离" class="headerlink" title="Hystrix隔离"></a>Hystrix隔离</h2><p><a href="http://www.infoq.com/cn/news/2013/01/netflix-hystrix-fault-tolerance" target="_blank" rel="external">Hystrix-应对复杂分布式系统中的延时和故障容错</a></p>
-<hr>
-<h2 id="基于Servlet3的请求隔离"><a href="#基于Servlet3的请求隔离" class="headerlink" title="基于Servlet3的请求隔离"></a>基于Servlet3的请求隔离</h2><p><a href="https://www.ibm.com/developerworks/cn/java/j-lo-servlet30/" target="_blank" rel="external">servlet3新特性</a></p>
-<blockquote>
-<p>Tomcat7以上支持Servlet3异步化，在此之前，所有请求都是同步的。</p>
-</blockquote>
-<p>异步化优点</p>
-<ul>
-<li>基于NIO能处理更高的并发连接数</li>
-<li>请求解析和业务处理线程池分离</li>
-<li>根据业务重要性进行业务分级、并分级线程池</li>
-<li>对业务线程池进行监控、降级、运维等处理</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理/" itemprop="url">《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T17:02:52+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理"><a href="#《亿级流量网站架构核心技术》学习笔记-（二）-——-负载均衡与反向代理" class="headerlink" title="《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理"></a>《亿级流量网站架构核心技术》学习笔记 （二） —— 负载均衡与反向代理</h2><blockquote>
-<p>单实例不能支撑用户请求的时候，就需要进行扩容</p>
-</blockquote>
-<p>如果用户访问 <a href="https://www.tmall.com" target="_blank" rel="external">https://www.tmall.com</a> 的方式访问请求，浏览器首先会查询DNS服务器所对应IP，然后通过IP访问对应服务器</p>
-<h4 id="方式"><a href="#方式" class="headerlink" title="方式"></a>方式</h4><p>www.tmall.com 域名映射多个IP，但是如果某台服务器重启或出现故障，DNS存在一定缓存时间，故障后切换时间长，且没有对后端服务进行心跳检测和失败重试的机制</p>
-<ul>
-<li>外网DNS通过GSLB(全局负载均衡)进行流量调度<ul>
-<li>查看公网ip<ul>
-<li>站长工具 - DNS查询 </li>
-</ul>
-</li>
-</ul>
-</li>
-<li>内网DNS通过简单的轮询负载均衡<ul>
-<li>HaProxy 和 Nginx</li>
-</ul>
-</li>
-</ul>
-<h3 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h3><p>Nginx通常用于七层负载，限制一定的吞吐量，为了提升吞吐量会在DNS和Nginx中引入接入层(LVS、F5做4层负载均衡)</p>
-<p><strong>首先通过DNS解析LVS/F5，然后LVS/F5转发给Nginx，再由Nginx转发给后端RealServer</strong></p>
-<p>业务开发人员只需关心Nginx层面，LVS/F5会由运维人员维护</p>
-<p>Nginx1.9.0以后开始支持TCP(ngx_stream_upstream_module)四层负载均衡</p>
-<h4 id="概念理解"><a href="#概念理解" class="headerlink" title="概念理解"></a>概念理解</h4><p>二层负载均衡<br>通过改写报文的目标MAC地址为上游服务器MAC地址</p>
-<ol>
-<li>源Ip地址和目标Ip地址不变</li>
-<li>负载均衡服务器和真实服务器共享一个VIP</li>
-</ol>
-<p>四层负载均衡</p>
-<ol>
-<li>根据端口将报文转发到上游服务器(不同的Ip的地址 + 端口)</li>
-</ol>
-<p>七层负载均衡</p>
-<ol>
-<li>根据端口号和应用层协议的主机名、URL、转发报文到上游服务器</li>
-</ol>
-<h2 id="负载均衡核心"><a href="#负载均衡核心" class="headerlink" title="负载均衡核心"></a>负载均衡核心</h2><ol>
-<li>上游服务器(upstream server)配置</li>
-<li>负载均衡算法</li>
-<li>失败重试机制</li>
-<li>服务器心跳检查</li>
-</ol>
-<hr>
-<h3 id="upstream-配置上游服务器（真实业务服务器）"><a href="#upstream-配置上游服务器（真实业务服务器）" class="headerlink" title="upstream 配置上游服务器（真实业务服务器）"></a>upstream 配置上游服务器（真实业务服务器）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>IP地址和端口</li>
-<li>权重：默认为1.权重越高分配给这台服务器的请求越多(如上每3次请求就有1次转发给8080，另外2次转发给8070)</li>
-</ul>
-<h3 id="proxy-pass-处理用户请求"><a href="#proxy-pass-处理用户请求" class="headerlink" title="proxy_pass 处理用户请求"></a>proxy_pass 处理用户请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    proxy_pass http://realServer;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>当访问Nginx时，会将请求反向代理到realServer配置的upstream server中</li>
-</ul>
-<hr>
-<h2 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h2><ul>
-<li>round-robin：轮询(默认)</li>
-<li>ip_hash：根据客户IP进行均衡负载（即相同的ip分配给同一个upstream server</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    ip_hash;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><p>hash 算法：根据请求uri进行负载均衡，可以使用Nginx变量</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    hash $uri;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>hash key[consistant]:对某一个key进行哈希或者使用一致性hash算法进行负载均衡</p>
-<ul>
-<li>使用hash算法存在的问题<ul>
-<li>当添加/删除一台服务器时，将导致很多key被重新负载均衡到不同服务器：所以建议使用一致性hash算法，只有少数key被重新负载均衡到不同服务器中</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>根据动态consistent_key指定<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    hash $consistent_key consistent;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>location指定一致性hash，会优先考虑请求参数cat，若没有，则根据请求uri进行负载<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    set $consistent_key $arg_cat;</div><div class="line">    if($consistent_key = &quot;&quot;)&#123;</div><div class="line">        set $consistent_key $request_uri;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="失败重试"><a href="#失败重试" class="headerlink" title="失败重试"></a>失败重试</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 max_fails=2 fail_timeout=10s weight=1;</div><div class="line">    server 172.16.42.81:8070 max_fails=2 fail_timeout=10s weight=2;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>当fail_timeout时间内失败了max_fails次，则认为该服务器不可用，然后摘掉该服务器，fail_timeouth后再次将服务器加入到存活服务器列表<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    proxy_connect_timeout 5s;</div><div class="line">    proxy_read_timeout 5s;</div><div class="line">    proxy_send_timeout 5s;</div><div class="line">    </div><div class="line">    proxy_next_upstream error timeout;</div><div class="line">    proxy_next_upstream_timeout 10s;</div><div class="line">    proxy_next_upstream_tries 2;</div><div class="line">    </div><div class="line">    proxy_pass http://realServer;</div><div class="line">    </div><div class="line">    add_header upstream_addr $upstream_addr;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<hr>
-<h2 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h2><blockquote>
-<p>Nginx默认采用惰性策略，Nginx上夜班提供health_check进行主动健康检查; 也可以集成nginx_upstream_check_module模块进行健康检查</p>
-</blockquote>
-<h3 id="nginx-upstream-check-module"><a href="#nginx-upstream-check-module" class="headerlink" title="nginx_upstream_check_module"></a>nginx_upstream_check_module</h3><h4 id="TCP心跳检查"><a href="#TCP心跳检查" class="headerlink" title="TCP心跳检查"></a>TCP心跳检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">    check interval=3000 rise=1 fail=3 timeout=2000 type=tcp;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>interval 每个3s检测一次</li>
-<li>fail 失败多少次之后，目标不存活</li>
-<li>rise 成功多少次后，目标存活，并可以处理请求</li>
-<li>timeout 请求超时时间配置</li>
-</ul>
-<h4 id="Http心跳检查"><a href="#Http心跳检查" class="headerlink" title="Http心跳检查"></a>Http心跳检查</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2;</div><div class="line">    check interval=3000 rise=1 fail=3 timeout=2000 type=http;</div><div class="line">    check_http_send &quot;HEAD /status HTTP/1.0\r\n\r\n&quot;;</div><div class="line">    check_http_expect_alive http_2xx http_3xx;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>check_http_send 检查时发出的http请求内容</li>
-<li>check_http_expect_alive 当上游服务器返回匹配的响应码，则认为上游服务器存活</li>
-</ul>
-<p>注意：间隔时间不能太短，否则可能因为心跳检查包太多造成上游服务器挂掉，同事设置合理超时时间</p>
-<p>安装健康检查模块需要先打nginx_upstream_check_module补丁，不然该模块不工作</p>
-<hr>
-<h2 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h2><h3 id="域名上游服务器"><a href="#域名上游服务器" class="headerlink" title="域名上游服务器"></a>域名上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server c0.3.cn;</div><div class="line">    server c1.3.cn;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Nginx社区版：在Nginx解析配置文件时将域名解析成IP地址并记到upstream上，当这两个域名对应ip发生变化时，不会更新，Nginx商业版支持动态更新</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">proxy_pass http://c0.3.cn</div></pre></td></tr></table></figure>
-<p>支持动态更新</p>
-<h3 id="备份上游服务器"><a href="#备份上游服务器" class="headerlink" title="备份上游服务器"></a>备份上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 backup;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="不可用上游服务器"><a href="#不可用上游服务器" class="headerlink" title="不可用上游服务器"></a>不可用上游服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 down;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="长连接"><a href="#长连接" class="headerlink" title="长连接"></a>长连接</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream realServer &#123;</div><div class="line">    server 172.16.42.81:8080 weight=1;</div><div class="line">    server 172.16.42.81:8070 weight=2 backup;</div><div class="line">    keepalive 100;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>keepalive 每个Worker进程与上游服务器可缓存的空闲连接最大数量，当超过这个数量时，最近最少使用的链接被关闭</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">location / &#123;</div><div class="line">    ## 支持keep-alive</div><div class="line">    proxy_http_version 1.1;</div><div class="line">    ## 支持http/1.0</div><div class="line">    proxy_set_header Connection &quot;Connection:Keep-Alive&quot;;</div><div class="line">    proxy_pass http://realServer;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>总长连接数 = 空闲连接池 + 释放连接池</p>
-<p>具体环境</p>
-<ul>
-<li>空闲连接池太小，连接不够用，需要不断建立连接</li>
-<li>空闲连接池太多，空闲连接太多，还未使用就超时</li>
-</ul>
-<p><strong>注意：尽量只对小报文开启长连接</strong></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2410,7 +2271,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-count">149</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2421,7 +2282,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">59</span>
+                <span class="site-state-item-count">60</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
