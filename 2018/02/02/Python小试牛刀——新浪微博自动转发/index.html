@@ -1,0 +1,937 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="新浪微博自动转发," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="前言 为了更加熟练python，所以通过新浪微博转发的例子加深印象  环境 python3.6  登录实现登录请求链通过火狐追踪新浪微博完整登录请求，可以获得2个关键URL  对登录进行加密处理 preLoginUrl = ‘https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;amp;callback=sinaSSOController.p">
+<meta name="keywords" content="新浪微博自动转发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python小试牛刀——新浪微博自动转发">
+<meta property="og:url" content="http://yoursite.com/2018/02/02/Python小试牛刀——新浪微博自动转发/index.html">
+<meta property="og:site_name" content="dzxblog">
+<meta property="og:description" content="前言 为了更加熟练python，所以通过新浪微博转发的例子加深印象  环境 python3.6  登录实现登录请求链通过火狐追踪新浪微博完整登录请求，可以获得2个关键URL  对登录进行加密处理 preLoginUrl = ‘https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;amp;callback=sinaSSOController.p">
+<meta property="og:updated_time" content="2018-02-02T08:50:14.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python小试牛刀——新浪微博自动转发">
+<meta name="twitter:description" content="前言 为了更加熟练python，所以通过新浪微博转发的例子加深印象  环境 python3.6  登录实现登录请求链通过火狐追踪新浪微博完整登录请求，可以获得2个关键URL  对登录进行加密处理 preLoginUrl = ‘https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;amp;callback=sinaSSOController.p">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/02/Python小试牛刀——新浪微博自动转发/"/>
+
+
+
+
+
+  <title>Python小试牛刀——新浪微博自动转发 | dzxblog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">dzxblog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/02/Python小试牛刀——新浪微博自动转发/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python小试牛刀——新浪微博自动转发</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-02T16:29:57+08:00">
+                2018-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>为了更加熟练python，所以通过新浪微博转发的例子加深印象</p>
+</blockquote>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>python3.6</li>
+</ul>
+<h2 id="登录实现"><a href="#登录实现" class="headerlink" title="登录实现"></a>登录实现</h2><h3 id="登录请求链"><a href="#登录请求链" class="headerlink" title="登录请求链"></a>登录请求链</h3><p>通过火狐追踪新浪微博完整登录请求，可以获得2个关键URL</p>
+<ul>
+<li>对登录进行加密处理<ul>
+<li>preLoginUrl = ‘<a href="https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;callback=sinaSSOController.preloginCallBack&amp;su=%s&amp;rsakt=mod&amp;checkpin=1&amp;client=ssologin.js(v1.4.19)&amp;_=%s" target="_blank" rel="external">https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;callback=sinaSSOController.preloginCallBack&amp;su=%s&amp;rsakt=mod&amp;checkpin=1&amp;client=ssologin.js(v1.4.19)&amp;_=%s</a>‘ % (su,int(round(time.time() * 1000))) </li>
+</ul>
+</li>
+<li>核心登录地址<ul>
+<li>loginUrl = ‘<a href="https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19" target="_blank" rel="external">https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19</a>)’</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p> 可以通过 <a href="http://login.sina.com.cn/js/sso/ssologin.js" target="_blank" rel="external">http://login.sina.com.cn/js/sso/ssologin.js</a> 解压查看加密方式</p>
+</blockquote>
+<h3 id="通过preLoginUrl得到几个关键参数"><a href="#通过preLoginUrl得到几个关键参数" class="headerlink" title="通过preLoginUrl得到几个关键参数"></a>通过preLoginUrl得到几个关键参数</h3><p><strong>servertime,nonce,pubkey,rsakv</strong></p>
+<h3 id="用户名通过base64位加密，也就是loginUrl中formData的su参数"><a href="#用户名通过base64位加密，也就是loginUrl中formData的su参数" class="headerlink" title="用户名通过base64位加密，也就是loginUrl中formData的su参数"></a>用户名通过base64位加密，也就是loginUrl中formData的su参数</h3><pre><code># 得到su值base64加密的账号
+def getSu(self):
+    b64_username = su = base64.b64encode(self.userName.encode(encoding=&quot;utf-8&quot;))
+    return su
+</code></pre><h3 id="密码加密方式比较复杂，通过ssologin-js中查看，也就是loginUrl中formData的sp参数"><a href="#密码加密方式比较复杂，通过ssologin-js中查看，也就是loginUrl中formData的sp参数" class="headerlink" title="密码加密方式比较复杂，通过ssologin.js中查看，也就是loginUrl中formData的sp参数"></a>密码加密方式比较复杂，通过ssologin.js中查看，也就是loginUrl中formData的sp参数</h3><pre><code># 从加密文件中得到加密密码sp
+def getSp(self,servertime,nonce,pubkey,rsakv):
+    pubkey = int(pubkey, 16)
+    # 65537是js加密文件文件中的固定值，原是十六进制数字10001
+    key = rsa.PublicKey(pubkey, 65537)
+    # 以下拼接明文从js加密文件中得到签名
+    sign = str(servertime) + &apos;\t&apos; + str(nonce) + &apos;\n&apos; + str(self.password)
+    sign = sign.encode(&apos;utf-8&apos;)
+    //rsa加密
+    sp = rsa.encrypt(sign, key)
+    # 把二进制数据的每个字节转换成相应的2位十六进制表示形式。
+    sp = binascii.b2a_hex(sp)
+    return sp
+</code></pre><h3 id="获取登录信息"><a href="#获取登录信息" class="headerlink" title="获取登录信息"></a>获取登录信息</h3><p>当然也可以用urllib3</p>
+<pre><code>        import requests # pip install requests
+
+        # 得到登录信息
+requests.packages.urllib3.disable_warnings() 
+def getInfo(self,su):
+    print(u&apos;正在校验用户信息，请稍后...&apos;)
+    while True:
+         try:
+             # 新浪微博做了登录加密处理
+             preLoginUrl = &apos;https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;callback=sinaSSOController.preloginCallBack&amp;su=%s&amp;rsakt=mod&amp;checkpin=1&amp;client=ssologin.js(v1.4.19)&amp;_=%s&apos; % (su,int(round(time.time() * 1000)))                                     
+             r = requests.get(preLoginUrl, verify=False);
+             if(r.status_code == 200):
+                # 通过正则表达式取出sinaSSOController.preloginCallBack({jsonBody})内容部分与密码加密有关
+                jsonBody = re.findall(r&apos;\((\{.*?\})\)&apos;, r.text)[0]
+                data = json.loads(jsonBody)
+                servertime = data[&apos;servertime&apos;]
+                nonce = data[&apos;nonce&apos;]
+                pubkey = data[&apos;pubkey&apos;]
+                rsakv = data[&apos;rsakv&apos;]
+             else:
+                print(u&apos;preLoginUrl调用出错，错误响应码：%s&apos; % r.status_code)
+                break
+         except requests.exceptions.ConnectionError:
+             print(&quot;校验失败，1s后重试...&quot;)
+             time.sleep(1)
+             continue
+         return servertime,nonce,pubkey,rsakv 
+</code></pre><h2 id="登录接口"><a href="#登录接口" class="headerlink" title="登录接口"></a>登录接口</h2><pre><code>       requests.packages.urllib3.disable_warnings() 
+def getCookies(self,su, sp, servertime, nonce, rsakv):     
+     print(u&apos;用户正在登录，请稍后...&apos;)
+     while True:
+         try:
+             #实际登录地址
+             loginUrl = &apos;https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19)&apos;
+             #表单数据
+             formData = {
+               &apos;entry&apos;:&apos;weibo&apos;,
+               &apos;gateway&apos;:&apos;1&apos;,
+               &apos;from&apos;:&apos;&apos;,
+               &apos;qrcode_flag&apos;:&apos;false&apos;,
+               &apos;useticket&apos;:&apos;1&apos;,
+               &apos;pagerefer&apos;:&apos;https://login.sina.com.cn/crossdomain2.php?action=logout&amp;r=https%3A%2F%2Fweibo.com%2Flogout.php%3Fbackurl%3D%252F&apos;,
+               &apos;vsnf&apos;:&apos;1&apos;,
+               &apos;su&apos;:su,
+               &apos;service&apos;:&apos;miniblog&apos;,
+               &apos;servertime&apos;:servertime,
+               &apos;nonce&apos;:nonce,
+               &apos;pwencode&apos;:&apos;rsa2&apos;,
+               &apos;rsakv&apos;:rsakv,
+               &apos;sp&apos;:sp,
+               &apos;sr&apos;:&apos;1366*768&apos;,
+               &apos;encoding&apos;:&apos;UTF-8&apos;,
+               &apos;prelt&apos;:&apos;4959&apos;,
+               &apos;url&apos;:&apos;https://weibo.com/ajaxlogin.php?framelogin=1&amp;callback=parent.sinaSSOController.feedBackUrlCallBack&apos;,
+               &apos;returntype&apos;:&apos;META&apos;
+             }
+             #请求头
+             headers = {
+               &apos;User-Agent&apos;:&apos;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36&apos;,
+               &apos;Accept&apos;:&apos;text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8&apos;,
+               &apos;Accept-Encoding&apos;:&apos;gzip, deflate, br&apos;,
+               &apos;Accept-Language&apos;:&apos;zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2&apos;,
+               &apos;Content-Type&apos;:&apos;application/x-www-form-urlencoded&apos;,
+               &apos;Host&apos;:&apos;login.sina.com.cn&apos;,
+               &apos;Referer&apos;:&apos;https://weibo.com/&apos;,
+               &apos;Upgrade-Insecure-Requests&apos;:&apos;1&apos;
+             }
+             #会话对象requests.Session能够跨请求地保持某些参数
+             session = requests.Session()
+             session.headers = headers
+             response = session.post(loginUrl, data=formData, verify=False)
+             result = response.content.decode(&apos;gbk&apos;)
+             #正则表达式找到location.replace中的网页location.replace(&quot;https://login.sina.com.cn/crossdomain2.php?action=login&amp;entry=weibo&amp;r=https%3A%2F%2Fpassport.weibo.com%2Fwbsso%2Flogin%3Fssosavestate%3D1548839580%26url%3Dhttps%253A%252F%252Fweibo.com%252Fajaxlogin.php%253Fframelogin%253D1%2526callback%253Dparent.sinaSSOController.feedBackUrlCallBack%2526sudaref%253Dweibo.com%26display%3D0%26ticket%3DST-NTk3Njc3MDY4NQ%3D%3D-1517303580-gz-D57C7A6D615CC630C5CB53402C39C42C-1%26retcode%3D0&amp;sr=1366%2A768&quot;);
+             # 并且得到location.replace中响应消息&lt;html&gt;&lt;head&gt;&lt;script language=&apos;javascript&apos;&gt;parent.sinaSSOController.feedBackUrlCallBack({&quot;result&quot;:true,&quot;userinfo&quot;:{&quot;uniqueid&quot;:&quot;5976770685&quot;,&quot;userid&quot;:null,&quot;displayname&quot;:null,&quot;userdomain&quot;:&quot;?wvr=5&amp;lf=reg&quot;},&quot;redirect&quot;:&quot;https:\/\/weibo.com\/nguide\/interest&quot;});&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;
+             info = re.findall(r&quot;location\.replace\(\&quot;(.*?)\&quot;&quot;, result)
+             # 响应内容
+             # {&quot;retcode&quot;:0,&quot;arrURL&quot;:[&quot;https:\/\/passport.weibo.com\/wbsso\/crossdomain?action=login&quot;,&quot;https:\/\/passport.97973.com\/sso\/crossdomain?action=login&quot;,&quot;https:\/\/passport.krcom.cn\/sso\/crossdomain?service=krvideo&amp;savestate=1&amp;action=login&quot;,&quot;https:\/\/passport.weibo.cn\/sso\/crossdomain?action=login&quot;]}
+             res = requests.get(info[0], verify=False);
+             jsonBody = re.findall(r&apos;\((\{.*?\})\)&apos;, res.text)[0]
+             # 获取cookie cookies.get_dict()得到cookie字典
+             cookies = response.cookies.get_dict()
+             data = json.loads(jsonBody)
+             if(data[&apos;retcode&apos;] == 0):  
+                 print(u&apos;用户%s登录成功&apos; % self.userName)
+                 return cookies
+             elif(data[&apos;retcode&apos;] == 101):
+                 print(data[&apos;reason&apos;])
+                 return None
+             else:
+                print(u&apos;登录失败,原因：%s&apos; % data[&apos;reason&apos;])
+                return None
+         except requests.exceptions.ConnectionError:
+             print(u&quot;登录尝试失败，1s后重试连接...&quot;)
+             time.sleep(1)
+             continue
+</code></pre><h1 id="登录成功后，保存cookie，进行转发"><a href="#登录成功后，保存cookie，进行转发" class="headerlink" title="登录成功后，保存cookie，进行转发"></a>登录成功后，保存cookie，进行转发</h1><pre><code> # content 发送内容 mid 微博ID pdetail location 博主定位
+requests.packages.urllib3.disable_warnings() 
+def forward(self,contents,mid,domain,location,is_comment_base):
+    requestCount = 0; #总请求次数
+    successCount = 0; #成功次数
+    # 通过登录接口获取用户cookie
+    su = weibo.getSu()
+    servertime,nonce,pubkey,rsakv=self.getInfo(su)
+    sp = weibo.getSp(servertime,nonce,pubkey,rsakv)
+    cookies = self.getCookies(su, sp,servertime,nonce,rsakv)
+    print(u&apos;正在请求转发，请稍后...&apos;)
+    while True:      
+        try:
+            content = CommonUtil.randomContent(contents)
+            forwardUrl = &apos;https://weibo.com/aj/v6/mblog/forward?ajwvr=6&amp;domain=%s&amp;__rnd=%s&apos; % (domain,int(round(time.time() * 1000))) 
+
+            formData = {
+                &apos;pic_src&apos;:&apos;&apos;,
+                &apos;pic_id&apos;:&apos;&apos;,
+                &apos;appkey&apos;:&apos;&apos;,
+                &apos;mid&apos;:mid,
+                &apos;styletype&apos;:&apos;1&apos;,
+                &apos;mark&apos;:&apos;&apos;,
+                &apos;reason&apos;:content,
+                &apos;location&apos;:&apos;page_%s_home&apos; % domain,
+                &apos;pdetail&apos;:pdetail,
+                &apos;module&apos;:&apos;&apos;,
+                &apos;page_module_id&apos;:&apos;&apos;,
+                &apos;refer_sort&apos;:&apos;&apos;,
+                &apos;rank&apos;:&apos;0&apos;,
+                # 给原博主评论
+                #&apos;is_comment_base&apos;:&apos;1&apos;,
+                &apos;rankid&apos;:&apos;&apos;,
+                &apos;isReEdit&apos;:&apos;false&apos;,
+                &apos;_t&apos;:&apos;0&apos;,
+            }   
+            if(is_comment_base == &apos;y&apos;):
+                formData[&apos;is_comment_base&apos;] = &apos;1&apos;
+
+            session = requests.Session()
+            #请求头
+            headers = {
+               &apos;User-Agent&apos;:&apos;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36&apos;,
+               &apos;Accept&apos;:&apos;*/*&apos;,
+               &apos;Accept-Encoding&apos;:&apos;gzip, deflate, br&apos;,
+               &apos;Accept-Language&apos;:&apos;zh-CN,zh;q=0.9&apos;,
+               &apos;Content-Type&apos;:&apos;application/x-www-form-urlencoded&apos;,
+               &apos;Origin&apos;:&apos;https://weibo.com&apos;,
+               &apos;Host&apos;:&apos;weibo.com&apos;,
+               &apos;Referer&apos;:&apos;https://weibo.com/u/5783494388?is_all=1&apos;,
+               &apos;Upgrade-Insecure-Requests&apos;:&apos;1&apos;,
+               &apos;X-Requested-With&apos;:&apos;XMLHttpRequest&apos;,
+            }
+            session.headers = headers  
+            time.sleep(2)#2s发送一次请求
+            response = session.post(forwardUrl, data=formData,cookies=cookies, verify=False)
+            result = response.content.decode(&apos;gbk&apos;)
+            data = json.loads(result)
+            requestCount = requestCount + 1 #记录请求数
+            if(data[&apos;code&apos;] == &apos;100000&apos;):
+                successCount = successCount + 1 #记录成功数
+                print(u&apos;转发内容：%s 成功次数：%s&apos; % (content,successCount))
+            elif(data[&apos;code&apos;] == &apos;100027&apos;):
+                print(u&apos;转发失败，进入小黑屋，停止转发,请更换账号，失败原因：%s  %s&apos; % (data[&apos;code&apos;],data[&apos;msg&apos;]))
+                print(u&apos;%s目前转发成功次数：%s&apos; %(self.userName,successCount))  
+                break
+            elif(data[&apos;code&apos;] == &apos;100001&apos; and &apos;微博发的太多啦，休息一会再发啦&apos; in data[&apos;msg&apos;]):
+                print(u&apos;微博发送太频繁，休息1分钟重试，失败原因%s(%s)&apos; %(data[&apos;code&apos;],data[&apos;msg&apos;]))
+                time.sleep(60)
+                continue
+            else:
+                print(u&apos;转发失败，失败原因:%s  %s&apos; %(data[&apos;code&apos;],data[&apos;msg&apos;]))
+                print(u&apos;%s目前转发成功次数：%s&apos; %(self.userName,successCount)) 
+            #if(requestCount &gt;= setCount):
+                #print(u&apos;用户%s转发成功次数：%s&apos; %(self.userName,successCount))
+                #break
+        except requests.exceptions.ConnectionError:
+             print(&quot;转发尝试失败，1s后重试连接...&quot;)
+             time.sleep(1)
+             continue 
+    print(u&apos;总共转发%s次&apos; %successCount) 
+</code></pre><h1 id="基础工具类"><a href="#基础工具类" class="headerlink" title="基础工具类"></a>基础工具类</h1><pre><code>class CommonUtil:
+         @staticmethod
+         def randomContent(contents):
+              return str(random.sample(contents, 1)[0])
+         @staticmethod
+         def decodeUTF8(str):
+             return str.decode(&quot;UTF-8&quot;)
+         @staticmethod
+         def decodeGBK(str):
+             return str.decode(&quot;GBK&quot;) 
+</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/新浪微博自动转发/" rel="tag"># 新浪微博自动转发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/25/JDK8新增的StampedLock锁/" rel="next" title="JDK8新增的StampedLock锁">
+                <i class="fa fa-chevron-left"></i> JDK8新增的StampedLock锁
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/08/Python小试牛刀——获取代理IP/" rel="prev" title="Python小试牛刀——获取代理IP">
+                Python小试牛刀——获取代理IP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg"
+               alt="dzx" />
+          <p class="site-author-name" itemprop="name">dzx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">151</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">61</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">115</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境"><span class="nav-number">2.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#登录实现"><span class="nav-number">3.</span> <span class="nav-text">登录实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#登录请求链"><span class="nav-number">3.1.</span> <span class="nav-text">登录请求链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过preLoginUrl得到几个关键参数"><span class="nav-number">3.2.</span> <span class="nav-text">通过preLoginUrl得到几个关键参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用户名通过base64位加密，也就是loginUrl中formData的su参数"><span class="nav-number">3.3.</span> <span class="nav-text">用户名通过base64位加密，也就是loginUrl中formData的su参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#密码加密方式比较复杂，通过ssologin-js中查看，也就是loginUrl中formData的sp参数"><span class="nav-number">3.4.</span> <span class="nav-text">密码加密方式比较复杂，通过ssologin.js中查看，也就是loginUrl中formData的sp参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取登录信息"><span class="nav-number">3.5.</span> <span class="nav-text">获取登录信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#登录接口"><span class="nav-number">4.</span> <span class="nav-text">登录接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#登录成功后，保存cookie，进行转发"><span class="nav-number"></span> <span class="nav-text">登录成功后，保存cookie，进行转发</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基础工具类"><span class="nav-number"></span> <span class="nav-text">基础工具类</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dzx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

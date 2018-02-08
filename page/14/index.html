@@ -254,6 +254,366 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java各种对象名称详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Java各种对象名称详解/" itemprop="url">Java各种对象名称详解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:41:55+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Object/" itemprop="url" rel="index">
+                    <span itemprop="name">Object</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="PO-persistant-object-持久对象"><a href="#PO-persistant-object-持久对象" class="headerlink" title="PO(persistant object) 持久对象"></a>PO(persistant object) 持久对象</h2><blockquote>
+<p>在 <strong>o/r 映射</strong>的时候出现的概念，如果没有 o/r 映射，没有这个概念存在了。<strong>通常对应数据模型 ( 数据库 ), 本身还有部分业务逻辑的处理。可以看成是与数据库中的表相映射的 java 对象。</strong>最简单的 PO 就是对应数据库中某个表中的一条记录，多个记录可以用 PO 的集合。 PO 中应该不包含任何对数据库的操作。</p>
+</blockquote>
+<p>##DO（Domain Object）领域对象</p>
+<blockquote>
+<p>就是从现实世界中抽象出来的有形或无形的业务实体。<strong>一般和数据中的表结构对应。</strong></p>
+</blockquote>
+<h2 id="TO-Transfer-Object"><a href="#TO-Transfer-Object" class="headerlink" title="TO(Transfer Object)"></a>TO(Transfer Object)</h2><blockquote>
+<p>数据传输对象<br>在应用程序不同 tie( 关系 ) 之间传输的对象</p>
+</blockquote>
+<h2 id="DTO（Data-Transfer-Object）数据传输对象"><a href="#DTO（Data-Transfer-Object）数据传输对象" class="headerlink" title="DTO（Data Transfer Object）数据传输对象"></a>DTO（Data Transfer Object）数据传输对象</h2><blockquote>
+<p>这个概念来源于J2EE的设计模式，原来的目的是为了EJB的分布式应用提供粗粒度的数据实体，以减少分布式调用的次数，从而提高分布式调用的性能和降低网络负载，但在这里，我泛指用于展示层与服务层之间的数据传输对象。</p>
+</blockquote>
+<h2 id="VO-view-object-值对象"><a href="#VO-view-object-值对象" class="headerlink" title="VO(view object) 值对象"></a>VO(view object) 值对象</h2><blockquote>
+<p>视图对象，用于展示层，它的作用是把某个指定页面（或组件）的所有数据封装起来。</p>
+</blockquote>
+<p>##BO(business object) 业务对象</p>
+<blockquote>
+<p>从业务模型的角度看 , 见 UML 元件领域模型中的领域对象。封装业务逻辑的 java 对象 , 通过调用 DAO 方法 , 结合 PO,VO 进行业务操作。 business object: 业务对象 主要作用是把业务逻辑封装为一个对象。这个对象可以包括一个或多个其它的对象。 比如一个简历，有教育经历、工作经历、社会关系等等。 我们可以把教育经历对应一个 PO ，工作经历对应一个 PO ，社会关系对应一个 PO 。 建立一个对应简历的 BO 对象处理简历，每个 BO 包含这些 PO 。 这样处理业务逻辑时，我们就可以针对 BO 去处理。</p>
+</blockquote>
+<h2 id="POJO-plain-ordinary-java-object-简单无规则-java-对象"><a href="#POJO-plain-ordinary-java-object-简单无规则-java-对象" class="headerlink" title="POJO(plain ordinary java object) 简单无规则 java 对象"></a>POJO(plain ordinary java object) 简单无规则 java 对象</h2><blockquote>
+<p>纯的传统意义的 java 对象。就是说在一些 Object/Relation Mapping 工具中，能够做到维护数据库表记录的 persisent object 完全是一个符合 Java Bean 规范的纯 Java 对象，没有增加别的属性和方法。我的理解就是最基本的 Java Bean ，只有属性字段及 setter 和 getter 方法！。</p>
+</blockquote>
+<h2 id="DAO-data-access-object-数据访问对象"><a href="#DAO-data-access-object-数据访问对象" class="headerlink" title="DAO(data access object) 数据访问对象"></a>DAO(data access object) 数据访问对象</h2><blockquote>
+<p>是一个 sun 的一个标准 j2ee 设计模式， 这个模式中有个接口就是 DAO ，它负持久层的操作。为业务层提供接口。此对象用于访问数据库。通常和 PO 结合使用， DAO 中包含了各种数据库的操作方法。通过它的方法 , 结合 PO 对数据库进行相关的操作。夹在业务逻辑与数据库资源中间。配合 VO, 提供数据库的 CRUD 操作</p>
+</blockquote>
+<p><a href="http://www.hollischuang.com/archives/553" target="_blank" rel="external">原文转自</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——LockSupport/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/线程笔记——LockSupport/" itemprop="url">线程笔记——LockSupport</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:41:08+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="LockSupport"><a href="#LockSupport" class="headerlink" title="LockSupport"></a>LockSupport</h2><p><img src="http://img.blog.csdn.net/20170410090804136?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>LocalSupport类特性</p>
+<ul>
+<li><p>不可实例化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">private LockSupport() &#123;&#125; // Cannot be instantiated.</div></pre></td></tr></table></figure>
+</li>
+<li><p>LockSupport的方法都是静态方法</p>
+</li>
+<li><p>私有变量</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">private static final sun.misc.Unsafe UNSAFE;</div><div class="line">   private static final long parkBlockerOffset;</div></pre></td></tr></table></figure>
+<h2 id="私有变量-unsafe"><a href="#私有变量-unsafe" class="headerlink" title="私有变量:unsafe"></a>私有变量:unsafe</h2><blockquote>
+<ol>
+<li><strong>sun.misc.Unsafe</strong>可以直接操控内存。被JDK广泛用于自己的包中，如java.nio和java.util.concurrent</li>
+<li>API十分不安全、不轻便、而且不稳定。不建议在生产环境中使用</li>
+<li>这个不安全的类提供了一个观察HotSpot JVM内部结构并且可以对其进行修改。有时它可以被用来在不适用C++调试的情况下学习虚拟机内部结构，有时也可以被拿来做性能监控和开发工具</li>
+</ol>
+</blockquote>
+<h2 id="私有变量-parkBlockerOffset"><a href="#私有变量-parkBlockerOffset" class="headerlink" title="私有变量: parkBlockerOffset"></a>私有变量: parkBlockerOffset</h2><ul>
+<li>被LockSupport的setBlocker和getBlocker调用</li>
+<li>这个对象是用来记录线程被阻塞时被谁阻塞的，用于线程监控和分析工具来定位原因</li>
+</ul>
+<h2 id="LockSupport-java"><a href="#LockSupport-java" class="headerlink" title="LockSupport.java"></a>LockSupport.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 通过反射机制获取Thread类的parkBlocker字段对象。然后通过   </div><div class="line"> * sun.misc.Unsafe对象的objectFieldOffset方法获取到</div><div class="line"> * parkBlocker在内存里的偏移量</div><div class="line"> */</div><div class="line">parkBlockerOffset = UNSAFE.objectFieldOffset</div><div class="line">                (tk.getDeclaredField(&quot;parkBlocker&quot;));</div></pre></td></tr></table></figure>
+<h2 id="Thread-java"><a href="#Thread-java" class="headerlink" title="Thread.java"></a>Thread.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * The argument supplied to the current call to</div><div class="line">    * java.util.concurrent.locks.LockSupport.park.</div><div class="line">    * Set by (private) java.util.concurrent.locks.LockSupport.setBlocker</div><div class="line">    * Accessed using java.util.concurrent.locks.LockSupport.getBlocker</div><div class="line">    */</div><div class="line">   volatile Object parkBlocker;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>JVM的实现可以自由选择如何实现Java对象的“布局”，也就是在内存里Java对象的各个部分放在哪里，包括对象的实例字段和一些元数据等。<br>sun.misc.Unsafe里关于对象字段访问的方法把对象布局抽象出来，它提供了objectFieldOffset()方法用于获取某个字段相对 Java对象的“起始地址”的偏移量，也提供了getInt、getLong、getObject之类的方法可以使用前面获取的偏移量来访问某个Java 对象的某个字段</p>
+</blockquote>
+<p><strong>为什么要用偏移量来获取对象？不直接调用get/set方法？</strong></p>
+<blockquote>
+<p>parkBlocker就是在线程处于阻塞的情况下才会被赋值。线程都已经阻塞了，如果不通过这种内存的方法，而是直接调用线程内的方法，线程是不会回应调用的</p>
+</blockquote>
+<hr>
+<h2 id="LockSupport-Method"><a href="#LockSupport-Method" class="headerlink" title="LockSupport Method"></a>LockSupport Method</h2><ul>
+<li>LockSupport中有且只有一个私有方法<ul>
+<li><strong>对给定线程t的parkBlocker赋值。为了防止这个parkBlocker被误用，该方法是不对外公开的</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private static void setBlocker(Thread t, Object arg) &#123;</div><div class="line">        // Even though volatile, hotspot doesn&apos;t need a write barrier here.</div><div class="line">        UNSAFE.putObject(t, parkBlockerOffset, arg);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>参数</p>
+<ul>
+<li>Thread t 需要被赋值Blocker的线程</li>
+<li>Object arg 具体的Blocker对象</li>
+</ul>
+<hr>
+<ul>
+<li>从线程t中获取它的parkBlocker对象，即返回的是阻塞线程t的Blocker对象<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static Object getBlocker(Thread t) &#123;  </div><div class="line">    if (t == null)  </div><div class="line">        throw new NullPointerException();  </div><div class="line">    return unsafe.getObjectVolatile(t, parkBlockerOffset);  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="以park开头的方法，用于阻塞线程"><a href="#以park开头的方法，用于阻塞线程" class="headerlink" title="以park开头的方法，用于阻塞线程"></a>以park开头的方法，用于阻塞线程</h3><p><strong>带blocker参数的park方法</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public static void park(Object blocker) &#123;</div><div class="line">        Thread t = Thread.currentThread();</div><div class="line">        setBlocker(t, blocker);</div><div class="line">        UNSAFE.park(false, 0L);</div><div class="line">        setBlocker(t, null);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkNanos(Object blocker, long nanos) &#123;</div><div class="line">        if (nanos &gt; 0) &#123;</div><div class="line">            Thread t = Thread.currentThread();</div><div class="line">            setBlocker(t, blocker);</div><div class="line">            UNSAFE.park(false, nanos);</div><div class="line">            setBlocker(t, null);</div><div class="line">        &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkUntil(Object blocker, long deadline) &#123;</div><div class="line">        Thread t = Thread.currentThread();</div><div class="line">        setBlocker(t, blocker);</div><div class="line">        UNSAFE.park(true, deadline);</div><div class="line">        setBlocker(t, null);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>参数：</p>
+<ul>
+<li>Object blocker：用于记录到线程中的parkBlocker对象。</li>
+<li>nanos：在nanos时间后线程自动恢复挂起</li>
+<li>deadline：在deadline时刻线程自动（这个毫秒其实就是自1970年1月1日0时起的毫秒数）</li>
+</ul>
+<p><strong>不带blocker参数的park方法</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public static void park() &#123;</div><div class="line">        UNSAFE.park(false, 0L);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkNanos(long nanos) &#123;</div><div class="line">        if (nanos &gt; 0)</div><div class="line">            UNSAFE.park(false, nanos);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkUntil(long deadline) &#123;</div><div class="line">        UNSAFE.park(true, deadline);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>没有做parkBlocker的赋值操作</li>
+</ul>
+<h3 id="以unpark开头的方法，用于解除阻塞"><a href="#以unpark开头的方法，用于解除阻塞" class="headerlink" title="以unpark开头的方法，用于解除阻塞"></a>以unpark开头的方法，用于解除阻塞</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public static void unpark(Thread thread) &#123;</div><div class="line">        if (thread != null)</div><div class="line">            UNSAFE.unpark(thread);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>park与unpark命令是成对出现的。unpark必须要在park命令后执行。但是线程的恢复并不一定要用unpark, 因为park的时间参数，有些情况下线程会自己恢复</p>
+</blockquote>
+<p><a href="https://my.oschina.net/readjava/blog/282882" target="_blank" rel="external">源码参考</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——AQS（AbstractQueuedSynchronizer）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1561,400 +1921,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/深入理解JVM学习笔记（二）-——-对象/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/深入理解JVM学习笔记（二）-——-对象/" itemprop="url">深入理解JVM学习笔记（二） —— 对象</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:29:38+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>【问题一】程序通过new一个普通对象的时候，虚拟机进行了哪些操作？<br>  解答： ①首先检查这个指令的参数是否能在常量池中定位到这个类引用<br>  ②并且检查这个符号引用代表的类是否被加载、解析、初始化过③若没有加载，必须执行相应类的类加载过程④<strong>虚拟机为新生对象分配内存</strong>(对象所需内存大小，在类加载时间可以完全确定)</p>
-<h3 id="④-分配内存"><a href="#④-分配内存" class="headerlink" title="④ 分配内存"></a>④ 分配内存</h3><blockquote>
-<p>为对象分配大小相当于把一块确定大小的内存从Java堆中划分出来。<strong>假设Java内存是规整的</strong>，所有用过的内存放在一边，所有空闲的内存放在一边，中间放着一个指针作为分界点的指示器。对象大小就是指针向空闲内存移动的距离，这种分配方式叫做<strong>指针碰撞</strong>。假设内存是不规整的，已使用的空间和空闲空间相互交错，虚拟机须维护一个列表，存放可用内存空间，在分配的时候根据列表找到一块足够大的空间给对象，并更新列表上的记录，这种分配被称为“空闲列表”<br>总结：选择哪种分配方式是通过Java内存是否规整决定，而Java是否规整又由采集的垃圾收集器（GC）是否带有压缩整理功能决定</p>
-<p><strong>Compact收集器采用指针碰撞方式，而Mark-Slweep采用空闲列表</strong></p>
-</blockquote>
-<hr>
-<p>分配对象可能是线程不安全的，虚拟机采用2种方式保证更新操作的原子性</p>
-<ul>
-<li>CAS+失败重试方式</li>
-<li>每个线程预分配一小块内存(本地线程分配缓冲区TLAB)。哪个线程需要分配内存，就在哪个线程的TLAB上分配，只有TLAB用完并分配新的TLAB，才同步锁定</li>
-</ul>
-<p>使用TLAB<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-XX:+/-UseTLAB</div></pre></td></tr></table></figure></p>
-<h3 id="⑤-初始化"><a href="#⑤-初始化" class="headerlink" title="⑤ 初始化"></a>⑤ 初始化</h3><blockquote>
-<p>虚拟机将分配到的内存空间初始化为0.如果使用TLAB，可将这一操作提前到分配TLAB时进行。<br>保证Java实例对象字段，不需要初始化，就可以直接使用。</p>
-</blockquote>
-<p>###⑥ 必要设置</p>
-<blockquote>
-<p>虚拟机对对象进行必要的设置。例如: 对象属于哪个类实例、如何找到类的元数据信息、对象哈希码、对象GC分代年龄等设置</p>
-</blockquote>
-<p>以上完成后。对于虚拟机来说，一个对象已经产生了，但是从Java的角度看，一个对象的创建刚刚开始——init()还未执行，所有字段还是0.</p>
-<blockquote>
-<p>注意：<strong>当一个对象初始化之后，一个真正可用的对象才算生成。</strong></p>
-</blockquote>
-<hr>
-<h2 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h2><p>对象在内存中的布局包含：<strong>对象头、实例数据、对齐填充</strong><br>HotSpot虚拟机对象头包括：<strong>存储自身对象运行数据和类型指针</strong></p>
-<ul>
-<li>存储自身对象<ul>
-<li>哈希码、GC分代年龄、锁标志、线程持有锁、偏向线程ID、偏向时间戳等</li>
-</ul>
-</li>
-<li>类型指针<ul>
-<li>通过这个指针确定这个对象属于哪个类实例。但是不是所有虚拟机都必须在对象数据类型保留类型指针，所以查找对象的元数据信息不一定要经过类本身。如果是一个数组，还需要记录长度数据。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<p>实例数据字段分配策略顺序：longs/doubles -&gt; int -&gt; short/chars -&gt; byte/boolean -&gt; oops </p>
-<ol>
-<li>相同宽度的字段总是分配在一起</li>
-<li>父类定义的变量总是在子类之前</li>
-<li>对其填充仅仅起占位符的作用</li>
-</ol>
-<hr>
-<h2 id="对象访问定位"><a href="#对象访问定位" class="headerlink" title="对象访问定位"></a>对象访问定位</h2><blockquote>
-<p>通过栈上的reference数据操作堆上数据<br>reference只提供了一个指向对象的引用，访问定位主流方式有使用句柄和直接指针两种方式实现</p>
-</blockquote>
-<p>访问方式</p>
-<ul>
-<li><p>使用句柄</p>
-<ul>
-<li>Java堆划分一块内存作为句柄池，reference存储对象句柄地址。而句柄中包含对象实例数据和类型数据各自的地址信息</li>
-</ul>
-</li>
-<li><p>使用直接指针</p>
-<ul>
-<li>reference存储的是对象地址</li>
-</ul>
-</li>
-</ul>
-<p>句柄访问方式<br><img src="http://img.blog.csdn.net/20170414155500400?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="句柄访问方式"></p>
-<p>直接指针访问方式<br><img src="http://img.blog.csdn.net/20170414155520041?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="直接指针访问方式"></p>
-<p>句柄访问优点：在对象移动时，改变的只是句柄中的实例数据本身，而reference本身并不改变</p>
-<p>直接指针的优点：访问速度快，节省了指针定位的开销</p>
-<ul>
-<li></li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/深入理解JVM学习笔记（一）-——-JVM数据区域/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/深入理解JVM学习笔记（一）-——-JVM数据区域/" itemprop="url">深入理解JVM学习笔记（一） —— JVM数据区域</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:28:56+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="JVM结构图"><a href="#JVM结构图" class="headerlink" title="JVM结构图"></a>JVM结构图</h3><p><img src="http://img.blog.csdn.net/20170413114755159?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="JVM结构"></p>
-<h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><blockquote>
-<p>是一块较小的内存空间。当前线程所执行的字节码的行号指示器。</p>
-</blockquote>
-<p>字节码解释器工作原理</p>
-<blockquote>
-<p>通过改变计数器的值来选取下一条需要执行的字节码指令。</p>
-</blockquote>
-<p>分支、循环、跳转、异常处理、线程恢复等操作都需要依赖计数器</p>
-<p>JAVA多线程实现方式</p>
-<blockquote>
-<p>线程之间轮流切换并分配处理器执行时间实现的</p>
-</blockquote>
-<p>运行Java方法时，执行虚拟机字节码指令地址。<br>运行Native方法时，计数器则为空(undefined)。<strong>是唯一一个在java虚拟机中没有规定outOfMemoryError的错误</strong></p>
-<hr>
-<h2 id="虚拟机栈"><a href="#虚拟机栈" class="headerlink" title="虚拟机栈"></a>虚拟机栈</h2><blockquote>
-<p>线程私有。虚拟机栈的生命周期和线程相同。用来描述java方法执行的内存模型。</p>
-</blockquote>
-<h3 id="栈帧"><a href="#栈帧" class="headerlink" title="栈帧"></a>栈帧</h3><blockquote>
-<p>每个方法创建时产生</p>
-<p>作用：存储局部变量表、操作数栈、动态链接、方法出口等。</p>
-<p><strong>每个方法调用到执行完成的过程，对应一个虚拟机栈帧入栈到出栈的过程</strong></p>
-</blockquote>
-<p>堆(Heap)栈(Stack)只是java虚拟机内存粗略的划分</p>
-<p>局部变量存储了编译时期各种基本类型、对象引用。不等于对象本身，可能是指向对象起始地址的引用指针，也可能是代表一个对象的句柄或其他与此对象相关的位置和returnAddress(字节码地址)</p>
-<p>特例：64位长度的long和double类型数据占用2个局部变量空间。其余只占用1个。</p>
-<h2 id="虚拟机栈异常"><a href="#虚拟机栈异常" class="headerlink" title="虚拟机栈异常"></a>虚拟机栈异常</h2><ol>
-<li><strong>线程请求的栈深度大于虚拟机所允许的栈深度，抛出StackOverException</strong></li>
-<li><strong>虚拟机动态扩展到无法申请到更多可用内存，抛出OutOfMemoryException</strong></li>
-</ol>
-<hr>
-<h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><blockquote>
-<p>虚拟机栈有的特性，本地方法栈都有。唯一的区别：<strong>虚拟机栈执行Java方法，本地方法栈执行Native方法</strong></p>
-</blockquote>
-<hr>
-<h2 id="堆（Heap）"><a href="#堆（Heap）" class="headerlink" title="堆（Heap）"></a>堆（Heap）</h2><blockquote>
-<p>虚拟机管理内存中最大的一块。<br>被所有线程共享的内存区域。<br>唯一作用就是存放对象实例。</p>
-</blockquote>
-<p>不过随着JIT编译器发展与逃逸分析技术成熟，栈上分配、标量替换也可以存放对象实例。</p>
-<p>Java堆是垃圾收集管理的主要区域，也叫做GC堆。</p>
-<p>从内存回收的角度看。由于垃圾回收分析采用分代收集算法。可细分为：新生代和老年代。也可分为：<strong>Eden空间、From Survivor空间、To Survivor空间。</strong></p>
-<p>从内存分配的角度看。线程共享的Java堆可划分<strong>多个线程私有的线程缓冲区。</strong></p>
-<p><strong>划分的目的是为了更好的回收内存、更快的分配内存。</strong></p>
-<p>-Xms 和 Xmx 控制Java堆大小。</p>
-<p><strong>堆异常</strong><br>如果堆中内存没有完成实例分配，抛出OutOfMemoryException</p>
-<hr>
-<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><blockquote>
-<p>各个线程的共享区域。存储<strong>已加载的类信息、常量、静态变量以及编译器编译后的代码数据。</strong><br>为了与Java堆区分开，方法区的另一个别名non-Heap(非堆)</p>
-</blockquote>
-<p><strong>非堆可以不实现垃圾收集。</strong></p>
-<h2 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h2><blockquote>
-<p>属于方法区一部分。用于存放编译时期生成的各种字面量和符号引用。<br>运行时常量池相当于Class常量池又一重要的特性：动态性。<br>运行期可将新的常量放入常量池。常用的是String的intern() </p>
-</blockquote>
-<h2 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h2><blockquote>
-<p>不属于虚拟机运行时数据区。也不属于虚拟机定义的内存区域。但是被频繁使用。可能导致OutOfMemoryException出现。</p>
-</blockquote>
-<p>NIO就使用了这个方式。通过使用Native函数直接分配给堆外内存。然后通过一个存储在Java堆中directByteBuffer对象作为这块内存的引用。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1999,7 +1970,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">149</span>
+                <span class="site-state-item-count">151</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2010,7 +1981,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">60</span>
+                <span class="site-state-item-count">61</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2021,7 +1992,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">113</span>
+                <span class="site-state-item-count">115</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

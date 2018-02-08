@@ -254,6 +254,336 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Session跨域的几种方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/Session跨域的几种方案/" itemprop="url">Session跨域的几种方案</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:10:33+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/跨域/" itemprop="url" rel="index">
+                    <span itemprop="name">跨域</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>之前项目中涉及到跨域问题（2个不同的域名访问同一个服务器）造成session丢失的问题，请求分发用的是nginx</p>
+<p>总结了以下，常用的session处理方式有以下几种</p>
+<h2 id="ip-hash"><a href="#ip-hash" class="headerlink" title="ip_hash"></a>ip_hash</h2><p>【概念】当对后端的多台动态应用服务器做负载均衡时，ip_hash指令能够将某个客户端IP的请求通过哈希算法定位到同一台后端服务器上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream myproject &#123;</div><div class="line">    ip_hash;</div><div class="line">    server 192.168.40.31:8070 //down 将服务器移除负载</div><div class="line">    server 192.168.40.16:8080; </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>【缺点】使用ip_hash指令<strong>无法保证后端服务器的负载均衡</strong>，可能有些后端服务器接收的请求多，有些后端服务器收到的请求少，而且设置后端服务权重等方法将不起作用</p>
+<p><a href="http://server.zzidc.com/fwqjs/222.html" target="_blank" rel="external">关于ip_hash</a></p>
+<h2 id="session共享"><a href="#session共享" class="headerlink" title="session共享"></a>session共享</h2><h3 id="第三方存储"><a href="#第三方存储" class="headerlink" title="第三方存储"></a>第三方存储</h3><p>【思路】把session数据保存到内存以外的一个统一的地方，例如Memcached/Redis等数据库中。那么问题又来了，如何替换掉Servlet容器创建和管理HttpSession的实现呢？（HttpSession是通过Servlet容器创建和管理的，像Tomcat/Jetty都是保存在内存中的）</p>
+<p>方法<br>1). 设计一个Filter，利用HttpServletRequestWrapper，实现自己的 getSession()方法，接管创建和管理Session数据的工作(SpringSession)</p>
+<blockquote>
+<p>Spring Session提供了一套创建和管理Servlet HttpSession的方案。Spring Session提供了集群Session（Clustered Sessions）功能，默认采用外置的Redis来存储Session数据，以此来解决Session共享的问题</p>
+</blockquote>
+<p>参考<br><a href="https://github.com/spring-projects/spring-session" target="_blank" rel="external">spring-session</a><br><a href="http://docs.spring.io/spring-session/docs/1.3.0.RELEASE/reference/html5/" target="_blank" rel="external">spring-session-官方英文文档</a><br><a href="http://blog.csdn.net/patrickyoung6625/article/details/45694157" target="_blank" rel="external">spring-session-csdn-blog</a></p>
+<p>2). 利用Servlet容器提供的插件功能，自定义HttpSession的创建和管理策略，并通过配置的方式替换掉默认的策略(需要耦合Tomcat/Jetty等Servlet容器的代码)</p>
+<p>参考(基于tomcat6或者7)<br><a href="https://github.com/jcoleman/tomcat-redis-session-manager" target="_blank" rel="external">tomcat-redis-manager</a><br><a href="https://github.com/magro/memcached-session-manager" target="_blank" rel="external">tomcat-memcached-manager</a></p>
+<h2 id="session复制"><a href="#session复制" class="headerlink" title="session复制"></a>session复制</h2><p>与服务器有关<br>参考<br><a href="http://wiki.jikexueyuan.com/project/tomcat/clustering.html" target="_blank" rel="external">tomcat中文文档</a><br><a href="http://tomcat.apache.org/tomcat-8.0-doc/config/cluster.html" target="_blank" rel="external">tomcat官方英文文档</a></p>
+<h2 id="http-无状态-token"><a href="#http-无状态-token" class="headerlink" title="http 无状态 token"></a>http 无状态 token</h2><p><a href="http://baike.baidu.com/item/HTTP%E6%97%A0%E7%8A%B6%E6%80%81%E5%8D%8F%E8%AE%AE" target="_blank" rel="external">百度百科（什么是无状态协议）</a><br><a href="http://wiki.jikexueyuan.com/project/oauth-2/" target="_blank" rel="external">OAuth2文档</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】lambda表达式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/05/【Java8】lambda表达式/" itemprop="url">【Java8】lambda表达式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T11:09:56+08:00">
+                2017-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li><p>学习内容</p>
+<ul>
+<li>行为参数化</li>
+<li>lambda表达式</li>
+<li>方法引用</li>
+</ul>
+</li>
+<li><p>行为参数化</p>
+<ul>
+<li>让函数仅保留模板代码，而把筛选条件抽离出来当做参数传递进来</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;Apple&gt; filterApples = filterApplesByAppleFilter(apples,(Apple apple) -&gt; Color.RED.equals(apple.getColor()) &amp;&amp; apple.getWeight() &gt;= 100);</div></pre></td></tr></table></figure>
+<ul>
+<li>lambda表达式定义</li>
+</ul>
+<blockquote>
+<p>lambda表达式定义为一种 简洁、可传递的匿名函数，首先我们需要明确<strong>lambda表达式本质上是一个函数，虽然它不属于某个特定的类，但具备参数列表、函数主体、返回类型，以及能够抛出异常；其次它是匿名的，lambda表达式没有具体的函数名称</strong>；lambda表达式可以像参数一样进行传递，从而极大的简化代码的编写</p>
+</blockquote>
+<ul>
+<li>lambda表达式格式<ul>
+<li>格式一： 参数列表 -&gt; 表达式</li>
+<li>格式二： 参数列表 -&gt; {表达式集合}</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>lambda表达式隐含了return关键字</strong>，所以在单个的表达式中，我们无需显式的写return关键字，但是<strong>当表达式是一个语句集合的时候，则需要显式添加return，并用花括号{ }将多个表达式包围起来</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//返回给定字符串的长度，隐含return语句</div><div class="line">(String s) -&gt; s.length() </div><div class="line"></div><div class="line">// 始终返回42的无参方法</div><div class="line">() -&gt; 42 </div><div class="line"></div><div class="line">// 包含多行表达式，则用花括号括起来</div><div class="line">(int x, int y) -&gt; &#123;</div><div class="line">    int z = x * y;</div><div class="line">    return x + z;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>依托于函数式接口使用lambda表达式</p>
+<ul>
+<li>自定义函数式接口<ul>
+<li>函数式接口定义为只具备 一个抽象方法的接口</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>方法引用</p>
+</li>
+</ul>
+<p>静态方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line">(args) -&gt; ClassName.staticMethod(args) / ClassName::staticMethod</div></pre></td></tr></table></figure>
+<p> 参数的实例方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(args) -&gt; args.instanceMethod() / ClassName::instanceMethod //ClassName是args的类型</div></pre></td></tr></table></figure>
+<p>外部的实例方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(args) -&gt; ext.instanceMethod(args) / ext::instanceMethod(args)</div></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/【Java8】foreach/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1685,371 +2015,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/Java各种对象名称详解/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/Java各种对象名称详解/" itemprop="url">Java各种对象名称详解</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:41:55+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Object/" itemprop="url" rel="index">
-                    <span itemprop="name">Object</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="PO-persistant-object-持久对象"><a href="#PO-persistant-object-持久对象" class="headerlink" title="PO(persistant object) 持久对象"></a>PO(persistant object) 持久对象</h2><blockquote>
-<p>在 <strong>o/r 映射</strong>的时候出现的概念，如果没有 o/r 映射，没有这个概念存在了。<strong>通常对应数据模型 ( 数据库 ), 本身还有部分业务逻辑的处理。可以看成是与数据库中的表相映射的 java 对象。</strong>最简单的 PO 就是对应数据库中某个表中的一条记录，多个记录可以用 PO 的集合。 PO 中应该不包含任何对数据库的操作。</p>
-</blockquote>
-<p>##DO（Domain Object）领域对象</p>
-<blockquote>
-<p>就是从现实世界中抽象出来的有形或无形的业务实体。<strong>一般和数据中的表结构对应。</strong></p>
-</blockquote>
-<h2 id="TO-Transfer-Object"><a href="#TO-Transfer-Object" class="headerlink" title="TO(Transfer Object)"></a>TO(Transfer Object)</h2><blockquote>
-<p>数据传输对象<br>在应用程序不同 tie( 关系 ) 之间传输的对象</p>
-</blockquote>
-<h2 id="DTO（Data-Transfer-Object）数据传输对象"><a href="#DTO（Data-Transfer-Object）数据传输对象" class="headerlink" title="DTO（Data Transfer Object）数据传输对象"></a>DTO（Data Transfer Object）数据传输对象</h2><blockquote>
-<p>这个概念来源于J2EE的设计模式，原来的目的是为了EJB的分布式应用提供粗粒度的数据实体，以减少分布式调用的次数，从而提高分布式调用的性能和降低网络负载，但在这里，我泛指用于展示层与服务层之间的数据传输对象。</p>
-</blockquote>
-<h2 id="VO-view-object-值对象"><a href="#VO-view-object-值对象" class="headerlink" title="VO(view object) 值对象"></a>VO(view object) 值对象</h2><blockquote>
-<p>视图对象，用于展示层，它的作用是把某个指定页面（或组件）的所有数据封装起来。</p>
-</blockquote>
-<p>##BO(business object) 业务对象</p>
-<blockquote>
-<p>从业务模型的角度看 , 见 UML 元件领域模型中的领域对象。封装业务逻辑的 java 对象 , 通过调用 DAO 方法 , 结合 PO,VO 进行业务操作。 business object: 业务对象 主要作用是把业务逻辑封装为一个对象。这个对象可以包括一个或多个其它的对象。 比如一个简历，有教育经历、工作经历、社会关系等等。 我们可以把教育经历对应一个 PO ，工作经历对应一个 PO ，社会关系对应一个 PO 。 建立一个对应简历的 BO 对象处理简历，每个 BO 包含这些 PO 。 这样处理业务逻辑时，我们就可以针对 BO 去处理。</p>
-</blockquote>
-<h2 id="POJO-plain-ordinary-java-object-简单无规则-java-对象"><a href="#POJO-plain-ordinary-java-object-简单无规则-java-对象" class="headerlink" title="POJO(plain ordinary java object) 简单无规则 java 对象"></a>POJO(plain ordinary java object) 简单无规则 java 对象</h2><blockquote>
-<p>纯的传统意义的 java 对象。就是说在一些 Object/Relation Mapping 工具中，能够做到维护数据库表记录的 persisent object 完全是一个符合 Java Bean 规范的纯 Java 对象，没有增加别的属性和方法。我的理解就是最基本的 Java Bean ，只有属性字段及 setter 和 getter 方法！。</p>
-</blockquote>
-<h2 id="DAO-data-access-object-数据访问对象"><a href="#DAO-data-access-object-数据访问对象" class="headerlink" title="DAO(data access object) 数据访问对象"></a>DAO(data access object) 数据访问对象</h2><blockquote>
-<p>是一个 sun 的一个标准 j2ee 设计模式， 这个模式中有个接口就是 DAO ，它负持久层的操作。为业务层提供接口。此对象用于访问数据库。通常和 PO 结合使用， DAO 中包含了各种数据库的操作方法。通过它的方法 , 结合 PO 对数据库进行相关的操作。夹在业务逻辑与数据库资源中间。配合 VO, 提供数据库的 CRUD 操作</p>
-</blockquote>
-<p><a href="http://www.hollischuang.com/archives/553" target="_blank" rel="external">原文转自</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/05/线程笔记——LockSupport/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/05/线程笔记——LockSupport/" itemprop="url">线程笔记——LockSupport</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-05T10:41:08+08:00">
-                2017-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="LockSupport"><a href="#LockSupport" class="headerlink" title="LockSupport"></a>LockSupport</h2><p><img src="http://img.blog.csdn.net/20170410090804136?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMjA1OTc0Nzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>LocalSupport类特性</p>
-<ul>
-<li><p>不可实例化</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">private LockSupport() &#123;&#125; // Cannot be instantiated.</div></pre></td></tr></table></figure>
-</li>
-<li><p>LockSupport的方法都是静态方法</p>
-</li>
-<li><p>私有变量</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">private static final sun.misc.Unsafe UNSAFE;</div><div class="line">   private static final long parkBlockerOffset;</div></pre></td></tr></table></figure>
-<h2 id="私有变量-unsafe"><a href="#私有变量-unsafe" class="headerlink" title="私有变量:unsafe"></a>私有变量:unsafe</h2><blockquote>
-<ol>
-<li><strong>sun.misc.Unsafe</strong>可以直接操控内存。被JDK广泛用于自己的包中，如java.nio和java.util.concurrent</li>
-<li>API十分不安全、不轻便、而且不稳定。不建议在生产环境中使用</li>
-<li>这个不安全的类提供了一个观察HotSpot JVM内部结构并且可以对其进行修改。有时它可以被用来在不适用C++调试的情况下学习虚拟机内部结构，有时也可以被拿来做性能监控和开发工具</li>
-</ol>
-</blockquote>
-<h2 id="私有变量-parkBlockerOffset"><a href="#私有变量-parkBlockerOffset" class="headerlink" title="私有变量: parkBlockerOffset"></a>私有变量: parkBlockerOffset</h2><ul>
-<li>被LockSupport的setBlocker和getBlocker调用</li>
-<li>这个对象是用来记录线程被阻塞时被谁阻塞的，用于线程监控和分析工具来定位原因</li>
-</ul>
-<h2 id="LockSupport-java"><a href="#LockSupport-java" class="headerlink" title="LockSupport.java"></a>LockSupport.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 通过反射机制获取Thread类的parkBlocker字段对象。然后通过   </div><div class="line"> * sun.misc.Unsafe对象的objectFieldOffset方法获取到</div><div class="line"> * parkBlocker在内存里的偏移量</div><div class="line"> */</div><div class="line">parkBlockerOffset = UNSAFE.objectFieldOffset</div><div class="line">                (tk.getDeclaredField(&quot;parkBlocker&quot;));</div></pre></td></tr></table></figure>
-<h2 id="Thread-java"><a href="#Thread-java" class="headerlink" title="Thread.java"></a>Thread.java</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * The argument supplied to the current call to</div><div class="line">    * java.util.concurrent.locks.LockSupport.park.</div><div class="line">    * Set by (private) java.util.concurrent.locks.LockSupport.setBlocker</div><div class="line">    * Accessed using java.util.concurrent.locks.LockSupport.getBlocker</div><div class="line">    */</div><div class="line">   volatile Object parkBlocker;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>JVM的实现可以自由选择如何实现Java对象的“布局”，也就是在内存里Java对象的各个部分放在哪里，包括对象的实例字段和一些元数据等。<br>sun.misc.Unsafe里关于对象字段访问的方法把对象布局抽象出来，它提供了objectFieldOffset()方法用于获取某个字段相对 Java对象的“起始地址”的偏移量，也提供了getInt、getLong、getObject之类的方法可以使用前面获取的偏移量来访问某个Java 对象的某个字段</p>
-</blockquote>
-<p><strong>为什么要用偏移量来获取对象？不直接调用get/set方法？</strong></p>
-<blockquote>
-<p>parkBlocker就是在线程处于阻塞的情况下才会被赋值。线程都已经阻塞了，如果不通过这种内存的方法，而是直接调用线程内的方法，线程是不会回应调用的</p>
-</blockquote>
-<hr>
-<h2 id="LockSupport-Method"><a href="#LockSupport-Method" class="headerlink" title="LockSupport Method"></a>LockSupport Method</h2><ul>
-<li>LockSupport中有且只有一个私有方法<ul>
-<li><strong>对给定线程t的parkBlocker赋值。为了防止这个parkBlocker被误用，该方法是不对外公开的</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private static void setBlocker(Thread t, Object arg) &#123;</div><div class="line">        // Even though volatile, hotspot doesn&apos;t need a write barrier here.</div><div class="line">        UNSAFE.putObject(t, parkBlockerOffset, arg);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<p>参数</p>
-<ul>
-<li>Thread t 需要被赋值Blocker的线程</li>
-<li>Object arg 具体的Blocker对象</li>
-</ul>
-<hr>
-<ul>
-<li>从线程t中获取它的parkBlocker对象，即返回的是阻塞线程t的Blocker对象<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static Object getBlocker(Thread t) &#123;  </div><div class="line">    if (t == null)  </div><div class="line">        throw new NullPointerException();  </div><div class="line">    return unsafe.getObjectVolatile(t, parkBlockerOffset);  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="以park开头的方法，用于阻塞线程"><a href="#以park开头的方法，用于阻塞线程" class="headerlink" title="以park开头的方法，用于阻塞线程"></a>以park开头的方法，用于阻塞线程</h3><p><strong>带blocker参数的park方法</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public static void park(Object blocker) &#123;</div><div class="line">        Thread t = Thread.currentThread();</div><div class="line">        setBlocker(t, blocker);</div><div class="line">        UNSAFE.park(false, 0L);</div><div class="line">        setBlocker(t, null);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkNanos(Object blocker, long nanos) &#123;</div><div class="line">        if (nanos &gt; 0) &#123;</div><div class="line">            Thread t = Thread.currentThread();</div><div class="line">            setBlocker(t, blocker);</div><div class="line">            UNSAFE.park(false, nanos);</div><div class="line">            setBlocker(t, null);</div><div class="line">        &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkUntil(Object blocker, long deadline) &#123;</div><div class="line">        Thread t = Thread.currentThread();</div><div class="line">        setBlocker(t, blocker);</div><div class="line">        UNSAFE.park(true, deadline);</div><div class="line">        setBlocker(t, null);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>参数：</p>
-<ul>
-<li>Object blocker：用于记录到线程中的parkBlocker对象。</li>
-<li>nanos：在nanos时间后线程自动恢复挂起</li>
-<li>deadline：在deadline时刻线程自动（这个毫秒其实就是自1970年1月1日0时起的毫秒数）</li>
-</ul>
-<p><strong>不带blocker参数的park方法</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public static void park() &#123;</div><div class="line">        UNSAFE.park(false, 0L);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkNanos(long nanos) &#123;</div><div class="line">        if (nanos &gt; 0)</div><div class="line">            UNSAFE.park(false, nanos);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static void parkUntil(long deadline) &#123;</div><div class="line">        UNSAFE.park(true, deadline);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>没有做parkBlocker的赋值操作</li>
-</ul>
-<h3 id="以unpark开头的方法，用于解除阻塞"><a href="#以unpark开头的方法，用于解除阻塞" class="headerlink" title="以unpark开头的方法，用于解除阻塞"></a>以unpark开头的方法，用于解除阻塞</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public static void unpark(Thread thread) &#123;</div><div class="line">        if (thread != null)</div><div class="line">            UNSAFE.unpark(thread);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<blockquote>
-<p>park与unpark命令是成对出现的。unpark必须要在park命令后执行。但是线程的恢复并不一定要用unpark, 因为park的时间参数，有些情况下线程会自己恢复</p>
-</blockquote>
-<p><a href="https://my.oschina.net/readjava/blog/282882" target="_blank" rel="external">源码参考</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2094,7 +2064,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">149</span>
+                <span class="site-state-item-count">151</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2105,7 +2075,7 @@
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">60</span>
+                <span class="site-state-item-count">61</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2116,7 +2086,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">113</span>
+                <span class="site-state-item-count">115</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

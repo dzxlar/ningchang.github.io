@@ -254,6 +254,538 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/08/Python小试牛刀——获取代理IP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/08/Python小试牛刀——获取代理IP/" itemprop="url">Python小试牛刀——获取代理IP</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-08T17:40:46+08:00">
+                2018-02-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>因为爬某些网站有IP限制，所以弄了一个获取代理的工具类</p>
+</blockquote>
+<pre><code># -*- coding: utf-8 -*-
+
+from bs4 import BeautifulSoup # pip install bs4 安装lxml解析器 import pip print(pip.pep425tags.get_supported()) 检测版本https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
+import requests
+import random
+
+class Proxy:
+
+    def getIps(self,url, headers):
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, &apos;lxml&apos;)
+        ips = soup.find_all(&apos;tr&apos;)
+        ipList = []
+        for i in range(1, len(ips)):
+            ipInfo = ips[i]
+            tds = ipInfo.find_all(&apos;td&apos;)
+            ipList.append(tds[1].text + &apos;:&apos; + tds[2].text)
+        return ipList
+
+    def getRandomIp(self,ipList):
+        proxyList = []
+        for ip in ipList:
+            proxyList.append(&apos;http://&apos; + ip)
+        proxyIp = random.choice(proxyList)
+        proxyUrl = {&apos;http&apos;: proxyIp,&apos;https&apos;:proxyIp}
+        return proxyUrl
+
+if __name__ == &apos;__main__&apos;:
+
+    proxy = Proxy()
+
+    url = &apos;http://www.xicidaili.com/nn/&apos;
+    headers = {
+        &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36&apos;
+    }
+    ipList = proxy.getIps(url, headers=headers)
+    proxyUrl = proxy.getRandomIp(ipList)
+    print(proxyUrl)
+</code></pre>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/02/Python小试牛刀——新浪微博自动转发/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dzx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="dzxblog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/02/Python小试牛刀——新浪微博自动转发/" itemprop="url">Python小试牛刀——新浪微博自动转发</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-02T16:29:57+08:00">
+                2018-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>为了更加熟练python，所以通过新浪微博转发的例子加深印象</p>
+</blockquote>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>python3.6</li>
+</ul>
+<h2 id="登录实现"><a href="#登录实现" class="headerlink" title="登录实现"></a>登录实现</h2><h3 id="登录请求链"><a href="#登录请求链" class="headerlink" title="登录请求链"></a>登录请求链</h3><p>通过火狐追踪新浪微博完整登录请求，可以获得2个关键URL</p>
+<ul>
+<li>对登录进行加密处理<ul>
+<li>preLoginUrl = ‘<a href="https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;callback=sinaSSOController.preloginCallBack&amp;su=%s&amp;rsakt=mod&amp;checkpin=1&amp;client=ssologin.js(v1.4.19)&amp;_=%s" target="_blank" rel="external">https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;callback=sinaSSOController.preloginCallBack&amp;su=%s&amp;rsakt=mod&amp;checkpin=1&amp;client=ssologin.js(v1.4.19)&amp;_=%s</a>‘ % (su,int(round(time.time() * 1000))) </li>
+</ul>
+</li>
+<li>核心登录地址<ul>
+<li>loginUrl = ‘<a href="https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19" target="_blank" rel="external">https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19</a>)’</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p> 可以通过 <a href="http://login.sina.com.cn/js/sso/ssologin.js" target="_blank" rel="external">http://login.sina.com.cn/js/sso/ssologin.js</a> 解压查看加密方式</p>
+</blockquote>
+<h3 id="通过preLoginUrl得到几个关键参数"><a href="#通过preLoginUrl得到几个关键参数" class="headerlink" title="通过preLoginUrl得到几个关键参数"></a>通过preLoginUrl得到几个关键参数</h3><p><strong>servertime,nonce,pubkey,rsakv</strong></p>
+<h3 id="用户名通过base64位加密，也就是loginUrl中formData的su参数"><a href="#用户名通过base64位加密，也就是loginUrl中formData的su参数" class="headerlink" title="用户名通过base64位加密，也就是loginUrl中formData的su参数"></a>用户名通过base64位加密，也就是loginUrl中formData的su参数</h3><pre><code># 得到su值base64加密的账号
+def getSu(self):
+    b64_username = su = base64.b64encode(self.userName.encode(encoding=&quot;utf-8&quot;))
+    return su
+</code></pre><h3 id="密码加密方式比较复杂，通过ssologin-js中查看，也就是loginUrl中formData的sp参数"><a href="#密码加密方式比较复杂，通过ssologin-js中查看，也就是loginUrl中formData的sp参数" class="headerlink" title="密码加密方式比较复杂，通过ssologin.js中查看，也就是loginUrl中formData的sp参数"></a>密码加密方式比较复杂，通过ssologin.js中查看，也就是loginUrl中formData的sp参数</h3><pre><code># 从加密文件中得到加密密码sp
+def getSp(self,servertime,nonce,pubkey,rsakv):
+    pubkey = int(pubkey, 16)
+    # 65537是js加密文件文件中的固定值，原是十六进制数字10001
+    key = rsa.PublicKey(pubkey, 65537)
+    # 以下拼接明文从js加密文件中得到签名
+    sign = str(servertime) + &apos;\t&apos; + str(nonce) + &apos;\n&apos; + str(self.password)
+    sign = sign.encode(&apos;utf-8&apos;)
+    //rsa加密
+    sp = rsa.encrypt(sign, key)
+    # 把二进制数据的每个字节转换成相应的2位十六进制表示形式。
+    sp = binascii.b2a_hex(sp)
+    return sp
+</code></pre><h3 id="获取登录信息"><a href="#获取登录信息" class="headerlink" title="获取登录信息"></a>获取登录信息</h3><p>当然也可以用urllib3</p>
+<pre><code>        import requests # pip install requests
+
+        # 得到登录信息
+requests.packages.urllib3.disable_warnings() 
+def getInfo(self,su):
+    print(u&apos;正在校验用户信息，请稍后...&apos;)
+    while True:
+         try:
+             # 新浪微博做了登录加密处理
+             preLoginUrl = &apos;https://login.sina.com.cn/sso/prelogin.php?entry=weibo&amp;callback=sinaSSOController.preloginCallBack&amp;su=%s&amp;rsakt=mod&amp;checkpin=1&amp;client=ssologin.js(v1.4.19)&amp;_=%s&apos; % (su,int(round(time.time() * 1000)))                                     
+             r = requests.get(preLoginUrl, verify=False);
+             if(r.status_code == 200):
+                # 通过正则表达式取出sinaSSOController.preloginCallBack({jsonBody})内容部分与密码加密有关
+                jsonBody = re.findall(r&apos;\((\{.*?\})\)&apos;, r.text)[0]
+                data = json.loads(jsonBody)
+                servertime = data[&apos;servertime&apos;]
+                nonce = data[&apos;nonce&apos;]
+                pubkey = data[&apos;pubkey&apos;]
+                rsakv = data[&apos;rsakv&apos;]
+             else:
+                print(u&apos;preLoginUrl调用出错，错误响应码：%s&apos; % r.status_code)
+                break
+         except requests.exceptions.ConnectionError:
+             print(&quot;校验失败，1s后重试...&quot;)
+             time.sleep(1)
+             continue
+         return servertime,nonce,pubkey,rsakv 
+</code></pre><h2 id="登录接口"><a href="#登录接口" class="headerlink" title="登录接口"></a>登录接口</h2><pre><code>       requests.packages.urllib3.disable_warnings() 
+def getCookies(self,su, sp, servertime, nonce, rsakv):     
+     print(u&apos;用户正在登录，请稍后...&apos;)
+     while True:
+         try:
+             #实际登录地址
+             loginUrl = &apos;https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19)&apos;
+             #表单数据
+             formData = {
+               &apos;entry&apos;:&apos;weibo&apos;,
+               &apos;gateway&apos;:&apos;1&apos;,
+               &apos;from&apos;:&apos;&apos;,
+               &apos;qrcode_flag&apos;:&apos;false&apos;,
+               &apos;useticket&apos;:&apos;1&apos;,
+               &apos;pagerefer&apos;:&apos;https://login.sina.com.cn/crossdomain2.php?action=logout&amp;r=https%3A%2F%2Fweibo.com%2Flogout.php%3Fbackurl%3D%252F&apos;,
+               &apos;vsnf&apos;:&apos;1&apos;,
+               &apos;su&apos;:su,
+               &apos;service&apos;:&apos;miniblog&apos;,
+               &apos;servertime&apos;:servertime,
+               &apos;nonce&apos;:nonce,
+               &apos;pwencode&apos;:&apos;rsa2&apos;,
+               &apos;rsakv&apos;:rsakv,
+               &apos;sp&apos;:sp,
+               &apos;sr&apos;:&apos;1366*768&apos;,
+               &apos;encoding&apos;:&apos;UTF-8&apos;,
+               &apos;prelt&apos;:&apos;4959&apos;,
+               &apos;url&apos;:&apos;https://weibo.com/ajaxlogin.php?framelogin=1&amp;callback=parent.sinaSSOController.feedBackUrlCallBack&apos;,
+               &apos;returntype&apos;:&apos;META&apos;
+             }
+             #请求头
+             headers = {
+               &apos;User-Agent&apos;:&apos;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36&apos;,
+               &apos;Accept&apos;:&apos;text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8&apos;,
+               &apos;Accept-Encoding&apos;:&apos;gzip, deflate, br&apos;,
+               &apos;Accept-Language&apos;:&apos;zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2&apos;,
+               &apos;Content-Type&apos;:&apos;application/x-www-form-urlencoded&apos;,
+               &apos;Host&apos;:&apos;login.sina.com.cn&apos;,
+               &apos;Referer&apos;:&apos;https://weibo.com/&apos;,
+               &apos;Upgrade-Insecure-Requests&apos;:&apos;1&apos;
+             }
+             #会话对象requests.Session能够跨请求地保持某些参数
+             session = requests.Session()
+             session.headers = headers
+             response = session.post(loginUrl, data=formData, verify=False)
+             result = response.content.decode(&apos;gbk&apos;)
+             #正则表达式找到location.replace中的网页location.replace(&quot;https://login.sina.com.cn/crossdomain2.php?action=login&amp;entry=weibo&amp;r=https%3A%2F%2Fpassport.weibo.com%2Fwbsso%2Flogin%3Fssosavestate%3D1548839580%26url%3Dhttps%253A%252F%252Fweibo.com%252Fajaxlogin.php%253Fframelogin%253D1%2526callback%253Dparent.sinaSSOController.feedBackUrlCallBack%2526sudaref%253Dweibo.com%26display%3D0%26ticket%3DST-NTk3Njc3MDY4NQ%3D%3D-1517303580-gz-D57C7A6D615CC630C5CB53402C39C42C-1%26retcode%3D0&amp;sr=1366%2A768&quot;);
+             # 并且得到location.replace中响应消息&lt;html&gt;&lt;head&gt;&lt;script language=&apos;javascript&apos;&gt;parent.sinaSSOController.feedBackUrlCallBack({&quot;result&quot;:true,&quot;userinfo&quot;:{&quot;uniqueid&quot;:&quot;5976770685&quot;,&quot;userid&quot;:null,&quot;displayname&quot;:null,&quot;userdomain&quot;:&quot;?wvr=5&amp;lf=reg&quot;},&quot;redirect&quot;:&quot;https:\/\/weibo.com\/nguide\/interest&quot;});&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;
+             info = re.findall(r&quot;location\.replace\(\&quot;(.*?)\&quot;&quot;, result)
+             # 响应内容
+             # {&quot;retcode&quot;:0,&quot;arrURL&quot;:[&quot;https:\/\/passport.weibo.com\/wbsso\/crossdomain?action=login&quot;,&quot;https:\/\/passport.97973.com\/sso\/crossdomain?action=login&quot;,&quot;https:\/\/passport.krcom.cn\/sso\/crossdomain?service=krvideo&amp;savestate=1&amp;action=login&quot;,&quot;https:\/\/passport.weibo.cn\/sso\/crossdomain?action=login&quot;]}
+             res = requests.get(info[0], verify=False);
+             jsonBody = re.findall(r&apos;\((\{.*?\})\)&apos;, res.text)[0]
+             # 获取cookie cookies.get_dict()得到cookie字典
+             cookies = response.cookies.get_dict()
+             data = json.loads(jsonBody)
+             if(data[&apos;retcode&apos;] == 0):  
+                 print(u&apos;用户%s登录成功&apos; % self.userName)
+                 return cookies
+             elif(data[&apos;retcode&apos;] == 101):
+                 print(data[&apos;reason&apos;])
+                 return None
+             else:
+                print(u&apos;登录失败,原因：%s&apos; % data[&apos;reason&apos;])
+                return None
+         except requests.exceptions.ConnectionError:
+             print(u&quot;登录尝试失败，1s后重试连接...&quot;)
+             time.sleep(1)
+             continue
+</code></pre><h1 id="登录成功后，保存cookie，进行转发"><a href="#登录成功后，保存cookie，进行转发" class="headerlink" title="登录成功后，保存cookie，进行转发"></a>登录成功后，保存cookie，进行转发</h1><pre><code> # content 发送内容 mid 微博ID pdetail location 博主定位
+requests.packages.urllib3.disable_warnings() 
+def forward(self,contents,mid,domain,location,is_comment_base):
+    requestCount = 0; #总请求次数
+    successCount = 0; #成功次数
+    # 通过登录接口获取用户cookie
+    su = weibo.getSu()
+    servertime,nonce,pubkey,rsakv=self.getInfo(su)
+    sp = weibo.getSp(servertime,nonce,pubkey,rsakv)
+    cookies = self.getCookies(su, sp,servertime,nonce,rsakv)
+    print(u&apos;正在请求转发，请稍后...&apos;)
+    while True:      
+        try:
+            content = CommonUtil.randomContent(contents)
+            forwardUrl = &apos;https://weibo.com/aj/v6/mblog/forward?ajwvr=6&amp;domain=%s&amp;__rnd=%s&apos; % (domain,int(round(time.time() * 1000))) 
+
+            formData = {
+                &apos;pic_src&apos;:&apos;&apos;,
+                &apos;pic_id&apos;:&apos;&apos;,
+                &apos;appkey&apos;:&apos;&apos;,
+                &apos;mid&apos;:mid,
+                &apos;styletype&apos;:&apos;1&apos;,
+                &apos;mark&apos;:&apos;&apos;,
+                &apos;reason&apos;:content,
+                &apos;location&apos;:&apos;page_%s_home&apos; % domain,
+                &apos;pdetail&apos;:pdetail,
+                &apos;module&apos;:&apos;&apos;,
+                &apos;page_module_id&apos;:&apos;&apos;,
+                &apos;refer_sort&apos;:&apos;&apos;,
+                &apos;rank&apos;:&apos;0&apos;,
+                # 给原博主评论
+                #&apos;is_comment_base&apos;:&apos;1&apos;,
+                &apos;rankid&apos;:&apos;&apos;,
+                &apos;isReEdit&apos;:&apos;false&apos;,
+                &apos;_t&apos;:&apos;0&apos;,
+            }   
+            if(is_comment_base == &apos;y&apos;):
+                formData[&apos;is_comment_base&apos;] = &apos;1&apos;
+
+            session = requests.Session()
+            #请求头
+            headers = {
+               &apos;User-Agent&apos;:&apos;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36&apos;,
+               &apos;Accept&apos;:&apos;*/*&apos;,
+               &apos;Accept-Encoding&apos;:&apos;gzip, deflate, br&apos;,
+               &apos;Accept-Language&apos;:&apos;zh-CN,zh;q=0.9&apos;,
+               &apos;Content-Type&apos;:&apos;application/x-www-form-urlencoded&apos;,
+               &apos;Origin&apos;:&apos;https://weibo.com&apos;,
+               &apos;Host&apos;:&apos;weibo.com&apos;,
+               &apos;Referer&apos;:&apos;https://weibo.com/u/5783494388?is_all=1&apos;,
+               &apos;Upgrade-Insecure-Requests&apos;:&apos;1&apos;,
+               &apos;X-Requested-With&apos;:&apos;XMLHttpRequest&apos;,
+            }
+            session.headers = headers  
+            time.sleep(2)#2s发送一次请求
+            response = session.post(forwardUrl, data=formData,cookies=cookies, verify=False)
+            result = response.content.decode(&apos;gbk&apos;)
+            data = json.loads(result)
+            requestCount = requestCount + 1 #记录请求数
+            if(data[&apos;code&apos;] == &apos;100000&apos;):
+                successCount = successCount + 1 #记录成功数
+                print(u&apos;转发内容：%s 成功次数：%s&apos; % (content,successCount))
+            elif(data[&apos;code&apos;] == &apos;100027&apos;):
+                print(u&apos;转发失败，进入小黑屋，停止转发,请更换账号，失败原因：%s  %s&apos; % (data[&apos;code&apos;],data[&apos;msg&apos;]))
+                print(u&apos;%s目前转发成功次数：%s&apos; %(self.userName,successCount))  
+                break
+            elif(data[&apos;code&apos;] == &apos;100001&apos; and &apos;微博发的太多啦，休息一会再发啦&apos; in data[&apos;msg&apos;]):
+                print(u&apos;微博发送太频繁，休息1分钟重试，失败原因%s(%s)&apos; %(data[&apos;code&apos;],data[&apos;msg&apos;]))
+                time.sleep(60)
+                continue
+            else:
+                print(u&apos;转发失败，失败原因:%s  %s&apos; %(data[&apos;code&apos;],data[&apos;msg&apos;]))
+                print(u&apos;%s目前转发成功次数：%s&apos; %(self.userName,successCount)) 
+            #if(requestCount &gt;= setCount):
+                #print(u&apos;用户%s转发成功次数：%s&apos; %(self.userName,successCount))
+                #break
+        except requests.exceptions.ConnectionError:
+             print(&quot;转发尝试失败，1s后重试连接...&quot;)
+             time.sleep(1)
+             continue 
+    print(u&apos;总共转发%s次&apos; %successCount) 
+</code></pre><h1 id="基础工具类"><a href="#基础工具类" class="headerlink" title="基础工具类"></a>基础工具类</h1><pre><code>class CommonUtil:
+         @staticmethod
+         def randomContent(contents):
+              return str(random.sample(contents, 1)[0])
+         @staticmethod
+         def decodeUTF8(str):
+             return str.decode(&quot;UTF-8&quot;)
+         @staticmethod
+         def decodeGBK(str):
+             return str.decode(&quot;GBK&quot;) 
+</code></pre>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/25/JDK8新增的StampedLock锁/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2167,337 +2699,11 @@ if (clientConfig.shouldRegisterWithEureka()) {
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/Eureka源码解析——项目结构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/24/Eureka源码解析——项目结构/" itemprop="url">Eureka源码解析——项目结构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T16:53:09+08:00">
-                2017-11-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/源码分析/" itemprop="url" rel="index">
-                    <span itemprop="name">源码分析</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Eureka源码解析"><a href="#Eureka源码解析" class="headerlink" title="Eureka源码解析"></a>Eureka源码解析</h1><h2 id="EurekaClient"><a href="#EurekaClient" class="headerlink" title="EurekaClient"></a>EurekaClient</h2><ul>
-<li><p><code>com.netflix.appinfo</code> Eureka应用配置文件信息</p>
-</li>
-<li><p><code>com.netflix.discovery</code> EurekaClient注册与发现相关功能</p>
-<ul>
-<li><code>EurekaClient</code> 注册发现客户端接口</li>
-<li><code>DiscoveryClient</code> 注册发现客户端实现类</li>
-<li><a href="https://baike.baidu.com/item/Guice/3227716?fr=aladdin" target="_blank" rel="external"><code>Guice</code></a> 使用Google轻量级IoC依赖注入框架，避免与Spring冲突 <a href="http://www.blogjava.net/xylz/archive/2009/12/22/306955.html" target="_blank" rel="external">Guice入门教程</a></li>
-<li><code>converters</code> Eureka 内部传输数据编解码转换器。支持XML和JSON的格式</li>
-<li><code>provider</code> 自定义的Jersey 请求和响应的序列化和反序列化实现</li>
-<li><code>providers</code> 实现 javax.inject.Provider 接口，设置 EurekaClientConfig (Eureka 客户端配置)的生成工厂 <a href="http://blog.csdn.net/derekjiang/article/details/7231490" target="_blank" rel="external">GoogleGuice入门介绍</a></li>
-<li><code>shared</code> EurekaClient 和 EurekaServer 注册发现相关的共享重用的代码</li>
-<li><code>util</code> 工具类</li>
-<li><code>endpoint</code> 未知</li>
-</ul>
-</li>
-</ul>
-<h2 id="EurekaClientArchaius2"><a href="#EurekaClientArchaius2" class="headerlink" title="EurekaClientArchaius2"></a>EurekaClientArchaius2</h2><p><a href="http://blog.csdn.net/zhangfb95/article/details/48297907" target="_blank" rel="external">Archaius是Netflix开源的配置管理组件</a></p>
-<h2 id="EurekaClientJersey2"><a href="#EurekaClientJersey2" class="headerlink" title="EurekaClientJersey2"></a>EurekaClientJersey2</h2><p><a href="https://baike.baidu.com/item/Jersey/17577306?fr=aladdin" target="_blank" rel="external">Jersey 是 JAX-RS（JSR311）开源参考实现，用于构建 RESTful WebService</a></p>
-<p><a href="http://blog.csdn.net/a19881029/article/details/43056429" target="_blank" rel="external">Jersey基本使用</a></p>
-<ul>
-<li>EurekaServer 使用 Jersey Server 创建 RESTful Server </li>
-<li>EurekaClient 使用 Jersey Client 请求 Eureka-Server </li>
-</ul>
-<h2 id="EurekaCore"><a href="#EurekaCore" class="headerlink" title="EurekaCore"></a>EurekaCore</h2><ul>
-<li><code>com.netflix.eureka</code> 为 Eureka-Server 的功能实现<ul>
-<li><code>EurekaBootStrap</code> EurekaServer启动类</li>
-<li><code>cluster</code> EurekaServer 集群数据复制相关</li>
-<li><code>lease</code> 应用注册后的租约管理( 注册 / 取消 / 续期 / 过期 )</li>
-<li><code>resources</code> 基于 Jersey Server 实现，相当于 Spring MVC 的控制层代码</li>
-<li><code>transport</code>基于com.netflix.discovery.shared.transport封装实现</li>
-</ul>
-</li>
-</ul>
-<h3 id="EurekaResources"><a href="#EurekaResources" class="headerlink" title="EurekaResources"></a>EurekaResources</h3><p>运维后台管理界面</p>
-<h2 id="EurekaServer"><a href="#EurekaServer" class="headerlink" title="EurekaServer"></a>EurekaServer</h2><p>打war包:EurekaClient + EurekaCore + EurekaResources</p>
-<h3 id="EurekaServerGovernator"><a href="#EurekaServerGovernator" class="headerlink" title="EurekaServerGovernator"></a>EurekaServerGovernator</h3><p><a href="http://www.codeweblog.com/guice-%E6%A1%86%E6%9E%B6%E6%89%A9%E5%B1%95-governator/" target="_blank" rel="external">使用 Netflix Governator 管理 Eureka-Server 的生命周期——governator</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/24/untitled-1511491947278/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dzx">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://wx2.sinaimg.cn/mw690/63b4ac8dgy1ffzs5lll1oj20zk0qoq4z.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="dzxblog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/24/untitled-1511491947278/" itemprop="url">性能调优——编译优化技术</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-24T10:52:27+08:00">
-                2017-11-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>即时编译器JIT：为了提高热点代码执行效率，虚拟机将热点代码编译成本地平台相关机器码，并进行各种层次的优化，完成此任务的编译器就叫即时编译器</p>
-<p>什么是热点代码？</p>
-<p>热点代码就是程序中频繁执行的方法或者代码块</p>
-<p>如何判定热点代码？</p>
-<p>基于采样的热点探测：周期性的检查各个线程中的栈顶，某些代码（方法）经常出现于栈顶，就属于热点代码</p>
-<p>该方法的优缺点？<br>优点：获取方法之间调用关系（通过堆栈展开）<br>缺点：无法精确到具体热度，容易受线程阻塞等外界因素扰乱热点探测</p>
-<p>基于计数器的热点探测：为每个方法（代码块）设置计数器，统计执行次数，执行次数超过一定阈值就被认为是热点方法</p>
-<p>该方法的优缺点？<br>优点：可以获取精确热度<br>缺点：需要为每个方法建立计数器，不能获取方法之间具体调用关系</p>
-<p>Tips: HotSpot虚拟机基于计数器探测方法(方法调用计数器和回边计数器)。</p>
-<p>计数器超过一定阈值就会触发JIT编译</p>
-<p>默认阈值Client模式下是1500次，Server模式下是10000。可以通过-XX:CompileThresold和-XX :BackEdgeThresold进行设置。还可通过-XX:OnStackReplacePercentage间接设置</p>
-<p>计算公式：</p>
-<p>虚拟机在Client模式下：</p>
-<p>回边计数器阈值计算公式 = 方法调用计数器阈值 * OSR比率(OnStackReplacePercentage) / 100</p>
-<p>OnStackReplacePercentage默认值933。 都取默认值的情况下，阈值为13995</p>
-<p>虚拟机在Server模式下：</p>
-<p>回边计数器阈值计算公式 = 方法调用计数器阈值 * OSR比率(OnStackReplacePercentage) - 解释器监控比率（InterpreterProfilePercentage） / 100</p>
-<p>OnStackReplacePercentage默认值140。 InterpreterProfilePercentage默认值33，都取默认值的情况下，阈值为10700</p>
-<p>编译过程</p>
-<p>JVM参数</p>
-<p>-XX:printCompilation 要求虚拟机在JIT时将编译成本地代码的方法名称打印出来</p>
-<p>-XX:+PrintCFGToFile<br>-XX:PrintIdealGraphFile<br>将虚拟机各个级段的数据输出到文件</p>
-<p>-XX:CompileThresold<br>-XX :BackEdgeThresold<br>-XX:OnStackReplacePercentage</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2542,7 +2748,7 @@ if (clientConfig.shouldRegisterWithEureka()) {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">149</span>
+                <span class="site-state-item-count">151</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2553,7 +2759,7 @@ if (clientConfig.shouldRegisterWithEureka()) {
             
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">60</span>
+                <span class="site-state-item-count">61</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -2564,7 +2770,7 @@ if (clientConfig.shouldRegisterWithEureka()) {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">113</span>
+                <span class="site-state-item-count">115</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
